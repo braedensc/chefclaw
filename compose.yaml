@@ -54,11 +54,22 @@ services:
         condition: service_healthy
     restart: "no"
 
+  # Rednote fetch sidecar (XHS-Downloader) — INTERNAL ONLY: no `ports:` mapping,
+  # ever (its API is unauthenticated; publishing it would let any LAN peer or
+  # browser page drive the session — plan §10). Image pinned to a digest. The
+  # api calls POST /xhs/detail with download:false and fetches media itself;
+  # the cookie (if any — guest tier is the default) rides per-request from the
+  # api's env, so the sidecar stays stateless and cookie-free at rest.
+  xhs:
+    image: joeanamier/xhs-downloader@sha256:7ce9c4e7711b7a805da5b1d4190079ad0eaf4abf07f235fe8b90c8da51b8c823
+    command: ["python", "main.py", "api"]
+    init: true
+
   api:
     build:
       context: .
       dockerfile: Dockerfile.api
-    init: true # reap zombies — Phase 2's yt-dlp subprocesses need this
+    init: true # reap zombies — yt-dlp spawns ffmpeg children
     environment:
       DB_HOST: postgres
       DB_PORT: "5432"
@@ -67,7 +78,20 @@ services:
       DB_NAME: ${DB_NAME:-chefclaw}
       CHEFCLAW_API_TOKEN: ${CHEFCLAW_API_TOKEN:-}
       MONTHLY_LLM_BUDGET_USD: ${MONTHLY_LLM_BUDGET_USD:-}
+      MAX_EXTRACTION_ATTEMPTS_PER_DAY: ${MAX_EXTRACTION_ATTEMPTS_PER_DAY:-}
       MEDIA_RETENTION: ${MEDIA_RETENTION:-keep}
+      MEDIA_DIR: /data/media
+      # Extraction (fail-closed: gemini with no key refuses at startup config)
+      CHEFCLAW_EXTRACTOR: ${CHEFCLAW_EXTRACTOR:-gemini}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+      GEMINI_MEDIA_RESOLUTION: ${GEMINI_MEDIA_RESOLUTION:-low}
+      # Rednote — tiered access (§16.10): guest by default; cookie = tier 1 only
+      XHS_SIDECAR_URL: http://xhs:5556
+      XHS_COOKIE: ${XHS_COOKIE:-}
+      XHS_USER_AGENT: ${XHS_USER_AGENT:-}
+      XHS_COOKIE_SET_DATE: ${XHS_COOKIE_SET_DATE:-}
+      BILIBILI_COOKIE: ${BILIBILI_COOKIE:-}
     ports:
       - "127.0.0.1:8000:8000"
     volumes:

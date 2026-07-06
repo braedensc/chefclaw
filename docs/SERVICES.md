@@ -62,22 +62,40 @@ server secret at birth: never a `VITE_*` var, never in the frontend bundle.
 
 ## 4. Rednote / Xiaohongshu (via XHS-Downloader sidecar)
 
-- **Identity:** a **secondary throwaway account** (decided 2026-07-05), created during
-  Phase 2 — bounds ban blast-radius. Signup typically needs a mobile number not
-  already bound to an XHS account; VoIP numbers may be rejected. If setup proves a
-  fight: fall back to the main account at low volume (see deferred hardening).
-- **Auth:** session **cookie + matching User-Agent pair** — `XHS_COOKIE`,
-  `XHS_USER_AGENT` in `.env.local`. **Cookies are session credentials = key-grade
-  secrets**, guarded in every layer (PreToolUse hook, native deny, `.gitignore`,
-  pre-commit grep, CI grep, secretlint value-pattern rules).
+- **Access is tiered** (policy 2026-07-06; supersedes the 2026-07-05
+  throwaway-account decision). **The main account NEVER enters the pipeline under any
+  circumstances** — no cookie, no session, no fallback-to-main:
+  - **Tier 0 — guest (DEFAULT, verified 2026-07-06):** no account at all — a real
+    public note fetched with no cookie. While guest covers typical cooking posts, no
+    account ever touches the pipeline.
+  - **Tier 1 — hard-isolated throwaway** (only for content guest can't fetch):
+    signed up with a different phone number, used **web-only in a dedicated browser
+    profile** that has never seen the main account, never installed in the phone app
+    beside it. A ban of it is disposable.
+  - **Tier 2 — manual file upload** (`LocalFileSource`): zero-platform-risk floor;
+    extraction never *requires* platform access.
+- **Auth (tier 1 only):** session **cookie + matching User-Agent pair** —
+  `XHS_COOKIE`, `XHS_USER_AGENT` in `.env.local`. **Cookies are session credentials =
+  key-grade secrets**, guarded in every layer (PreToolUse hook, native deny,
+  `.gitignore`, pre-commit grep, CI grep, secretlint value-pattern rules). The cookie
+  rides **per-request** in the api's sidecar call — the sidecar stays stateless; no
+  config-file cookie mount.
+- **Share links required:** XHS rejects token-less URLs, so paste the **full share
+  link** — its `xsec_token` is preserved on the fetch URL only; the canonical note id
+  stays token-free for dedupe (see the 2026-07-06 adapters ADR).
 - **Expiry:** 2–4 weeks. `XHS_COOKIE_SET_DATE` is written by hand at **every** refresh
   (age is not derivable from the cookie string); `/api/health` warns before expiry.
   The refresh procedure lands in `docs/RUNBOOK.md` at Phase 4.
 - **Isolation:** sidecar runs on the **internal compose network only — no published
-  host port** (its API is unauthenticated); image pinned to a digest.
+  host port** (its API is unauthenticated); image pinned to digest
+  `sha256:7ce9c4e7711b7a805da5b1d4190079ad0eaf4abf07f235fe8b90c8da51b8c823`
+  (v2.7.stable). The sidecar response echoes the cookie in its `params` field —
+  **never log raw sidecar response bodies**; the adapter parses `data` only.
 - **ToS reality, stated plainly:** automated downloading violates platform ToS. Posture
   is personal use — single user, built-in delays, no redistribution.
 - **Provisioning record:** 2026-07-05 — account not created; Phase 2 setup step.
+  2026-07-06 — guest tier verified against a real public note; **no account created**
+  (tier-0 default holds; tier-1 signup only if guest stops sufficing).
 
 ## 5. Bilibili (via yt-dlp)
 
@@ -94,5 +112,5 @@ server secret at birth: never a `VITE_*` var, never in the frontend bundle.
 | Switch Gemini to **paid tier** (no training) | Before any personal data (M5/M7) — hard precondition |
 | `CHEFCLAW_API_TOKEN` rotation + real TLS | When the stack goes public-internet-facing (M-Deploy; Tailscale-only exposure defers it) |
 | Per-user budgets / auth beyond bearer token | Multi-user, if it ever happens (dedicated ADR) |
-| Secondary-account fallback note | If throwaway XHS signup fails, main account + low volume is the accepted risk — revisit if throttled/banned |
+| XHS tier-1 throwaway signup | Only if guest tier stops covering needed notes; main-account fallback is **revoked** (2026-07-06) — tier-2 manual upload is the guaranteed floor |
 | DashScope region/data-governance review | Before the fallback adapter's first real call |

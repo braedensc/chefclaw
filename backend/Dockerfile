@@ -5,6 +5,10 @@ FROM python:3.13-slim
 # uv from the official distroless image, pinned to match the dev machine.
 COPY --from=ghcr.io/astral-sh/uv:0.11.26 /uv /uvx /bin/
 
+# ffmpeg: yt-dlp merges Bilibili DASH video+audio streams by spawning it.
+RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 ENV UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy
