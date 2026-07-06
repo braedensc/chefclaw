@@ -1,0 +1,50 @@
+# chefclaw daily backup — systemd service unit (the VPS counterpart of
+# ops/com.chefclaw.backup.plist.example; plan §10: an unscheduled backup
+# script is not a backup). The matching TIMER (chefclaw-backup.timer.example)
+# owns the 03:30 schedule; this unit runs scripts/backup.sh from the repo
+# root; stdout/stderr go to journald (there is no ops/backup.log on the VPS).
+#
+# INSTALL (human steps, on the VPS — assumes the repo at /opt/chefclaw; edit
+# WorkingDirectory below first if it lives elsewhere):
+#   1. Copy BOTH units, dropping the .example suffix:
+#        sudo cp ops/chefclaw-backup.service.example /etc/systemd/system/chefclaw-backup.service
+#        sudo cp ops/chefclaw-backup.timer.example /etc/systemd/system/chefclaw-backup.timer
+#   2. Make sure /opt/chefclaw/.env.local holds CHEFCLAW_BACKUP_DIR and
+#      BACKUP_GPG_PASSPHRASE (passphrase generated once, stored in the
+#      password manager FIRST — never only on this machine). On the VPS,
+#      CHEFCLAW_BACKUP_DIR should point OFF the VPS (docs/RUNBOOK.md §2 +
+#      the 2026-07-06 M-Deploy ADR) — a backup beside the data it protects
+#      only survives software mistakes, not host loss.
+#   3. Enable the TIMER (never `enable` this service — it has no [Install]
+#      section; the timer owns the schedule):
+#        sudo systemctl daemon-reload
+#        sudo systemctl enable --now chefclaw-backup.timer
+#   4. Verify: run once by hand (sudo systemctl start chefclaw-backup.service),
+#      check the log (journalctl -u chefclaw-backup.service), and confirm
+#      /api/health reports backup: "fresh".
+#
+# UNINSTALL:
+#   sudo systemctl disable --now chefclaw-backup.timer
+#   sudo rm /etc/systemd/system/chefclaw-backup.service /etc/systemd/system/chefclaw-backup.timer
+#   sudo systemctl daemon-reload
+#
+# Notes:
+#   - The script resolves its own config from .env.local at runtime; nothing
+#     secret lives in this file, and the journal never sees secret values
+#     (backup.sh never prints them — the passphrase travels on fd 3 only).
+#   - Runs as root (system unit): docker + the repo's ops/ state file are
+#     reachable without a docker-group login user.
+#   - Failure detection is pull-only: /api/health's backup staleness readout
+#     is the backstop that catches silently-missed runs.
+
+[Unit]
+Description=chefclaw encrypted backup (read-only pg_dump + media volume archive)
+# The script talks to the running compose stack (`docker compose exec` +
+# a throwaway :ro container) — Docker must be up first.
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/chefclaw
+ExecStart=/bin/sh scripts/backup.sh

@@ -108,11 +108,22 @@ class BilibiliSource:
             return 1
         return part if part >= 1 else 1
 
+    def _platform_proxy_kwargs(self) -> dict[str, Any]:
+        """Proxy kwargs for the short-link resolution client — the M-Deploy
+        fetch-proxy knob covers ALL platform-fetch traffic (yt-dlp gets the
+        same value via its own `proxy` opt in fetch())."""
+        if self._settings.chefclaw_fetch_proxy:
+            return {"proxy": self._settings.chefclaw_fetch_proxy}
+        return {}
+
     async def _follow_redirects(self, url: str) -> str:
         """Resolve a b23.tv short link to its BV URL. No cookies, ever."""
         try:
             async with httpx.AsyncClient(
-                transport=self._transport, follow_redirects=True, timeout=30.0
+                transport=self._transport,
+                follow_redirects=True,
+                timeout=30.0,
+                **self._platform_proxy_kwargs(),
             ) as client:
                 response = await client.get(url)
         except httpx.HTTPError as exc:
@@ -140,6 +151,9 @@ class BilibiliSource:
         # Anonymous-first: only attach a cookie when one is configured.
         if self._settings.bilibili_cookie:
             opts["http_headers"] = {"Cookie": self._settings.bilibili_cookie}
+        # Fetch-proxy knob (M-Deploy ladder): platform-fetch traffic only.
+        if self._settings.chefclaw_fetch_proxy:
+            opts["proxy"] = self._settings.chefclaw_fetch_proxy
 
         try:
             info = await asyncio.to_thread(self._downloader, ref.fetch_url, opts)

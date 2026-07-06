@@ -36,6 +36,7 @@ adds one row here.
 | [Source & extractor adapter contracts](adr/2026-07-06-source-and-extractor-adapters.md) | 2026-07-06 | `SourceAdapter` resolve → `CanonicalRef` as the authoritative dedupe input; rednote guest-tier default + accepted `xsec_token` fetch-url deviation; digest-pinned internal-only XHS sidecar with per-request cookie; extractor never repairs output; fakes config-selectable |
 | [Jobs without a broker](adr/2026-07-06-jobs-without-broker.md) | 2026-07-06 | In-process asyncio worker (one uvicorn worker, strictly serial — double-spend closed at concurrency 1); `FOR UPDATE SKIP LOCKED` claim with attempts counted at claim; idempotent paid stage + fail-closed budget gate before every paid call + per-attempt spend ledger; startup reconcile to `interrupted` (never auto-rerun paid work); atomic N-recipe store; TaskIQ as graduation path |
 | [Data model & dedupe on canonical identity](adr/2026-07-06-data-model-and-dedupe.md) | 2026-07-06 | `UNIQUE(platform, canonical_id, dish_index)` as THE dedupe constraint (canonical identity, never raw URLs); `owner_id` + uuidv7 pks from migration #1; jobs carry queryable platform/canonical_id + payload `url`/`fetch_url` (retries never re-resolve); `llm_spend` per attempt as cost/cap source of truth; hard DELETE re-opens extraction; `document` JSONB never user-editable |
+| [M-Deploy: VPS + Tailscale & the Rednote escalation ladder](adr/2026-07-06-m-deploy-vps-and-rednote-escalation.md) | 2026-07-06 | Hetzner-class VPS, Tailscale-first, zero public exposure (127.0.0.1-bound ports + `tailscale serve`); MacBook is not a server; rednote-from-datacenter test-first with a prepared all-config escalation ladder (phone upload → home exit node → residential proxy → home relay) behind the single `CHEFCLAW_FETCH_PROXY` knob; backups move to systemd on the VPS and must land off-VPS |
 
 ## Planned ADRs
 
@@ -81,5 +82,8 @@ its phase or milestone opens, with a design pass over
   the 2026-07-06 data-model ADR's accepted tradeoffs).
 
 **Milestones — each opens with its own ADR:**
-M-Deploy (Tailscale-first; the datacenter-IP/Rednote wrinkle) · M5 nutrition ·
-M6 meal planning + grocery · M7 fitness ingestion · M8 MCP server · M9 mobile.
+M-Deploy — **done**:
+[M-Deploy: VPS + Tailscale & the Rednote escalation ladder](adr/2026-07-06-m-deploy-vps-and-rednote-escalation.md)
+(2026-07-06; prep PR — deploy-day execution follows `docs/RUNBOOK.md` §4) ·
+M5 nutrition · M6 meal planning + grocery · M7 fitness ingestion ·
+M8 MCP server · M9 mobile.

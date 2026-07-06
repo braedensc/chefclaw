@@ -32,9 +32,32 @@ def settings(**overrides: Any) -> Settings:
         "xhs_sidecar_url": "",
         "xhs_cookie": "",
         "xhs_user_agent": "",
+        "chefclaw_fetch_proxy": "",
     }
     values.update(overrides)
     return Settings(**values)
+
+
+PROXY = "socks5://proxy.test:1055"  # fake — the M-Deploy fetch-proxy knob
+
+
+def spy_async_client(module_path: str, monkeypatch: pytest.MonkeyPatch) -> list[dict[str, Any]]:
+    """Record httpx.AsyncClient constructor kwargs inside an adapter module.
+
+    A real `proxy=` kwarg mounts a proxy transport that would BYPASS the
+    MockTransport test seam (and try the network), so the spy strips it after
+    recording — the assertion target is the constructor kwargs themselves.
+    """
+    calls: list[dict[str, Any]] = []
+    real_client = httpx.AsyncClient
+
+    def factory(*args: Any, **kwargs: Any) -> httpx.AsyncClient:
+        calls.append(dict(kwargs))
+        kwargs.pop("proxy", None)
+        return real_client(*args, **kwargs)
+
+    monkeypatch.setattr(f"{module_path}.httpx.AsyncClient", factory)
+    return calls
 
 
 def no_network_transport() -> httpx.MockTransport:
@@ -186,6 +209,7 @@ async def test_bilibili_fetch_anonymous_by_default(tmp_path: Path) -> None:
 
     assert seen["url"] == ref.fetch_url
     assert "http_headers" not in seen["opts"]  # anonymous-first: no cookie header
+    assert "proxy" not in seen["opts"]  # direct by default — no fetch proxy
     assert seen["opts"]["format_sort"] == ["res:480"]  # capped ≤480p
     assert seen["opts"]["noplaylist"] is True
     assert media.video_path == tmp_path / f"{BV}.mp4"
@@ -206,6 +230,34 @@ async def test_bilibili_fetch_sends_cookie_only_when_configured(tmp_path: Path) 
     ref = CanonicalRef("bilibili", f"{BV}-p1", f"https://www.bilibili.com/video/{BV}/?p=1")
     await source.fetch(ref, tmp_path)
     assert seen["opts"]["http_headers"]["Cookie"] == cookie
+
+
+async def test_bilibili_fetch_proxy_passed_to_yt_dlp_when_set(tmp_path: Path) -> None:
+    """M-Deploy fetch-proxy knob: yt-dlp gets the proxy as an opt when set."""
+    seen: dict[str, Any] = {}
+
+    def downloader(url: str, opts: dict[str, Any]) -> dict[str, Any]:
+        seen["opts"] = opts
+        return fake_info(tmp_path)
+
+    source = BilibiliSource(settings(chefclaw_fetch_proxy=PROXY), downloader=downloader)
+    ref = CanonicalRef("bilibili", f"{BV}-p1", f"https://www.bilibili.com/video/{BV}/?p=1")
+    await source.fetch(ref, tmp_path)
+    assert seen["opts"]["proxy"] == PROXY
+
+
+async def test_bilibili_short_link_resolution_uses_fetch_proxy(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """b23.tv resolution is platform-fetch traffic — the knob covers it too."""
+    calls = spy_async_client("chefclaw.sources.bilibili", monkeypatch)
+    target = f"https://www.bilibili.com/video/{BV}?p=2"
+    source = BilibiliSource(
+        settings(chefclaw_fetch_proxy=PROXY), transport=redirect_transport(target)
+    )
+    ref = await source.resolve("https://b23.tv/abc123")
+    assert ref.canonical_id == f"{BV}-p2"
+    assert calls[0]["proxy"] == PROXY
 
 
 @pytest.mark.parametrize(
@@ -398,6 +450,64 @@ async def test_rednote_fetch_cookie_mode_sends_cookie_and_ua(tmp_path: Path) -> 
     await source.fetch(rednote_ref(), tmp_path)
     assert captured["detail_json"]["cookie"] == cookie
     assert captured["media_headers"]["user-agent"] == "Mozilla/5.0 (test)"
+
+
+async def test_rednote_fetch_proxy_routes_platform_traffic_only(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """M-Deploy fetch-proxy knob (ladder rungs b/c/d): the sidecar payload
+    carries the proxy for the sidecar's own platform call, and the api's
+    media-download client is constructed with it — but the api→sidecar client
+    stays DIRECT (that hop is compose-internal by design)."""
+    calls = spy_async_client("chefclaw.sources.rednote", monkeypatch)
+    captured: dict[str, Any] = {}
+    source = RednoteSource(
+        settings(xhs_sidecar_url="http://xhs:5556", chefclaw_fetch_proxy=PROXY),
+        transport=sidecar_transport(captured),
+    )
+    media = await source.fetch(rednote_ref(), tmp_path)
+
+    assert captured["detail_json"] == {
+        "url": f"https://www.xiaohongshu.com/explore/{NOTE_ID}",
+        "download": False,
+        "proxy": PROXY,
+    }
+    # fetch() constructs exactly two clients: [0] api→sidecar (direct),
+    # [1] media download (proxied).
+    assert len(calls) == 2
+    assert "proxy" not in calls[0]
+    assert calls[1]["proxy"] == PROXY
+    assert media.video_path.read_bytes() == b"media-bytes"
+
+
+async def test_rednote_fetch_without_proxy_builds_direct_clients(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Knob unset (the default): no `proxy` kwarg on any client, no `proxy`
+    key in the sidecar payload — everything direct."""
+    calls = spy_async_client("chefclaw.sources.rednote", monkeypatch)
+    captured: dict[str, Any] = {}
+    source = RednoteSource(
+        settings(xhs_sidecar_url="http://xhs:5556"),
+        transport=sidecar_transport(captured),
+    )
+    await source.fetch(rednote_ref(), tmp_path)
+    assert "proxy" not in captured["detail_json"]
+    assert all("proxy" not in kwargs for kwargs in calls)
+
+
+async def test_rednote_short_link_resolution_uses_fetch_proxy(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """xhslink.com resolution is platform-fetch traffic — the knob covers it."""
+    calls = spy_async_client("chefclaw.sources.rednote", monkeypatch)
+    target = f"https://www.xiaohongshu.com/explore/{NOTE_ID}?xsec_token=ABshareToken"
+    source = RednoteSource(
+        settings(chefclaw_fetch_proxy=PROXY), transport=redirect_transport(target)
+    )
+    ref = await source.resolve("https://xhslink.com/a/AbCdEf123")
+    assert ref.canonical_id == NOTE_ID
+    assert calls[0]["proxy"] == PROXY
 
 
 @pytest.mark.parametrize(

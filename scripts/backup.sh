@@ -27,7 +27,11 @@
 # Retention: the newest 14 of each artifact kind; older ones are pruned.
 # Any failure ⇒ ops/last-backup.json records ok:false and the exit is non-zero.
 #
-# Scheduling: ops/com.chefclaw.backup.plist.example (launchd, daily 03:30).
+# Scheduling (daily 03:30, pick the host's scheduler):
+#   macOS  — ops/com.chefclaw.backup.plist.example (launchd)
+#   Linux  — ops/chefclaw-backup.service.example + .timer.example (systemd)
+# The script itself is POSIX sh, portable to both (BSD/GNU stat handled below;
+# date uses only portable forms).
 
 set -u
 set +x # defensive: never trace (a traced heredoc would print the passphrase)
@@ -36,7 +40,8 @@ umask 077
 # launchd user agents get a MINIMAL environment (PATH=/usr/bin:/bin:/usr/sbin:
 # /sbin) — docker and gpg live in the Homebrew/Docker-Desktop prefixes, so the
 # scheduled run would otherwise fail every night. Appending (not prepending)
-# keeps an interactive shell's own PATH authoritative.
+# keeps an interactive shell's own PATH authoritative. On Linux/systemd this
+# append is a harmless no-op (docker + gpg live in /usr/bin).
 PATH="${PATH}:/opt/homebrew/bin:/usr/local/bin"
 export PATH
 
@@ -114,8 +119,8 @@ fi
 if [ -z "${BACKUP_GPG_PASSPHRASE:-}" ]; then
     fail "BACKUP_GPG_PASSPHRASE is unset — generate one, store it in the password manager FIRST, then set it in .env.local"
 fi
-command -v gpg >/dev/null 2>&1 || fail "gpg not found — install it (macOS: brew install gnupg)"
-command -v docker >/dev/null 2>&1 || fail "docker not found — is Docker Desktop installed and on PATH?"
+command -v gpg >/dev/null 2>&1 || fail "gpg not found — install it (macOS: brew install gnupg; Debian/Ubuntu: apt-get install gnupg)"
+command -v docker >/dev/null 2>&1 || fail "docker not found — is Docker (Desktop on macOS, Engine on Linux) installed and on PATH?"
 mkdir -p "$CHEFCLAW_BACKUP_DIR" || fail "cannot create CHEFCLAW_BACKUP_DIR"
 
 STAMP="$(date -u '+%Y%m%dT%H%M%SZ')"

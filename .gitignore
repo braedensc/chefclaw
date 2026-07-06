@@ -19,10 +19,12 @@ cookies*
 *.cookies
 
 # Ops runtime state (backup state file + logs — machine-local, never published).
-# `ops/*` + negation (not `ops/`) so the committed launchd example survives:
+# `ops/*` + negations (not `ops/`) so the committed scheduler examples survive:
 # git can't re-include files under a fully-ignored directory.
 ops/*
 !ops/com.chefclaw.backup.plist.example
+!ops/chefclaw-backup.service.example
+!ops/chefclaw-backup.timer.example
 
 # Dependencies
 node_modules/

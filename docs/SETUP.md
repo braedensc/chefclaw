@@ -49,6 +49,9 @@ open http://127.0.0.1:8000        # paste the same token into the token gate
 # once .env.local exists, prefer: docker compose --env-file .env.local up -d
 ```
 
+> **Deploying to a VPS instead of running locally?** The turn-key procedure
+> (Hetzner + Tailscale + systemd backups) is `docs/RUNBOOK.md` §4.
+
 **Dev loop** (hot reload): `docker compose up -d postgres migrate` for the DB, then
 `uv run python -m chefclaw.main` in backend/ and `npm run dev` at the root (Vite on
 127.0.0.1:5173, proxying `/api` to the api).

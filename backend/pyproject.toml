@@ -14,7 +14,9 @@ dependencies = [
     "pydantic-settings",
     "yt-dlp>=2026.7.4",
     "google-genai>=2.10.0",
-    "httpx>=0.28.1",
+    # [socks] so the M-Deploy fetch-proxy knob accepts socks5:// URLs
+    # (Tailscale SOCKS5 — escalation ladder rung b); yt-dlp handles socks natively.
+    "httpx[socks]>=0.28.1",
     "python-multipart>=0.0.32",
 ]
 

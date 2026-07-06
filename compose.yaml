@@ -92,6 +92,9 @@ services:
       XHS_USER_AGENT: ${XHS_USER_AGENT:-}
       XHS_COOKIE_SET_DATE: ${XHS_COOKIE_SET_DATE:-}
       BILIBILI_COOKIE: ${BILIBILI_COOKIE:-}
+      # Platform-fetch proxy (M-Deploy Rednote escalation ladder — rungs b/c/d
+      # are all this ONE knob). Empty = direct, the default.
+      CHEFCLAW_FETCH_PROXY: ${CHEFCLAW_FETCH_PROXY:-}
     ports:
       - "127.0.0.1:8000:8000"
     volumes:
