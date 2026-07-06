@@ -43,6 +43,13 @@ class Settings(BaseSettings):
     gemini_api_key: str = ""
     gemini_model: str = "gemini-2.5-flash"  # model id is config, never hardcoded
     gemini_media_resolution: str = "low"  # escalate only if overlay text is missed
+    # Qwen fallback via DashScope OpenAI-compatible mode (CHEFCLAW_EXTRACTOR=qwen;
+    # fail-closed when keyless). Region/data-governance review is a HUMAN
+    # precondition before first real use — docs/SERVICES.md §3. The base URL is
+    # config so that review can pick the region deliberately.
+    dashscope_api_key: str = ""
+    dashscope_model: str = "qwen3-vl-plus"  # config, never trusted as current
+    dashscope_base_url: str = "https://dashscope-intl.aliyuncs.com/compatible-mode/v1"
 
     # ── Sources (Phase 2) ───────────────────────────────────────────────────
     # Source-adapter selection (plan §16.9 golden-suite split): "real" registers
@@ -64,6 +71,12 @@ class Settings(BaseSettings):
     # Directory of the built SPA to serve at "/" (prod mode). Unset => skip.
     # In compose this points at the built frontend, e.g. ../frontend/dist.
     chefclaw_static_dir: str = ""
+
+    # ── Backups (Phase 4) ───────────────────────────────────────────────────
+    # scripts/backup.sh (host-side, launchd-scheduled) writes ops/last-backup.json;
+    # compose bind-mounts ./ops read-only at /data/ops so /api/health can report
+    # backup staleness. Missing file = 'not_configured', never an error.
+    backup_state_file: str = "/data/ops/last-backup.json"
 
     @property
     def database_url(self) -> str:

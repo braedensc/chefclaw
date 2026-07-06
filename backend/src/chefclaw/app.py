@@ -7,6 +7,7 @@ lifespan, so the unit-test tier gets an app with no worker and no DB touch.
 
 import asyncio
 import contextlib
+import json
 import uuid
 from contextlib import asynccontextmanager
 from datetime import UTC, date, datetime
@@ -21,6 +22,7 @@ from pydantic import BaseModel
 from chefclaw import db, spend
 from chefclaw.auth import require_owner
 from chefclaw.config import Settings, get_settings
+from chefclaw.extractors import extractor_model_id
 from chefclaw.routers.extraction import router as extraction_router
 from chefclaw.routers.jobs import router as jobs_router
 from chefclaw.routers.library import router as library_router
@@ -31,19 +33,77 @@ from chefclaw.services.repo import PostgresJobStore
 # at 21 (stale) — proactive, BEFORE the expiry window closes.
 COOKIE_AGING_DAYS = 14
 COOKIE_STALE_DAYS = 21
+# Backups are launchd-scheduled daily (ops/com.chefclaw.backup.plist.example);
+# 26h = one cycle plus slack, so a single missed run already shows 'stale'.
+BACKUP_STALE_HOURS = 26
+# A finished_at in the FUTURE is corrupted state or serious clock skew — it
+# must warn, not report 'fresh' until the bogus date arrives. Small negative
+# ages (container-vs-host drift after a laptop sleep) stay tolerated.
+BACKUP_FUTURE_SLACK_HOURS = 0.5
 _SIDECAR_PROBE_TIMEOUT_SECONDS = 1.0
 
 
 class HealthResponse(BaseModel):
-    """Phase-2 health shape (plan §7 screen 4). ``backup`` stays a
-    placeholder until Phase 4's backup script lands."""
+    """Phase-4 health shape (plan §7 screen 4): sidecar + cookie + backup
+    staleness + spend readout, plus which extractor/model is live. New fields
+    keep schema-level defaults so the generated TS client treats them as
+    optional — the endpoint always sets them explicitly."""
 
     status: Literal["ok", "degraded"]
     db: Literal["ok", "unreachable"]
     sidecar: Literal["ok", "unreachable", "not_configured"] = "not_configured"
     cookie_freshness: Literal["fresh", "aging", "stale", "not_configured"] = "not_configured"
-    backup: Literal["not_configured"] = "not_configured"
+    # The raw XHS_COOKIE_SET_DATE string (None when no cookie is configured).
+    # Surfaced verbatim so the Settings screen can show WHEN the cookie was
+    # set next to the freshness bucket — an unparseable value still shows
+    # (bucket says 'stale'; seeing the typo is the fastest fix).
+    cookie_set_date: str | None = None
+    # 'fresh' = last run ok and < BACKUP_STALE_HOURS old; 'stale' = old,
+    # failed, or unreadable state; 'not_configured' = no state file yet.
+    backup: Literal["fresh", "stale", "not_configured"] = "not_configured"
+    backup_finished_at: str | None = None
+    extractor: str = "fake"
+    model: str = "fake-extractor"
     spend_month_usd: float | None = None
+
+
+def _backup_status(
+    settings: Settings, *, now: datetime | None = None
+) -> tuple[Literal["fresh", "stale", "not_configured"], str | None]:
+    """Backup freshness from the state file scripts/backup.sh writes
+    (bind-mounted read-only at /data/ops). NEVER raises: a missing file is
+    'not_configured'; anything unreadable/failed/old fails toward 'stale' —
+    the warning must never hide (same posture as cookie freshness)."""
+    state_path = Path(settings.backup_state_file)
+    try:
+        raw = state_path.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        return "not_configured", None
+    except OSError:
+        # The file EXISTS but can't be read (permissions, a directory in its
+        # place, …) — that is a broken backup signal, not "never configured":
+        # saying 'not_configured' would tell the operator to set up backups
+        # they already have. Warn instead.
+        return "stale", None
+    try:
+        state = json.loads(raw)
+        finished_at_raw = state["finished_at"]
+        finished_at = datetime.fromisoformat(finished_at_raw)
+        ok = state["ok"] is True
+    except (ValueError, KeyError, TypeError):
+        return "stale", None  # unreadable state ⇒ warn, never 500
+    if finished_at.tzinfo is None:
+        finished_at = finished_at.replace(tzinfo=UTC)
+    if not ok:
+        return "stale", finished_at_raw
+    age_hours = ((now or datetime.now(UTC)) - finished_at).total_seconds() / 3600
+    if age_hours < -BACKUP_FUTURE_SLACK_HOURS:
+        # A future finished_at would otherwise read 'fresh' until the bogus
+        # date arrives — potentially years of a dead backup looking healthy.
+        return "stale", finished_at_raw
+    if age_hours >= BACKUP_STALE_HOURS:
+        return "stale", finished_at_raw
+    return "fresh", finished_at_raw
 
 
 async def _sidecar_status(settings: Settings) -> Literal["ok", "unreachable", "not_configured"]:
@@ -104,11 +164,17 @@ async def health(
     """Health check. NOT publicly exempt from auth — it exposes spend/cookie
     state (plan §16 amendment 3)."""
     db_ok = await db.ping()
+    backup, backup_finished_at = _backup_status(settings)
     return HealthResponse(
         status="ok" if db_ok else "degraded",
         db="ok" if db_ok else "unreachable",
         sidecar=await _sidecar_status(settings),
         cookie_freshness=_cookie_freshness(settings.xhs_cookie_set_date),
+        cookie_set_date=settings.xhs_cookie_set_date.strip() or None,
+        backup=backup,
+        backup_finished_at=backup_finished_at,
+        extractor=settings.chefclaw_extractor,
+        model=extractor_model_id(settings),
         spend_month_usd=await _spend_month_to_date(owner_id) if db_ok else None,
     )
 

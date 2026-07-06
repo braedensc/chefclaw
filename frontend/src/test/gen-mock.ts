@@ -15,8 +15,13 @@
 import { vi } from 'vitest';
 import type { Mock } from 'vitest';
 
-import type { JobOut, RecipeDetail, RecipePage } from '../client/types.gen';
-import { recipePage } from './fixtures';
+import type {
+  HealthResponse,
+  JobOut,
+  RecipeDetail,
+  RecipePage,
+} from '../client/types.gen';
+import { healthResponse, recipePage } from './fixtures';
 
 /** A mocked generated mutationFn — tests assert on the options it receives. */
 type MutationMock = Mock<(options: unknown) => unknown>;
@@ -28,6 +33,9 @@ interface GenState {
   recipesById: Record<string, RecipeDetail>;
   jobsById: Record<string, JobOut>;
   jobsList: JobOut[];
+  health: HealthResponse;
+  /** When set, the health queryFn throws it instead (401/network scenarios). */
+  healthError: Error | null;
   extract: MutationMock;
   upload: MutationMock;
   patch: MutationMock;
@@ -39,6 +47,8 @@ export const genState: GenState = {
   recipesById: {},
   jobsById: {},
   jobsList: [],
+  health: healthResponse(),
+  healthError: null,
   extract: mutationMock(),
   upload: mutationMock(),
   patch: mutationMock(),
@@ -50,6 +60,8 @@ export function resetGenState(): void {
   genState.recipesById = {};
   genState.jobsById = {};
   genState.jobsList = [];
+  genState.health = healthResponse();
+  genState.healthError = null;
   genState.extract = mutationMock();
   genState.upload = mutationMock();
   genState.patch = mutationMock();
@@ -114,10 +126,13 @@ export function genMockModule() {
       mutationFn: (options: unknown) => genState.deleteRecipe(options),
     }),
 
-    // Only health-panel.tsx uses this; included so any mount stays safe.
+    // settings-page.tsx (screen 4) — genState.healthError drives failures.
     healthApiHealthGetOptions: () => ({
       queryKey: [{ _id: 'healthApiHealthGet' }],
-      queryFn: async () => ({ status: 'ok', db: 'ok' }),
+      queryFn: async () => {
+        if (genState.healthError) throw genState.healthError;
+        return genState.health;
+      },
     }),
   };
 }

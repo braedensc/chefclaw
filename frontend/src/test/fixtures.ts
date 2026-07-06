@@ -3,6 +3,7 @@
 // realistic data: 原文 fields, verbatim raw_text quantities ("适量" included).
 
 import type {
+  HealthResponse,
   JobOut,
   RecipeDetail,
   RecipePage,
@@ -131,4 +132,23 @@ export function recipeDetail(
 
 export function recipePage(items: RecipeSummary[]): RecipePage {
   return { items, total: items.length, limit: 50, offset: 0 };
+}
+
+/** A healthy /api/health payload (guest-tier cookie posture, fresh backup). */
+export function healthResponse(
+  overrides: Partial<HealthResponse> = {},
+): HealthResponse {
+  return {
+    status: 'ok',
+    db: 'ok',
+    sidecar: 'ok',
+    cookie_freshness: 'not_configured',
+    cookie_set_date: null,
+    backup: 'fresh',
+    backup_finished_at: '2026-07-06T03:30:00+00:00',
+    extractor: 'gemini',
+    model: 'gemini-2.5-flash',
+    spend_month_usd: 0.2,
+    ...overrides,
+  };
 }

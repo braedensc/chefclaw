@@ -69,6 +69,9 @@ npm run generate:client -w frontend    # after re-exporting openapi.json; commit
 docker compose -f compose.golden.yaml up -d --build   # project chefclaw-golden, :8100
 npm run test:golden                    # paste→card end-to-end; then plain `down`
 
+# Backups (read-only vs the stack; procedures + drill record: docs/RUNBOOK.md)
+sh scripts/backup.sh                   # encrypted pg_dump + media archive; launchd-scheduled via ops/*.plist.example
+
 # Kit guardrails
 npm run test:hooks                     # hook block/allow battery (must stay green)
 npm run lint:secrets                   # secretlint over all tracked files
@@ -99,10 +102,11 @@ machine-local `MEMORY.md` auto-memory is Claude-*discovered* learnings — don't
 .claude/            hooks (PreToolUse guardrails, Stop PR check), settings, skills
 .github/workflows/  CI — secret scan + forbidden paths today; app jobs land with Phase 1
 .husky/             pre-commit: secretlint
-docs/               SETUP, SERVICES, SECURITY, COLLABORATION, TESTING, LESSONS,
-                    ARCHITECTURE (the ADR index) + adr/ (one file per decision)
+docs/               SETUP, SERVICES, SECURITY, RUNBOOK (ops procedures), COLLABORATION,
+                    TESTING, LESSONS, ARCHITECTURE (the ADR index) + adr/ (one per decision)
 planning/           gitignored reference material — never staged, never committed
-scripts/            check_placeholders.py today; backup.sh lands in Phase 4
+scripts/            check_placeholders.py; backup.sh (encrypted backups — docs/RUNBOOK.md)
+ops/                gitignored backup state/logs + the committed launchd plist example
 backend/            uv project — FastAPI transport, framework-free services (adapters +
                     asyncio worker land Phase 2), Alembic migrations, exported openapi.json
 frontend/           Vite + React SPA — TanStack Query/Router, generated typed client

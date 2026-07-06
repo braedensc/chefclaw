@@ -81,11 +81,12 @@ in **one transaction**; startup reconcile marks orphaned running jobs
 ## llm_spend
 
 The cost ledger — written **per model attempt, including failures** (that's when
-spend runs hot and `extraction_meta` would undercount). A failed attempt whose
-error carried no token accounting is recorded with **zero tokens** — the row
-still counts toward the daily attempt cap (which counts rows, not dollars);
-dollar undercounting on failures is a known limitation until typed errors
-carry usage.
+spend runs hot and `extraction_meta` would undercount). Since Phase 4, failed
+attempts ledger the **real token usage** whenever the model API surfaced it
+before failing (`ExtractionFailedError`/`RateLimitedError` carry it); zeros
+remain only where usage never existed adapter-side (timeouts, transport errors
+mid-call). Either way the row counts toward the daily attempt cap — the cap
+counts rows, not dollars, so it bounds runaway retries even at zero.
 
 | Column | Type | Notes |
 |---|---|---|

@@ -11,7 +11,8 @@ local Docker compose, so the "host env" store **collapses into `.env.local`**:
 
 | Store | Holds | Set by |
 |---|---|---|
-| `.env.local` (gitignored) | Everything: `CHEFCLAW_API_TOKEN`, `GEMINI_API_KEY`, `DASHSCOPE_API_KEY` (later), `XHS_COOKIE` + `XHS_USER_AGENT` + `XHS_COOKIE_SET_DATE`, `BILIBILI_COOKIE` (optional), `DATABASE_URL`, budget knobs, `MEDIA_RETENTION` | **Human only** — the hook blocks Claude writing `.env*` |
+| `.env.local` (gitignored) | Everything: `CHEFCLAW_API_TOKEN`, `GEMINI_API_KEY`, `DASHSCOPE_API_KEY` (Phase 4 fallback), `XHS_COOKIE` + `XHS_USER_AGENT` + `XHS_COOKIE_SET_DATE`, `BILIBILI_COOKIE` (optional), `DATABASE_URL`, budget knobs, `MEDIA_RETENTION`, backup knobs (`CHEFCLAW_BACKUP_DIR`, `BACKUP_GPG_PASSPHRASE` — operational copy only) | **Human only** — the hook blocks Claude writing `.env*` |
+| Password manager | `BACKUP_GPG_PASSPHRASE` — the **canonical** copy (generated once, stored here FIRST; never only on this machine). `.env.local` carries just the operational copy `scripts/backup.sh` reads | Human only |
 | GitHub Actions secrets | **Nothing.** CI runs on dummy env values only; currently no real key needed (revisit at M-Deploy) | — |
 | Host env (deployed) | Does not exist until M-Deploy; re-map then | — |
 
@@ -53,12 +54,22 @@ server secret at birth: never a `VITE_*` var, never in the frontend bundle.
 
 ## 3. DashScope / Qwen (fallback extractor)
 
-- **Status: deferred** — implemented as a config-flagged `ExtractorAdapter` in Phase 4;
-  key (`DASHSCOPE_API_KEY`, `.env.local`) not created until then.
-- **Precondition before first use:** review the endpoint's **region and
-  data-governance terms** (where video bytes land, retention, training eligibility)
-  and note the result here.
-- **Provisioning record:** 2026-07-05 — not provisioned.
+- **Status: implemented, UNVERIFIED-LIVE** (Phase 4) — `QwenExtractor` behind
+  `CHEFCLAW_EXTRACTOR=qwen` (+ `DASHSCOPE_MODEL`, `DASHSCOPE_BASE_URL`), built
+  against the documented OpenAI-compatible video-input shape and fail-closed
+  when keyless; it has **never been exercised against the live endpoint** (no
+  key exists). Known-unverified specifics are marked in
+  `backend/src/chefclaw/extractors/qwen.py` (Base64 video acceptance + size
+  cap, current model catalog).
+- **Precondition before first use (HUMAN):** review the endpoint's **region and
+  data-governance terms** (where video bytes land, retention, training
+  eligibility), pick the base URL deliberately, and note the result here.
+- **Provisioning** *(you, in dashboards — only AFTER the region review above)*:
+  DashScope console → create an API key → paste into `.env.local` as
+  `DASHSCOPE_API_KEY` (optionally `DASHSCOPE_MODEL` / `DASHSCOPE_BASE_URL`), then
+  restart the api with `CHEFCLAW_EXTRACTOR=qwen` to switch over.
+- **Provisioning record:** 2026-07-05 — not provisioned. 2026-07-06 — adapter
+  landed (mocked tests only); key still not created; region review still pending.
 
 ## 4. Rednote / Xiaohongshu (via XHS-Downloader sidecar)
 
@@ -85,7 +96,7 @@ server secret at birth: never a `VITE_*` var, never in the frontend bundle.
   stays token-free for dedupe (see the 2026-07-06 adapters ADR).
 - **Expiry:** 2–4 weeks. `XHS_COOKIE_SET_DATE` is written by hand at **every** refresh
   (age is not derivable from the cookie string); `/api/health` warns before expiry.
-  The refresh procedure lands in `docs/RUNBOOK.md` at Phase 4.
+  Refresh procedure: `docs/RUNBOOK.md` §1 (tier 1 only — never the main account).
 - **Isolation:** sidecar runs on the **internal compose network only — no published
   host port** (its API is unauthenticated); image pinned to digest
   `sha256:7ce9c4e7711b7a805da5b1d4190079ad0eaf4abf07f235fe8b90c8da51b8c823`
@@ -104,6 +115,21 @@ server secret at birth: never a `VITE_*` var, never in the frontend bundle.
   `.env.local`) only if on-screen-text OCR ever needs 1080p.
 - Same ToS posture as §4: personal use, low volume, delays, no redistribution.
 - **Provisioning record:** 2026-07-05 — nothing to provision.
+
+## 6. Backups (local gpg + launchd — no external service)
+
+- **Identity:** `scripts/backup.sh` — read-only encrypted `pg_dump` + media-volume
+  archive to `CHEFCLAW_BACKUP_DIR` (e.g. `<your-backup-destination>`), scheduled
+  daily via `ops/com.chefclaw.backup.plist.example`. Full procedures, install
+  steps, restore, and the performed drill record: `docs/RUNBOOK.md` §2.
+- **Secret + which store:** `BACKUP_GPG_PASSPHRASE` — **canonical copy in the
+  password manager** (generated once, stored there FIRST — never only on this
+  machine); `.env.local` holds the operational copy the script resolves at
+  runtime. Staleness is surfaced by `/api/health` (`fresh`/`stale`/`not_configured`).
+- **Provisioning record:** 2026-07-06 — script + launchd example landed; **restore
+  drill performed and verified** (row counts, content checksums, media SHA-256
+  round-trip — record in `docs/RUNBOOK.md`). launchd agent **not yet loaded**
+  (human step); health reports `not_configured` until scheduled backups run.
 
 ## Deferred hardening (tracked here so it can't fall through the cracks)
 

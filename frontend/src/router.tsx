@@ -9,6 +9,7 @@ import type { RouterHistory } from '@tanstack/react-router';
 import { AppShell } from './components/app-shell';
 import { LibraryPage } from './components/library-page';
 import { RecipeDetailPage } from './components/recipe-detail-page';
+import { SettingsPage } from './components/settings-page';
 import { TokenGate } from './components/token-gate';
 
 function RootLayout() {
@@ -35,7 +36,17 @@ const recipeDetailRoute = createRoute({
   component: RecipeDetailPage,
 });
 
-const routeTree = rootRoute.addChildren([indexRoute, recipeDetailRoute]);
+const settingsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/settings',
+  component: SettingsPage,
+});
+
+const routeTree = rootRoute.addChildren([
+  indexRoute,
+  recipeDetailRoute,
+  settingsRoute,
+]);
 
 /** Factory so tests can mount the real route tree on a memory history. */
 export function createAppRouter(history?: RouterHistory) {

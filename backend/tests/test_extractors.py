@@ -282,6 +282,38 @@ async def test_gemini_json_garbage_raises_extraction_failed_preserving_raw():
     assert files.deleted == ["files/test-upload"]  # cleanup still ran
 
 
+async def test_gemini_parse_failure_carries_usage_when_sdk_surfaced_it():
+    """A billed-but-unparseable response must hand its token accounting to the
+    worker (via the error) so the ledger records real tokens, not zeros."""
+    usage = SimpleNamespace(
+        prompt_token_count=1200, candidates_token_count=340, thoughts_token_count=None
+    )
+    files = StubFiles(upload_result=active_file())
+    models = StubModels(response=gemini_response("not json at all", usage))
+    extractor = make_gemini(files, models)
+
+    with pytest.raises(ExtractionFailedError) as exc_info:
+        await extractor.extract(VIDEO, None, None)
+    carried = exc_info.value.usage
+    assert carried == ExtractionUsage(
+        model_id="gemini-test-model",
+        prompt_version="v1",
+        tokens_in=1200,
+        tokens_out=340,
+        tokens_thinking=0,
+    )
+
+
+async def test_gemini_parse_failure_without_metadata_carries_no_usage():
+    files = StubFiles(upload_result=active_file())
+    models = StubModels(response=gemini_response("not json at all", usage=None))
+    extractor = make_gemini(files, models)
+
+    with pytest.raises(ExtractionFailedError) as exc_info:
+        await extractor.extract(VIDEO, None, None)
+    assert exc_info.value.usage is None  # worker ledgers zeros (unchanged contract)
+
+
 async def test_gemini_non_array_json_raises_extraction_failed_preserving_raw():
     raw = json.dumps({"dish_name": {"en": "solo", "original": "单"}})
     files = StubFiles(upload_result=active_file())

@@ -35,8 +35,11 @@ calls safe:
   Zero-token rows still count toward the daily cap, which counts rows, not
   dollars.
 - **Retries:** max 3 attempts (counted at claim), **typed-retryable errors
-  only**, linear `2s × attempt` backoff. Untyped leaks are terminal — an
-  unknown error must not silently burn paid retries.
+  only**, linear backoff scaled per error type — `rate_limited` waits
+  `30s × attempt` (the API said slow down; re-poking it immediately wastes an
+  attempt), every other retryable waits `2s × attempt` *(Phase 4 split; was a
+  single 2s scale)*. Untyped leaks are terminal — an unknown error must not
+  silently burn paid retries.
 - **Startup reconcile:** jobs stranded mid-stage by a restart are flipped to
   `failed` / `interrupted` — **explicit human retry only, never auto-rerun
   paid work** (`docker compose watch` restarts the api constantly; auto-rerun
@@ -81,9 +84,12 @@ calls safe:
   abandons the thread — the download keeps running until yt-dlp returns.
   Compose `init: true` reaps orphaned ffmpeg children; plan §4's process-group
   `killpg` applies when downloads move to subprocess form.
-- **Zero-token failure rows (known limitation):** a failed attempt whose error
-  carried no token accounting is ledgered with zeros — it bounds the daily cap
-  but undercounts dollars, until typed errors carry usage (future PR).
+- **Zero-token failure rows (narrowed, Phase 4):** `ExtractionFailedError` /
+  `RateLimitedError` now **carry token usage** when the model API surfaced it
+  before failing (a billed-but-unparseable response), and the ledger records
+  the real tokens. Zeros remain only for failures where usage genuinely never
+  existed adapter-side (timeouts, transport errors mid-call) — those rows
+  still bound the daily cap while undercounting dollars.
 - **No partial unique index on active jobs:** the enqueue dedupe is
   read-then-insert, so a race can create twin pending jobs for one canonical
   identity. The paid call stays single regardless (the idempotent stage adopts
