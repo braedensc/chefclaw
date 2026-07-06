@@ -563,3 +563,85 @@ def test_quantity_model_direct_construction() -> None:
     assert q.raw_text == "两大勺"
     with pytest.raises(ValidationError):  # pydantic error on bad literal
         Quantity(raw_text="两大勺", unit_type="handfuls")
+
+
+def test_all_null_quantity_object_canonicalizes_to_none() -> None:
+    """The two encodings of "no quantity stated" are the same value — an
+    all-null quantity object collapses to None (canonicalization, not repair)."""
+    from chefclaw.documents import Ingredient
+
+    ing = Ingredient.model_validate(
+        {
+            "raw_text": "五花肉",
+            "name": {"en": "pork belly", "original": "五花肉"},
+            "quantity": {"raw_text": None, "value": None, "unit": None, "unit_type": None},
+        }
+    )
+    assert ing.quantity is None
+
+
+def test_partially_null_quantity_still_rejected() -> None:
+    """A value with no raw_text is inconsistent data, not an absence — reject."""
+    import pydantic
+    import pytest as _pytest
+
+    from chefclaw.documents import Ingredient
+
+    with _pytest.raises(pydantic.ValidationError):
+        Ingredient.model_validate(
+            {
+                "raw_text": "五花肉",
+                "name": {"en": "pork belly", "original": "五花肉"},
+                "quantity": {"raw_text": None, "value": 2.0, "unit": None, "unit_type": None},
+            }
+        )
+
+
+def test_empty_quantity_dict_still_rejected() -> None:
+    """An empty dict is neither encoding of absence — strict schema rejects it
+    (missing required raw_text)."""
+    import pydantic
+    import pytest as _pytest
+
+    from chefclaw.documents import Ingredient
+
+    with _pytest.raises(pydantic.ValidationError):
+        Ingredient.model_validate(
+            {
+                "raw_text": "五花肉",
+                "name": {"en": "pork belly", "original": "五花肉"},
+                "quantity": {},
+            }
+        )
+
+
+def test_null_text_quantity_with_approx_tag_canonicalizes_to_none() -> None:
+    """unit_type set on an otherwise-null quantity is a classification of
+    absence — same canonicalization applies."""
+    from chefclaw.documents import Ingredient
+
+    ing = Ingredient.model_validate(
+        {
+            "raw_text": "葱花",
+            "name": {"en": "scallions", "original": "葱花"},
+            "quantity": {"raw_text": None, "value": None, "unit": None, "unit_type": "approx"},
+        }
+    )
+    assert ing.quantity is None
+
+
+def test_null_text_quantity_with_unit_still_rejected() -> None:
+    """A unit without raw_text is data from nowhere — reject."""
+    import pydantic
+    import pytest as _pytest
+
+    from chefclaw.documents import Ingredient
+
+    with _pytest.raises(pydantic.ValidationError):
+        Ingredient.model_validate(
+            {
+                "raw_text": "葱花",
+                "name": {"en": "scallions", "original": "葱花"},
+                "quantity": {"raw_text": None, "value": None, "unit": "tbsp", "unit_type": None},
+            }
+        )
