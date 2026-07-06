@@ -8,6 +8,9 @@ the model cannot bypass these — there is no --no-verify equivalent.
 Distilled from todoclaw's .claude/hooks/pre-tool-use.py v2 — in production
 2026-06-23 → 2026-07-03 across a full build (Stages 0–6). The v2 hardening
 (prose-stripping, branch-scoped push guard) shipped post-retro on 2026-07-03.
+Adapted for chefclaw at bootstrap, 2026-07-05: cookie-file guards (platform
+session credentials), Gemini/DashScope key patterns, and the Docker-volume
+destruction guards that replace the kit's Supabase section (see docs/adr/).
 Every guard here is verified by the block/allow battery in test_hooks.py,
 which runs in CI.
 
@@ -19,9 +22,11 @@ building this kit — see docs/LESSONS.md.)
 
 Layout:
   1. UNIVERSAL GUARDS — keep these in every project.
-  2. STACK-SPECIFIC GUARDS — Supabase/Postgres examples at the bottom;
-     replace them for your datastore, keep the *shape* (protect remote,
-     allow local).
+  2. STACK-SPECIFIC GUARDS — chefclaw: Docker-volume destruction + destructive
+     SQL against remote Postgres. NOTE the deliberate inversion of the kit's
+     shape: chefclaw's LOCAL volumes (Postgres data, retained media) hold the
+     only copy of irreplaceable data, so volume-destroying commands are
+     human-only, while plain compose up/down/restart stays frictionless.
 """
 import json
 import os
@@ -373,14 +378,18 @@ if tool == "Bash":
             "Download first, inspect, then run."
         )
 
-    # Block staging reference dirs or real .env files.
-    # `planning/` is this kit's default name for a gitignored reference-material
-    # dir (licensed specs, exports, scratch notes). If your project names it
-    # differently, update this pattern AND .gitignore AND .husky/pre-commit AND
-    # the app CI's forbidden-paths grep together — every layer must agree.
-    if re.search(r"\bgit\s+add\b[^#\n;&|]*(planning/|\.env(?!\.example))", scan):
+    # Block staging reference dirs, real .env files, or cookie files.
+    # `planning/` is the gitignored reference-material dir (the chefclaw build
+    # plan lives there). Cookie files are platform session credentials —
+    # key-grade secrets. If a pattern here changes, update .gitignore AND
+    # .husky/pre-commit AND the app CI's forbidden-paths grep together —
+    # every layer must agree.
+    if re.search(
+        r"\bgit\s+add\b[^#\n;&|]*(planning/|\.env(?!\.example)|\bcookies\b|\.cookies\b)",
+        scan,
+    ):
         block(
-            "Staging planning/ or .env files is forbidden — "
+            "Staging planning/, .env, or cookie files is forbidden — "
             "these paths are gitignored to prevent leaks."
         )
 
@@ -420,17 +429,19 @@ if tool == "Bash":
             "auto-merge that shouldn't have been enabled.)"
         )
 
-    # Block shell-reading secret files (cat, less, head, etc.).
+    # Block shell-reading secret files (cat, less, head, etc.) — including
+    # platform cookie files (session credentials to real accounts).
     # The [^#\n;&|]* gap is scoped per shell command, so a .env named in a
     # LATER command on the same line (e.g. `cat foo; grep x .env`) is not a
     # false positive — while a real `cat .env` still blocks.
     if re.search(
-        r"\b(cat|less|head|tail|bat|open|more)\b[^#\n;&|]*(\.env(?!\.example)|\.pem\b|\.key\b)",
+        r"\b(cat|less|head|tail|bat|open|more)\b[^#\n;&|]*"
+        r"(\.env(?!\.example)|\.pem\b|\.key\b|\bcookies\b|\.cookies\b)",
         scan,
     ):
         block(
-            "Reading secret files (.env, .pem, .key) via shell is not allowed. "
-            "Reference by variable name only."
+            "Reading secret files (.env, .pem, .key, cookies) via shell is not "
+            "allowed. Reference by variable name only."
         )
 
 
@@ -446,6 +457,11 @@ if tool == "Read":
         )
     if re.search(r"\.(pem|key)$", basename):
         block(f"Reading {basename} is blocked — private key files are off-limits.")
+    if re.match(r"^cookies([._-]|$)", basename) or basename.endswith(".cookies"):
+        block(
+            f"Reading {basename} is blocked — platform cookie files are session "
+            "credentials to real accounts (key-grade secrets)."
+        )
 
 
 # ── Edit / Write ──────────────────────────────────────────────────────────────
@@ -460,6 +476,13 @@ if tool in ("Edit", "Write"):
             "Only .env.example (with placeholder values) is committed."
         )
 
+    # Block writing cookie files — session credentials are managed by the human
+    if re.match(r"^cookies([._-]|$)", basename) or basename.endswith(".cookies"):
+        block(
+            f"Writing {basename} is blocked — platform cookie files are session "
+            "credentials and are managed by the human only (docs/SECURITY.md)."
+        )
+
     # Block embedding secret values in any file content
     content = inp.get("new_string", "") or inp.get("content", "")
     SECRET_PATTERNS = [
@@ -469,9 +492,11 @@ if tool in ("Edit", "Write"):
         (r"(?:AKID|AKIA)[A-Z0-9]{16}", "AWS access key"),
         (r"gh[pousr]_[A-Za-z0-9_]{36,}", "GitHub personal access token"),
         (r"eyJ[a-zA-Z0-9_-]{20,}\.[a-zA-Z0-9_-]{20,}\.[a-zA-Z0-9_-]{20,}", "JWT token value"),
-        # Extension point: add patterns for providers YOUR project uses, e.g.
-        # OpenAI-style keys: (r"sk-[a-zA-Z0-9]{32,}", "OpenAI-style API key").
-        # Add a battery case in test_hooks.py for every pattern you add.
+        # chefclaw providers (bootstrap 2026-07-05): Gemini + DashScope keys.
+        (r"AIza[0-9A-Za-z_-]{35}", "Google/Gemini API key"),
+        (r"sk-[a-zA-Z0-9]{32,}", "OpenAI-style / DashScope API key"),
+        # Extension point: add patterns for providers YOUR project uses —
+        # and a battery case in test_hooks.py for every pattern you add.
     ]
     for pattern, label in SECRET_PATTERNS:
         if re.search(pattern, content):
@@ -482,32 +507,54 @@ if tool in ("Edit", "Write"):
 
 
 # ════════════════════════════════════════════════════════════════════════════
-# 2. STACK-SPECIFIC GUARDS — Supabase / Postgres
-#    Replace this section for your datastore. Keep the shape: the LOCAL
-#    (disposable) instance stays unguarded so routine resets are frictionless;
-#    the REMOTE (irreplaceable) instance gets hard blocks on destructive ops.
+# 2. STACK-SPECIFIC GUARDS — chefclaw: Docker volumes + remote Postgres
+#    DELIBERATE INVERSION of the kit's local-is-disposable shape: chefclaw's
+#    LOCAL Docker volumes (Postgres data + retained media archive) hold the
+#    ONLY copy of irreplaceable data between backups. Volume-destroying
+#    commands are therefore human-only; plain `docker compose up/down/restart`
+#    and localhost SQL (Alembic needs it) stay frictionless. Tests and the
+#    golden suite run against a SEPARATE test database/compose project — never
+#    the real one (CLAUDE.md Key Design Decisions, docs/TESTING.md).
 # ════════════════════════════════════════════════════════════════════════════
 if tool == "Bash":
     scan = _strip_prose(inp.get("command", ""))
 
-    # `supabase db reset` wipes the database. Local (Docker) is fine; --linked /
-    # --db-url target a REMOTE db and would destroy it.
-    if re.search(r"\bsupabase\b[^#\n]*\bdb\s+reset\b", scan) and \
-       re.search(r"--linked\b|--db-url\b", scan):
-        block(
-            "`supabase db reset` against a linked/remote database wipes it. "
-            "Only the local (Docker) reset is allowed; change prod via reviewed, "
-            "reversible migrations."
-        )
+    VOLUME_HELP = (
+        "This command destroys Docker volumes — chefclaw's local volumes hold "
+        "the ONLY copy of irreplaceable data (recipes DB + retained media). "
+        "Volume destruction is the human's action only. Plain `docker compose "
+        "down` (containers only, volumes kept) is allowed."
+    )
 
-    # Deleting a hosted Supabase project is irreversible.
-    if re.search(r"\bsupabase\b[^#\n]*\bprojects?\s+delete\b", scan):
-        block("`supabase projects delete` is irreversible and is not allowed.")
+    # `docker compose down -v/--volumes` (incl. legacy `docker-compose`) deletes
+    # the named volumes with the containers.
+    if re.search(
+        r"\bdocker(?:\s+compose|-compose)\b[^#\n;&|]*\bdown\b[^#\n;&|]*"
+        r"(?:\s-[a-zA-Z]*v\b|--volumes\b)",
+        scan,
+    ):
+        block(VOLUME_HELP)
+
+    # `docker compose rm -v` removes stopped containers AND their anonymous
+    # volumes.
+    if re.search(
+        r"\bdocker(?:\s+compose|-compose)\b[^#\n;&|]*\brm\b[^#\n;&|]*\s-[a-zA-Z]*v\b",
+        scan,
+    ):
+        block(VOLUME_HELP)
+
+    # `docker volume rm/remove/prune` deletes volumes directly.
+    if re.search(r"\bdocker\b[^#\n;&|]*\bvolume\s+(rm|remove|prune)\b", scan):
+        block(VOLUME_HELP)
+
+    # `docker system prune --volumes` sweeps volumes with everything else.
+    if re.search(r"\bdocker\b[^#\n;&|]*\bsystem\s+prune\b[^#\n;&|]*--volumes\b", scan):
+        block(VOLUME_HELP)
 
     # Raw destructive SQL (DROP / TRUNCATE / DELETE) aimed at a NON-localhost
-    # Postgres host — e.g. psql against a remote connection string. A postgres
-    # URL whose host is not localhost/127.0.0.1 alongside a destructive verb
-    # is blocked.
+    # Postgres host — e.g. psql against a remote connection string. Localhost
+    # stays frictionless (Alembic migrations, the separate test DB); this guard
+    # matters from M-Deploy onward, when a deployed DB exists.
     if re.search(r"\b(drop|truncate|delete)\b", scan, re.IGNORECASE) and re.search(
         r"postgres(?:ql)?://[^\s'\"]*@(?!(?:localhost|127\.0\.0\.1|0\.0\.0\.0))",
         scan,

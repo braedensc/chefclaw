@@ -4,6 +4,14 @@ The pyramid as actually built and run in todoclaw (2026-06-23 → 2026-07-03; 13
 tests, 11-spec golden E2E suite, smoke in CI on every PR). Sources: ADR-0008/0011/0018/
 0020, both Playwright configs, and the e2e harness.
 
+> **chefclaw mapping:** unit = **pytest** (backend, httpx `ASGITransport`) + **Vitest**
+> (frontend); CI smoke = **Playwright boots-and-renders** with dummy env and **no
+> database**; golden = the **paste-to-card** suite against the **local compose stack**
+> with config-selectable fake `SourceAdapter`/`ExtractorAdapter` — Gemini is called
+> server-side in the worker, so browser route-mocking can't cover it — and a
+> **separate test database/compose project**, because the local DB here is production
+> data (kit inversion, docs/SECURITY.md). Everything below transfers.
+
 ---
 
 ## The pyramid

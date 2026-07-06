@@ -41,6 +41,8 @@ FAKE_JWT = ".".join("eyJ" + "a" * 24 for _ in range(3))
 FAKE_GH_TOKEN = "ghp" + "_" + "A" * 40
 FAKE_AWS_KEY = "AKIA" + "0" * 16
 FAKE_KEY_BLOCK = "-----BEGIN " + "PRIVATE KEY-----"
+FAKE_GOOGLE_KEY = "AIza" + "S" * 35
+FAKE_DASHSCOPE_KEY = "sk-" + "0" * 32
 
 
 def bash(c):
@@ -286,6 +288,22 @@ def main():
         ("Private key block in content blocked", write("/x/k.txt", FAKE_KEY_BLOCK), BLOCK, HOOK),
         ("prose mentioning 'password' allowed",
          write("/x/doc.md", "never log the password; reference env vars by name"), ALLOW, HOOK),
+        ("Google/Gemini key in content blocked", write("/x/cfg.md", FAKE_GOOGLE_KEY), BLOCK, HOOK),
+        ("DashScope sk- key in content blocked", write("/x/cfg.md", FAKE_DASHSCOPE_KEY), BLOCK, HOOK),
+        ("short sk- prose allowed (no 32-char tail)",
+         write("/x/n.md", "use the model config key, e.g. sk-model-name"), ALLOW, HOOK),
+
+        # ── universal: platform cookie files (chefclaw — session credentials) ─
+        ("cat cookies.txt blocked", bash("cat cookies.txt"), BLOCK, HOOK),
+        ("head session.cookies blocked", bash("head -n1 xhs/session.cookies"), BLOCK, HOOK),
+        ("Read cookies.txt blocked", read("/x/cookies.txt"), BLOCK, HOOK),
+        ("Read xhs.cookies blocked", read("/x/xhs.cookies"), BLOCK, HOOK),
+        ("Write cookies.txt blocked", write("/x/cookies.txt", "a1=b2"), BLOCK, HOOK),
+        ("git add cookies file blocked", bash("git add cookies.txt"), BLOCK, HOOK),
+        ("Read cookiestore.ts allowed (not a cookie file)", read("/x/cookiestore.ts"), ALLOW, HOOK),
+        ("prose mentioning cookies allowed",
+         write("/x/doc.md", "refresh the XHS cookies every few weeks"), ALLOW, HOOK),
+        ("grep docs for cookie allowed", bash("grep -r cookie docs/"), ALLOW, HOOK),
 
         # ── universal: prose-stripping (the v2 fix) ──────────────────────────
         ("destructive verbs in commit -m prose allowed",
@@ -359,16 +377,30 @@ def main():
         ("rm /tmp/junk beside a hook mention allowed (rm targets junk, not the hook)", bash(
             f"rm /tmp/junk && cat {os.path.join(feat_root, '.claude/hooks/pre-tool-use.py')}"), ALLOW, feat_hook),
 
-        # ── stack-specific: Supabase/Postgres (replace with your datastore) ──
-        ("supabase db reset --linked blocked", bash("supabase db reset --linked"), BLOCK, HOOK),
-        ("supabase db reset --db-url blocked",
-         bash(f"supabase db reset --db-url {FAKE_DB_URL}"), BLOCK, HOOK),
-        ("local supabase db reset allowed", bash("supabase db reset"), ALLOW, HOOK),
-        ("supabase projects delete blocked", bash("supabase projects delete my-proj"), BLOCK, HOOK),
+        # ── stack-specific: chefclaw Docker volumes (local = irreplaceable) ──
+        ("docker compose down -v blocked", bash("docker compose down -v"), BLOCK, HOOK),
+        ("docker compose down --volumes blocked",
+         bash("docker compose down --volumes"), BLOCK, HOOK),
+        ("docker-compose down -v (legacy) blocked", bash("docker-compose down -v"), BLOCK, HOOK),
+        ("docker compose down (volumes kept) allowed", bash("docker compose down"), ALLOW, HOOK),
+        ("docker compose down --remove-orphans allowed",
+         bash("docker compose down --remove-orphans"), ALLOW, HOOK),
+        ("docker compose rm -v blocked", bash("docker compose rm -sfv api"), BLOCK, HOOK),
+        ("docker volume rm blocked", bash("docker volume rm chefclaw_pgdata"), BLOCK, HOOK),
+        ("docker volume prune blocked", bash("docker volume prune -f"), BLOCK, HOOK),
+        ("docker system prune --volumes blocked",
+         bash("docker system prune --volumes"), BLOCK, HOOK),
+        ("docker system prune (no volumes) allowed", bash("docker system prune"), ALLOW, HOOK),
+        ("docker volume ls allowed", bash("docker volume ls"), ALLOW, HOOK),
+        ("docker compose up allowed", bash("docker compose up -d --watch"), ALLOW, HOOK),
+        ("docker down -v in commit -m prose allowed",
+         bash('git commit -m "guard docker compose down -v"'), ALLOW, feat_hook),
+
+        # ── stack-specific: destructive SQL against remote Postgres ─────────
         ("destructive SQL on REMOTE host blocked",
-         bash(f"psql '{FAKE_DB_URL}' -c 'TRUNCATE tasks;'"), BLOCK, HOOK),
+         bash(f"psql '{FAKE_DB_URL}' -c 'TRUNCATE recipes;'"), BLOCK, HOOK),
         ("destructive SQL on LOCAL host allowed",
-         bash(f"psql '{FAKE_LOCAL_DB_URL}' -c 'TRUNCATE tasks;'"), ALLOW, HOOK),
+         bash(f"psql '{FAKE_LOCAL_DB_URL}' -c 'TRUNCATE recipes;'"), ALLOW, HOOK),
 
         # ── merged-PR guard (mocked gh; todoclaw PR #61) ─────────────────────
         ("commit on MERGED-PR branch blocked",

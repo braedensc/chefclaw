@@ -1,14 +1,28 @@
 name: CI
 
-# The kit's own CI — the kit lints itself. Layer 3 of the 3-layer security model
-# (docs/SECURITY.md). Distilled from todoclaw's ci.yml (live 2026-06-23 →
-# 2026-07-03); the app-project version with lint/typecheck/test/e2e jobs lives
-# at templates/workflows/ci.yml.
+# ══════════════════════════════════════════════════════════════════════════════
+# chefclaw app CI — activated at bootstrap from the claude-project-kit template
+# (templates/workflows/ci.yml, distilled from todoclaw's ci.yml — the gate for
+# every PR of a live production build, 2026-06-23 → 2026-07-03).
 #
-# The job `name:` IS the required-status-check context. Branch protection
-# requiring "Kit checks" is set only AFTER this workflow's first green run on
-# main — requiring a context before it has ever reported wedges every open PR
-# (merge-THEN-require; see docs/LESSONS.md).
+# Layer 3 of the security/quality model — the unbypassable gate (--no-verify
+# can't skip it).
+#
+# PHASED ACTIVATION (merge-then-require, docs/LESSONS.md):
+#   Phase 0 (this file): one job — "Secret scan + forbidden paths" — the only
+#     job that can pass before any app code exists. It carries the kit-CI steps
+#     forward (hook battery, JSON/YAML validation, placeholder regression).
+#   Phase 1 adds: backend (ruff, pytest), frontend (eslint, tsc -b, vitest),
+#     the openapi-ts drift check, and a non-required Playwright smoke — each
+#     flipped to a required context only AFTER it has reported green on main:
+#       gh api -X POST repos/<owner>/<repo>/branches/main/protection/required_status_checks/contexts \
+#         -f 'contexts[]=<job name>'
+#
+# Two rules that bite if you skip them:
+# 1. Each job's `name:` IS the required-status-check context string.
+# 2. Merge THEN require — requiring a context that has never reported wedges
+#    every open PR (docs/LESSONS.md).
+# ══════════════════════════════════════════════════════════════════════════════
 
 on:
   push:
@@ -20,14 +34,21 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  kit-checks:
-    name: Kit checks
+  secrets-and-paths:
+    name: Secret scan + forbidden paths
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
 
+      # The hook battery ships as a permanent CI step (needs only python3 + git,
+      # both preinstalled) — every edit to .claude/hooks/pre-tool-use.py is
+      # regression-gated forever.
       - name: Hook battery (block/allow)
         run: python3 .claude/hooks/test_hooks.py
 
@@ -50,13 +71,14 @@ jobs:
           sys.exit(1 if bad else 0)
           '
 
-      - name: Placeholder integrity (used == documented)
-        run: python3 scripts/check_placeholders.py
+      # --bootstrapped: asserts zero {{…}} tokens remain anywhere in the repo.
+      - name: Placeholder regression (zero tokens remain)
+        run: python3 scripts/check_placeholders.py --bootstrapped
 
-      - name: Block forbidden paths (planning/, real .env, key material)
+      - name: Block forbidden paths (planning/, real .env, key material, cookies)
         run: |
           FORBIDDEN=$(git ls-files \
-            | grep -E '^planning/|(^|/)\.env|\.pem$|\.key$' \
+            | grep -E '^planning/|(^|/)\.env|\.pem$|\.key$|(^|/)cookies[^/]*$|\.cookies$' \
             | grep -v -E '(^|/)\.env\.example$' \
             || true)
           if [ -n "$FORBIDDEN" ]; then

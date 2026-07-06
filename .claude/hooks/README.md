@@ -24,25 +24,31 @@ Runs before every tool call. Exit 2 = block with reason. Exit 0 = allow.
 | `rm -rf` / `rm --recursive` | Bash | Accidental mass deletion |
 | `curl/wget \| sh` | Bash | Supply-chain attack vector |
 | `git add planning/` | Bash | `planning/` is gitignored reference material; staging it would publish it |
-| `git add .env*` (non-example) | Bash | Secrets leak via git |
+| `git add .env*` (non-example) or cookie files | Bash | Secrets leak via git |
 | Any push naming `main`/`master` | Bash | Bypasses PR + CI gate |
 | Bare `--force`/`-f` push (any branch) | Bash | Can clobber unseen remote commits; `--force-with-lease` is allowed on feature branches |
 | `git commit`/`git push` on a branch whose PR is **MERGED** | Bash | Pushes there are silently stranded (GitHub stops syncing the head + running CI); fails open if `gh`/network can't verify |
 | `gh pr merge` in any form except `--disable-auto` | Bash | **Merging is the human's action only** — Claude opens PRs and stops; `--auto` still means the agent caused the merge |
-| Reading `.env*`, `*.pem`, `*.key` via shell | Bash | Secrets entering Claude's context |
-| Reading `.env*` (non-example), `*.pem`, `*.key` | Read | Same |
-| Writing to `.env*` (non-example) | Edit/Write | Only `.env.example` is committed |
-| Embedding secret values | Edit/Write | Regex patterns for Anthropic keys, DB URLs with passwords, private key blocks, AWS keys, GitHub tokens, raw JWTs |
+| Reading `.env*`, `*.pem`, `*.key`, `cookies*`/`*.cookies` via shell | Bash | Secrets entering Claude's context (cookies are session credentials to real accounts) |
+| Reading `.env*` (non-example), `*.pem`, `*.key`, `cookies*`/`*.cookies` | Read | Same |
+| Writing to `.env*` (non-example) or `cookies*`/`*.cookies` | Edit/Write | Only `.env.example` is committed; cookie files are human-managed |
+| Embedding secret values | Edit/Write | Regex patterns for Anthropic keys, Google/Gemini keys, DashScope/OpenAI-style keys, DB URLs with passwords, private key blocks, AWS keys, GitHub tokens, raw JWTs |
 
-### Stack-specific guards (Supabase/Postgres — replace for your datastore)
+### Stack-specific guards (chefclaw: Docker volumes + remote Postgres)
+
+**Deliberate inversion of the kit's shape** (adapted at bootstrap, 2026-07-05):
+chefclaw's LOCAL Docker volumes (Postgres data + retained media archive) hold the
+only copy of irreplaceable data between backups, so volume destruction is
+human-only — while plain `docker compose up/down/restart` and localhost SQL
+(Alembic migrations, the separate test DB) stay frictionless.
 
 | What it blocks | Why |
 |---|---|
-| `supabase db reset --linked` / `--db-url` | Wipes a **production** database — only the local (Docker) reset is allowed |
-| `supabase projects delete` | Irreversible deletion of a hosted project |
-| Remote `DROP`/`TRUNCATE`/`DELETE` SQL | Destructive SQL against a non-localhost `postgres://…@host`; run it only on the local DB via migrations |
-
-Keep the *shape* when you swap datastores: local/disposable stays frictionless, remote/irreplaceable gets hard blocks.
+| `docker compose down -v/--volumes` (incl. legacy `docker-compose`) | Deletes the named volumes with the containers |
+| `docker compose rm -v` | Removes stopped containers AND their anonymous volumes |
+| `docker volume rm/remove/prune` | Deletes volumes directly |
+| `docker system prune --volumes` | Sweeps volumes with everything else (`system prune` without the flag is allowed) |
+| Remote `DROP`/`TRUNCATE`/`DELETE` SQL | Destructive SQL against a non-localhost `postgres://…@host` — matters from M-Deploy onward; localhost stays frictionless |
 
 > **v2 — guards match operations, not prose.** Quoted payloads of `-m/--message/--title/--body/-t/-b` are stripped before the danger patterns run, so `git commit -m "drop stale rows"` or a PR body *describing* `rm -rf` no longer false-positives. Message text is inert prose — never executed — so stripping loses no protection. `git commit -F <file>` / `--body-file` remain the norm for long text.
 
@@ -100,7 +106,9 @@ Appends a one-line timestamped record of every `Bash`/`Edit`/`Write` call to `.c
 python3 .claude/hooks/test_hooks.py
 ```
 
-92 block/allow cases covering every guard above — the self-protection cases (edit/mutate a hook → block; read/py_compile/stage → allow, incl. that a redirect must *target* a protected path so `... hook 2>&1` isn't a false positive), the v2 prose-stripping allows, sandboxed branch-guard/branch-naming cases (throwaway git repos pinned to `main` / `master` / a codename / a feature branch, so results don't depend on this repo's current branch or CI's detached HEAD), a real sibling-worktree sandbox for the cross-worktree guard, merged-PR and never-merge guard cases against a **mocked `gh`** (no network), and Stop-hook cases including the DIRTY-PR block (its exit-0 + JSON-decision protocol, plus the dedup that prevents nag loops). Runs in CI on every PR; also available as `npm run test:hooks`
+113 block/allow cases covering every guard above — including the chefclaw
+additions (Docker-volume destruction block/allow pairs, cookie-file guards
+across Bash/Read/Write/git-add, Gemini/DashScope key patterns) — the self-protection cases (edit/mutate a hook → block; read/py_compile/stage → allow, incl. that a redirect must *target* a protected path so `... hook 2>&1` isn't a false positive), the v2 prose-stripping allows, sandboxed branch-guard/branch-naming cases (throwaway git repos pinned to `main` / `master` / a codename / a feature branch, so results don't depend on this repo's current branch or CI's detached HEAD), a real sibling-worktree sandbox for the cross-worktree guard, merged-PR and never-merge guard cases against a **mocked `gh`** (no network), and Stop-hook cases including the DIRTY-PR block (its exit-0 + JSON-decision protocol, plus the dedup that prevents nag loops). Runs in CI on every PR; also available as `npm run test:hooks`
 (and the repo-wide secret scan as `npm run lint:secrets`). **If you edit a hook, add a
 case — and keep docs/COLLABORATION.md's "What's automatic (enforcement)" section in
 sync.**

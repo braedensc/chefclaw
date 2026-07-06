@@ -37,11 +37,12 @@ if [ "$BRANCH" = "main" ] || [ "$BRANCH" = "master" ]; then
   exit 1
 fi
 
-# ── 1. Block planning/ and real .env files from being staged ─────────────────
-# Match planning/ or any path component starting with .env, then explicitly
-# allow .env.example. (|| true so a no-match grep doesn't abort under `sh -e`)
+# ── 1. Block planning/, real .env files, and cookie files from being staged ──
+# Match planning/, any path component starting with .env, or cookie files
+# (platform session credentials — key-grade), then explicitly allow
+# .env.example. (|| true so a no-match grep doesn't abort under `sh -e`)
 FORBIDDEN=$(git diff --cached --name-only \
-  | grep -E '^planning/|(^|/)\.env' \
+  | grep -E '^planning/|(^|/)\.env|(^|/)cookies[^/]*$|\.cookies$' \
   | grep -v -E '(^|/)\.env\.example$' \
   || true)
 if [ -n "$FORBIDDEN" ]; then
@@ -51,6 +52,7 @@ if [ -n "$FORBIDDEN" ]; then
   echo ""
   echo "  planning/ is gitignored reference material and must never be published."
   echo "  .env files (other than .env.example) contain real secrets."
+  echo "  cookies* files are platform session credentials — key-grade secrets."
   echo ""
   exit 1
 fi

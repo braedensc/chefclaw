@@ -128,14 +128,17 @@ worktrees for you — ask it to "work on X in a new worktree.")
 - `node_modules/` and local service state are per-folder: run `npm install` in each
   worktree (the pre-commit secret scan self-heals via the shared git dir even before
   you do).
-- **`.env.local` does not follow you into a worktree** (symptom: a blank page, not an
-  error, in Vite-style apps) — and if parallel worktrees share one local test
-  account, they collide. Run the per-worktree provisioning script once per new
-  worktree: `scripts/dev-worktree-login.sh <slug>` (ships at `templates/scripts/`
-  until bootstrap activates it) — regenerates `.env.local` from the running local
-  stack + creates a dedicated `<slug>@dev.local` login. Claude may *invoke* the
-  script (hooks block constructing/reading env content, not running a committed
-  script); or prefer tooling that resolves env at runtime from the running stack.
+- **`.env.local` does not follow you into a worktree** (symptom: a blank page or
+  auth/config failures, not a clear error). chefclaw's `.env.local` holds
+  human-provided secrets (API keys, platform cookies) that cannot be regenerated
+  from the running stack, so copying it into each new worktree is a **human step,
+  once per worktree** — the hooks correctly block Claude from writing `.env*`
+  files. (The kit's `dev-worktree-login.sh` provisioning script was dropped at
+  bootstrap for exactly this reason.)
+- **Parallel worktrees share the single local compose stack and its test
+  database.** Treat the golden suite and the compose stack (up/down/migrate) as
+  serialized resources — one session at a time (see the serialized-resources list
+  below).
 - Git hooks run from the MAIN checkout (`core.hooksPath` is absolute): a hook fix on a
   branch takes effect only after it merges AND the main checkout pulls it.
 - **Cross-worktree writes are hook-blocked**: a write whose path belongs to a

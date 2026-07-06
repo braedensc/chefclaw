@@ -1,8 +1,10 @@
 # Security Model
 
-> **Found a vulnerability in the kit itself** (a hook bypass, a guard gap)? Please
-> open a [private security advisory](https://github.com/braedensc/claude-project-kit/security/advisories/new)
-> rather than a public issue.
+> **Found a vulnerability in chefclaw?** Please open a
+> [private security advisory](https://github.com/braedensc/chefclaw/security/advisories/new)
+> rather than a public issue. If it's a flaw in the inherited guardrails themselves
+> (a hook bypass, a guard gap), please also report it upstream to
+> [claude-project-kit](https://github.com/braedensc/claude-project-kit/security/advisories/new).
 
 Distilled from todoclaw's production security posture (built 2026-06-23 → 2026-07-03,
 live app + real API spend, zero leaks). Everything here was enforced, not aspirational.
@@ -80,8 +82,14 @@ for the others** — todoclaw's deploys proved this repeatedly:
 | Store | Examples | Set by | Feeds |
 |---|---|---|---|
 | Local env | `.env.local` (gitignored) | **Human only** — the hook blocks Claude from writing `.env*` and key-shaped values | Local dev server |
-| CI secrets | GitHub → Settings → Secrets and variables → Actions | Human (`gh secret set` or dashboard) | Workflows (backup/deploy/keepalive) |
-| Host env | `supabase secrets set …`, Vercel env vars | Human (CLI/dashboard) | Deployed functions / frontend build |
+| CI secrets | GitHub → Settings → Secrets and variables → Actions | Human (`gh secret set` or dashboard) | Workflows — **currently empty for chefclaw**: CI runs with dummy env only, no test ever receives a real key |
+| Host env | *(collapses into `.env.local` for chefclaw — see note)* | Human (CLI/dashboard) | Deployed functions / frontend build |
+
+> **chefclaw note:** this app is a self-hosted docker compose stack — the host *is* the
+> local machine, so the kit's "host env" store collapses into `.env.local`. The three
+> stores are effectively: `.env.local` (local **and** host, human-only) / GitHub Actions
+> secrets (CI — currently holds nothing) / —. A separate host store returns only at
+> M-Deploy if the stack moves off-machine.
 
 Rules that fall out of this:
 
@@ -111,6 +119,17 @@ Rules that fall out of this:
 
 ## Database posture (Postgres/Supabase flavor — keep the shape for any datastore)
 
+> **chefclaw inversion:** the kit assumes local = disposable, remote = production.
+> Here the **local Docker volume is production** — it holds the irreplaceable recipe
+> library (and the retained media archive, on its own named volume). So volume
+> destruction (`down -v`, `volume rm`/`prune`, `system prune --volumes`,
+> `compose rm -v`) is hook-blocked, and pytest/golden suites run against a
+> **separate test database/compose project**, never the real one. Localhost SQL
+> itself stays frictionless (Alembic needs it). One deliberate divergence from the
+> blueprint below: MVP's `DELETE /api/recipes/{id}` is a **hard delete** (decided —
+> single user deleting their own rows); the no-client-delete pattern becomes
+> relevant at multi-user.
+
 - **RLS deny-by-default on every table**: owner-scoped policies (`user_id = auth.uid()`
   in both `USING` and `WITH CHECK`), scoped `to authenticated`, `user_id` defaulting
   server-side. Once proven adversarially, **clone the pattern verbatim per table**.
@@ -131,14 +150,20 @@ Rules that fall out of this:
 
 The PreToolUse hook completes the picture locally: destructive ops against a **remote**
 database are blocked outright; the **local** (Docker) stack stays frictionless. Local is
-disposable, production is irreplaceable.
+disposable, production is irreplaceable — except in chefclaw, where that mapping is
+inverted (see the note at the top of this section).
 
 ---
 
 ## AI cost guardrails (the owner-key pattern)
 
 For any app calling a paid AI API on the owner's key (from todoclaw ADR-0015/0017,
-live with real spend):
+live with real spend). chefclaw instantiates this pattern as the `llm_spend` ledger
+(one row per model attempt, failures included) plus **fail-closed** budget vars —
+`MONTHLY_LLM_BUDGET_USD` / `MAX_EXTRACTION_ATTEMPTS_PER_DAY` unset or unparseable
+means **no paid calls**, surfaced as a typed config error — and the budget +
+daily-cap check runs before **every paid call**. (Mechanics land with the Phase-2
+extraction pipeline.)
 
 1. **Server-side-only keys.** The API key is a platform function secret, read from
    server env. Never in the bundle, never in a client-visible var, never logged. The
@@ -163,6 +188,19 @@ live with real spend):
 7. **Verify model IDs and pricing against live docs** before hard-coding cost math —
    post-cutoff models/prices change. Bias the math in the *conservative* direction (a
    kill-switch that can only trip early, never late).
+
+---
+
+## Scraping & platform ToS posture (chefclaw)
+
+Automated downloading violates Bilibili/Xiaohongshu ToS — stated plainly, not hidden.
+The posture that makes this defensible: **personal, single-user use** at low volume
+with built-in delays, anonymous Bilibili access where quality permits, and **no
+redistribution** of extracted content. Platform cookies are session credentials to a
+real account — **key-grade secrets**, guarded in every layer (PreToolUse hook, native
+`permissions.deny`, `.gitignore`, pre-commit scan, CI scan, secretlint `cookies*` /
+`*.cookies` rules). The Rednote session uses a **secondary throwaway account** so a
+ban's blast radius is bounded to something disposable.
 
 ---
 

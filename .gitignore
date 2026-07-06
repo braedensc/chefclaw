@@ -13,6 +13,11 @@ planning/
 *.pem
 *.key
 
+# Platform cookies — session credentials to real accounts, key-grade secrets.
+# The PreToolUse hook, native deny, pre-commit grep, and CI grep refuse these too.
+cookies*
+*.cookies
+
 # Dependencies
 node_modules/
 
