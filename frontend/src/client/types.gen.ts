@@ -5,12 +5,65 @@ export type ClientOptions = {
 };
 
 /**
+ * Body_upload_recipe_video_api_recipes_upload_post
+ */
+export type BodyUploadRecipeVideoApiRecipesUploadPost = {
+    /**
+     * File
+     */
+    file: Blob | File;
+    /**
+     * Platform Hint
+     */
+    platform_hint?: string | null;
+    /**
+     * Provenance Url
+     */
+    provenance_url?: string | null;
+};
+
+/**
+ * ErrorBody
+ *
+ * Typed error payload: ``error_type`` is the stable taxonomy string the
+ * UI maps onto actions (runbook link, retry button, hard stop).
+ */
+export type ErrorBody = {
+    /**
+     * Detail
+     */
+    detail: string;
+    /**
+     * Error Type
+     */
+    error_type: string;
+};
+
+/**
+ * ExtractRequest
+ */
+export type ExtractRequest = {
+    /**
+     * Url
+     */
+    url: string;
+};
+
+/**
+ * HTTPValidationError
+ */
+export type HttpValidationError = {
+    /**
+     * Detail
+     */
+    detail?: Array<ValidationError>;
+};
+
+/**
  * HealthResponse
  *
- * Extensible Phase-1 health shape.
- *
- * sidecar / cookie_freshness / backup / spend_month_usd are placeholders
- * whose real values land in later phases (plan §7 screen 4).
+ * Phase-2 health shape (plan §7 screen 4). ``backup`` stays a
+ * placeholder until Phase 4's backup script lands.
  */
 export type HealthResponse = {
     /**
@@ -20,7 +73,7 @@ export type HealthResponse = {
     /**
      * Cookie Freshness
      */
-    cookie_freshness?: 'not_configured';
+    cookie_freshness?: 'fresh' | 'aging' | 'stale' | 'not_configured';
     /**
      * Db
      */
@@ -28,7 +81,7 @@ export type HealthResponse = {
     /**
      * Sidecar
      */
-    sidecar?: 'not_configured';
+    sidecar?: 'ok' | 'unreachable' | 'not_configured';
     /**
      * Spend Month Usd
      */
@@ -37,6 +90,230 @@ export type HealthResponse = {
      * Status
      */
     status: 'ok' | 'degraded';
+};
+
+/**
+ * JobOut
+ */
+export type JobOut = {
+    /**
+     * Attempts
+     */
+    attempts: number;
+    /**
+     * Canonical Id
+     */
+    canonical_id: string | null;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Error Detail
+     */
+    error_detail: string | null;
+    /**
+     * Error Type
+     */
+    error_type: string | null;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Platform
+     */
+    platform: string | null;
+    /**
+     * Result Recipe Ids
+     */
+    result_recipe_ids: Array<string>;
+    /**
+     * Status
+     */
+    status: string;
+    /**
+     * Type
+     */
+    type: string;
+    /**
+     * Updated At
+     */
+    updated_at: string;
+};
+
+/**
+ * RecipeDetail
+ *
+ * Full recipe including the (read-only) document.
+ */
+export type RecipeDetail = {
+    /**
+     * Canonical Id
+     */
+    canonical_id: string;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Dish Index
+     */
+    dish_index: number;
+    /**
+     * Document
+     */
+    document: {
+        [key: string]: unknown;
+    };
+    /**
+     * Extraction Meta
+     */
+    extraction_meta: {
+        [key: string]: unknown;
+    };
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Platform
+     */
+    platform: string;
+    /**
+     * Source Url
+     */
+    source_url: string;
+    /**
+     * Status
+     */
+    status: string;
+    /**
+     * Tags
+     */
+    tags: Array<string>;
+    /**
+     * Title En
+     */
+    title_en: string | null;
+    /**
+     * Title Original
+     */
+    title_original: string | null;
+    /**
+     * User Notes
+     */
+    user_notes: string | null;
+};
+
+/**
+ * RecipePage
+ */
+export type RecipePage = {
+    /**
+     * Items
+     */
+    items: Array<RecipeSummary>;
+    /**
+     * Limit
+     */
+    limit: number;
+    /**
+     * Offset
+     */
+    offset: number;
+    /**
+     * Total
+     */
+    total: number;
+};
+
+/**
+ * RecipePatch
+ *
+ * The ONLY user-editable fields. extra='forbid' rejects document edits.
+ */
+export type RecipePatch = {
+    /**
+     * Tags
+     */
+    tags?: Array<string> | null;
+    /**
+     * User Notes
+     */
+    user_notes?: string | null;
+};
+
+/**
+ * RecipeSummary
+ *
+ * Library-card shape (list endpoint).
+ */
+export type RecipeSummary = {
+    /**
+     * Canonical Id
+     */
+    canonical_id: string;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Dish Index
+     */
+    dish_index: number;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Platform
+     */
+    platform: string;
+    /**
+     * Status
+     */
+    status: string;
+    /**
+     * Tags
+     */
+    tags: Array<string>;
+    /**
+     * Title En
+     */
+    title_en: string | null;
+    /**
+     * Title Original
+     */
+    title_original: string | null;
+};
+
+/**
+ * ValidationError
+ */
+export type ValidationError = {
+    /**
+     * Context
+     */
+    ctx?: {
+        [key: string]: unknown;
+    };
+    /**
+     * Input
+     */
+    input?: unknown;
+    /**
+     * Location
+     */
+    loc: Array<string | number>;
+    /**
+     * Message
+     */
+    msg: string;
+    /**
+     * Error Type
+     */
+    type: string;
 };
 
 export type HealthApiHealthGetData = {
@@ -54,3 +331,271 @@ export type HealthApiHealthGetResponses = {
 };
 
 export type HealthApiHealthGetResponse = HealthApiHealthGetResponses[keyof HealthApiHealthGetResponses];
+
+export type GetJobApiJobsJobIdGetData = {
+    body?: never;
+    path: {
+        /**
+         * Job Id
+         */
+        job_id: string;
+    };
+    query?: never;
+    url: '/api/jobs/{job_id}';
+};
+
+export type GetJobApiJobsJobIdGetErrors = {
+    /**
+     * Not Found
+     */
+    404: ErrorBody;
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetJobApiJobsJobIdGetError = GetJobApiJobsJobIdGetErrors[keyof GetJobApiJobsJobIdGetErrors];
+
+export type GetJobApiJobsJobIdGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: JobOut;
+};
+
+export type GetJobApiJobsJobIdGetResponse = GetJobApiJobsJobIdGetResponses[keyof GetJobApiJobsJobIdGetResponses];
+
+export type ListRecipesApiRecipesGetData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Q
+         */
+        q?: string | null;
+        /**
+         * Platform
+         */
+        platform?: string | null;
+        /**
+         * Tag
+         */
+        tag?: string | null;
+        /**
+         * Sort
+         */
+        sort?: 'newest' | 'oldest';
+        /**
+         * Limit
+         */
+        limit?: number;
+        /**
+         * Offset
+         */
+        offset?: number;
+    };
+    url: '/api/recipes';
+};
+
+export type ListRecipesApiRecipesGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ListRecipesApiRecipesGetError = ListRecipesApiRecipesGetErrors[keyof ListRecipesApiRecipesGetErrors];
+
+export type ListRecipesApiRecipesGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: RecipePage;
+};
+
+export type ListRecipesApiRecipesGetResponse = ListRecipesApiRecipesGetResponses[keyof ListRecipesApiRecipesGetResponses];
+
+export type ExtractRecipeApiRecipesExtractPostData = {
+    body: ExtractRequest;
+    path?: never;
+    query?: never;
+    url: '/api/recipes/extract';
+};
+
+export type ExtractRecipeApiRecipesExtractPostErrors = {
+    /**
+     * Bad Request
+     */
+    400: ErrorBody;
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+    /**
+     * Bad Gateway
+     */
+    502: ErrorBody;
+    /**
+     * Service Unavailable
+     */
+    503: ErrorBody;
+};
+
+export type ExtractRecipeApiRecipesExtractPostError = ExtractRecipeApiRecipesExtractPostErrors[keyof ExtractRecipeApiRecipesExtractPostErrors];
+
+export type ExtractRecipeApiRecipesExtractPostResponses = {
+    /**
+     * Existing job (canonical dedupe hit)
+     */
+    200: JobOut;
+    /**
+     * Successful Response
+     */
+    202: JobOut;
+};
+
+export type ExtractRecipeApiRecipesExtractPostResponse = ExtractRecipeApiRecipesExtractPostResponses[keyof ExtractRecipeApiRecipesExtractPostResponses];
+
+export type UploadRecipeVideoApiRecipesUploadPostData = {
+    body: BodyUploadRecipeVideoApiRecipesUploadPost;
+    path?: never;
+    query?: never;
+    url: '/api/recipes/upload';
+};
+
+export type UploadRecipeVideoApiRecipesUploadPostErrors = {
+    /**
+     * Bad Request
+     */
+    400: ErrorBody;
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+    /**
+     * Bad Gateway
+     */
+    502: ErrorBody;
+    /**
+     * Service Unavailable
+     */
+    503: ErrorBody;
+};
+
+export type UploadRecipeVideoApiRecipesUploadPostError = UploadRecipeVideoApiRecipesUploadPostErrors[keyof UploadRecipeVideoApiRecipesUploadPostErrors];
+
+export type UploadRecipeVideoApiRecipesUploadPostResponses = {
+    /**
+     * Existing job (canonical dedupe hit)
+     */
+    200: JobOut;
+    /**
+     * Successful Response
+     */
+    202: JobOut;
+};
+
+export type UploadRecipeVideoApiRecipesUploadPostResponse = UploadRecipeVideoApiRecipesUploadPostResponses[keyof UploadRecipeVideoApiRecipesUploadPostResponses];
+
+export type DeleteRecipeApiRecipesRecipeIdDeleteData = {
+    body?: never;
+    path: {
+        /**
+         * Recipe Id
+         */
+        recipe_id: string;
+    };
+    query?: never;
+    url: '/api/recipes/{recipe_id}';
+};
+
+export type DeleteRecipeApiRecipesRecipeIdDeleteErrors = {
+    /**
+     * Not Found
+     */
+    404: ErrorBody;
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type DeleteRecipeApiRecipesRecipeIdDeleteError = DeleteRecipeApiRecipesRecipeIdDeleteErrors[keyof DeleteRecipeApiRecipesRecipeIdDeleteErrors];
+
+export type DeleteRecipeApiRecipesRecipeIdDeleteResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type DeleteRecipeApiRecipesRecipeIdDeleteResponse = DeleteRecipeApiRecipesRecipeIdDeleteResponses[keyof DeleteRecipeApiRecipesRecipeIdDeleteResponses];
+
+export type GetRecipeApiRecipesRecipeIdGetData = {
+    body?: never;
+    path: {
+        /**
+         * Recipe Id
+         */
+        recipe_id: string;
+    };
+    query?: never;
+    url: '/api/recipes/{recipe_id}';
+};
+
+export type GetRecipeApiRecipesRecipeIdGetErrors = {
+    /**
+     * Not Found
+     */
+    404: ErrorBody;
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetRecipeApiRecipesRecipeIdGetError = GetRecipeApiRecipesRecipeIdGetErrors[keyof GetRecipeApiRecipesRecipeIdGetErrors];
+
+export type GetRecipeApiRecipesRecipeIdGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: RecipeDetail;
+};
+
+export type GetRecipeApiRecipesRecipeIdGetResponse = GetRecipeApiRecipesRecipeIdGetResponses[keyof GetRecipeApiRecipesRecipeIdGetResponses];
+
+export type PatchRecipeApiRecipesRecipeIdPatchData = {
+    body: RecipePatch;
+    path: {
+        /**
+         * Recipe Id
+         */
+        recipe_id: string;
+    };
+    query?: never;
+    url: '/api/recipes/{recipe_id}';
+};
+
+export type PatchRecipeApiRecipesRecipeIdPatchErrors = {
+    /**
+     * Not Found
+     */
+    404: ErrorBody;
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type PatchRecipeApiRecipesRecipeIdPatchError = PatchRecipeApiRecipesRecipeIdPatchErrors[keyof PatchRecipeApiRecipesRecipeIdPatchErrors];
+
+export type PatchRecipeApiRecipesRecipeIdPatchResponses = {
+    /**
+     * Successful Response
+     */
+    200: RecipeDetail;
+};
+
+export type PatchRecipeApiRecipesRecipeIdPatchResponse = PatchRecipeApiRecipesRecipeIdPatchResponses[keyof PatchRecipeApiRecipesRecipeIdPatchResponses];

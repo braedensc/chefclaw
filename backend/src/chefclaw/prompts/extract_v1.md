@@ -10,6 +10,12 @@ creativity.
 
 - Output ONLY a JSON array. No markdown fences, no commentary, no keys outside
   the schema below.
+- **Emit ONLY the keys shown in the dish object shape — never invent additional
+  keys** (no `ingredients_prep`, no `notes` on steps, no metadata of your own).
+  The validator rejects unknown keys and the whole extraction fails. Anything
+  you want to record beyond the schema belongs INSIDE the existing fields:
+  per-step prep detail goes in that step's `instruction` or `technique_notes`;
+  per-ingredient detail goes in that ingredient's `notes`.
 - One array element per distinct dish demonstrated. Most videos show one dish;
   some show several — produce one complete object for each. Never merge two
   dishes into one object.
@@ -98,9 +104,17 @@ Field notes:
 
 - `ingredients[].raw_text` — the full verbatim ingredient mention (name +
   quantity as one string, e.g. "五花肉500克"). Immutable source of truth.
+- `quantity` — three distinct cases, never mixed up:
+  1. A concrete amount is stated ("三个", "500克") → full object with `raw_text`
+     and the explicit value/unit split rules above.
+  2. An approximate phrase is stated ("适量", "少许", "to taste") → object with
+     that phrase as `raw_text`, `value: null`, `unit: null`, `unit_type: "approx"`.
+  3. **Nothing about quantity is said or shown at all** → the ENTIRE `quantity`
+     field is `null`. Never emit a quantity object with `raw_text: null` —
+     `raw_text` must always be a real string when the object exists.
 - `quantity.unit_type` — `volume` (spoons, cups, ml), `mass` (g, kg, 斤, 两),
   `count` (pieces, cloves, 个/根/瓣), `approx` (适量/少许/to-taste/unspecified).
-- `prep_state` — `"dried"`, `"fresh"`, `"cooked"`, `"raw"`, or `null` when the
+- `prep_state` — `"dried"`, `"fresh"`, `"cooked"`, `"raw"`, `"frozen"`, or `null` when the
   video doesn't indicate one.
 - `notes` — verbatim qualifiers from the host ("要肥瘦相间的", "去皮"), else null.
 - `nutrition_ref` — ALWAYS `null`. It is reserved for a later system; you never
