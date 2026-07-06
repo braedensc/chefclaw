@@ -9,6 +9,15 @@
 
 FROM node:22-alpine AS webbuild
 WORKDIR /build
+# Observability build args (V2-A ADR): VITE_* values are baked into the SPA
+# bundle at build time. Only the DSN (an ingest address, not a credential —
+# docs/STACK-RATIONALE.md) may ride here; server keys never appear as VITE_*.
+ARG GIT_SHA=
+ARG VITE_SENTRY_DSN=
+ARG VITE_SENTRY_ENVIRONMENT=local
+ENV VITE_SENTRY_DSN=${VITE_SENTRY_DSN} \
+    VITE_SENTRY_ENVIRONMENT=${VITE_SENTRY_ENVIRONMENT} \
+    VITE_SENTRY_RELEASE=${GIT_SHA}
 COPY package.json package-lock.json ./
 COPY frontend ./frontend
 RUN npm ci -w frontend --ignore-scripts
@@ -35,10 +44,15 @@ RUN uv sync --frozen --no-dev
 
 COPY --from=webbuild /build/frontend/dist /app/static
 
+# The backend's Sentry `release` tag — same GIT_SHA the SPA build got. Empty
+# (e.g. a plain `docker compose up --build` without GIT_SHA exported) simply
+# omits the release tag; events still flow.
+ARG GIT_SHA=
 ENV PATH="/app/.venv/bin:$PATH" \
     CHEFCLAW_HOST=0.0.0.0 \
     CHEFCLAW_PORT=8000 \
-    CHEFCLAW_STATIC_DIR=/app/static
+    CHEFCLAW_STATIC_DIR=/app/static \
+    SENTRY_RELEASE=${GIT_SHA}
 
 EXPOSE 8000
 

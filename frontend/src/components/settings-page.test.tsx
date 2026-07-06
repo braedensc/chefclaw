@@ -2,7 +2,7 @@ import { fireEvent, screen, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ApiError } from '../api-error';
-import { healthResponse } from '../test/fixtures';
+import { healthResponse, spendSummary } from '../test/fixtures';
 import { genState, resetGenState } from '../test/gen-mock';
 import { renderApp } from '../test/render-app';
 
@@ -34,11 +34,14 @@ describe('SettingsPage', () => {
   });
 
   describe('Extraction section', () => {
-    it('shows the live extractor and model with spend against the $10 budget', async () => {
+    it('shows the live extractor and model with spend against the REAL budget cap', async () => {
+      // V2-A: the cap comes from /api/health (budget_monthly_usd), not a
+      // mirrored frontend constant.
       genState.health = healthResponse({
         extractor: 'gemini',
         model: 'gemini-2.5-flash',
         spend_month_usd: 2.5,
+        budget_monthly_usd: 12,
       });
 
       renderApp('/settings');
@@ -47,12 +50,41 @@ describe('SettingsPage', () => {
       expect(section.getByText('gemini')).toBeInTheDocument();
       expect(section.getByText('gemini-2.5-flash')).toBeInTheDocument();
       expect(section.getByText('$2.50')).toBeInTheDocument();
-      expect(section.getByText(/of \$10\.00 budget/)).toBeInTheDocument();
+      expect(section.getByText(/of \$12\.00 budget/)).toBeInTheDocument();
       const bar = section.getByRole('progressbar', {
         name: 'Month-to-date spend against budget',
       });
       expect(bar).toHaveAttribute('aria-valuenow', '2.5');
-      expect(bar).toHaveAttribute('aria-valuemax', '10');
+      expect(bar).toHaveAttribute('aria-valuemax', '12');
+    });
+
+    it('shows the fail-closed warning (no bar) when the budget is not configured', async () => {
+      genState.health = healthResponse({
+        budget_monthly_usd: null,
+        daily_attempt_cap: null,
+        attempts_today: null,
+      });
+
+      renderApp('/settings');
+      const section = await findSection('Extraction');
+
+      expect(
+        section.getByText(/extraction is disabled \(fail-closed\)/i),
+      ).toBeInTheDocument();
+      expect(section.getByText(/MONTHLY_LLM_BUDGET_USD/)).toBeInTheDocument();
+      expect(section.queryByRole('progressbar')).not.toBeInTheDocument();
+    });
+
+    it('shows attempts today against the daily cap', async () => {
+      genState.health = healthResponse({
+        attempts_today: 3,
+        daily_attempt_cap: 25,
+      });
+
+      renderApp('/settings');
+      const section = await findSection('Extraction');
+
+      expect(section.getByText('3 of 25')).toBeInTheDocument();
     });
 
     it('renders zero spend as a real $0.00 bar, not the unavailable state', async () => {
@@ -100,6 +132,88 @@ describe('SettingsPage', () => {
       ).toBeInTheDocument();
       expect(section.queryByRole('progressbar')).not.toBeInTheDocument();
       expect(section.queryByText(/\$0\.00/)).not.toBeInTheDocument();
+    });
+  });
+
+  describe('API section (V2-A worker + error-tracking rows)', () => {
+    it('shows an alive worker and unconfigured error tracking', async () => {
+      genState.health = healthResponse({
+        worker: 'alive',
+        sentry_enabled: false,
+      });
+
+      renderApp('/settings');
+      const section = await findSection('API');
+
+      expect(section.getByText('alive')).toBeInTheDocument();
+      expect(
+        section.getByText(/not configured \(set SENTRY_DSN to enable\)/),
+      ).toBeInTheDocument();
+    });
+
+    it('warns loudly when the worker task is dead', async () => {
+      genState.health = healthResponse({ worker: 'dead' });
+
+      renderApp('/settings');
+      const section = await findSection('API');
+
+      expect(section.getByText('dead')).toBeInTheDocument();
+      expect(section.getByText(/no extraction will run/i)).toBeInTheDocument();
+    });
+
+    it('shows Sentry enabled when the backend reports it', async () => {
+      genState.health = healthResponse({ sentry_enabled: true });
+
+      renderApp('/settings');
+      const section = await findSection('API');
+
+      expect(section.getByText('Sentry enabled')).toBeInTheDocument();
+    });
+  });
+
+  describe('Spend history section (GET /api/spend)', () => {
+    it('lists per-day rows with the per-model split, newest first', async () => {
+      genState.spend = spendSummary();
+
+      renderApp('/settings');
+      const section = await findSection('Spend history');
+
+      expect(await section.findByText(/last 30 days/i)).toBeInTheDocument();
+      expect(section.getByText(/month to date \$1\.25/i)).toBeInTheDocument();
+      expect(section.getByText('2026-07-06')).toBeInTheDocument();
+      expect(section.getByText('3 attempts')).toBeInTheDocument();
+      expect(
+        section.getByText(/gemini-2\.5-flash \$0\.30 · qwen3-vl-plus \$0\.10/),
+      ).toBeInTheDocument();
+      expect(section.getByText('2026-07-04')).toBeInTheDocument();
+    });
+
+    it('shows the quiet empty state when there was no activity', async () => {
+      genState.spend = spendSummary({
+        days: [],
+        total_usd: 0,
+        month_to_date_usd: 0,
+      });
+
+      renderApp('/settings');
+      const section = await findSection('Spend history');
+
+      expect(
+        await section.findByText(/no extraction attempts in the last 30 days/i),
+      ).toBeInTheDocument();
+    });
+
+    it('degrades gracefully when the ledger read fails', async () => {
+      genState.spendError = new ApiError(503, 'Service Unavailable', {
+        detail: 'db down',
+      });
+
+      renderApp('/settings');
+      const section = await findSection('Spend history');
+
+      expect(
+        await section.findByText(/spend history is unavailable/i),
+      ).toBeInTheDocument();
     });
   });
 

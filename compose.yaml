@@ -69,6 +69,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.api
+      args:
+        # Sentry release/DSN baked at build (V2-A). Deploys should export
+        # GIT_SHA=$(git rev-parse --short HEAD) before `up -d --build`
+        # (docs/RUNBOOK.md §4); everything defaults to off/empty.
+        GIT_SHA: ${GIT_SHA:-}
+        VITE_SENTRY_DSN: ${VITE_SENTRY_DSN:-}
+        VITE_SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT:-local}
     init: true # reap zombies — yt-dlp spawns ffmpeg children
     environment:
       DB_HOST: postgres
@@ -95,6 +102,12 @@ services:
       # Platform-fetch proxy (M-Deploy Rednote escalation ladder — rungs b/c/d
       # are all this ONE knob). Empty = direct, the default.
       CHEFCLAW_FETCH_PROXY: ${CHEFCLAW_FETCH_PROXY:-}
+      # Observability (V2-A): no DSN => Sentry never initialises (opt-in by
+      # presence); logs are structured JSON on stdout for `compose logs`.
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT:-local}
+      CHEFCLAW_LOG_FORMAT: ${CHEFCLAW_LOG_FORMAT:-json}
+      CHEFCLAW_LOG_LEVEL: ${CHEFCLAW_LOG_LEVEL:-INFO}
     ports:
       - "127.0.0.1:8000:8000"
     volumes:

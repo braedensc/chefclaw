@@ -13,7 +13,7 @@ import hmac
 import uuid
 from typing import Annotated
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy import select
 
@@ -36,6 +36,7 @@ async def fetch_owner_id() -> uuid.UUID | None:
 
 
 async def require_owner(
+    request: Request,
     credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(_bearer_scheme)],
     settings: Annotated[Settings, Depends(get_settings)],
 ) -> uuid.UUID:
@@ -78,4 +79,7 @@ async def require_owner(
             )
         _cached_owner_id = owner_id
 
+    # The request log (observability.RequestLogMiddleware) reads this off the
+    # ASGI scope — the owner UUID is scope, not a secret.
+    request.state.owner_id = _cached_owner_id
     return _cached_owner_id

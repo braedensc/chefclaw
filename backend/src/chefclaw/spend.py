@@ -14,20 +14,25 @@ the daily cap bounds runaway retries even when a failed attempt's token
 counts are unknown and recorded as zero.
 """
 
+import logging
 import uuid
-from datetime import UTC, datetime
+from dataclasses import dataclass
+from datetime import UTC, date, datetime, timedelta
 from decimal import ROUND_UP, Decimal, InvalidOperation
 from typing import TYPE_CHECKING
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from chefclaw import observability
 from chefclaw.errors import BudgetExceededError, ConfigError
 from chefclaw.extractors import ExtractionUsage
 from chefclaw.models import LlmSpend
 
 if TYPE_CHECKING:
     from chefclaw.config import Settings
+
+logger = logging.getLogger(__name__)
 
 # ─── Pricing table ───────────────────────────────────────────────────────────
 # !!! RE-VERIFY THESE NUMBERS AGAINST LIVE GEMINI PRICING BEFORE TRUSTING !!!
@@ -200,3 +205,145 @@ async def record_spend(
     session.add(row)
     await session.commit()
     return row
+
+
+# ─── Budget alerting (V2-A ADR — crossing-edge, best-effort) ─────────────────
+
+BUDGET_ALERT_THRESHOLDS: tuple[Decimal, ...] = (Decimal("0.80"), Decimal("1.00"))
+
+
+def thresholds_crossed(before: Decimal, after: Decimal, budget: Decimal) -> list[int]:
+    """Which alert thresholds (as percents: 80, 100) THIS attempt crossed.
+
+    Crossing-edge (``before < line <= after``), so each threshold alerts on
+    exactly the attempt that crosses it — never once per attempt for the rest
+    of the month. One big attempt can legitimately cross both at once.
+    """
+    return [
+        int(fraction * 100)
+        for fraction in BUDGET_ALERT_THRESHOLDS
+        if before < budget * fraction <= after
+    ]
+
+
+async def alert_budget_progress(
+    session: AsyncSession,
+    settings: "Settings",
+    owner_id: uuid.UUID,
+    attempt_cost: Decimal,
+) -> None:
+    """After a ledger write: warn (log + Sentry) when the month's spend
+    crosses 80% / 100% of MONTHLY_LLM_BUDGET_USD. Best-effort by design —
+    alerting must NEVER break the ledger write it follows, so every failure
+    path here degrades to a debug log."""
+    try:
+        monthly_budget, _ = parse_budget(settings)
+    except ConfigError:
+        return  # fail-closed config ⇒ no paid calls happen; nothing to alert on
+    try:
+        after = await month_to_date_usd(session, owner_id)
+    except Exception:
+        logger.debug("budget-alert ledger read failed", exc_info=True)
+        return
+    for pct in thresholds_crossed(after - attempt_cost, after, monthly_budget):
+        message = (
+            f"LLM spend crossed {pct}% of the monthly budget: "
+            f"${after} of ${monthly_budget} (MONTHLY_LLM_BUDGET_USD)"
+        )
+        logger.warning(
+            message,
+            extra={
+                "budget_pct": pct,
+                "spend_month_usd": float(after),
+                "budget_monthly_usd": float(monthly_budget),
+            },
+        )
+        observability.capture_budget_alert(message, pct)
+
+
+# ─── Spend history (GET /api/spend — V2-A ADR) ───────────────────────────────
+
+
+@dataclass(frozen=True)
+class DailyModelSpend:
+    """One (UTC day, model) aggregation bucket from the ledger."""
+
+    day: date
+    model: str
+    cost_usd: Decimal
+    attempts: int
+    tokens_in: int
+    tokens_out: int
+    tokens_thinking: int
+
+
+@dataclass(frozen=True)
+class SpendSummary:
+    """Everything the spend endpoint reports — assembled here so the router
+    stays a thin transport. ``budget_monthly_usd``/``daily_attempt_cap`` are
+    None when the budget config is fail-closed (unset/unparseable)."""
+
+    period_days: int
+    month_to_date_usd: Decimal
+    attempts_today: int
+    budget_monthly_usd: Decimal | None
+    daily_attempt_cap: int | None
+    rows: list[DailyModelSpend]
+
+
+async def spend_by_day_and_model(
+    session: AsyncSession, owner_id: uuid.UUID, *, days: int
+) -> list[DailyModelSpend]:
+    """Per-UTC-day, per-model ledger aggregation over the last ``days`` days
+    (today included), newest day first."""
+    since = day_start(datetime.now(UTC)) - timedelta(days=days - 1)
+    # Explicit UTC bucketing: date_trunc on a timestamptz otherwise follows
+    # the connection's TimeZone setting.
+    day_col = func.date_trunc("day", func.timezone("UTC", LlmSpend.created_at))
+    stmt = (
+        select(
+            day_col.label("day"),
+            LlmSpend.model,
+            func.sum(LlmSpend.cost_usd).label("cost_usd"),
+            func.count(LlmSpend.id).label("attempts"),
+            func.coalesce(func.sum(LlmSpend.tokens_in), 0).label("tokens_in"),
+            func.coalesce(func.sum(LlmSpend.tokens_out), 0).label("tokens_out"),
+            func.coalesce(func.sum(LlmSpend.tokens_thinking), 0).label("tokens_thinking"),
+        )
+        .where(LlmSpend.owner_id == owner_id, LlmSpend.created_at >= since)
+        .group_by(day_col, LlmSpend.model)
+        .order_by(day_col.desc(), LlmSpend.model)
+    )
+    result = await session.execute(stmt)
+    return [
+        DailyModelSpend(
+            day=row.day.date() if isinstance(row.day, datetime) else row.day,
+            model=row.model,
+            cost_usd=Decimal(row.cost_usd),
+            attempts=int(row.attempts),
+            tokens_in=int(row.tokens_in),
+            tokens_out=int(row.tokens_out),
+            tokens_thinking=int(row.tokens_thinking),
+        )
+        for row in result
+    ]
+
+
+async def spend_summary(
+    session: AsyncSession, settings: "Settings", owner_id: uuid.UUID, *, days: int
+) -> SpendSummary:
+    """The full spend readout. Budget caps come from the same fail-closed
+    parse the paid-call gate uses — None here means 'extraction is refusing
+    paid calls', and the UI says so instead of inventing a number."""
+    try:
+        budget, daily_cap = parse_budget(settings)
+    except ConfigError:
+        budget, daily_cap = None, None
+    return SpendSummary(
+        period_days=days,
+        month_to_date_usd=await month_to_date_usd(session, owner_id),
+        attempts_today=await attempts_today(session, owner_id),
+        budget_monthly_usd=budget,
+        daily_attempt_cap=daily_cap,
+        rows=await spend_by_day_and_model(session, owner_id, days=days),
+    )

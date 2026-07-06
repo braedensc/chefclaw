@@ -25,7 +25,14 @@ from chefclaw.documents import RecipeDocument
 from chefclaw.extractors import ExtractionUsage
 from chefclaw.models import Job, JobStatus, Recipe
 
-__all__ = ["ACTIVE_STATUSES", "RUNNING_STATUSES", "JobStore", "PostgresJobStore"]
+__all__ = [
+    "ACTIVE_STATUSES",
+    "RUNNING_STATUSES",
+    "JobStore",
+    "PostgresJobStore",
+    "PostgresSpendReader",
+    "SpendReader",
+]
 
 # A job in any of these states already owns its (platform, canonical_id) —
 # the dedupe check returns it instead of enqueueing a twin.
@@ -347,3 +354,25 @@ class PostgresJobStore:
             await spend.record_spend(
                 session, job_id=job_id, owner_id=owner_id, usage=usage, cost_usd=cost_usd
             )
+            # After the committed write: 80%/100% crossing-edge budget alerts
+            # (best-effort — alert_budget_progress never raises; V2-A ADR).
+            await spend.alert_budget_progress(session, self._settings, owner_id, cost_usd)
+
+
+class SpendReader(Protocol):
+    """What the spend endpoint needs — kept beside JobStore for the same
+    reason: the CI unit tier fakes it (no database), the golden tier runs it."""
+
+    async def summary(self, owner_id: uuid.UUID, *, days: int) -> spend.SpendSummary: ...
+
+
+class PostgresSpendReader:
+    """Real ledger reads for GET /api/spend."""
+
+    def __init__(self, sessionmaker: async_sessionmaker[AsyncSession], settings: Settings) -> None:
+        self._sessionmaker = sessionmaker
+        self._settings = settings
+
+    async def summary(self, owner_id: uuid.UUID, *, days: int) -> spend.SpendSummary:
+        async with self._sessionmaker() as session:
+            return await spend.spend_summary(session, self._settings, owner_id, days=days)

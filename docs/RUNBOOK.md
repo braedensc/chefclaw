@@ -289,11 +289,22 @@ on deploy day if months have passed.
      from the password manager, never generated on the VPS alone; point the
      dir OFF the VPS, see the ADR's backup note)
    - `MEDIA_RETENTION`
+   - `SENTRY_DSN` + `VITE_SENTRY_DSN` + `SENTRY_ENVIRONMENT=vps` (observability
+     — V2-A ADR; empty DSNs are legal and simply disable Sentry)
    - optionally `DB_PASSWORD` (postgres stays loopback-bound either way)
-6. **Start the stack:**
-   `cd /opt/chefclaw && sudo docker compose --env-file .env.local up -d --build`
+6. **Start the stack** — export the release SHA first so Sentry events carry
+   the deployed commit (plain `up -d --build` without it works too, just
+   untagged):
+
+   ```bash
+   cd /opt/chefclaw
+   GIT_SHA=$(git rev-parse --short HEAD) sudo -E docker compose --env-file .env.local up -d --build
+   ```
+
    — then confirm nothing listens publicly: `ss -tlnp | grep -E '8000|5432'`
-   must show only `127.0.0.1`.
+   must show only `127.0.0.1`. Logs are structured JSON on stdout: read them
+   with `sudo docker compose logs -f api` (each line carries method/path/
+   status/latency for requests, job_id/stage for worker events).
 7. **Front the api toward the tailnet** (syntax verified 2026-07-06;
    Tailscale auto-provisions the TLS cert — if HTTPS certificates aren't
    enabled for the tailnet yet, the command tells you and links the console

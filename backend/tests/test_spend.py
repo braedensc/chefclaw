@@ -198,3 +198,71 @@ async def test_record_spend_zero_token_failure_row_is_legal() -> None:
     )
     assert session.commits == 1
     assert (row.tokens_in, row.tokens_out, row.tokens_thinking) == (0, 0, 0)
+
+
+# ── budget alerting (V2-A ADR — crossing-edge) ───────────────────────────────
+
+
+def test_thresholds_crossed_edges() -> None:
+    budget = Decimal("10")
+    crossed = spend.thresholds_crossed
+    assert crossed(Decimal("7.90"), Decimal("8.00"), budget) == [80]
+    assert crossed(Decimal("9.99"), Decimal("10.00"), budget) == [100]
+    # One big attempt can cross both thresholds at once.
+    assert crossed(Decimal("7.00"), Decimal("10.50"), budget) == [80, 100]
+    # Already past the line before this attempt => no re-alert.
+    assert crossed(Decimal("8.00"), Decimal("9.00"), budget) == []
+    assert crossed(Decimal("10.00"), Decimal("11.00"), budget) == []
+    # Below every line: silence.
+    assert crossed(Decimal("0"), Decimal("7.99"), budget) == []
+
+
+async def test_alert_budget_progress_logs_and_captures(
+    monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
+) -> None:
+    async def fake_month(session, owner_id):
+        return Decimal("8.10")  # after this attempt's 0.20: before was 7.90
+
+    captured: list[tuple[str, int]] = []
+    monkeypatch.setattr(spend, "month_to_date_usd", fake_month)
+    monkeypatch.setattr(
+        spend.observability, "capture_budget_alert", lambda msg, pct: captured.append((msg, pct))
+    )
+
+    import logging
+
+    with caplog.at_level(logging.WARNING, logger="chefclaw.spend"):
+        await spend.alert_budget_progress(None, make_settings(), OWNER_ID, Decimal("0.20"))
+
+    (record,) = [r for r in caplog.records if r.name == "chefclaw.spend"]
+    assert record.budget_pct == 80
+    ((message, pct),) = captured
+    assert pct == 80
+    assert "80%" in message
+
+
+async def test_alert_budget_progress_failclosed_config_is_silent(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Fail-closed budget config => no paid calls happen, so alerting simply
+    returns (and must not raise out of the ledger write path)."""
+    reads = {"month": 0}
+
+    async def fake_month(session, owner_id):
+        reads["month"] += 1
+        return Decimal("0")
+
+    monkeypatch.setattr(spend, "month_to_date_usd", fake_month)
+    await spend.alert_budget_progress(None, Settings(), OWNER_ID, Decimal("0.20"))
+    assert reads["month"] == 0  # config parse failed first; no ledger read
+
+
+async def test_alert_budget_progress_never_raises_on_read_failure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    async def broken_month(session, owner_id):
+        raise RuntimeError("db went away")
+
+    monkeypatch.setattr(spend, "month_to_date_usd", broken_month)
+    # Must swallow: alerting is best-effort and follows a COMMITTED write.
+    await spend.alert_budget_progress(None, make_settings(), OWNER_ID, Decimal("0.20"))

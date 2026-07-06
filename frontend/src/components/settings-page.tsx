@@ -2,7 +2,10 @@ import { useQuery } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 
 import { ApiError } from '../api-error';
-import { healthApiHealthGetOptions } from '../client/@tanstack/react-query.gen';
+import {
+  getSpendApiSpendGetOptions,
+  healthApiHealthGetOptions,
+} from '../client/@tanstack/react-query.gen';
 import type { HealthResponse } from '../client/types.gen';
 import { useTokenActions } from '../token-context';
 
@@ -13,19 +16,15 @@ import { useTokenActions } from '../token-context';
  */
 export const HEALTH_POLL_MS = 15_000;
 
-/**
- * Mirrors the MONTHLY_LLM_BUDGET_USD the operator sets in .env.local (plan
- * §10: $10/mo). The health endpoint reports spend but not the budget cap, so
- * the bar renders against this constant — keep it in sync if the budget
- * changes.
- */
-export const MONTHLY_BUDGET_USD = 10;
+/** Spend-history window requested from GET /api/spend (V2-A). */
+export const SPEND_HISTORY_DAYS = 30;
 
 /**
- * Screen 4 (plan §7): Settings/health — which extractor/model is live and
- * month-to-date spend (Extraction), sidecar + tiered cookie posture (Rednote
- * access), and backup staleness (Backups). Data is GET /api/health, polled
- * gently while this screen is open.
+ * Screen 4 (plan §7): Settings/health — which extractor/model is live,
+ * month-to-date spend against the REAL configured budget (V2-A: the cap
+ * comes from /api/health; null means the fail-closed config refuses paid
+ * calls), a spend history (GET /api/spend), sidecar + tiered cookie posture
+ * (Rednote access), and backup staleness (Backups).
  *
  * Failure handling is absorbed from the Phase-1 HealthPanel: 401 → clear the
  * token; other non-2xx → show the status; no response → the stack is down.
@@ -94,6 +93,7 @@ export function SettingsPage() {
         <div className="mt-4 space-y-4">
           <ApiSection health={health.data} />
           <ExtractionSection health={health.data} />
+          <SpendHistorySection />
           <RednoteSection health={health.data} />
           <BackupsSection health={health.data} />
         </div>
@@ -130,8 +130,10 @@ const WARN_CLASS = 'font-medium text-amber-400';
 const BAD_CLASS = 'font-medium text-red-400';
 const NEUTRAL_CLASS = 'text-neutral-300';
 
-/** Overall status + db — the Phase-1 HealthPanel readout, kept. */
+/** Overall status + db — the Phase-1 HealthPanel readout, plus the V2-A
+ * worker-aliveness and error-tracking rows. */
 function ApiSection({ health }: { health: HealthResponse }) {
+  const worker = health.worker ?? 'not_running';
   return (
     <Section label="API">
       <dl className="mt-3 grid grid-cols-[8rem_1fr] gap-y-2 text-sm">
@@ -145,6 +147,30 @@ function ApiSection({ health }: { health: HealthResponse }) {
             {health.db}
           </span>
         </Row>
+        <Row label="worker">
+          {worker === 'alive' ? (
+            <span className={OK_CLASS}>alive</span>
+          ) : worker === 'dead' ? (
+            <div>
+              <span className={BAD_CLASS}>dead</span>
+              <p className="mt-1 text-xs text-neutral-400">
+                The job worker crashed — no extraction will run. Restart the api
+                container (docker compose restart api).
+              </p>
+            </div>
+          ) : (
+            <span className={NEUTRAL_CLASS}>not running</span>
+          )}
+        </Row>
+        <Row label="error tracking">
+          {health.sentry_enabled ? (
+            <span className={OK_CLASS}>Sentry enabled</span>
+          ) : (
+            <span className={NEUTRAL_CLASS}>
+              not configured (set SENTRY_DSN to enable)
+            </span>
+          )}
+        </Row>
       </dl>
     </Section>
   );
@@ -152,6 +178,9 @@ function ApiSection({ health }: { health: HealthResponse }) {
 
 function ExtractionSection({ health }: { health: HealthResponse }) {
   const spend = health.spend_month_usd ?? null;
+  const budget = health.budget_monthly_usd ?? null;
+  const attemptsToday = health.attempts_today ?? null;
+  const dailyCap = health.daily_attempt_cap ?? null;
   return (
     <Section label="Extraction">
       <dl className="mt-3 grid grid-cols-[8rem_1fr] gap-y-2 text-sm">
@@ -163,22 +192,43 @@ function ExtractionSection({ health }: { health: HealthResponse }) {
             {health.model ?? 'unknown'}
           </span>
         </Row>
+        {attemptsToday !== null && dailyCap !== null && (
+          <Row label="attempts today">
+            <span className={NEUTRAL_CLASS}>
+              {attemptsToday} of {dailyCap}
+            </span>
+          </Row>
+        )}
       </dl>
-      {spend === null ? (
+      {budget === null ? (
+        // Fail-closed truth (§16.8): no budget config means NO paid calls —
+        // say so loudly instead of rendering a bar against an invented cap.
+        <p className="mt-3 rounded-md border border-amber-900 bg-amber-950/40 p-3 text-sm text-amber-300">
+          Budget is not configured — extraction is disabled (fail-closed). Set
+          MONTHLY_LLM_BUDGET_USD and MAX_EXTRACTION_ATTEMPTS_PER_DAY in the
+          server environment.
+        </p>
+      ) : spend === null ? (
         // Honest null state: null means "could not read the ledger", not $0.
         <p className="mt-3 text-sm text-neutral-400">
           Month-to-date spend is unavailable — the spend ledger could not be
           read (is the database up?).
         </p>
       ) : (
-        <SpendBar spendUsd={spend} />
+        <SpendBar spendUsd={spend} budgetUsd={budget} />
       )}
     </Section>
   );
 }
 
-function SpendBar({ spendUsd }: { spendUsd: number }) {
-  const fraction = spendUsd / MONTHLY_BUDGET_USD;
+function SpendBar({
+  spendUsd,
+  budgetUsd,
+}: {
+  spendUsd: number;
+  budgetUsd: number;
+}) {
+  const fraction = spendUsd / budgetUsd;
   const widthPct = Math.min(100, Math.max(0, fraction * 100));
   const barClass =
     fraction >= 1
@@ -193,14 +243,14 @@ function SpendBar({ spendUsd }: { spendUsd: number }) {
         <span className="font-medium">${spendUsd.toFixed(2)}</span>
         <span className="text-neutral-500">
           {' '}
-          of ${MONTHLY_BUDGET_USD.toFixed(2)} budget
+          of ${budgetUsd.toFixed(2)} budget
         </span>
       </p>
       <div
         role="progressbar"
         aria-label="Month-to-date spend against budget"
         aria-valuemin={0}
-        aria-valuemax={MONTHLY_BUDGET_USD}
+        aria-valuemax={budgetUsd}
         aria-valuenow={spendUsd}
         className="mt-2 h-2 w-full overflow-hidden rounded-full bg-neutral-800"
       >
@@ -210,6 +260,71 @@ function SpendBar({ spendUsd }: { spendUsd: number }) {
         />
       </div>
     </div>
+  );
+}
+
+/**
+ * Spend history (GET /api/spend): one row per UTC day with activity, newest
+ * first, with the per-model split inline. Its own query — the history is
+ * heavier than /api/health and does not need the 15 s poll.
+ */
+function SpendHistorySection() {
+  const spend = useQuery(
+    getSpendApiSpendGetOptions({ query: { days: SPEND_HISTORY_DAYS } }),
+  );
+  return (
+    <Section label="Spend history">
+      {spend.isPending && (
+        <p className="mt-3 text-sm text-neutral-400">Loading spend history…</p>
+      )}
+      {spend.isError && (
+        <p className="mt-3 text-sm text-neutral-400">
+          Spend history is unavailable (could not read the ledger).
+        </p>
+      )}
+      {spend.isSuccess && spend.data.days.length === 0 && (
+        <p className="mt-3 text-sm text-neutral-400">
+          No extraction attempts in the last {spend.data.period_days} days.
+        </p>
+      )}
+      {spend.isSuccess && spend.data.days.length > 0 && (
+        <>
+          <p className="mt-3 text-sm text-neutral-300">
+            Last {spend.data.period_days} days:{' '}
+            <span className="font-medium">
+              ${spend.data.total_usd.toFixed(2)}
+            </span>
+            <span className="text-neutral-500">
+              {' '}
+              · month to date ${spend.data.month_to_date_usd.toFixed(2)}
+            </span>
+          </p>
+          <ul className="mt-3 space-y-2 text-sm">
+            {spend.data.days.map((day) => (
+              <li
+                key={day.date}
+                className="flex flex-wrap items-baseline gap-x-3 gap-y-1"
+              >
+                <span className="font-mono text-xs text-neutral-400">
+                  {day.date}
+                </span>
+                <span className="font-medium text-neutral-200">
+                  ${day.cost_usd.toFixed(2)}
+                </span>
+                <span className="text-neutral-500">
+                  {day.attempts} attempt{day.attempts === 1 ? '' : 's'}
+                </span>
+                <span className="font-mono text-xs text-neutral-500">
+                  {day.models
+                    .map((m) => `${m.model} $${m.cost_usd.toFixed(2)}`)
+                    .join(' · ')}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </Section>
   );
 }
 

@@ -86,6 +86,17 @@
       "HealthResponse": {
         "description": "Phase-4 health shape (plan §7 screen 4): sidecar + cookie + backup\nstaleness + spend readout, plus which extractor/model is live. New fields\nkeep schema-level defaults so the generated TS client treats them as\noptional — the endpoint always sets them explicitly.",
         "properties": {
+          "attempts_today": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attempts Today"
+          },
           "backup": {
             "default": "not_configured",
             "enum": [
@@ -106,6 +117,17 @@
               }
             ],
             "title": "Backup Finished At"
+          },
+          "budget_monthly_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Budget Monthly Usd"
           },
           "cookie_freshness": {
             "default": "not_configured",
@@ -129,6 +151,17 @@
             ],
             "title": "Cookie Set Date"
           },
+          "daily_attempt_cap": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Daily Attempt Cap"
+          },
           "db": {
             "enum": [
               "ok",
@@ -146,6 +179,11 @@
             "default": "fake-extractor",
             "title": "Model",
             "type": "string"
+          },
+          "sentry_enabled": {
+            "default": false,
+            "title": "Sentry Enabled",
+            "type": "boolean"
           },
           "sidecar": {
             "default": "not_configured",
@@ -174,6 +212,16 @@
               "degraded"
             ],
             "title": "Status",
+            "type": "string"
+          },
+          "worker": {
+            "default": "not_running",
+            "enum": [
+              "alive",
+              "dead",
+              "not_running"
+            ],
+            "title": "Worker",
             "type": "string"
           }
         },
@@ -530,6 +578,137 @@
           "created_at"
         ],
         "title": "RecipeSummary",
+        "type": "object"
+      },
+      "SpendDay": {
+        "description": "One UTC day of ledger activity; days with zero attempts are omitted.",
+        "properties": {
+          "attempts": {
+            "title": "Attempts",
+            "type": "integer"
+          },
+          "cost_usd": {
+            "title": "Cost Usd",
+            "type": "number"
+          },
+          "date": {
+            "format": "date",
+            "title": "Date",
+            "type": "string"
+          },
+          "models": {
+            "items": {
+              "$ref": "#/components/schemas/SpendModelSlice"
+            },
+            "title": "Models",
+            "type": "array"
+          }
+        },
+        "required": [
+          "date",
+          "cost_usd",
+          "attempts",
+          "models"
+        ],
+        "title": "SpendDay",
+        "type": "object"
+      },
+      "SpendModelSlice": {
+        "description": "One model's share of a day's ledger (GET /api/spend, V2-A ADR).",
+        "properties": {
+          "attempts": {
+            "title": "Attempts",
+            "type": "integer"
+          },
+          "cost_usd": {
+            "title": "Cost Usd",
+            "type": "number"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "tokens_in": {
+            "title": "Tokens In",
+            "type": "integer"
+          },
+          "tokens_out": {
+            "title": "Tokens Out",
+            "type": "integer"
+          },
+          "tokens_thinking": {
+            "title": "Tokens Thinking",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "model",
+          "cost_usd",
+          "attempts",
+          "tokens_in",
+          "tokens_out",
+          "tokens_thinking"
+        ],
+        "title": "SpendModelSlice",
+        "type": "object"
+      },
+      "SpendSummaryOut": {
+        "description": "The spend readout: per-day/per-model history over the requested window\nplus month-to-date and the configured caps. ``budget_monthly_usd`` /\n``daily_attempt_cap`` are null when the budget config is fail-closed —\nthe UI must say 'extraction disabled', never invent a cap.",
+        "properties": {
+          "attempts_today": {
+            "title": "Attempts Today",
+            "type": "integer"
+          },
+          "budget_monthly_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Budget Monthly Usd"
+          },
+          "daily_attempt_cap": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Daily Attempt Cap"
+          },
+          "days": {
+            "items": {
+              "$ref": "#/components/schemas/SpendDay"
+            },
+            "title": "Days",
+            "type": "array"
+          },
+          "month_to_date_usd": {
+            "title": "Month To Date Usd",
+            "type": "number"
+          },
+          "period_days": {
+            "title": "Period Days",
+            "type": "integer"
+          },
+          "total_usd": {
+            "title": "Total Usd",
+            "type": "number"
+          }
+        },
+        "required": [
+          "period_days",
+          "total_usd",
+          "month_to_date_usd",
+          "attempts_today",
+          "days"
+        ],
+        "title": "SpendSummaryOut",
         "type": "object"
       },
       "ValidationError": {
@@ -1189,6 +1368,57 @@
         "summary": "Patch Recipe",
         "tags": [
           "recipes"
+        ]
+      }
+    },
+    "/api/spend": {
+      "get": {
+        "description": "Per-day, per-model spend over the last ``days`` UTC days, plus\nmonth-to-date and the configured caps (null caps = fail-closed config).",
+        "operationId": "get_spend_api_spend_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "default": 30,
+              "maximum": 365,
+              "minimum": 1,
+              "title": "Days",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpendSummaryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Spend",
+        "tags": [
+          "spend"
         ]
       }
     }

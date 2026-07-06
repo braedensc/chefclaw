@@ -157,6 +157,39 @@ server secret at birth: never a `VITE_*` var, never in the frontend bundle.
   (record choice here). First rednote-from-datacenter test result: **pending
   deploy day** (record pass/degraded + any ladder rung taken here).
 
+## 8. Sentry (error tracking — V2-A, DSN-gated)
+
+**What it is, plainly:** a hosted error-tracking service. When the backend
+worker or the SPA hits an unhandled error, the SDK sends a report (stack
+trace, tags like job id/stage/error_type, release SHA) to sentry.io, which
+groups duplicates into "issues" and can email on new ones. Without it, a job
+that dies on the VPS is just a log line nobody was watching.
+
+- **Cost:** the free Developer tier (generous event quota, 30-day retention,
+  one user) — chefclaw's single-user error volume is a rounding error against
+  it. No card required, no paid tier ever needed for this project.
+- **Provisioning** *(you, in dashboards)*: create a free account → one project
+  (platform: Python) → copy its **DSN** into `.env.local` as `SENTRY_DSN` and
+  `VITE_SENTRY_DSN` (one project for both is fine at this volume; split into a
+  second React project later if the mixed stream annoys). Set
+  `SENTRY_ENVIRONMENT=vps` on the server, leave `local` elsewhere.
+- **DSN posture:** a DSN is an ingest ADDRESS, not a credential — someone with
+  it could send you fake events, not read anything. It may be baked into the
+  public SPA bundle (`VITE_SENTRY_DSN`); it still lives in `.env.local`, and
+  Hard Rule 4 (server keys never as `VITE_*`) is unaffected.
+- **Gating (kit pattern):** empty/unset DSN ⇒ the SDK is **never initialised**
+  — dev, CI, and tests send zero events by construction. Proven by unit test
+  (`backend/tests/test_observability.py`, `frontend/src/sentry.test.ts`).
+- **What gets sent / scrubbed:** error tracking only (no tracing, no session
+  replay, no PII, request bodies never); an event scrubber additionally
+  denylists every chefclaw secret name (cookies, API keys, the bearer token).
+- **Sentry MCP:** the tooling has a Sentry MCP server wired for inspecting
+  issues from Claude sessions — needs one-time OAuth (claude.ai connector
+  settings, or `/mcp` in an interactive `claude` session).
+- **Provisioning record:** 2026-07-06 — code landed DSN-gated (V2-A PR).
+  **Sentry project: pending creation** (record date + org/project slug here);
+  MCP auth: pending.
+
 ## Deferred hardening (tracked here so it can't fall through the cracks)
 
 | Item | Trigger |

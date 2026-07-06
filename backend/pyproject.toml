@@ -18,6 +18,8 @@ dependencies = [
     # (Tailscale SOCKS5 — escalation ladder rung b); yt-dlp handles socks natively.
     "httpx[socks]>=0.28.1",
     "python-multipart>=0.0.32",
+    # DSN-gated error tracking (V2-A ADR): no SENTRY_DSN => never initialised.
+    "sentry-sdk[fastapi]>=2.0",
 ]
 
 [dependency-groups]
