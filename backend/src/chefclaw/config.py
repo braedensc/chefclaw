@@ -80,6 +80,16 @@ class Settings(BaseSettings):
     # In compose this points at the built frontend, e.g. ../frontend/dist.
     chefclaw_static_dir: str = ""
 
+    # ── Observability (V2-A ADR) ────────────────────────────────────────────
+    # Sentry is opt-in by presence: empty DSN ⇒ the SDK is never initialised
+    # (dev/CI/tests send zero events). The DSN is an ingest address, not a
+    # credential — it still lives in .env.local per the three-stores model.
+    sentry_dsn: str = ""
+    sentry_environment: str = "local"  # local | vps — tags every event
+    sentry_release: str = ""  # git SHA, baked at image build (GIT_SHA build arg)
+    chefclaw_log_format: str = "json"  # json | text (anything else ⇒ json)
+    chefclaw_log_level: str = "INFO"
+
     # ── Backups (Phase 4) ───────────────────────────────────────────────────
     # scripts/backup.sh (host-side, launchd-scheduled) writes ops/last-backup.json;
     # compose bind-mounts ./ops read-only at /data/ops so /api/health can report

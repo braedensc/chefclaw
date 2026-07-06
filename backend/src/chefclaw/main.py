@@ -11,6 +11,17 @@ import os
 import uvicorn
 
 from chefclaw.app import create_app
+from chefclaw.config import get_settings
+from chefclaw.observability import configure_logging, init_sentry
+
+# Observability is wired at the PROCESS entrypoint, deliberately not inside
+# create_app(): the unit-test tier builds apps without touching the root
+# logger (pytest's capture stays intact) or Sentry (no DSN in tests anyway —
+# but the SDK is never even initialised there). Sentry init precedes app
+# creation so its FastAPI/Starlette integrations see the app get built.
+_settings = get_settings()
+configure_logging(_settings)
+init_sentry(_settings)
 
 app = create_app()
 

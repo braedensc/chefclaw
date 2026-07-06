@@ -69,6 +69,10 @@ export type HttpValidationError = {
  */
 export type HealthResponse = {
     /**
+     * Attempts Today
+     */
+    attempts_today?: number | null;
+    /**
      * Backup
      */
     backup?: 'fresh' | 'stale' | 'not_configured';
@@ -77,6 +81,10 @@ export type HealthResponse = {
      */
     backup_finished_at?: string | null;
     /**
+     * Budget Monthly Usd
+     */
+    budget_monthly_usd?: number | null;
+    /**
      * Cookie Freshness
      */
     cookie_freshness?: 'fresh' | 'aging' | 'stale' | 'not_configured';
@@ -84,6 +92,10 @@ export type HealthResponse = {
      * Cookie Set Date
      */
     cookie_set_date?: string | null;
+    /**
+     * Daily Attempt Cap
+     */
+    daily_attempt_cap?: number | null;
     /**
      * Db
      */
@@ -97,6 +109,10 @@ export type HealthResponse = {
      */
     model?: string;
     /**
+     * Sentry Enabled
+     */
+    sentry_enabled?: boolean;
+    /**
      * Sidecar
      */
     sidecar?: 'ok' | 'unreachable' | 'not_configured';
@@ -108,6 +124,10 @@ export type HealthResponse = {
      * Status
      */
     status: 'ok' | 'degraded';
+    /**
+     * Worker
+     */
+    worker?: 'alive' | 'dead' | 'not_running';
 };
 
 /**
@@ -308,6 +328,101 @@ export type RecipeSummary = {
      * Title Original
      */
     title_original: string | null;
+};
+
+/**
+ * SpendDay
+ *
+ * One UTC day of ledger activity; days with zero attempts are omitted.
+ */
+export type SpendDay = {
+    /**
+     * Attempts
+     */
+    attempts: number;
+    /**
+     * Cost Usd
+     */
+    cost_usd: number;
+    /**
+     * Date
+     */
+    date: string;
+    /**
+     * Models
+     */
+    models: Array<SpendModelSlice>;
+};
+
+/**
+ * SpendModelSlice
+ *
+ * One model's share of a day's ledger (GET /api/spend, V2-A ADR).
+ */
+export type SpendModelSlice = {
+    /**
+     * Attempts
+     */
+    attempts: number;
+    /**
+     * Cost Usd
+     */
+    cost_usd: number;
+    /**
+     * Model
+     */
+    model: string;
+    /**
+     * Tokens In
+     */
+    tokens_in: number;
+    /**
+     * Tokens Out
+     */
+    tokens_out: number;
+    /**
+     * Tokens Thinking
+     */
+    tokens_thinking: number;
+};
+
+/**
+ * SpendSummaryOut
+ *
+ * The spend readout: per-day/per-model history over the requested window
+ * plus month-to-date and the configured caps. ``budget_monthly_usd`` /
+ * ``daily_attempt_cap`` are null when the budget config is fail-closed —
+ * the UI must say 'extraction disabled', never invent a cap.
+ */
+export type SpendSummaryOut = {
+    /**
+     * Attempts Today
+     */
+    attempts_today: number;
+    /**
+     * Budget Monthly Usd
+     */
+    budget_monthly_usd?: number | null;
+    /**
+     * Daily Attempt Cap
+     */
+    daily_attempt_cap?: number | null;
+    /**
+     * Days
+     */
+    days: Array<SpendDay>;
+    /**
+     * Month To Date Usd
+     */
+    month_to_date_usd: number;
+    /**
+     * Period Days
+     */
+    period_days: number;
+    /**
+     * Total Usd
+     */
+    total_usd: number;
 };
 
 /**
@@ -653,3 +768,33 @@ export type PatchRecipeApiRecipesRecipeIdPatchResponses = {
 };
 
 export type PatchRecipeApiRecipesRecipeIdPatchResponse = PatchRecipeApiRecipesRecipeIdPatchResponses[keyof PatchRecipeApiRecipesRecipeIdPatchResponses];
+
+export type GetSpendApiSpendGetData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Days
+         */
+        days?: number;
+    };
+    url: '/api/spend';
+};
+
+export type GetSpendApiSpendGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetSpendApiSpendGetError = GetSpendApiSpendGetErrors[keyof GetSpendApiSpendGetErrors];
+
+export type GetSpendApiSpendGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: SpendSummaryOut;
+};
+
+export type GetSpendApiSpendGetResponse = GetSpendApiSpendGetResponses[keyof GetSpendApiSpendGetResponses];

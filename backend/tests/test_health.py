@@ -48,6 +48,15 @@ async def test_health_200_full_shape(client: AsyncClient, ping_ok: None) -> None
         "extractor": "fake",  # the conftest Settings default
         "model": "fake-extractor",
         "spend_month_usd": None,
+        # V2-A: caps are null (conftest Settings leave the budget pair unset —
+        # fail-closed), the ledger reads are stubbed to None, no lifespan ran
+        # (ASGITransport) so the worker task doesn't exist, and Sentry is
+        # never initialised in the unit tier.
+        "budget_monthly_usd": None,
+        "daily_attempt_cap": None,
+        "attempts_today": None,
+        "worker": "not_running",
+        "sentry_enabled": False,
     }
 
 

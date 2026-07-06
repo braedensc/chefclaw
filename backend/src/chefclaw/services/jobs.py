@@ -24,13 +24,14 @@ import logging
 import random
 import shutil
 import tempfile
+import time
 import uuid
 from collections.abc import Awaitable, Callable, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from chefclaw import errors, spend
+from chefclaw import errors, observability, spend
 from chefclaw.config import Settings
 from chefclaw.documents import SourceInfo, validate_extraction
 from chefclaw.extractors import (
@@ -262,7 +263,7 @@ class Worker:
                 continue
             try:
                 await self.process(job)
-            except Exception:
+            except Exception as exc:
                 # process() only leaks an exception when the STORE itself
                 # failed (db outage mid-job: set_status/requeue/mark_failed
                 # raised). The job is left mid-stage for the next boot's
@@ -272,6 +273,15 @@ class Worker:
                     "job %s processing leaked an error (db outage?); "
                     "leaving it mid-stage for reconcile",
                     job.id,
+                    extra={"job_id": str(job.id), "stage": "store"},
+                )
+                observability.capture_job_failure(
+                    exc,
+                    job_id=job.id,
+                    stage="store",
+                    error_type="store_failure",
+                    platform=job.platform,
+                    attempt=job.attempts,
                 )
                 await self._sleeper(self._idle_seconds)
 
@@ -287,11 +297,34 @@ class Worker:
         scratch_dir = _scratch_root(self._settings) / _JOB_SCRATCH_DIRNAME / str(job.id)
         stage = "download"
         terminal = True
+        started = time.perf_counter()
+        job_extra = {
+            "job_id": str(job.id),
+            "job_type": job.type,
+            "platform": job.platform,
+            "attempt": job.attempts,
+        }
+        logger.info(
+            "job %s claimed (%s/%s, attempt %d)",
+            job.id, job.type, job.platform, job.attempts,
+            extra=job_extra,
+        )
         try:
             media = await self._download(job, scratch_dir)
+            logger.info(
+                "job %s download stage done",
+                job.id,
+                extra={**job_extra, "stage": "download",
+                       "duration_ms": round((time.perf_counter() - started) * 1000, 1)},
+            )
             stage = "extract"
             await self._extract_validate_store(job, media)
-            logger.info("job %s stored (attempt %d)", job.id, job.attempts)
+            logger.info(
+                "job %s stored (attempt %d)",
+                job.id, job.attempts,
+                extra={**job_extra, "stage": "stored",
+                       "duration_ms": round((time.perf_counter() - started) * 1000, 1)},
+            )
         except asyncio.CancelledError:
             terminal = False  # reconcile owns this on next boot
             raise
@@ -301,6 +334,15 @@ class Worker:
                 logger.warning(
                     "job %s attempt %d failed (%s), requeueing: %s",
                     job.id, job.attempts, err.error_type, err,
+                    extra={**job_extra, "stage": stage, "error_type": err.error_type},
+                )
+                # A breadcrumb, not an issue — retries annotate the eventual
+                # terminal failure instead of paging on their own.
+                observability.add_job_breadcrumb(
+                    f"attempt {job.attempts} requeued ({err.error_type})",
+                    job_id=job.id,
+                    stage=stage,
+                    error_type=err.error_type,
                 )
                 await self.store.requeue(job.id)
                 # Linear backoff, scaled per error type (rate_limited backs
@@ -317,6 +359,15 @@ class Worker:
                 logger.warning(
                     "job %s failed terminally (%s) after %d attempt(s): %s",
                     job.id, err.error_type, job.attempts, err,
+                    extra={**job_extra, "stage": stage, "error_type": err.error_type},
+                )
+                observability.capture_job_failure(
+                    err,
+                    job_id=job.id,
+                    stage=stage,
+                    error_type=err.error_type,
+                    platform=job.platform,
+                    attempt=job.attempts,
                 )
                 await self.store.mark_failed(job.id, err.error_type, str(err))
         except Exception as exc:
@@ -324,7 +375,19 @@ class Worker:
             # FileNotFoundError, …): assign a stage-appropriate type; terminal
             # (an unknown error must not silently burn paid retries).
             error_type = "extraction_failed" if stage == "extract" else "download_failed"
-            logger.exception("job %s hit an untyped error in %s stage", job.id, stage)
+            logger.exception(
+                "job %s hit an untyped error in %s stage",
+                job.id, stage,
+                extra={**job_extra, "stage": stage, "error_type": error_type},
+            )
+            observability.capture_job_failure(
+                exc,
+                job_id=job.id,
+                stage=stage,
+                error_type=error_type,
+                platform=job.platform,
+                attempt=job.attempts,
+            )
             await self.store.mark_failed(
                 job.id, error_type, f"{type(exc).__name__}: {exc}"
             )
@@ -382,6 +445,10 @@ class Worker:
 
     async def _extract_validate_store(self, job: Job, media: FetchedMedia) -> list[uuid.UUID]:
         await self.store.set_status(job.id, JobStatus.EXTRACTING.value)
+        logger.info(
+            "job %s extracting", job.id,
+            extra={"job_id": str(job.id), "stage": "extract"},
+        )
 
         # IDEMPOTENT PAID STAGE (§4): a crash between store and flip left
         # recipes behind — adopt them, never re-spend.
@@ -430,6 +497,10 @@ class Worker:
         await self._record_attempt(job, usage=outcome.usage)
 
         await self.store.set_status(job.id, JobStatus.VALIDATING.value)
+        logger.info(
+            "job %s validating (%d dish(es))", job.id, len(outcome.dishes),
+            extra={"job_id": str(job.id), "stage": "validate"},
+        )
         # Provenance is pipeline truth (documents.validate_extraction
         # overwrites any model-emitted source block).
         source = SourceInfo(

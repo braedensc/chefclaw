@@ -10,10 +10,16 @@ from chefclaw.config import Settings, get_settings
 from chefclaw.errors import ChefclawError
 from chefclaw.schemas import ErrorBody
 from chefclaw.services.jobs import default_source_adapters
-from chefclaw.services.repo import JobStore, PostgresJobStore
+from chefclaw.services.repo import JobStore, PostgresJobStore, PostgresSpendReader, SpendReader
 from chefclaw.sources import SourceAdapter
 
-__all__ = ["error_response", "get_job_store", "get_source_adapters", "http_status_for"]
+__all__ = [
+    "error_response",
+    "get_job_store",
+    "get_source_adapters",
+    "get_spend_reader",
+    "http_status_for",
+]
 
 # Typed taxonomy → HTTP status for errors surfaced at request time (the
 # worker path stores them on the job instead). ConfigError is a 503: the
@@ -48,3 +54,8 @@ def get_source_adapters(
     settings: Annotated[Settings, Depends(get_settings)],
 ) -> list[SourceAdapter]:
     return default_source_adapters(settings)
+
+
+def get_spend_reader(settings: Annotated[Settings, Depends(get_settings)]) -> SpendReader:
+    """The real ledger reader; tests override this dependency with a fake."""
+    return PostgresSpendReader(db.get_sessionmaker(), settings)

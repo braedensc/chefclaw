@@ -8,6 +8,7 @@ import type {
   RecipeDetail,
   RecipePage,
   RecipeSummary,
+  SpendSummaryOut,
 } from '../client/types.gen';
 
 export function jobOut(overrides: Partial<JobOut> = {}): JobOut {
@@ -149,6 +150,66 @@ export function healthResponse(
     extractor: 'gemini',
     model: 'gemini-2.5-flash',
     spend_month_usd: 0.2,
+    budget_monthly_usd: 10,
+    daily_attempt_cap: 25,
+    attempts_today: 1,
+    worker: 'alive',
+    sentry_enabled: false,
+    ...overrides,
+  };
+}
+
+/** A /api/spend payload: two models on the newest day + one older day. */
+export function spendSummary(
+  overrides: Partial<SpendSummaryOut> = {},
+): SpendSummaryOut {
+  return {
+    period_days: 30,
+    total_usd: 1.25,
+    month_to_date_usd: 1.25,
+    attempts_today: 3,
+    budget_monthly_usd: 10,
+    daily_attempt_cap: 25,
+    days: [
+      {
+        date: '2026-07-06',
+        cost_usd: 0.4,
+        attempts: 3,
+        models: [
+          {
+            model: 'gemini-2.5-flash',
+            cost_usd: 0.3,
+            attempts: 2,
+            tokens_in: 1000,
+            tokens_out: 200,
+            tokens_thinking: 0,
+          },
+          {
+            model: 'qwen3-vl-plus',
+            cost_usd: 0.1,
+            attempts: 1,
+            tokens_in: 500,
+            tokens_out: 100,
+            tokens_thinking: 0,
+          },
+        ],
+      },
+      {
+        date: '2026-07-04',
+        cost_usd: 0.85,
+        attempts: 4,
+        models: [
+          {
+            model: 'gemini-2.5-flash',
+            cost_usd: 0.85,
+            attempts: 4,
+            tokens_in: 4000,
+            tokens_out: 800,
+            tokens_thinking: 50,
+          },
+        ],
+      },
+    ],
     ...overrides,
   };
 }

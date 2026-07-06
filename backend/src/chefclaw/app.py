@@ -15,17 +15,19 @@ from pathlib import Path
 from typing import Annotated, Literal
 
 import httpx
-from fastapi import APIRouter, Depends, FastAPI
+from fastapi import APIRouter, Depends, FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from chefclaw import db, spend
+from chefclaw import db, observability, spend
 from chefclaw.auth import require_owner
 from chefclaw.config import Settings, get_settings
+from chefclaw.errors import ConfigError
 from chefclaw.extractors import extractor_model_id
 from chefclaw.routers.extraction import router as extraction_router
 from chefclaw.routers.jobs import router as jobs_router
 from chefclaw.routers.library import router as library_router
+from chefclaw.routers.spend import router as spend_router
 from chefclaw.services.jobs import Worker, default_source_adapters
 from chefclaw.services.repo import PostgresJobStore
 
@@ -65,6 +67,18 @@ class HealthResponse(BaseModel):
     extractor: str = "fake"
     model: str = "fake-extractor"
     spend_month_usd: float | None = None
+    # V2-A additions. Caps are null when the budget config is fail-closed
+    # (unset/unparseable) — the UI says "extraction disabled", never invents
+    # a number; attempts_today is null when the ledger could not be read.
+    budget_monthly_usd: float | None = None
+    daily_attempt_cap: int | None = None
+    attempts_today: int | None = None
+    # Worker aliveness is task-not-done, NOT a heartbeat timestamp — a
+    # timestamp false-alarms during any long legitimate download/extract
+    # stage; the real failure mode is the asyncio task dying while the api
+    # keeps answering. 'not_running' = no lifespan (unit tests).
+    worker: Literal["alive", "dead", "not_running"] = "not_running"
+    sentry_enabled: bool = False
 
 
 def _backup_status(
@@ -153,11 +167,40 @@ async def _spend_month_to_date(owner_id: uuid.UUID) -> float | None:
         return None
 
 
+async def _attempts_today(owner_id: uuid.UUID) -> int | None:
+    """Today's ledger attempt count (same never-raises contract as above)."""
+    try:
+        async with db.get_sessionmaker()() as session:
+            return await spend.attempts_today(session, owner_id)
+    except Exception:
+        return None
+
+
+def _budget_caps(settings: Settings) -> tuple[float | None, int | None]:
+    """The configured caps, or (None, None) under fail-closed config — the
+    same parse the paid-call gate uses, so health and the gate can't drift."""
+    try:
+        monthly, daily = spend.parse_budget(settings)
+    except ConfigError:
+        return None, None
+    return float(monthly), daily
+
+
+def _worker_status(app: FastAPI) -> Literal["alive", "dead", "not_running"]:
+    """'dead' is the silent killer this exists for: the worker task crashed
+    but the api still answers — no job would ever run again."""
+    task: asyncio.Task | None = getattr(app.state, "worker_task", None)
+    if task is None:
+        return "not_running"
+    return "dead" if task.done() else "alive"
+
+
 api_router = APIRouter(prefix="/api")
 
 
 @api_router.get("/health", response_model=HealthResponse)
 async def health(
+    request: Request,
     owner_id: Annotated[uuid.UUID, Depends(require_owner)],
     settings: Annotated[Settings, Depends(get_settings)],
 ) -> HealthResponse:
@@ -165,6 +208,7 @@ async def health(
     state (plan §16 amendment 3)."""
     db_ok = await db.ping()
     backup, backup_finished_at = _backup_status(settings)
+    budget_monthly_usd, daily_attempt_cap = _budget_caps(settings)
     return HealthResponse(
         status="ok" if db_ok else "degraded",
         db="ok" if db_ok else "unreachable",
@@ -176,6 +220,11 @@ async def health(
         extractor=settings.chefclaw_extractor,
         model=extractor_model_id(settings),
         spend_month_usd=await _spend_month_to_date(owner_id) if db_ok else None,
+        budget_monthly_usd=budget_monthly_usd,
+        daily_attempt_cap=daily_attempt_cap,
+        attempts_today=await _attempts_today(owner_id) if db_ok else None,
+        worker=_worker_status(request.app),
+        sentry_enabled=observability.sentry_enabled(),
     )
 
 
@@ -189,6 +238,9 @@ async def _lifespan(app: FastAPI):
         settings=settings,
     )
     task = asyncio.create_task(worker.run_forever(), name="chefclaw-extraction-worker")
+    # Health reads aliveness off this: a done() task = the worker died while
+    # the api keeps answering (the failure mode worth surfacing).
+    app.state.worker_task = task
     try:
         yield
     finally:
@@ -202,10 +254,16 @@ async def _lifespan(app: FastAPI):
 def create_app() -> FastAPI:
     """Build the application: API routes, then the SPA mount (prod mode)."""
     app = FastAPI(title="chefclaw", version="0.1.0", lifespan=_lifespan)
+    # Structured request log for /api/* (method/path/status/latency/owner —
+    # never query strings, headers, or bodies). Logging + Sentry themselves
+    # are configured at the PROCESS entrypoint (main.py), not here — the app
+    # factory must stay side-effect-free for the unit-test tier.
+    app.add_middleware(observability.RequestLogMiddleware)
     app.include_router(api_router)
     app.include_router(extraction_router)
     app.include_router(jobs_router)
     app.include_router(library_router)
+    app.include_router(spend_router)
 
     # Serve the built SPA same-origin in prod. CHEFCLAW_STATIC_DIR unset =>
     # skip (dev mode uses the Vite proxy instead). Mounted AFTER api routes

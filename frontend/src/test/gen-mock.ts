@@ -20,8 +20,9 @@ import type {
   JobOut,
   RecipeDetail,
   RecipePage,
+  SpendSummaryOut,
 } from '../client/types.gen';
-import { healthResponse, recipePage } from './fixtures';
+import { healthResponse, recipePage, spendSummary } from './fixtures';
 
 /** A mocked generated mutationFn — tests assert on the options it receives. */
 type MutationMock = Mock<(options: unknown) => unknown>;
@@ -36,6 +37,9 @@ interface GenState {
   health: HealthResponse;
   /** When set, the health queryFn throws it instead (401/network scenarios). */
   healthError: Error | null;
+  spend: SpendSummaryOut;
+  /** When set, the spend queryFn throws it instead. */
+  spendError: Error | null;
   extract: MutationMock;
   upload: MutationMock;
   patch: MutationMock;
@@ -49,6 +53,8 @@ export const genState: GenState = {
   jobsList: [],
   health: healthResponse(),
   healthError: null,
+  spend: spendSummary(),
+  spendError: null,
   extract: mutationMock(),
   upload: mutationMock(),
   patch: mutationMock(),
@@ -62,6 +68,8 @@ export function resetGenState(): void {
   genState.jobsList = [];
   genState.health = healthResponse();
   genState.healthError = null;
+  genState.spend = spendSummary();
+  genState.spendError = null;
   genState.extract = mutationMock();
   genState.upload = mutationMock();
   genState.patch = mutationMock();
@@ -132,6 +140,15 @@ export function genMockModule() {
       queryFn: async () => {
         if (genState.healthError) throw genState.healthError;
         return genState.health;
+      },
+    }),
+
+    // settings-page.tsx spend history — genState.spendError drives failures.
+    getSpendApiSpendGetOptions: (options?: { query?: unknown }) => ({
+      queryKey: [{ _id: 'getSpendApiSpendGet', query: options?.query }],
+      queryFn: async () => {
+        if (genState.spendError) throw genState.spendError;
+        return genState.spend;
       },
     }),
   };

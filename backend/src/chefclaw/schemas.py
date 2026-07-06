@@ -11,7 +11,7 @@ silent ignore.
 """
 
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -24,6 +24,9 @@ __all__ = [
     "RecipePage",
     "RecipePatch",
     "RecipeSummary",
+    "SpendDay",
+    "SpendModelSlice",
+    "SpendSummaryOut",
 ]
 
 
@@ -122,3 +125,38 @@ class RecipePatch(BaseModel):
 
     tags: list[str] | None = None
     user_notes: str | None = None
+
+
+class SpendModelSlice(BaseModel):
+    """One model's share of a day's ledger (GET /api/spend, V2-A ADR)."""
+
+    model: str
+    cost_usd: float
+    attempts: int
+    tokens_in: int
+    tokens_out: int
+    tokens_thinking: int
+
+
+class SpendDay(BaseModel):
+    """One UTC day of ledger activity; days with zero attempts are omitted."""
+
+    date: date
+    cost_usd: float
+    attempts: int
+    models: list[SpendModelSlice]
+
+
+class SpendSummaryOut(BaseModel):
+    """The spend readout: per-day/per-model history over the requested window
+    plus month-to-date and the configured caps. ``budget_monthly_usd`` /
+    ``daily_attempt_cap`` are null when the budget config is fail-closed —
+    the UI must say 'extraction disabled', never invent a cap."""
+
+    period_days: int
+    total_usd: float
+    month_to_date_usd: float
+    attempts_today: int
+    budget_monthly_usd: float | None = None
+    daily_attempt_cap: int | None = None
+    days: list[SpendDay]

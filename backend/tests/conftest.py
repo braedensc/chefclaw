@@ -34,15 +34,19 @@ def stub_owner_lookup(monkeypatch: pytest.MonkeyPatch) -> None:
 
 @pytest.fixture(autouse=True)
 def stub_spend_readout(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Stub the health endpoint's ledger read — the unit tier must never open
+    """Stub the health endpoint's ledger reads — the unit tier must never open
     a real connection (the local compose DB is PRODUCTION — kit inversion)."""
 
     async def fake_spend(owner_id: uuid.UUID) -> None:
         return None
 
+    async def fake_attempts(owner_id: uuid.UUID) -> None:
+        return None
+
     from chefclaw import app as app_module
 
     monkeypatch.setattr(app_module, "_spend_month_to_date", fake_spend)
+    monkeypatch.setattr(app_module, "_attempts_today", fake_attempts)
 
 
 @pytest.fixture

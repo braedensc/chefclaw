@@ -6,6 +6,10 @@ import { createRoot } from 'react-dom/client';
 import { queryClient } from './api';
 import './index.css';
 import { router } from './router';
+import { maybeInitSentry } from './sentry';
+
+// Before any render: a crash during mount should still be reported.
+maybeInitSentry();
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
