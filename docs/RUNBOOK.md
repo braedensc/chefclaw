@@ -126,6 +126,10 @@ schedule on wake only if the Mac was *asleep* at 03:30 — not if it was shut do
 and failure detection is pull-only, so the health readout is the backstop that
 catches silently-missed runs either way.
 
+> **On the VPS** (no launchd): the systemd equivalents are
+> `ops/chefclaw-backup.service.example` + `ops/chefclaw-backup.timer.example`
+> — install steps in the service file's header; see §4 step 9.
+
 ### Restore procedure
 
 **Never restore into the production stack.** Restores go into a throwaway
@@ -226,3 +230,142 @@ volumes.
   (`docs/adr/2026-07-06-source-and-extractor-adapters.md`) — the sidecar contract
   (`POST /xhs/detail`, `download:false`, response shape) must be re-verified
   against the new version, never casually retagged.
+
+---
+
+## 4. Deploy (VPS + Tailscale)
+
+Turn-key procedure for the M-Deploy posture (ADR:
+`docs/adr/2026-07-06-m-deploy-vps-and-rednote-escalation.md`): a Hetzner-class
+VPS, **Tailscale-first access, zero public exposure** — every published port
+stays `127.0.0.1`-bound on the VPS (compose.yaml already does this) and
+`tailscale serve` fronts the api toward the tailnet only. Install commands
+below were verified current against the official docs on 2026-07-06; re-verify
+on deploy day if months have passed.
+
+1. **Provision** *(you, in dashboards)*: Hetzner Cloud → new CX-class server
+   (a CX22-tier shared vCPU box is plenty for single-user), **Ubuntu LTS**,
+   SSH key auth (no password login). Record the date/host in
+   `docs/SERVICES.md` §7.
+2. **Install Docker Engine + compose plugin** (official apt repo —
+   docs.docker.com/engine/install/ubuntu):
+
+   ```bash
+   sudo apt update && sudo apt install ca-certificates curl
+   sudo install -m 0755 -d /etc/apt/keyrings
+   sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+   sudo chmod a+r /etc/apt/keyrings/docker.asc
+   sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
+   Types: deb
+   URIs: https://download.docker.com/linux/ubuntu
+   Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
+   Components: stable
+   Architectures: $(dpkg --print-architecture)
+   Signed-By: /etc/apt/keyrings/docker.asc
+   EOF
+   sudo apt update
+   sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+   ```
+
+3. **Install Tailscale** (official apt repo — pkgs.tailscale.com; the URLs
+   below are the Ubuntu 24.04 "noble" ones — substitute your release codename):
+
+   ```bash
+   curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/noble.noarmor.gpg | sudo tee /usr/share/keyrings/tailscale-archive-keyring.gpg >/dev/null
+   curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/noble.tailscale-keyring.list | sudo tee /etc/apt/sources.list.d/tailscale.list
+   sudo apt-get update && sudo apt-get install tailscale
+   sudo tailscale up   # prints an auth URL — approve it in the admin console
+   ```
+
+4. **Clone the repo** to the documented path (the systemd units and this
+   runbook assume it): `sudo git clone https://github.com/<owner>/chefclaw /opt/chefclaw`.
+5. **HUMAN creates `/opt/chefclaw/.env.local` on the server** (Claude is
+   hook-blocked from `.env*` everywhere, including here). Exactly these vars
+   (contract + placeholders: `.env.example`):
+   - `CHEFCLAW_API_TOKEN` — fresh token, not the local dev one
+   - `GEMINI_API_KEY`
+   - `MONTHLY_LLM_BUDGET_USD` + `MAX_EXTRACTION_ATTEMPTS_PER_DAY` (fail-closed pair)
+   - `CHEFCLAW_BACKUP_DIR` + `BACKUP_GPG_PASSPHRASE` (backup pair — passphrase
+     from the password manager, never generated on the VPS alone; point the
+     dir OFF the VPS, see the ADR's backup note)
+   - `MEDIA_RETENTION`
+   - optionally `DB_PASSWORD` (postgres stays loopback-bound either way)
+6. **Start the stack:**
+   `cd /opt/chefclaw && sudo docker compose --env-file .env.local up -d --build`
+   — then confirm nothing listens publicly: `ss -tlnp | grep -E '8000|5432'`
+   must show only `127.0.0.1`.
+7. **Front the api toward the tailnet** (syntax verified 2026-07-06;
+   Tailscale auto-provisions the TLS cert — if HTTPS certificates aren't
+   enabled for the tailnet yet, the command tells you and links the console
+   toggle):
+
+   ```bash
+   sudo tailscale serve --https=443 --bg 127.0.0.1:8000
+   tailscale serve status        # verify; `sudo tailscale serve --https=443 off` disables
+   ```
+
+8. **Phone:** install the Tailscale app, sign in to the same tailnet, then
+   open `https://<vps-hostname>.<tailnet>.ts.net` and paste the API token
+   into the token gate once.
+9. **Install the backup schedule** (systemd, not launchd — the VPS has no
+   launchd): follow the header of `ops/chefclaw-backup.service.example`
+   (copy both units to `/etc/systemd/system/`, enable the **timer**, run the
+   service once by hand, check `journalctl -u chefclaw-backup.service`).
+10. **Verify end-to-end:** Settings screen all green — api reachable over the
+    tailnet URL, sidecar `ok`, budget readout present, backup `fresh` after
+    the step-9 manual run. Then paste one real link per platform; **watch the
+    rednote job especially** — this is the first datacenter-IP test of the
+    guest tier (see §5 if it degrades).
+
+---
+
+## 5. Rednote escalation ladder (operator playbook)
+
+Posture (plan amendment §16.11, ADR
+`2026-07-06-m-deploy-vps-and-rednote-escalation.md`): rednote-from-datacenter
+is **test-first — fix on actual breakage, never pre-buy**. The failure plan is
+prepared, not improvised: every rung is pure config, and rungs b/c/d are the
+same single knob (`CHEFCLAW_FETCH_PROXY`).
+
+### Recognizing degradation
+
+The signature is **platform-shaped, not job-shaped**:
+
+- Jobs drawer: `download_failed` (or guest-tier `cookies_expired`) errors
+  **concentrated on rednote jobs while bilibili jobs keep succeeding**. That
+  split is the datacenter-IP signal — a broken network would fail both.
+- One-off failures are normal (deleted note vs missing `xsec_token` — §1);
+  degradation means *fresh share links for known-public notes* fail
+  repeatedly.
+- `/api/health` stays green throughout (sidecar `ok` — the sidecar is
+  reachable; it's the *platform* refusing the sidecar's datacenter IP).
+
+Confirm before escalating: re-fetch one known-good public note with a fresh
+share link. If it works, it was note-level, not IP-level — stay put.
+
+### The rungs (in order; stop at the first one that restores service)
+
+| Rung | What | Config change (the entire fix) |
+|---|---|---|
+| **a — tier-2 phone upload** | Zero prep, works regardless of server IP: browse Rednote on the phone (residential by definition), save the video, upload via the web UI with the provenance URL. | **None.** This works today; use it while deciding whether b/c/d are worth it. |
+| **b — home exit node** | An existing always-on home device (Apple TV tvOS 17+ / NAS / a Tailscale-capable router) becomes a tailnet **exit node**; the VPS runs a userspace-networking `tailscaled` SOCKS5 proxy pointed at it, so platform fetches exit from the home residential IP. | On the VPS: run a second, userspace-networking `tailscaled` with `--socks5-server=:1055` (e.g. the `tailscale/tailscale` container attached to the compose network), then select the exit node with `tailscale set --exit-node=<home-device>` — an `up`/`set` flag, **not** a `tailscaled` one (flag split verified against tailscale 1.98.8). Then in `.env.local`: `CHEFCLAW_FETCH_PROXY=socks5://<proxy-host>:1055` and `docker compose --env-file .env.local up -d api`. |
+| **c — commercial residential proxy** | Paid residential proxy via the same knob. **Gray-market caveat recorded in the ADR**: residential-proxy IP sourcing is ethically murky — a last resort before d, not a default. | `.env.local`: `CHEFCLAW_FETCH_PROXY=<provider URL>` (any credentials in that URL make it a secret — `.env.local` only, never anywhere else), restart the api. |
+| **d — home-relay endpoint** | The original seam: run the fetch path itself on a residential-IP home device joined to the tailnet — move the xhs sidecar home and point the api at it. | `.env.local`: `XHS_SIDECAR_URL=http://<home-device-tailscale-ip>:5556` (tailnet traffic only — never expose the sidecar publicly), plus `CHEFCLAW_FETCH_PROXY` at a home proxy if the CDN media downloads are also IP-gated; restart the api. |
+
+### Knob mechanics (what `CHEFCLAW_FETCH_PROXY` actually touches)
+
+- Routes **platform-fetch traffic only**: the sidecar detail call's per-request
+  `proxy` param (the sidecar dials the proxy itself), the api's media
+  downloads and short-link resolution, and yt-dlp. The api→sidecar hop and
+  DB/API traffic stay direct.
+- Because the **sidecar dials the proxy too**, the proxy address must be
+  reachable from *both* the api and xhs containers — put a proxy container on
+  the compose network rather than on the host loopback.
+- `socks5://` URLs: the api's httpx ships with socks support
+  (`httpx[socks]`); yt-dlp handles socks natively. The pinned sidecar image
+  was inspected (2026-07-06, throwaway container): its `ExtractParams` model
+  declares `proxy` (the per-request param is honored, not silently dropped)
+  and it ships httpx 0.28.1 + socksio 1.0.0, so socks5 *client construction*
+  works there too. **End-to-end socks5 through the sidecar is still
+  unverified** — if rung b fails inside the sidecar, front the SOCKS5 with a
+  small HTTP proxy (note the result in the ADR).

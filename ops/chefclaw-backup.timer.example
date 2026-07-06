@@ -1,0 +1,20 @@
+# chefclaw daily backup — systemd timer unit. Fires chefclaw-backup.service
+# daily at 03:30 (server local time). Install steps live in
+# ops/chefclaw-backup.service.example — both units install together; enable
+# THIS timer (`sudo systemctl enable --now chefclaw-backup.timer`), never the
+# service.
+#
+# Verify the schedule after enabling: systemctl list-timers chefclaw-backup.timer
+
+[Unit]
+Description=Daily chefclaw backup at 03:30
+
+[Timer]
+OnCalendar=*-*-* 03:30:00
+# Run a missed schedule at next boot (a VPS that was down across 03:30 still
+# backs up) — the launchd example only catches sleep, not shutdown; this
+# catches both. /api/health staleness remains the backstop for silent failures.
+Persistent=true
+
+[Install]
+WantedBy=timers.target

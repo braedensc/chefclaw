@@ -63,6 +63,14 @@ class Settings(BaseSettings):
     xhs_user_agent: str = ""
     xhs_cookie_set_date: str = ""  # human-written at every refresh; health warns off it
     bilibili_cookie: str = ""  # optional — anonymous is the default tier
+    # Fetch proxy (M-Deploy Rednote escalation ladder — 2026-07-06 ADR): routes
+    # ONLY platform-fetch traffic through a proxy — the sidecar detail call's
+    # `proxy` param (the sidecar's own platform call), the api's media
+    # downloads and short-link resolution, and yt-dlp. Ladder rungs b (home
+    # exit node via Tailscale SOCKS5), c (commercial residential proxy), and
+    # d (home relay) are all this ONE knob. Empty = direct (the default).
+    # The api→sidecar hop is compose-internal and is NEVER proxied.
+    chefclaw_fetch_proxy: str = ""
 
     # ── Media dirs (Phase 2) ────────────────────────────────────────────────
     media_dir: str = "/data/media"  # retained archive — named volume, irreplaceable

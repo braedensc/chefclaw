@@ -14,7 +14,7 @@ local Docker compose, so the "host env" store **collapses into `.env.local`**:
 | `.env.local` (gitignored) | Everything: `CHEFCLAW_API_TOKEN`, `GEMINI_API_KEY`, `DASHSCOPE_API_KEY` (Phase 4 fallback), `XHS_COOKIE` + `XHS_USER_AGENT` + `XHS_COOKIE_SET_DATE`, `BILIBILI_COOKIE` (optional), `DATABASE_URL`, budget knobs, `MEDIA_RETENTION`, backup knobs (`CHEFCLAW_BACKUP_DIR`, `BACKUP_GPG_PASSPHRASE` — operational copy only) | **Human only** — the hook blocks Claude writing `.env*` |
 | Password manager | `BACKUP_GPG_PASSPHRASE` — the **canonical** copy (generated once, stored here FIRST; never only on this machine). `.env.local` carries just the operational copy `scripts/backup.sh` reads | Human only |
 | GitHub Actions secrets | **Nothing.** CI runs on dummy env values only; currently no real key needed (revisit at M-Deploy) | — |
-| Host env (deployed) | Does not exist until M-Deploy; re-map then | — |
+| Host env (deployed) | At M-Deploy this becomes the VPS's own `/opt/chefclaw/.env.local` (same human-only rule; var list in `docs/RUNBOOK.md` §4 step 5) — see §7 | Human only |
 
 `.env.example` (placeholders only) is the committed contract. `CHEFCLAW_API_TOKEN` is a
 server secret at birth: never a `VITE_*` var, never in the frontend bundle.
@@ -120,7 +120,8 @@ server secret at birth: never a `VITE_*` var, never in the frontend bundle.
 
 - **Identity:** `scripts/backup.sh` — read-only encrypted `pg_dump` + media-volume
   archive to `CHEFCLAW_BACKUP_DIR` (e.g. `<your-backup-destination>`), scheduled
-  daily via `ops/com.chefclaw.backup.plist.example`. Full procedures, install
+  daily via `ops/com.chefclaw.backup.plist.example` (macOS/launchd; on the VPS:
+  the systemd units — §7). Full procedures, install
   steps, restore, and the performed drill record: `docs/RUNBOOK.md` §2.
 - **Secret + which store:** `BACKUP_GPG_PASSPHRASE` — **canonical copy in the
   password manager** (generated once, stored there FIRST — never only on this
@@ -130,6 +131,31 @@ server secret at birth: never a `VITE_*` var, never in the frontend bundle.
   drill performed and verified** (row counts, content checksums, media SHA-256
   round-trip — record in `docs/RUNBOOK.md`). launchd agent **not yet loaded**
   (human step); health reports `not_configured` until scheduled backups run.
+
+## 7. M-Deploy — VPS + Tailscale (prep landed; provisioning pending)
+
+- **Posture** (ADR `docs/adr/2026-07-06-m-deploy-vps-and-rednote-escalation.md`):
+  Hetzner-class VPS, Ubuntu LTS, **Tailscale-first, zero public exposure** —
+  ports stay `127.0.0.1`-bound, `tailscale serve` fronts the tailnet. Turn-key
+  procedure: `docs/RUNBOOK.md` §4; Rednote escalation playbook: §5.
+- **VPS (Hetzner-class)** *(you, in dashboards)*: Hetzner Cloud → CX-class
+  server, Ubuntu LTS, SSH-key-only auth. The server's
+  `/opt/chefclaw/.env.local` is the deployed host-env store (human-only, same
+  as locally; exact var list in RUNBOOK §4 step 5 — `CHEFCLAW_API_TOKEN` gets
+  a **fresh** token, never the local dev one).
+- **Tailscale** *(you, in dashboards)*: create/sign in to the tailnet, approve
+  the VPS from `tailscale up`'s auth URL, enable HTTPS certificates when
+  `tailscale serve` asks, install the phone app on the same tailnet.
+- **Backups on the VPS:** scheduled via the systemd units
+  (`ops/chefclaw-backup.service.example` + `.timer.example`);
+  `CHEFCLAW_BACKUP_DIR` must point **off-VPS** (tailnet copy home or object
+  storage — decide at provisioning; the artifacts are gpg-encrypted at rest).
+- **Provisioning record:** 2026-07-06 — prep landed (fetch-proxy knob, systemd
+  unit examples, RUNBOOK §4/§5, ADR). **VPS: pending provisioning** (record
+  date, server type, region here when created). **Tailscale: pending tailnet**
+  (record date + tailnet name here). **Off-VPS backup destination: pending**
+  (record choice here). First rednote-from-datacenter test result: **pending
+  deploy day** (record pass/degraded + any ladder rung taken here).
 
 ## Deferred hardening (tracked here so it can't fall through the cracks)
 

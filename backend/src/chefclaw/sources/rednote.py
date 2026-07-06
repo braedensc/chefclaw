@@ -17,8 +17,9 @@ real sidecar API, ``ExtractParams``/``ExtractData`` in its OpenAPI schema):
    §16.10; the main account never enters the pipeline). Response:
    ``{"message": str, "params": <echo>, "data": dict|null}`` with data keys
    like ``作品标题``/``作者昵称``/``作品类型``/``下载地址`` (list of URLs).
-   SECURITY: ``params`` echoes the request INCLUDING the cookie — only
-   ``data`` is ever parsed or stored; never log the raw response body.
+   SECURITY: ``params`` echoes the request INCLUDING the cookie and the
+   fetch proxy (a rung-c proxy URL may carry credentials) — only ``data``
+   is ever parsed or stored; never log the raw response body.
 2. The api downloads the returned media URL(s) ITSELF via httpx into
    ``dest_dir`` (the sidecar stays stateless; retention lives in one place),
    sending ``settings.xhs_user_agent`` when set.
@@ -68,6 +69,14 @@ class RednoteSource:
         self._settings = settings
         self._transport = transport  # test seam: httpx.MockTransport
 
+    def _platform_proxy_kwargs(self) -> dict[str, Any]:
+        """Proxy kwargs for clients that touch the PLATFORM (media downloads,
+        short-link resolution) — the M-Deploy fetch-proxy knob. The api→sidecar
+        client never gets these: that hop is compose-internal by design."""
+        if self._settings.chefclaw_fetch_proxy:
+            return {"proxy": self._settings.chefclaw_fetch_proxy}
+        return {}
+
     # ── matching ────────────────────────────────────────────────────────────
 
     def matches(self, url: str) -> bool:
@@ -111,7 +120,10 @@ class RednoteSource:
             headers["User-Agent"] = self._settings.xhs_user_agent
         try:
             async with httpx.AsyncClient(
-                transport=self._transport, follow_redirects=True, timeout=30.0
+                transport=self._transport,
+                follow_redirects=True,
+                timeout=30.0,
+                **self._platform_proxy_kwargs(),
             ) as client:
                 response = await client.get(url, headers=headers)
         except httpx.HTTPError as exc:
@@ -136,7 +148,10 @@ class RednoteSource:
 
         paths: list[Path] = []
         async with httpx.AsyncClient(
-            transport=self._transport, follow_redirects=True, timeout=_MEDIA_TIMEOUT
+            transport=self._transport,
+            follow_redirects=True,
+            timeout=_MEDIA_TIMEOUT,
+            **self._platform_proxy_kwargs(),
         ) as client:
             for index, media_url in enumerate(media_urls):
                 paths.append(await self._download_media(client, media_url, ref, index, dest_dir))
@@ -156,6 +171,11 @@ class RednoteSource:
         # Guest tier is the default (§16.10): only send a cookie if configured.
         if self._settings.xhs_cookie:
             payload["cookie"] = self._settings.xhs_cookie
+        # Fetch-proxy knob (M-Deploy ladder): the SIDECAR's own platform call
+        # goes through the proxy — passed per-request, so the sidecar stays
+        # stateless. The api→sidecar hop itself is never proxied.
+        if self._settings.chefclaw_fetch_proxy:
+            payload["proxy"] = self._settings.chefclaw_fetch_proxy
 
         try:
             async with httpx.AsyncClient(
