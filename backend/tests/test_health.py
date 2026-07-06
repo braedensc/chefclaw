@@ -1,7 +1,9 @@
 """/api/health auth + shape tests (no real database — see conftest)."""
 
-from httpx import AsyncClient
+from httpx import ASGITransport, AsyncClient
 
+from chefclaw.app import create_app
+from chefclaw.config import Settings, get_settings
 from tests.conftest import OWNER_ID, TEST_TOKEN, bearer
 
 
@@ -49,6 +51,23 @@ async def test_health_degraded_when_db_unreachable(
     body = response.json()
     assert body["status"] == "degraded"
     assert body["db"] == "unreachable"
+
+
+async def test_health_never_raises_on_malformed_sidecar_url(ping_ok: None) -> None:
+    """A stray control character in XHS_SIDECAR_URL (classic \\r from a
+    Windows-edited env file) raises httpx.InvalidURL — which is NOT an
+    HTTPError. Health must report 'unreachable', never 500. The malformed URL
+    fails at request build, so no network is ever touched."""
+    app = create_app()
+    app.dependency_overrides[get_settings] = lambda: Settings(
+        chefclaw_api_token=TEST_TOKEN,
+        xhs_sidecar_url="http://xhs:8000\r",
+    )
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        response = await client.get("/api/health", headers=bearer(TEST_TOKEN))
+    assert response.status_code == 200
+    assert response.json()["sidecar"] == "unreachable"
 
 
 async def test_owner_id_is_cached_seeded_owner(client: AsyncClient, ping_ok: None) -> None:

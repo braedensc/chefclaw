@@ -90,12 +90,43 @@ class Ingredient(BaseModel):
     raw_text: str = Field(min_length=1, description="Verbatim from the source — immutable.")
     name: BilingualText
     quantity: Quantity | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def _all_null_quantity_is_null(cls, data: object) -> object:
+        """Canonicalize the two encodings of "no quantity stated".
+
+        Models frequently emit ``quantity: {raw_text: null, value: null, unit:
+        null, unit_type: null}`` — or the same with ``unit_type: "approx"`` as
+        a classification of the absence — where the contract wants
+        ``quantity: null``. With no captured text, no value, and no unit, the
+        object encodes exactly the same absence, so collapsing it to ``None``
+        creates and destroys no food data — a canonicalization, NOT a repair
+        (Hard Rule 7 intact). An object carrying an actual ``value`` or
+        ``unit`` without ``raw_text`` is a number from nowhere — genuinely
+        inconsistent data, still rejected.
+        """
+        if isinstance(data, dict):
+            q = data.get("quantity")
+            if (
+                isinstance(q, dict)
+                and q
+                and q.get("raw_text") is None
+                and q.get("value") is None
+                and q.get("unit") is None
+                and set(q) <= {"raw_text", "value", "unit", "unit_type"}
+            ):
+                data = {**data, "quantity": None}
+        return data
     quantity_grams_stated: float | None = Field(
         default=None,
         gt=0,
         description="ONLY if the host explicitly states a weight — never estimated.",
     )
-    prep_state: Literal["dried", "fresh", "cooked", "raw"] | None = None
+    # Enum grows EVIDENCE-DRIVEN: values are added when real videos surface
+    # them (validation_failed preserves the raw output, so a miss is loud).
+    # "frozen" added 2026-07-06 from the first real Rednote acceptance video.
+    prep_state: Literal["dried", "fresh", "cooked", "raw", "frozen"] | None = None
     notes: str | None = None
     # Reserved for pillar 2 (nutrition). The `None` type IS the validator:
     # any non-null value is rejected — the extractor never fills this.
