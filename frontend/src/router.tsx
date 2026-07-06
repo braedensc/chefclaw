@@ -2,29 +2,47 @@ import {
   createRootRoute,
   createRoute,
   createRouter,
+  Outlet,
 } from '@tanstack/react-router';
+import type { RouterHistory } from '@tanstack/react-router';
 
+import { AppShell } from './components/app-shell';
+import { LibraryPage } from './components/library-page';
+import { RecipeDetailPage } from './components/recipe-detail-page';
 import { TokenGate } from './components/token-gate';
 
-function IndexPage() {
+function RootLayout() {
   return (
-    <main className="min-h-screen bg-neutral-950 text-neutral-100">
-      <TokenGate />
-    </main>
+    <TokenGate>
+      <AppShell>
+        <Outlet />
+      </AppShell>
+    </TokenGate>
   );
 }
 
-const rootRoute = createRootRoute();
+const rootRoute = createRootRoute({ component: RootLayout });
 
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
-  component: IndexPage,
+  component: LibraryPage,
 });
 
-const routeTree = rootRoute.addChildren([indexRoute]);
+const recipeDetailRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/recipes/$id',
+  component: RecipeDetailPage,
+});
 
-export const router = createRouter({ routeTree });
+const routeTree = rootRoute.addChildren([indexRoute, recipeDetailRoute]);
+
+/** Factory so tests can mount the real route tree on a memory history. */
+export function createAppRouter(history?: RouterHistory) {
+  return createRouter({ routeTree, history });
+}
+
+export const router = createAppRouter();
 
 declare module '@tanstack/react-router' {
   interface Register {

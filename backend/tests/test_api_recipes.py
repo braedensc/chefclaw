@@ -93,6 +93,7 @@ async def test_extract_new_job_202_returns_job_resource() -> None:
     assert body["type"] == "extract"
     assert (body["platform"], body["canonical_id"]) == ("bilibili", "BVtest00001-p1")
     assert body["result_recipe_ids"] == []
+    assert body["url"] == FAKE_URL  # the originally pasted URL — the retry affordance re-POSTs it
     assert {"id", "attempts", "error_type", "error_detail", "created_at", "updated_at"} <= set(
         body
     )
@@ -195,6 +196,55 @@ async def test_get_job_200_and_owner_scoped_404() -> None:
     assert other.status_code == 404  # someone else's job is invisible
     assert other.json()["error_type"] == "not_found"
     assert missing.status_code == 404
+
+
+async def test_get_job_url_lifted_from_payload_and_none_when_absent() -> None:
+    store = FakeJobStore()
+    with_url = store.seed_job(owner_id=OWNER_ID)
+    without_url = store.seed_job(owner_id=OWNER_ID, canonical_id="BVnourl", payload={})
+    async with client_for(build_app(store)) as client:
+        first = await client.get(f"/api/jobs/{with_url.id}", headers=bearer(TEST_TOKEN))
+        second = await client.get(f"/api/jobs/{without_url.id}", headers=bearer(TEST_TOKEN))
+    assert first.json()["url"] == "https://example.test/v"
+    assert second.status_code == 200
+    assert second.json()["url"] is None
+
+
+# ─── GET /api/jobs (jobs drawer list) ────────────────────────────────────────
+
+
+async def test_list_jobs_shape_ordering_and_owner_scope() -> None:
+    store = FakeJobStore()
+    oldest = store.seed_job(owner_id=OWNER_ID, canonical_id="BVone", status="stored")
+    newest = store.seed_job(
+        owner_id=OWNER_ID,
+        canonical_id="BVtwo",
+        status="failed",
+        payload={"url": "fake://two", "fetch_url": "fake://two"},
+    )
+    store.seed_job(owner_id=uuid.uuid4(), canonical_id="BVtheirs")  # invisible
+    async with client_for(build_app(store)) as client:
+        response = await client.get("/api/jobs", headers=bearer(TEST_TOKEN))
+    assert response.status_code == 200
+    body = response.json()
+    # Newest activity first (updated_at DESC), someone else's jobs excluded.
+    assert [item["id"] for item in body] == [str(newest.id), str(oldest.id)]
+    assert body[0]["url"] == "fake://two"
+    assert body[1]["url"] == "https://example.test/v"
+    assert all("payload" not in item for item in body)
+
+
+async def test_list_jobs_limit_default_and_cap() -> None:
+    store = FakeJobStore()
+    for index in range(25):
+        store.seed_job(owner_id=OWNER_ID, canonical_id=f"BV{index}")
+    async with client_for(build_app(store)) as client:
+        default = await client.get("/api/jobs", headers=bearer(TEST_TOKEN))
+        one = await client.get("/api/jobs", params={"limit": 1}, headers=bearer(TEST_TOKEN))
+        over = await client.get("/api/jobs", params={"limit": 101}, headers=bearer(TEST_TOKEN))
+    assert len(default.json()) == 20  # default limit
+    assert len(one.json()) == 1
+    assert over.status_code == 422  # le=100
 
 
 # ─── GET /api/recipes (library list) ─────────────────────────────────────────
@@ -336,6 +386,7 @@ async def test_delete_recipe_204_and_404(monkeypatch: pytest.MonkeyPatch) -> Non
     [
         ("GET", "/api/recipes"),
         ("GET", f"/api/recipes/{uuid.uuid4()}"),
+        ("GET", "/api/jobs"),
         ("GET", f"/api/jobs/{uuid.uuid4()}"),
         ("PATCH", f"/api/recipes/{uuid.uuid4()}"),
         ("DELETE", f"/api/recipes/{uuid.uuid4()}"),

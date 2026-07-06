@@ -1,0 +1,78 @@
+# GOLDEN-SUITE STACK ONLY — never the daily-driver stack (that's compose.yaml,
+# whose volumes are production data). This project is fully isolated from it:
+# its own compose project name, its own ports (127.0.0.1:55433 / 127.0.0.1:8100),
+# and NO named volumes — postgres runs on tmpfs, so the whole stack is
+# throwaway by design (tests must never need volume-destroying commands, which
+# are hook-blocked). Fake source + fake extractor: no platform is touched, no
+# paid call can happen. The token below is a TEST CONSTANT, not a secret.
+#
+# Run:   docker compose -f compose.golden.yaml up -d --build
+# Stop:  docker compose -f compose.golden.yaml down   (plain down — volumes
+#        don't exist; the tmpfs data dies with the container)
+
+name: chefclaw-golden
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: chefclaw
+      POSTGRES_PASSWORD: chefclaw-local-dev
+      POSTGRES_DB: chefclaw
+    ports:
+      - "127.0.0.1:55433:5432"
+    tmpfs:
+      # PG 18+ images want the mount at /var/lib/postgresql (data lands in a
+      # subdirectory) — see compose.yaml. tmpfs, NOT a volume: throwaway.
+      - /var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U chefclaw -d chefclaw"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # One-shot: applies Alembic migrations (also seeds the owner row), then exits.
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    command: ["alembic", "upgrade", "head"]
+    environment:
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_USER: chefclaw
+      DB_PASSWORD: chefclaw-local-dev
+      DB_NAME: chefclaw
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  # NO xhs sidecar in this stack, and XHS_SIDECAR_URL stays unset: the Rednote
+  # source is disabled fail-closed; CHEFCLAW_SOURCES=fake never reaches it.
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    init: true
+    environment:
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_USER: chefclaw
+      DB_PASSWORD: chefclaw-local-dev
+      DB_NAME: chefclaw
+      # Test constant (documented in TESTING.md's golden contract), not a secret.
+      CHEFCLAW_API_TOKEN: golden-test-token
+      # Fake seams (plan §16.9): no platform fetch, no paid model call.
+      CHEFCLAW_EXTRACTOR: fake
+      CHEFCLAW_SOURCES: fake
+      # Budget vars are fail-closed — set them so the (fake) pipeline runs.
+      MONTHLY_LLM_BUDGET_USD: "10"
+      MAX_EXTRACTION_ATTEMPTS_PER_DAY: "20"
+    ports:
+      - "127.0.0.1:8100:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully

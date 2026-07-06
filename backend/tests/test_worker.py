@@ -684,3 +684,31 @@ async def test_media_retention_keep_moves_into_archive(tmp_path: Path) -> None:
     assert meta["retained_media"] == [str(archived[0])]
     # Scratch is still cleaned even when media was retained:
     assert not (tmp_path / "scratch" / "chefclaw-jobs" / str(job.id)).exists()
+
+
+# ─── default_source_adapters (CHEFCLAW_SOURCES selection, §16.9) ─────────────
+
+
+def test_default_source_adapters_real_registers_platform_adapters(tmp_path: Path) -> None:
+    adapters = jobs_module.default_source_adapters(make_settings(tmp_path))
+    assert [adapter.platform for adapter in adapters] == ["bilibili", "rednote"]
+
+
+def test_default_source_adapters_fake_uses_real_platform_enum(tmp_path: Path) -> None:
+    adapters = jobs_module.default_source_adapters(
+        make_settings(tmp_path, chefclaw_sources="fake")
+    )
+    assert len(adapters) == 1
+    fake = adapters[0]
+    assert isinstance(fake, FakeSource)
+    # platform must be a REAL enum value — document SourceInfo validation
+    # would reject a stored dish whose provenance platform isn't one.
+    assert fake.platform == "bilibili"
+    assert fake.canonical_id == "fake-golden-1"
+    assert fake.matches("fake://golden-check")
+    assert not fake.matches("https://www.bilibili.com/video/BV1xx411c7mD")
+
+
+def test_default_source_adapters_unknown_value_fails_closed(tmp_path: Path) -> None:
+    with pytest.raises(errors.ConfigError):
+        jobs_module.default_source_adapters(make_settings(tmp_path, chefclaw_sources="prod"))

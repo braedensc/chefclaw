@@ -20,7 +20,8 @@
     "format:check": "npm run format:check -w frontend",
     "typecheck": "npm run typecheck -w frontend",
     "test": "npm run test -w frontend",
-    "test:e2e": "npm run test:e2e -w frontend"
+    "test:e2e": "npm run test:e2e -w frontend",
+    "test:golden": "npm run test:golden -w frontend"
   },
   "devDependencies": {
     "@secretlint/secretlint-rule-pattern": "^13.0.2",

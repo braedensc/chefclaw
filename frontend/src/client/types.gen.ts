@@ -140,6 +140,10 @@ export type JobOut = {
      * Updated At
      */
     updated_at: string;
+    /**
+     * Url
+     */
+    url?: string | null;
 };
 
 /**
@@ -331,6 +335,38 @@ export type HealthApiHealthGetResponses = {
 };
 
 export type HealthApiHealthGetResponse = HealthApiHealthGetResponses[keyof HealthApiHealthGetResponses];
+
+export type ListJobsApiJobsGetData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Limit
+         */
+        limit?: number;
+    };
+    url: '/api/jobs';
+};
+
+export type ListJobsApiJobsGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ListJobsApiJobsGetError = ListJobsApiJobsGetErrors[keyof ListJobsApiJobsGetErrors];
+
+export type ListJobsApiJobsGetResponses = {
+    /**
+     * Response List Jobs Api Jobs Get
+     *
+     * Successful Response
+     */
+    200: Array<JobOut>;
+};
+
+export type ListJobsApiJobsGetResponse = ListJobsApiJobsGetResponses[keyof ListJobsApiJobsGetResponses];
 
 export type GetJobApiJobsJobIdGetData = {
     body?: never;

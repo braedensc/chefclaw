@@ -82,6 +82,8 @@ class JobStore(Protocol):
 
     async def get_job(self, job_id: uuid.UUID, owner_id: uuid.UUID) -> Job | None: ...
 
+    async def list_jobs(self, owner_id: uuid.UUID, limit: int = 20) -> list[Job]: ...
+
     async def claim_next_job(self) -> Job | None: ...
 
     async def set_status(self, job_id: uuid.UUID, status: str) -> None: ...
@@ -190,6 +192,18 @@ class PostgresJobStore:
         stmt = select(Job).where(Job.id == job_id, Job.owner_id == owner_id)
         async with self._sessionmaker() as session:
             return (await session.execute(stmt)).scalars().first()
+
+    async def list_jobs(self, owner_id: uuid.UUID, limit: int = 20) -> list[Job]:
+        """The jobs drawer (active + recent): this owner's jobs, newest
+        activity first (updated_at moves on every status change)."""
+        stmt = (
+            select(Job)
+            .where(Job.owner_id == owner_id)
+            .order_by(Job.updated_at.desc())
+            .limit(limit)
+        )
+        async with self._sessionmaker() as session:
+            return list((await session.execute(stmt)).scalars().all())
 
     # ── worker lifecycle ─────────────────────────────────────────────────────
 
