@@ -236,17 +236,28 @@ volumes.
 ## 4. Deploy (VPS + Tailscale)
 
 Turn-key procedure for the M-Deploy posture (ADR:
-`docs/adr/2026-07-06-m-deploy-vps-and-rednote-escalation.md`): a Hetzner-class
-VPS, **Tailscale-first access, zero public exposure** — every published port
-stays `127.0.0.1`-bound on the VPS (compose.yaml already does this) and
+`docs/adr/2026-07-06-m-deploy-vps-and-rednote-escalation.md`): **any mainstream
+x86 VPS**, **Tailscale-first access, zero public exposure** — every published
+port stays `127.0.0.1`-bound on the VPS (compose.yaml already does this) and
 `tailscale serve` fronts the api toward the tailnet only. Install commands
 below were verified current against the official docs on 2026-07-06; re-verify
 on deploy day if months have passed.
 
-1. **Provision** *(you, in dashboards)*: Hetzner Cloud → new CX-class server
-   (a CX22-tier shared vCPU box is plenty for single-user), **Ubuntu LTS**,
-   SSH key auth (no password login). Record the date/host in
-   `docs/SERVICES.md` §7.
+**Host choice (2026-07-06):** the steps are provider-agnostic — only the
+dashboard in step 1 differs. Any standard x86 VPS with **≥ 2 GB RAM**
+(ffmpeg's DASH merge + the Gemini video upload spike past 1 GB during
+extraction) running **Ubuntu LTS** works:
+
+- **Hetzner** CX22 (2 vCPU / 4 GB, ~€4.5/mo) — the cheapest with real headroom;
+  reputable (est. 1997, huge in self-hosting). The assumed host below.
+- **DigitalOcean** Basic droplet (2 GB, ~$12/mo) — the most recognizable
+  personal-project cloud with the best beginner docs. Also Linode/Vultr.
+- Oracle Always Free (ARM, $0) stays viable but adds an arm64 multi-arch build
+  and free-tier capacity friction — skip it if paying a few dollars is fine.
+
+1. **Provision** *(you, in dashboards)*: create the server (2 GB+ RAM),
+   **Ubuntu LTS**, SSH key auth (no password login). Record the date/host/
+   provider in `docs/SERVICES.md` §7.
 2. **Install Docker Engine + compose plugin** (official apt repo —
    docs.docker.com/engine/install/ubuntu):
 
@@ -311,11 +322,21 @@ on deploy day if months have passed.
    launchd): follow the header of `ops/chefclaw-backup.service.example`
    (copy both units to `/etc/systemd/system/`, enable the **timer**, run the
    service once by hand, check `journalctl -u chefclaw-backup.service`).
-10. **Verify end-to-end:** Settings screen all green — api reachable over the
-    tailnet URL, sidecar `ok`, budget readout present, backup `fresh` after
-    the step-9 manual run. Then paste one real link per platform; **watch the
-    rednote job especially** — this is the first datacenter-IP test of the
-    guest tier (see §5 if it degrades).
+10. **Verify end-to-end** with the scripted smoke check (run from a
+    tailnet-connected machine, e.g. your Mac — the token comes from the env,
+    never an argument):
+
+    ```bash
+    CHEFCLAW_API_TOKEN=<the-server-token> sh scripts/prod-smoke.sh \
+      https://<host>.<tailnet>.ts.net <server-public-ip>
+    ```
+
+    It asserts reachability, that auth is enforced (401 without a token, 200
+    with), that `db`/`worker` are healthy, and — given the public IP — that
+    **8000/5432 are NOT reachable publicly** (the zero-public-exposure
+    invariant). Then open the Settings screen (all green) and paste one real
+    link per platform; **watch the rednote job especially** — this is the first
+    datacenter-IP test of the guest tier (see §5 if it degrades).
 
 ---
 
