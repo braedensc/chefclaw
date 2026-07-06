@@ -1,0 +1,12 @@
+# Markdown is never auto-formatted (kit convention).
+*.md
+
+# Generated typed client — committed, machine-formatted by openapi-ts.
+# Patterns are **-anchored because this file serves two base paths: frontend/
+# (npm run format:check) and the repo root (lint-staged --ignore-path).
+**/src/client/
+
+# Build and test artifacts.
+**/dist/
+**/test-results/
+**/playwright-report/

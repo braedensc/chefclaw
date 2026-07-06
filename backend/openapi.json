@@ -1,0 +1,99 @@
+{
+  "components": {
+    "schemas": {
+      "HealthResponse": {
+        "description": "Extensible Phase-1 health shape.\n\nsidecar / cookie_freshness / backup / spend_month_usd are placeholders\nwhose real values land in later phases (plan §7 screen 4).",
+        "properties": {
+          "backup": {
+            "const": "not_configured",
+            "default": "not_configured",
+            "title": "Backup",
+            "type": "string"
+          },
+          "cookie_freshness": {
+            "const": "not_configured",
+            "default": "not_configured",
+            "title": "Cookie Freshness",
+            "type": "string"
+          },
+          "db": {
+            "enum": [
+              "ok",
+              "unreachable"
+            ],
+            "title": "Db",
+            "type": "string"
+          },
+          "sidecar": {
+            "const": "not_configured",
+            "default": "not_configured",
+            "title": "Sidecar",
+            "type": "string"
+          },
+          "spend_month_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Spend Month Usd"
+          },
+          "status": {
+            "enum": [
+              "ok",
+              "degraded"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "db"
+        ],
+        "title": "HealthResponse",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "title": "chefclaw",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/health": {
+      "get": {
+        "description": "Health check. NOT publicly exempt from auth — it exposes spend/cookie\nstate (plan §16 amendment 3).",
+        "operationId": "health_api_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Health"
+      }
+    }
+  }
+}

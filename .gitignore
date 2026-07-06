@@ -21,6 +21,12 @@ cookies*
 # Dependencies
 node_modules/
 
+# Python (backend/ — uv project)
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+
 # Build output
 dist/
 

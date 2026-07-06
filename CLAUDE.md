@@ -49,16 +49,31 @@ Layout: **npm workspaces** — root `package.json` is kit tooling + workspace ro
 > `.nvmrc` — run `nvm use` first if your shell defaults elsewhere.
 
 ```bash
-npm install                                        # husky + secretlint, wires pre-commit
-npm run test:hooks                                 # hook block/allow battery (must stay green)
-npm run lint:secrets                               # secretlint over all tracked files
-python3 scripts/check_placeholders.py --bootstrapped  # no stray {{…}} tokens
+# Stack (prod-mode: api serves the built SPA same-origin at :8000)
+CHEFCLAW_API_TOKEN=pick-something docker compose up -d --build
+docker compose down                    # containers only — volumes ALWAYS survive
+
+# Backend (run inside backend/)
+uv run pytest -q                       # unit tier — no DB (CI constraint)
+uv run ruff check .
+uv run alembic upgrade head            # against the compose DB
+uv run python -m chefclaw.export_openapi openapi.json   # after ANY route/schema change
+
+# Frontend / workspace root
+npm run dev                            # Vite dev server :5173, /api proxied to :8000
+npm test · npm run lint · npm run format:check · npm run typecheck
+npm run test:e2e                       # Playwright smoke — dummy env, NO database
+npm run generate:client -w frontend    # after re-exporting openapi.json; commit both
+
+# Kit guardrails
+npm run test:hooks                     # hook block/allow battery (must stay green)
+npm run lint:secrets                   # secretlint over all tracked files
+python3 scripts/check_placeholders.py --bootstrapped
 ```
 
-**Lands in Phase 1** (listed so no one invents variants — none of these work yet):
-`docker compose up --watch` (postgres + api + web + xhs sidecar) · `npm run dev`
-(frontend workspace) · `uv run pytest` / `uv run ruff check` (in `backend/`) ·
-`uv run alembic upgrade head` · typed-client generation + CI drift check.
+**Contract rule:** a backend route/schema change is incomplete until
+`backend/openapi.json` + `frontend/src/client` are regenerated and committed —
+the "OpenAPI drift" CI job enforces it.
 
 **Skills** (`.claude/skills/<name>/SKILL.md`, invoked `/name`): the kit ships `/ship`
 (commit → push → PR → watch CI → stop) and `/new-adr`. Add project-specific ones for
@@ -84,10 +99,13 @@ docs/               SETUP, SERVICES, SECURITY, COLLABORATION, TESTING, LESSONS,
                     ARCHITECTURE (the ADR index) + adr/ (one file per decision)
 planning/           gitignored reference material — never staged, never committed
 scripts/            check_placeholders.py today; backup.sh lands in Phase 4
-backend/            (Phase 1) uv project — FastAPI transport, framework-free services,
-                    adapters (SourceAdapter/ExtractorAdapter), asyncio worker, Alembic
-frontend/           (Phase 1) Vite + React SPA — generated typed client, TanStack
-compose.yaml        (Phase 1) postgres + api + web + xhs sidecar (internal network only)
+backend/            uv project — FastAPI transport, framework-free services (adapters +
+                    asyncio worker land Phase 2), Alembic migrations, exported openapi.json
+frontend/           Vite + React SPA — TanStack Query/Router, generated typed client
+                    (src/client — regenerate, never hand-edit), Vitest, Playwright smoke
+compose.yaml        postgres + migrate + api; named volumes are IRREPLACEABLE (see below);
+                    xhs sidecar joins in Phase 2 (internal network only)
+Dockerfile.api      prod image: builds the SPA, serves it from the api same-origin
 .env.example        the env contract, placeholder values only (humans create .env.local)
 package.json        npm workspace root: kit tooling (husky, secretlint) + workspace scripts
 ```

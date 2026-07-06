@@ -1,0 +1,90 @@
+# chefclaw local stack (Phase 1: postgres + api; the xhs sidecar lands with
+# Phase 2). All published ports bind to 127.0.0.1 (CLAUDE.md).
+#
+# ── THE VOLUMES BELOW ARE IRREPLACEABLE (kit inversion) ──────────────────────
+# chefclaw_pgdata holds the only copy of the recipe library between backups;
+# chefclaw_media will hold the retained source-video archive from Phase 2.
+# Volume-destroying commands (`down -v`, `volume rm/prune`, `system prune
+# --volumes`, `compose rm -v`) are PreToolUse-hook-blocked and human-only.
+# Plain `docker compose down` (containers only) is always safe.
+#
+# Env: values interpolate from the shell (or `docker compose --env-file
+# .env.local …` once .env.local exists — see docs/SETUP.md). With nothing set,
+# the stack boots with local-dev defaults and an EMPTY api token — the api then
+# answers every request 401 with instructions, by design (auth is
+# disabled-closed). Quick start:
+#   CHEFCLAW_API_TOKEN=pick-something docker compose up -d --build
+
+name: chefclaw
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: ${DB_USER:-chefclaw}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-chefclaw-local-dev}
+      POSTGRES_DB: ${DB_NAME:-chefclaw}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      # PG 18+ images want the mount at /var/lib/postgresql (data lands in a
+      # subdirectory) — mounting the old …/data path makes the container refuse
+      # to start. See docker-library/postgres#37.
+      - chefclaw_pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-chefclaw} -d ${DB_NAME:-chefclaw}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # One-shot: applies Alembic migrations, then exits. The api waits for it.
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    command: ["alembic", "upgrade", "head"]
+    environment:
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_USER: ${DB_USER:-chefclaw}
+      DB_PASSWORD: ${DB_PASSWORD:-chefclaw-local-dev}
+      DB_NAME: ${DB_NAME:-chefclaw}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    init: true # reap zombies — Phase 2's yt-dlp subprocesses need this
+    environment:
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_USER: ${DB_USER:-chefclaw}
+      DB_PASSWORD: ${DB_PASSWORD:-chefclaw-local-dev}
+      DB_NAME: ${DB_NAME:-chefclaw}
+      CHEFCLAW_API_TOKEN: ${CHEFCLAW_API_TOKEN:-}
+      MONTHLY_LLM_BUDGET_USD: ${MONTHLY_LLM_BUDGET_USD:-}
+      MEDIA_RETENTION: ${MEDIA_RETENTION:-keep}
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - chefclaw_media:/data/media # reserved now; the Phase-2 retained archive
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    develop:
+      watch:
+        - action: sync+restart
+          path: backend/src
+          target: /app/src
+        - action: rebuild
+          path: backend/uv.lock
+
+volumes:
+  chefclaw_pgdata: # IRREPLACEABLE — recipe library (hook-guarded)
+  chefclaw_media: # IRREPLACEABLE from Phase 2 — retained source videos (hook-guarded)
