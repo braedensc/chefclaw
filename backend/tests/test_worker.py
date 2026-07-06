@@ -14,6 +14,7 @@ import pytest
 
 from chefclaw import errors
 from chefclaw.config import Settings
+from chefclaw.extractors import ExtractionUsage
 from chefclaw.extractors.fake import FakeExtractor, default_dish
 from chefclaw.models import Job
 from chefclaw.services import jobs as jobs_module
@@ -326,6 +327,44 @@ async def test_retryable_failures_cap_at_three_attempts(tmp_path: Path) -> None:
     assert store.budget_checks == 3  # and each retry re-passed the gate first
 
 
+def test_backoff_constants_pinned() -> None:
+    """Phase 4 polish: rate_limited backs off on a DISTINCT, much slower scale
+    than other retryables. These are safety bounds — change them in code with
+    a reviewed diff, and update this pin deliberately."""
+    assert jobs_module.RETRY_BACKOFF_SECONDS == 2.0
+    assert jobs_module.RATE_LIMITED_BACKOFF_SECONDS == 30.0
+
+
+async def test_rate_limited_backoff_is_slower_and_scales_with_attempts(
+    tmp_path: Path,
+) -> None:
+    store, source = FakeJobStore(), make_source()
+    settings = make_settings(tmp_path)
+    extractor = FakeExtractor(failure=errors.RateLimitedError("model throttled"))
+    worker, sleeper = make_worker(store, source, settings, extractor)
+
+    await enqueue_extract(store, OWNER_ID, FAKE_URL, [source], settings)
+    await claim_and_process(worker, store)  # attempt 1 → requeue
+    assert jobs_module.RATE_LIMITED_BACKOFF_SECONDS * 1 in sleeper.calls
+    await claim_and_process(worker, store)  # attempt 2 → requeue
+    assert jobs_module.RATE_LIMITED_BACKOFF_SECONDS * 2 in sleeper.calls
+    # And the ordinary retry scale was never used for a rate-limit:
+    assert jobs_module.RETRY_BACKOFF_SECONDS * 1 not in sleeper.calls
+
+
+async def test_other_retryable_backoff_stays_on_the_fast_scale(tmp_path: Path) -> None:
+    store, source = FakeJobStore(), make_source()
+    settings = make_settings(tmp_path)
+    source.fail_fetch(errors.DownloadFailedError("cdn hiccup"), times=1)
+    worker, sleeper = make_worker(store, source, settings, FakeExtractor())
+
+    await enqueue_extract(store, OWNER_ID, FAKE_URL, [source], settings)
+    await claim_and_process(worker, store)  # attempt 1 → requeue
+
+    assert jobs_module.RETRY_BACKOFF_SECONDS * 1 in sleeper.calls
+    assert jobs_module.RATE_LIMITED_BACKOFF_SECONDS * 1 not in sleeper.calls
+
+
 async def test_cookies_expired_is_terminal_first_attempt(tmp_path: Path) -> None:
     store, source = FakeJobStore(), make_source()
     settings = make_settings(tmp_path)
@@ -369,6 +408,57 @@ async def test_extraction_failed_attempts_all_ledgered(tmp_path: Path) -> None:
     assert len(store.spend_rows) == 3
     assert all(row["tokens_in"] == 0 for row in store.spend_rows)
     assert all(row["model"] == "fake-extractor" for row in store.spend_rows)
+
+
+@pytest.mark.parametrize(
+    "make_failure",
+    [
+        lambda usage: errors.ExtractionFailedError("billed but unparseable", usage=usage),
+        lambda usage: errors.RateLimitedError("throttled after billing", usage=usage),
+    ],
+)
+async def test_failed_attempt_with_carried_usage_ledgers_real_tokens(
+    tmp_path: Path, make_failure
+) -> None:
+    """The jobs-ADR known-limitation fix: when the adapter salvaged usage from
+    the failing response, the ledger records REAL tokens — not zeros."""
+    store, source = FakeJobStore(), make_source()
+    settings = make_settings(tmp_path)
+    carried = ExtractionUsage(
+        model_id="gemini-test-model",
+        prompt_version="v1",
+        tokens_in=1200,
+        tokens_out=340,
+        tokens_thinking=0,
+    )
+    extractor = FakeExtractor(failure=make_failure(carried))
+    worker, _ = make_worker(store, source, settings, extractor)
+
+    await enqueue_extract(store, OWNER_ID, FAKE_URL, [source], settings)
+    job = await claim_and_process(worker, store)
+
+    assert job.status == "pending"  # retryable — requeued
+    assert len(store.spend_rows) == 1
+    row = store.spend_rows[0]
+    assert row["tokens_in"] == 1200
+    assert row["tokens_out"] == 340
+    assert row["model"] == "gemini-test-model"  # the FAILING attempt's model, verbatim
+
+
+async def test_failed_attempt_without_usage_still_ledgers_zeros(tmp_path: Path) -> None:
+    """No carried usage (the pre-fix shape) keeps the zero-row contract:
+    the row exists (daily cap counts rows) with zero tokens."""
+    store, source = FakeJobStore(), make_source()
+    settings = make_settings(tmp_path)
+    extractor = FakeExtractor(failure=errors.ExtractionFailedError("died before usage"))
+    worker, _ = make_worker(store, source, settings, extractor)
+
+    await enqueue_extract(store, OWNER_ID, FAKE_URL, [source], settings)
+    await claim_and_process(worker, store)
+
+    assert len(store.spend_rows) == 1
+    assert store.spend_rows[0]["tokens_in"] == 0
+    assert store.spend_rows[0]["tokens_out"] == 0
 
 
 async def test_untyped_exception_in_extract_stage_is_typed_terminal(tmp_path: Path) -> None:

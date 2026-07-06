@@ -21,6 +21,15 @@ export function AppShell({ children }: { children: ReactNode }) {
             chefclaw
           </Link>
           <div className="flex items-center gap-2">
+            {/* A LINK named "Settings" — the golden selector contract's
+                button "Jobs" (e2e/golden) stays the only header button
+                with that accessible name. */}
+            <Link
+              to="/settings"
+              className="rounded-md border border-neutral-700 px-3 py-1.5 text-xs text-neutral-300 hover:border-neutral-500 hover:text-neutral-100"
+            >
+              Settings
+            </Link>
             <button
               type="button"
               aria-expanded={jobsOpen}

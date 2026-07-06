@@ -199,8 +199,11 @@ with built-in delays, anonymous Bilibili access where quality permits, and **no
 redistribution** of extracted content. Platform cookies are session credentials to a
 real account — **key-grade secrets**, guarded in every layer (PreToolUse hook, native
 `permissions.deny`, `.gitignore`, pre-commit scan, CI scan, secretlint `cookies*` /
-`*.cookies` rules). The Rednote session uses a **secondary throwaway account** so a
-ban's blast radius is bounded to something disposable.
+`*.cookies` rules). Rednote access is **tiered** (2026-07-06 policy — SERVICES.md §4,
+RUNBOOK.md §1): guest/no-account by default, a hard-isolated throwaway account only
+when guest can't fetch, manual file upload as the zero-platform-risk floor — so a
+ban's blast radius is at worst a disposable throwaway. **The main account never
+enters the pipeline under any circumstances.**
 
 ---
 
@@ -221,7 +224,8 @@ panic — RLS is the guard.
 **Backup restore:** download the encrypted artifact →
 `gpg --batch --passphrase "$BACKUP_GPG_PASSPHRASE" -d backup.sql.gpg > backup.sql` →
 restore into a fresh/throwaway DB → verify row counts. Prove the full round-trip once
-**before** you need it.
+**before** you need it. (chefclaw: full step-by-step procedure + the performed
+2026-07-06 drill record live in `docs/RUNBOOK.md` §2.)
 
 **Schema rollback is not `git revert`:** reverting a migration file only stops it
 re-applying. Run the migration's hand-written `-- down:` block against prod, remove its

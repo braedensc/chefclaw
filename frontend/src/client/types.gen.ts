@@ -62,22 +62,40 @@ export type HttpValidationError = {
 /**
  * HealthResponse
  *
- * Phase-2 health shape (plan §7 screen 4). ``backup`` stays a
- * placeholder until Phase 4's backup script lands.
+ * Phase-4 health shape (plan §7 screen 4): sidecar + cookie + backup
+ * staleness + spend readout, plus which extractor/model is live. New fields
+ * keep schema-level defaults so the generated TS client treats them as
+ * optional — the endpoint always sets them explicitly.
  */
 export type HealthResponse = {
     /**
      * Backup
      */
-    backup?: 'not_configured';
+    backup?: 'fresh' | 'stale' | 'not_configured';
+    /**
+     * Backup Finished At
+     */
+    backup_finished_at?: string | null;
     /**
      * Cookie Freshness
      */
     cookie_freshness?: 'fresh' | 'aging' | 'stale' | 'not_configured';
     /**
+     * Cookie Set Date
+     */
+    cookie_set_date?: string | null;
+    /**
      * Db
      */
     db: 'ok' | 'unreachable';
+    /**
+     * Extractor
+     */
+    extractor?: string;
+    /**
+     * Model
+     */
+    model?: string;
     /**
      * Sidecar
      */

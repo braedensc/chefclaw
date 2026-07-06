@@ -96,6 +96,9 @@ services:
       - "127.0.0.1:8000:8000"
     volumes:
       - chefclaw_media:/data/media # reserved now; the Phase-2 retained archive
+      # Backup state (ops/last-backup.json, written by host-side scripts/backup.sh)
+      # — READ-ONLY: the api only reports staleness, it never writes here.
+      - ./ops:/data/ops:ro
     depends_on:
       postgres:
         condition: service_healthy

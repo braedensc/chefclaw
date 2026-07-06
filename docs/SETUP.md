@@ -75,6 +75,9 @@ the *local* and *host* store; GitHub Actions secrets is the CI store (currently 
 | `MONTHLY_LLM_BUDGET_USD` | Phase 2 | **Fail-closed:** unset or unparseable ⇒ NO paid model calls (typed config error) — not "no cap". Checked before every paid call. |
 | `MAX_EXTRACTION_ATTEMPTS_PER_DAY` | Phase 2 | Daily attempt cap (attempts, not videos). Same fail-closed rule. |
 | `MEDIA_RETENTION` | Phase 2 | Keep/discard the low-res archive copy of source videos (default: keep). |
+| `CHEFCLAW_BACKUP_DIR` | Phase 4 | Where `scripts/backup.sh` writes encrypted artifacts — point it at `<your-backup-destination>` (ideally synced/off-machine). |
+| `BACKUP_GPG_PASSPHRASE` | Phase 4 | Symmetric backup key. Generated once, **password manager first** (canonical copy) — `.env.local` holds only the operational copy; never only on this machine. |
+| `CHEFCLAW_BACKUP_INCLUDE_MEDIA` | optional | `0` skips the media-volume archive (default `1`; the script warns past 1 GiB). |
 
 ---
 
@@ -102,6 +105,10 @@ npm run generate:client -w frontend       # regen typed client (drift-checked)
 docker compose -f compose.golden.yaml up -d --build
 npm run test:golden
 docker compose -f compose.golden.yaml down   # plain down — it has no volumes
+
+# Backups (procedures + performed drill record: docs/RUNBOOK.md §2)
+sh scripts/backup.sh                      # encrypted pg_dump + media archive — read-only vs the stack
+# schedule daily via launchd: ops/com.chefclaw.backup.plist.example (install steps in its header)
 
 # Kit guardrails
 npm run test:hooks                        # hook block/allow battery

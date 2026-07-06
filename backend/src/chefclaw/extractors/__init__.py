@@ -25,6 +25,7 @@ __all__ = [
     "ExtractionOutcome",
     "ExtractionUsage",
     "ExtractorAdapter",
+    "extractor_model_id",
     "get_extractor",
 ]
 
@@ -84,8 +85,11 @@ def get_extractor(settings: Settings) -> ExtractorAdapter:
     """Config-selected extractor (``CHEFCLAW_EXTRACTOR``): fail closed.
 
     - ``fake`` (default) — canned fixtures, zero spend, safe everywhere.
-    - ``gemini`` — the real adapter; an empty ``GEMINI_API_KEY`` is a typed
+    - ``gemini`` — the primary adapter; an empty ``GEMINI_API_KEY`` is a typed
       ConfigError HERE, before anything is downloaded or uploaded (§16.8).
+    - ``qwen`` — the DashScope fallback (plan §3); same keyless fail-closed
+      rule for ``DASHSCOPE_API_KEY``. The endpoint region/data-governance
+      review (docs/SERVICES.md) is a HUMAN precondition before first real use.
     - anything else — ConfigError (a typo must never silently pick a backend).
     """
     name = settings.chefclaw_extractor
@@ -102,6 +106,21 @@ def get_extractor(settings: Settings) -> ExtractorAdapter:
         from chefclaw.extractors.gemini import GeminiExtractor
 
         return GeminiExtractor(settings)
+    if name == "qwen":
+        from chefclaw.extractors.qwen import QwenExtractor
+
+        return QwenExtractor(settings)  # keyless ⇒ ConfigError in the constructor
     raise ConfigError(
-        f"Unknown CHEFCLAW_EXTRACTOR value {name!r} — expected 'fake' or 'gemini'."
+        f"Unknown CHEFCLAW_EXTRACTOR value {name!r} — expected 'fake', 'gemini', or 'qwen'."
     )
+
+
+def extractor_model_id(settings: Settings) -> str:
+    """The model id the configured extractor would bill against — used by the
+    spend ledger for attempts that died before usage existed, and by
+    ``/api/health``'s readout. Never constructs an adapter (no key checks)."""
+    if settings.chefclaw_extractor == "gemini":
+        return settings.gemini_model
+    if settings.chefclaw_extractor == "qwen":
+        return settings.dashscope_model
+    return f"{settings.chefclaw_extractor}-extractor"

@@ -7,7 +7,16 @@ runbook link, interrupted → retry button, budget_exceeded → hard stop).
 
 ``duplicate_url`` is deliberately NOT here — a duplicate is control flow
 (return the existing job/recipes), never an error.
+
+Import-cycle note: ``chefclaw.extractors`` imports this module, so the
+``ExtractionUsage`` references below are TYPE_CHECKING-only strings — errors
+CARRY usage (duck-typed at runtime), they never import the extractors package.
 """
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from chefclaw.extractors import ExtractionUsage
 
 
 class ChefclawError(Exception):
@@ -34,10 +43,18 @@ class CookiesExpiredError(ChefclawError):
 
 class RateLimitedError(ChefclawError):
     """Platform or model API throttled us. Retryable with backoff — and every
-    retry that reaches a paid call is budget-checked first."""
+    retry that reaches a paid call is budget-checked first.
+
+    ``usage`` carries the attempt's token accounting when the model API
+    surfaced usage before failing — the spend ledger records the real tokens
+    instead of zeros (jobs ADR known-limitation fix, Phase 4)."""
 
     error_type = "rate_limited"
     retryable = True
+
+    def __init__(self, message: str, usage: "ExtractionUsage | None" = None) -> None:
+        super().__init__(message)
+        self.usage = usage
 
 
 class DownloadFailedError(ChefclawError):
@@ -49,14 +66,24 @@ class DownloadFailedError(ChefclawError):
 
 class ExtractionFailedError(ChefclawError):
     """The model call itself failed (or returned unusable output). Retryable —
-    the worker may re-attempt with an adjusted prompt, budget-checked."""
+    the worker may re-attempt with an adjusted prompt, budget-checked.
+
+    ``usage`` carries the attempt's token accounting when the model API
+    surfaced usage before failing (e.g. it billed a response we could not
+    parse) — the spend ledger records the real tokens instead of zeros."""
 
     error_type = "extraction_failed"
     retryable = True
 
-    def __init__(self, message: str, raw_text: str | None = None) -> None:
+    def __init__(
+        self,
+        message: str,
+        raw_text: str | None = None,
+        usage: "ExtractionUsage | None" = None,
+    ) -> None:
         super().__init__(message)
         self.raw_text = raw_text  # full raw model text, preserved for debugging
+        self.usage = usage
 
 
 class ValidationFailedError(ChefclawError):

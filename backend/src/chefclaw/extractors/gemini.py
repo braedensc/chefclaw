@@ -15,7 +15,6 @@ from __future__ import annotations
 
 import asyncio
 import json
-from importlib import resources
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -25,12 +24,9 @@ from google.genai import types as genai_types
 
 from chefclaw.errors import ConfigError, ExtractionFailedError, RateLimitedError
 from chefclaw.extractors import ExtractionOutcome, ExtractionUsage
+from chefclaw.extractors.prompt import PROMPT_VERSION, load_prompt, with_source_context
 
-if TYPE_CHECKING:
-    from chefclaw.config import Settings
-
-PROMPT_VERSION = "v1"
-_PROMPT_RESOURCE = "extract_v1.md"
+__all__ = ["PROMPT_VERSION", "GeminiExtractor", "load_prompt"]
 
 # Config string → SDK enum. Unknown values are a ConfigError (fail-closed, §16.8),
 # never a silent default: media resolution is a cost & quality knob.
@@ -45,17 +41,8 @@ _TEMPERATURE = 0.1
 
 _RAW_SNIPPET_CHARS = 500  # how much raw text goes into the error MESSAGE (full in .raw_text)
 
-
-def load_prompt() -> str:
-    """Load the versioned extraction prompt shipped inside the package."""
-    text = (
-        resources.files("chefclaw").joinpath("prompts").joinpath(_PROMPT_RESOURCE).read_text(
-            encoding="utf-8"
-        )
-    )
-    if not text.strip():
-        raise ConfigError(f"Extraction prompt {_PROMPT_RESOURCE!r} is empty — refusing paid calls.")
-    return text
+if TYPE_CHECKING:
+    from chefclaw.config import Settings
 
 
 def _map_api_error(exc: genai_errors.APIError) -> Exception:
@@ -149,16 +136,7 @@ class GeminiExtractor:
         source_title: str | None,
         source_duration_seconds: int | None,
     ) -> genai_types.GenerateContentResponse:
-        prompt = self._prompt
-        context_lines = []
-        if source_title:
-            context_lines.append(f"Source post/video title: {source_title}")
-        if source_duration_seconds is not None:
-            context_lines.append(f"Source video duration: {source_duration_seconds} seconds")
-        if context_lines:
-            prompt = prompt + "\n\n## Source context (metadata, not content)\n" + "\n".join(
-                context_lines
-            )
+        prompt = with_source_context(self._prompt, source_title, source_duration_seconds)
 
         config = genai_types.GenerateContentConfig(
             temperature=_TEMPERATURE,
@@ -176,54 +154,64 @@ class GeminiExtractor:
         except genai_errors.APIError as exc:
             raise _map_api_error(exc) from exc
 
+    def _usage_from_response(
+        self, response: genai_types.GenerateContentResponse
+    ) -> ExtractionUsage | None:
+        """Token accounting from usage_metadata, or None when the SDK carried
+        none. Failures attach this to the raised error so the ledger records
+        real tokens for a billed-but-unusable response (Phase 4 fix)."""
+        usage_meta = response.usage_metadata
+        if usage_meta is None:
+            return None
+        return ExtractionUsage(
+            model_id=self._model_id,
+            prompt_version=PROMPT_VERSION,
+            tokens_in=usage_meta.prompt_token_count or 0,
+            tokens_out=usage_meta.candidates_token_count or 0,
+            # Thinking is disabled; the SDK reports thoughts_token_count as
+            # None/absent then — record what it reports, defaulting to 0.
+            tokens_thinking=usage_meta.thoughts_token_count or 0,
+        )
+
     def _parse_response(
         self, response: genai_types.GenerateContentResponse
     ) -> ExtractionOutcome:
+        usage = self._usage_from_response(response)
+
         raw_text = response.text
         if raw_text is None:
-            raise ExtractionFailedError("Gemini returned no text content to parse.")
+            raise ExtractionFailedError("Gemini returned no text content to parse.", usage=usage)
 
         try:
             parsed = json.loads(raw_text)
         except json.JSONDecodeError as exc:
-            err = ExtractionFailedError(
+            raise ExtractionFailedError(
                 f"Gemini returned non-JSON output ({exc}); "
-                f"raw text starts: {raw_text[:_RAW_SNIPPET_CHARS]!r}"
-            )
-            err.raw_text = raw_text  # full raw output preserved for debugging
-            raise err from exc
+                f"raw text starts: {raw_text[:_RAW_SNIPPET_CHARS]!r}",
+                raw_text=raw_text,  # full raw output preserved for debugging
+                usage=usage,
+            ) from exc
         if not isinstance(parsed, list):
-            err = ExtractionFailedError(
+            raise ExtractionFailedError(
                 "Gemini returned JSON but not the required top-level array of dishes "
                 f"(got {type(parsed).__name__}); "
-                f"raw text starts: {raw_text[:_RAW_SNIPPET_CHARS]!r}"
+                f"raw text starts: {raw_text[:_RAW_SNIPPET_CHARS]!r}",
+                raw_text=raw_text,
+                usage=usage,
             )
-            err.raw_text = raw_text
-            raise err
 
         warnings: list[str] = []
-        usage_meta = response.usage_metadata
-        if usage_meta is None:
+        if usage is None:
             warnings.append("Gemini response carried no usage_metadata — tokens recorded as 0.")
-            tokens_in = tokens_out = tokens_thinking = 0
-        else:
-            tokens_in = usage_meta.prompt_token_count or 0
-            tokens_out = usage_meta.candidates_token_count or 0
-            # Thinking is disabled; the SDK reports thoughts_token_count as
-            # None/absent then — record what it reports, defaulting to 0.
-            tokens_thinking = usage_meta.thoughts_token_count or 0
-
-        return ExtractionOutcome(
-            dishes=parsed,
-            usage=ExtractionUsage(
+            usage = ExtractionUsage(
                 model_id=self._model_id,
                 prompt_version=PROMPT_VERSION,
-                tokens_in=tokens_in,
-                tokens_out=tokens_out,
-                tokens_thinking=tokens_thinking,
-            ),
-            warnings=warnings,
-        )
+                tokens_in=0,
+                tokens_out=0,
+                tokens_thinking=0,
+            )
+
+        return ExtractionOutcome(dishes=parsed, usage=usage, warnings=warnings)
 
     async def _delete_best_effort(self, uploaded: genai_types.File) -> None:
         """Files-API cleanup must never fail the extraction."""

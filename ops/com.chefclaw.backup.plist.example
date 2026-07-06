@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  chefclaw daily backup — launchd user agent (plan §10: an unscheduled backup
+  script is not a backup). Runs scripts/backup.sh from the repo root every day
+  at 03:30 local time; stdout/stderr append to ops/backup.log (gitignored).
+
+  INSTALL (human steps — Claude never loads agents):
+    1. Copy this file, dropping the .example suffix, and replace ALL THREE
+       occurrences of /Users/yourname/chefclaw below with the real repo path:
+         cp ops/com.chefclaw.backup.plist.example ~/Library/LaunchAgents/com.chefclaw.backup.plist
+         $EDITOR ~/Library/LaunchAgents/com.chefclaw.backup.plist
+    2. Make sure .env.local holds CHEFCLAW_BACKUP_DIR and
+       BACKUP_GPG_PASSPHRASE (passphrase generated once, stored in the
+       password manager FIRST — never only on this machine).
+    3. Load it:
+         launchctl load ~/Library/LaunchAgents/com.chefclaw.backup.plist
+    4. Verify: run once by hand (launchctl start com.chefclaw.backup), then
+       check ops/backup.log and confirm /api/health reports backup: "fresh".
+
+  UNINSTALL:
+    launchctl unload ~/Library/LaunchAgents/com.chefclaw.backup.plist
+    rm ~/Library/LaunchAgents/com.chefclaw.backup.plist
+
+  Notes:
+    - The script resolves its own config from .env.local at runtime; nothing
+      secret lives in this file.
+    - launchd agents run with a MINIMAL environment (PATH=/usr/bin:/bin:
+      /usr/sbin:/sbin — no Homebrew, no Docker Desktop prefix). backup.sh
+      appends /opt/homebrew/bin and /usr/local/bin to its own PATH so docker
+      and gpg resolve here without any EnvironmentVariables block.
+    - launchd runs missed schedules on wake only if the Mac was asleep at
+      03:30 (not if it was shut down) — /api/health's staleness readout is the
+      backstop that catches silently-missed runs either way.
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.chefclaw.backup</string>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/yourname/chefclaw</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/sh</string>
+        <string>scripts/backup.sh</string>
+    </array>
+
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>3</integer>
+        <key>Minute</key>
+        <integer>30</integer>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/Users/yourname/chefclaw/ops/backup.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/yourname/chefclaw/ops/backup.log</string>
+</dict>
+</plist>

@@ -194,7 +194,7 @@ function JobErrorAction({
     return (
       <p className="mt-1 text-red-200">
         The Rednote cookie has expired — follow the cookie-refresh runbook
-        (docs/RUNBOOK.md, lands with Phase 4).
+        (docs/RUNBOOK.md §1).
       </p>
     );
   }

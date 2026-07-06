@@ -132,6 +132,11 @@ describe('JobsDrawer', () => {
     expect(
       await within(drawer).findByText(/docs\/RUNBOOK\.md/),
     ).toBeInTheDocument();
+    // The runbook EXISTS (Phase 4) — the pre-landing "lands with Phase 4"
+    // hedge must not resurface.
+    expect(
+      within(drawer).queryByText(/lands with Phase 4/),
+    ).not.toBeInTheDocument();
     expect(within(drawer).getByText(/Budget cap reached/)).toBeInTheDocument();
     expect(
       within(drawer).getByText(/Check server configuration/),

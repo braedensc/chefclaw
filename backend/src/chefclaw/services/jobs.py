@@ -33,7 +33,12 @@ from typing import Any
 from chefclaw import errors, spend
 from chefclaw.config import Settings
 from chefclaw.documents import SourceInfo, validate_extraction
-from chefclaw.extractors import ExtractionUsage, ExtractorAdapter, get_extractor
+from chefclaw.extractors import (
+    ExtractionUsage,
+    ExtractorAdapter,
+    extractor_model_id,
+    get_extractor,
+)
 from chefclaw.models import Job, JobStatus
 from chefclaw.services.repo import JobStore
 from chefclaw.sources import CanonicalRef, FetchedMedia, SourceAdapter, resolve_source
@@ -57,7 +62,13 @@ DOWNLOAD_TIMEOUT_SECONDS = 600.0
 EXTRACT_TIMEOUT_SECONDS = 900.0
 MAX_ATTEMPTS = 3  # per job, counted at claim; then terminal failed (plan §4)
 IDLE_SLEEP_SECONDS = 1.0  # poll cadence when the queue is empty
-RETRY_BACKOFF_SECONDS = 2.0  # multiplied by the attempt number after a requeue
+# Backoff after a retryable requeue, multiplied by the attempt number. Two
+# distinct scales (Phase 4 polish): rate_limited means a platform/model API
+# said SLOW DOWN — immediately re-poking it wastes an attempt and antagonizes
+# the throttle, so it backs off in tens of seconds; every other retryable
+# (transient download/extract hiccup) stays snappy.
+RETRY_BACKOFF_SECONDS = 2.0
+RATE_LIMITED_BACKOFF_SECONDS = 30.0
 # §16.10 behavior rule: a jittered politeness delay before every PLATFORM
 # fetch (skipped for 'local' — no platform is touched). Injectable sleeper
 # lets tests skip the wall-clock wait.
@@ -292,9 +303,16 @@ class Worker:
                     job.id, job.attempts, err.error_type, err,
                 )
                 await self.store.requeue(job.id)
-                # Small linear backoff; the loop is serial so this simply
-                # delays the next claim (created_at ordering keeps fairness).
-                await self._sleeper(RETRY_BACKOFF_SECONDS * job.attempts)
+                # Linear backoff, scaled per error type (rate_limited backs
+                # off much harder — see the constants above); the loop is
+                # serial so this simply delays the next claim (created_at
+                # ordering keeps fairness).
+                backoff = (
+                    RATE_LIMITED_BACKOFF_SECONDS
+                    if err.error_type == "rate_limited"
+                    else RETRY_BACKOFF_SECONDS
+                )
+                await self._sleeper(backoff * job.attempts)
             else:
                 logger.warning(
                     "job %s failed terminally (%s) after %d attempt(s): %s",
@@ -388,11 +406,13 @@ class Worker:
             raise errors.ExtractionFailedError(
                 f"extraction timed out after {EXTRACT_TIMEOUT_SECONDS:.0f}s"
             ) from None
-        except (errors.ExtractionFailedError, errors.RateLimitedError):
-            # The call reached the model and may have consumed tokens the
-            # adapter couldn't report — the ledger row itself is what counts
-            # (the daily cap counts rows), so write one with zero tokens.
-            await self._record_attempt(job, usage=None)
+        except (errors.ExtractionFailedError, errors.RateLimitedError) as err:
+            # The call reached the model and may have consumed tokens. When
+            # the adapter salvaged usage from the failing response (a billed
+            # 429 / unparseable output), ledger the REAL tokens; otherwise
+            # write zeros — the row itself is what counts either way (the
+            # daily cap counts rows).
+            await self._record_attempt(job, usage=err.usage)
             raise
         except errors.ChefclawError:
             # Remaining typed errors (ConfigError: auth rejected before any
@@ -465,7 +485,7 @@ class Worker:
         bounds runaway retries."""
         if usage is None:
             usage = ExtractionUsage(
-                model_id=self._attempt_model_id(),
+                model_id=extractor_model_id(self._settings),
                 prompt_version="unknown",
                 tokens_in=0,
                 tokens_out=0,
@@ -477,11 +497,6 @@ class Worker:
             usage=usage,
             cost_usd=spend.estimate_cost(usage),
         )
-
-    def _attempt_model_id(self) -> str:
-        if self._settings.chefclaw_extractor == "gemini":
-            return self._settings.gemini_model
-        return f"{self._settings.chefclaw_extractor}-extractor"
 
     # ── media retention (§4, MEDIA_RETENTION knob) ───────────────────────────
 

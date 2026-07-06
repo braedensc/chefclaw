@@ -84,13 +84,28 @@
         "type": "object"
       },
       "HealthResponse": {
-        "description": "Phase-2 health shape (plan §7 screen 4). ``backup`` stays a\nplaceholder until Phase 4's backup script lands.",
+        "description": "Phase-4 health shape (plan §7 screen 4): sidecar + cookie + backup\nstaleness + spend readout, plus which extractor/model is live. New fields\nkeep schema-level defaults so the generated TS client treats them as\noptional — the endpoint always sets them explicitly.",
         "properties": {
           "backup": {
-            "const": "not_configured",
             "default": "not_configured",
+            "enum": [
+              "fresh",
+              "stale",
+              "not_configured"
+            ],
             "title": "Backup",
             "type": "string"
+          },
+          "backup_finished_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Backup Finished At"
           },
           "cookie_freshness": {
             "default": "not_configured",
@@ -103,12 +118,33 @@
             "title": "Cookie Freshness",
             "type": "string"
           },
+          "cookie_set_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cookie Set Date"
+          },
           "db": {
             "enum": [
               "ok",
               "unreachable"
             ],
             "title": "Db",
+            "type": "string"
+          },
+          "extractor": {
+            "default": "fake",
+            "title": "Extractor",
+            "type": "string"
+          },
+          "model": {
+            "default": "fake-extractor",
+            "title": "Model",
             "type": "string"
           },
           "sidecar": {
