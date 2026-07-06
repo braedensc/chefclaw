@@ -199,3 +199,4 @@ that dies on the VPS is just a log line nobody was watching.
 | Per-user budgets / auth beyond bearer token | Multi-user, if it ever happens (dedicated ADR) |
 | XHS tier-1 throwaway signup | Only if guest tier stops covering needed notes; main-account fallback is **revoked** (2026-07-06) — tier-2 manual upload is the guaranteed floor |
 | DashScope region/data-governance review | Before the fallback adapter's first real call |
+| Bound `MAX_UPLOAD_MB` for **Content-Length-less (chunked)** uploads at the ASGI layer | V2-D audit — the pre-parse Content-Length middleware + the handler streaming guard already close the realistic case (all browser/mobile uploads send Content-Length); the residual is a token-holder using a custom chunked client on a Tailscale-gated single-user box |

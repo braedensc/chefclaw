@@ -639,6 +639,10 @@ export type UploadRecipeVideoApiRecipesUploadPostErrors = {
      */
     400: ErrorBody;
     /**
+     * Content Too Large
+     */
+    413: ErrorBody;
+    /**
      * Validation Error
      */
     422: HttpValidationError;

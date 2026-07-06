@@ -115,3 +115,11 @@ class ConfigError(ChefclawError):
     plan §16.8). Also raised for other unusable configuration."""
 
     error_type = "config_error"
+
+
+class UploadTooLargeError(ChefclawError):
+    """A tier-2 file upload exceeds MAX_UPLOAD_MB. Not retryable — the same
+    bytes will always be too big. Surfaced at request time as a 413; the cap
+    exists so an authed client cannot fill the server's disk."""
+
+    error_type = "upload_too_large"

@@ -35,6 +35,11 @@ class Settings(BaseSettings):
     monthly_llm_budget_usd: str = ""
     max_extraction_attempts_per_day: str = ""
     media_retention: str = "keep"  # keep | discard — the retained low-res archive
+    # Upload size cap (tier-2 file upload). Enforced pre-parse in middleware so
+    # an oversized upload is rejected 413 BEFORE Starlette spools it to disk —
+    # an unbounded upload endpoint lets an authed client fill the box's disk.
+    # A few-minute cooking video is tens of MB; 500 leaves generous headroom.
+    max_upload_mb: int = 500
 
     # ── Extraction (Phase 2) ────────────────────────────────────────────────
     # Extractor selection: "fake" is the SAFE default (tests, golden suite, no
