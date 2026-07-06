@@ -87,7 +87,11 @@ class JobOut(BaseModel):
 
 
 class RecipeSummary(BaseModel):
-    """Library-card shape (list endpoint)."""
+    """Library-card shape (list endpoint). The card fields (``difficulty`` /
+    ``total_time_minutes`` / ``ingredient_count``) are PROJECTED verbatim from
+    the stored validated document — never computed food facts (Hard Rule 7).
+    ``has_cover`` is derived from the server-side ``cover_path``, which itself
+    never leaves the API (the /cover endpoint streams the file)."""
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -99,7 +103,43 @@ class RecipeSummary(BaseModel):
     dish_index: int
     status: str
     tags: list[str]
+    has_cover: bool = False
+    difficulty: str | None = None
+    total_time_minutes: int | None = None
+    ingredient_count: int | None = None
     created_at: datetime
+
+    @model_validator(mode="before")
+    @classmethod
+    def _project_from_document(cls, data: Any) -> Any:
+        """ORM ``Recipe`` → dict of the contract fields plus the document
+        projections (same shape as JobOut._lift_url_from_payload). Dicts pass
+        through untouched."""
+        if isinstance(data, dict) or not hasattr(data, "document"):
+            return data
+        document = data.document or {}
+        ingredients = document.get("ingredients")
+        return {
+            "id": data.id,
+            "title_en": data.title_en,
+            "title_original": data.title_original,
+            "platform": data.platform,
+            "canonical_id": data.canonical_id,
+            "dish_index": data.dish_index,
+            "status": data.status,
+            "tags": data.tags,
+            "has_cover": data.cover_path is not None,
+            "difficulty": document.get("difficulty"),
+            "total_time_minutes": document.get("total_time_minutes"),
+            "ingredient_count": len(ingredients) if isinstance(ingredients, list) else None,
+            "created_at": data.created_at,
+            # RecipeDetail (subclass) fields ride along; the summary shape
+            # ignores extras on validation.
+            "source_url": data.source_url,
+            "user_notes": data.user_notes,
+            "document": data.document,
+            "extraction_meta": data.extraction_meta,
+        }
 
 
 class RecipeDetail(RecipeSummary):

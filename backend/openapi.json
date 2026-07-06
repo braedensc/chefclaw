@@ -353,6 +353,17 @@
             "title": "Created At",
             "type": "string"
           },
+          "difficulty": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Difficulty"
+          },
           "dish_index": {
             "title": "Dish Index",
             "type": "integer"
@@ -367,10 +378,26 @@
             "title": "Extraction Meta",
             "type": "object"
           },
+          "has_cover": {
+            "default": false,
+            "title": "Has Cover",
+            "type": "boolean"
+          },
           "id": {
             "format": "uuid",
             "title": "Id",
             "type": "string"
+          },
+          "ingredient_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ingredient Count"
           },
           "platform": {
             "title": "Platform",
@@ -412,6 +439,17 @@
               }
             ],
             "title": "Title Original"
+          },
+          "total_time_minutes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Time Minutes"
           },
           "user_notes": {
             "anyOf": [
@@ -508,7 +546,7 @@
         "type": "object"
       },
       "RecipeSummary": {
-        "description": "Library-card shape (list endpoint).",
+        "description": "Library-card shape (list endpoint). The card fields (``difficulty`` /\n``total_time_minutes`` / ``ingredient_count``) are PROJECTED verbatim from\nthe stored validated document — never computed food facts (Hard Rule 7).\n``has_cover`` is derived from the server-side ``cover_path``, which itself\nnever leaves the API (the /cover endpoint streams the file).",
         "properties": {
           "canonical_id": {
             "title": "Canonical Id",
@@ -519,14 +557,41 @@
             "title": "Created At",
             "type": "string"
           },
+          "difficulty": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Difficulty"
+          },
           "dish_index": {
             "title": "Dish Index",
             "type": "integer"
+          },
+          "has_cover": {
+            "default": false,
+            "title": "Has Cover",
+            "type": "boolean"
           },
           "id": {
             "format": "uuid",
             "title": "Id",
             "type": "string"
+          },
+          "ingredient_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ingredient Count"
           },
           "platform": {
             "title": "Platform",
@@ -564,6 +629,17 @@
               }
             ],
             "title": "Title Original"
+          },
+          "total_time_minutes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Time Minutes"
           }
         },
         "required": [
@@ -1376,6 +1452,61 @@
           }
         ],
         "summary": "Patch Recipe",
+        "tags": [
+          "recipes"
+        ]
+      }
+    },
+    "/api/recipes/{recipe_id}/cover": {
+      "get": {
+        "description": "Stream the poster keyframe. One 404 covers every miss — no recipe, no\ncover generated, file gone from the archive.",
+        "operationId": "get_recipe_cover_api_recipes__recipe_id__cover_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "recipe_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Recipe Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "image/jpeg": {}
+            },
+            "description": "The recipe's poster keyframe."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Recipe Cover",
         "tags": [
           "recipes"
         ]

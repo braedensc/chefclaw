@@ -47,6 +47,18 @@ async def _noop_sleep(_seconds: float) -> None:
     return None
 
 
+async def _fake_cover_generator(video_path, target_dir, fractions):
+    """Cover seam double: real files, no ffmpeg (the golden tier is about
+    real SQL, not real frame extraction)."""
+    target_dir.mkdir(parents=True, exist_ok=True)
+    covers: list[str | None] = []
+    for index in range(len(fractions)):
+        out_path = target_dir / f"cover-{index}.jpg"
+        out_path.write_bytes(b"jpg")
+        covers.append(str(out_path))
+    return covers
+
+
 @pytest.fixture
 async def engine():
     engine = create_async_engine(GOLDEN_DB_URL)
@@ -129,6 +141,7 @@ async def test_atomic_store_and_ledger(sessionmaker, owner_id, tmp_path: Path) -
         adapters=[source],
         settings=settings,
         extractor_factory=lambda _s: extractor,
+        cover_generator=_fake_cover_generator,
         sleeper=_noop_sleep,
     )
 
@@ -148,6 +161,12 @@ async def test_atomic_store_and_ledger(sessionmaker, owner_id, tmp_path: Path) -
     assert stored_job.result_recipe_ids == [r.id for r in recipes]
     assert recipes[0].document["source"]["url"] == FAKE_URL
     assert spend_count == 1
+    # Covers rode the SAME transaction: per-dish cover-<i>.jpg on each row.
+    archive_dir = Path(settings.media_dir) / "bilibili" / "BVgolden003-p1"
+    assert [r.cover_path for r in recipes] == [
+        str(archive_dir / "cover-0.jpg"),
+        str(archive_dir / "cover-1.jpg"),
+    ]
 
     # Re-enqueueing the same canonical identity returns the completed job:
     again, existing = await enqueue_extract(store, owner_id, FAKE_URL, [source], settings)
@@ -169,6 +188,7 @@ async def test_store_results_unique_violation_adopts(
         adapters=[source],
         settings=settings,
         extractor_factory=lambda _s: extractor,
+        cover_generator=_fake_cover_generator,
         sleeper=_noop_sleep,
     )
 
@@ -224,6 +244,7 @@ async def test_hard_delete_reopens_extraction(sessionmaker, owner_id, tmp_path: 
         adapters=[source],
         settings=settings,
         extractor_factory=lambda _s: extractor,
+        cover_generator=_fake_cover_generator,
         sleeper=_noop_sleep,
     )
 
@@ -284,6 +305,7 @@ async def test_kill_mid_extract_no_double_spend_and_reconcile(
         adapters=[source],
         settings=settings,
         extractor_factory=lambda _s: blocking,
+        cover_generator=_fake_cover_generator,
         sleeper=_noop_sleep,
     )
 
@@ -308,6 +330,7 @@ async def test_kill_mid_extract_no_double_spend_and_reconcile(
         adapters=[source],
         settings=settings,
         extractor_factory=lambda _s: fresh_extractor,
+        cover_generator=_fake_cover_generator,
         sleeper=_noop_sleep,
     )
     restart_task = asyncio.create_task(restarted.run_forever())

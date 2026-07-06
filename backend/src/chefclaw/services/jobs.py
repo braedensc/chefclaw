@@ -40,7 +40,13 @@ from chefclaw.extractors import (
     extractor_model_id,
     get_extractor,
 )
-from chefclaw.models import Job, JobStatus
+from chefclaw.models import Job, JobStatus, Recipe
+from chefclaw.services.covers import (
+    CoverGenerator,
+    archived_video_path,
+    cover_fractions,
+    generate_covers,
+)
 from chefclaw.services.repo import JobStore
 from chefclaw.sources import CanonicalRef, FetchedMedia, SourceAdapter, resolve_source
 from chefclaw.sources.localfile import LocalFileSource
@@ -222,6 +228,8 @@ class Worker:
         settings: Settings,
         *,
         extractor_factory: Callable[[Settings], ExtractorAdapter] = get_extractor,
+        cover_generator: CoverGenerator = generate_covers,
+        backfill_covers_on_start: bool = False,
         sleeper: Sleeper = asyncio.sleep,
         jitter: Callable[[], float] = random.random,
         idle_seconds: float = IDLE_SLEEP_SECONDS,
@@ -230,6 +238,11 @@ class Worker:
         self._adapters_by_platform = {adapter.platform: adapter for adapter in adapters}
         self._settings = settings
         self._extractor_factory = extractor_factory
+        # Injectable like the sleeper: CI-tier tests must never shell out to
+        # real ffmpeg. The backfill flag defaults OFF (tests); the app turns
+        # it on for the one-shot startup pass.
+        self._cover_generator = cover_generator
+        self._backfill_covers_on_start = backfill_covers_on_start
         self._sleeper = sleeper
         self._jitter = jitter
         self._idle_seconds = idle_seconds
@@ -252,6 +265,8 @@ class Worker:
                     logger.debug("startup reconcile failed (db not up yet?)", exc_info=True)
                     await self._sleeper(self._idle_seconds)
                     continue
+                if self._backfill_covers_on_start:
+                    await self.backfill_covers()  # one-shot, best-effort, never raises
             try:
                 job = await self.store.claim_next_job()
             except Exception:
@@ -529,8 +544,10 @@ class Worker:
         if retention_warnings:
             extraction_meta["warnings"].extend(retention_warnings)
 
+        cover_paths = await self._generate_covers(job, media, retained, len(documents))
+
         recipe_ids = await self.store.store_results(
-            job, documents, extraction_meta=extraction_meta
+            job, documents, extraction_meta=extraction_meta, cover_paths=cover_paths
         )
         if recipe_ids is None:
             # UNIQUE(platform, canonical_id, dish_index) fired: a raced
@@ -568,6 +585,88 @@ class Worker:
             usage=usage,
             cost_usd=spend.estimate_cost(usage),
         )
+
+    # ── covers (poster keyframes — strictly best-effort) ─────────────────────
+
+    async def _generate_covers(
+        self, job: Job, media: FetchedMedia, retained: list[str], dish_count: int
+    ) -> list[str | None]:
+        """One poster keyframe per dish, from the retained archive file
+        (media_retention=keep) or the scratch download. STRICTLY BEST-EFFORT:
+        any failure yields None for that dish — a cover must never fail or
+        delay the job's store."""
+        try:
+            video_path = self._cover_source_video(media, retained)
+            if video_path is None:
+                return [None] * dish_count
+            target_dir = Path(self._settings.media_dir) / job.platform / job.canonical_id
+            covers = list(
+                await self._cover_generator(video_path, target_dir, cover_fractions(dish_count))
+            )
+        except Exception:
+            logger.warning(
+                "job %s cover generation failed; storing without covers", job.id, exc_info=True
+            )
+            return [None] * dish_count
+        # Defensive length normalization — the store zips covers onto dishes.
+        return covers[:dish_count] + [None] * (dish_count - len(covers))
+
+    @staticmethod
+    def _cover_source_video(media: FetchedMedia, retained: list[str]) -> Path | None:
+        # media_retention=keep MOVED the download into the archive — the
+        # retained entry with the download's filename is the video; discard
+        # mode leaves it in scratch (cleaned only after the store).
+        for entry in retained:
+            path = Path(entry)
+            if path.name == media.video_path.name and path.is_file():
+                return path
+        if media.video_path.is_file():
+            return media.video_path
+        return None
+
+    async def backfill_covers(self) -> None:
+        """One-shot startup backfill (strictly serial, best-effort): recipes
+        stored before the cover stage existed get a poster keyframe from
+        their retained archive video. Never raises — a failed backfill must
+        never take the worker down."""
+        try:
+            missing = await self.store.list_recipes_missing_covers()
+        except Exception:
+            logger.warning("cover backfill: could not list recipes", exc_info=True)
+            return
+        if not missing:
+            return
+        generated = skipped = 0
+        groups: dict[tuple[str, str], list[Recipe]] = {}
+        for recipe in missing:
+            groups.setdefault((recipe.platform, recipe.canonical_id), []).append(recipe)
+        for (platform, canonical_id), recipes in groups.items():
+            try:
+                media_dir = Path(self._settings.media_dir) / platform / canonical_id
+                video_path = archived_video_path(media_dir)
+                if video_path is None:
+                    skipped += len(recipes)
+                    continue
+                # Same spread as the live stage: dish i sits at (i+1)/(N+1).
+                dish_count = max(recipe.dish_index for recipe in recipes) + 1
+                covers = await self._cover_generator(
+                    video_path, media_dir, cover_fractions(dish_count)
+                )
+                for recipe in recipes:
+                    cover = (
+                        covers[recipe.dish_index] if recipe.dish_index < len(covers) else None
+                    )
+                    if cover is None:
+                        skipped += 1
+                        continue
+                    await self.store.set_recipe_cover(recipe.id, cover)
+                    generated += 1
+            except Exception:
+                skipped += len(recipes)
+                logger.warning(
+                    "cover backfill failed for (%s, %s)", platform, canonical_id, exc_info=True
+                )
+        logger.info("cover backfill: %d generated, %d skipped", generated, skipped)
 
     # ── media retention (§4, MEDIA_RETENTION knob) ───────────────────────────
 

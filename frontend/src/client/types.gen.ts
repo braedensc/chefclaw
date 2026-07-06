@@ -199,6 +199,10 @@ export type RecipeDetail = {
      */
     created_at: string;
     /**
+     * Difficulty
+     */
+    difficulty?: string | null;
+    /**
      * Dish Index
      */
     dish_index: number;
@@ -215,9 +219,17 @@ export type RecipeDetail = {
         [key: string]: unknown;
     };
     /**
+     * Has Cover
+     */
+    has_cover?: boolean;
+    /**
      * Id
      */
     id: string;
+    /**
+     * Ingredient Count
+     */
+    ingredient_count?: number | null;
     /**
      * Platform
      */
@@ -242,6 +254,10 @@ export type RecipeDetail = {
      * Title Original
      */
     title_original: string | null;
+    /**
+     * Total Time Minutes
+     */
+    total_time_minutes?: number | null;
     /**
      * User Notes
      */
@@ -289,7 +305,11 @@ export type RecipePatch = {
 /**
  * RecipeSummary
  *
- * Library-card shape (list endpoint).
+ * Library-card shape (list endpoint). The card fields (``difficulty`` /
+ * ``total_time_minutes`` / ``ingredient_count``) are PROJECTED verbatim from
+ * the stored validated document — never computed food facts (Hard Rule 7).
+ * ``has_cover`` is derived from the server-side ``cover_path``, which itself
+ * never leaves the API (the /cover endpoint streams the file).
  */
 export type RecipeSummary = {
     /**
@@ -301,13 +321,25 @@ export type RecipeSummary = {
      */
     created_at: string;
     /**
+     * Difficulty
+     */
+    difficulty?: string | null;
+    /**
      * Dish Index
      */
     dish_index: number;
     /**
+     * Has Cover
+     */
+    has_cover?: boolean;
+    /**
      * Id
      */
     id: string;
+    /**
+     * Ingredient Count
+     */
+    ingredient_count?: number | null;
     /**
      * Platform
      */
@@ -328,6 +360,10 @@ export type RecipeSummary = {
      * Title Original
      */
     title_original: string | null;
+    /**
+     * Total Time Minutes
+     */
+    total_time_minutes?: number | null;
 };
 
 /**
@@ -772,6 +808,38 @@ export type PatchRecipeApiRecipesRecipeIdPatchResponses = {
 };
 
 export type PatchRecipeApiRecipesRecipeIdPatchResponse = PatchRecipeApiRecipesRecipeIdPatchResponses[keyof PatchRecipeApiRecipesRecipeIdPatchResponses];
+
+export type GetRecipeCoverApiRecipesRecipeIdCoverGetData = {
+    body?: never;
+    path: {
+        /**
+         * Recipe Id
+         */
+        recipe_id: string;
+    };
+    query?: never;
+    url: '/api/recipes/{recipe_id}/cover';
+};
+
+export type GetRecipeCoverApiRecipesRecipeIdCoverGetErrors = {
+    /**
+     * Not Found
+     */
+    404: ErrorBody;
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetRecipeCoverApiRecipesRecipeIdCoverGetError = GetRecipeCoverApiRecipesRecipeIdCoverGetErrors[keyof GetRecipeCoverApiRecipesRecipeIdCoverGetErrors];
+
+export type GetRecipeCoverApiRecipesRecipeIdCoverGetResponses = {
+    /**
+     * The recipe's poster keyframe.
+     */
+    200: unknown;
+};
 
 export type GetSpendApiSpendGetData = {
     body?: never;

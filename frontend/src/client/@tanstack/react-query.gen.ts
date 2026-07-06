@@ -3,8 +3,8 @@
 import { type DefaultError, type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { deleteRecipeApiRecipesRecipeIdDelete, extractRecipeApiRecipesExtractPost, getJobApiJobsJobIdGet, getRecipeApiRecipesRecipeIdGet, getSpendApiSpendGet, healthApiHealthGet, listJobsApiJobsGet, listRecipesApiRecipesGet, type Options, patchRecipeApiRecipesRecipeIdPatch, uploadRecipeVideoApiRecipesUploadPost } from '../sdk.gen';
-import type { DeleteRecipeApiRecipesRecipeIdDeleteData, DeleteRecipeApiRecipesRecipeIdDeleteError, DeleteRecipeApiRecipesRecipeIdDeleteResponse, ExtractRecipeApiRecipesExtractPostData, ExtractRecipeApiRecipesExtractPostError, ExtractRecipeApiRecipesExtractPostResponse, GetJobApiJobsJobIdGetData, GetJobApiJobsJobIdGetError, GetJobApiJobsJobIdGetResponse, GetRecipeApiRecipesRecipeIdGetData, GetRecipeApiRecipesRecipeIdGetError, GetRecipeApiRecipesRecipeIdGetResponse, GetSpendApiSpendGetData, GetSpendApiSpendGetError, GetSpendApiSpendGetResponse, HealthApiHealthGetData, HealthApiHealthGetResponse, ListJobsApiJobsGetData, ListJobsApiJobsGetError, ListJobsApiJobsGetResponse, ListRecipesApiRecipesGetData, ListRecipesApiRecipesGetError, ListRecipesApiRecipesGetResponse, PatchRecipeApiRecipesRecipeIdPatchData, PatchRecipeApiRecipesRecipeIdPatchError, PatchRecipeApiRecipesRecipeIdPatchResponse, UploadRecipeVideoApiRecipesUploadPostData, UploadRecipeVideoApiRecipesUploadPostError, UploadRecipeVideoApiRecipesUploadPostResponse } from '../types.gen';
+import { deleteRecipeApiRecipesRecipeIdDelete, extractRecipeApiRecipesExtractPost, getJobApiJobsJobIdGet, getRecipeApiRecipesRecipeIdGet, getRecipeCoverApiRecipesRecipeIdCoverGet, getSpendApiSpendGet, healthApiHealthGet, listJobsApiJobsGet, listRecipesApiRecipesGet, type Options, patchRecipeApiRecipesRecipeIdPatch, uploadRecipeVideoApiRecipesUploadPost } from '../sdk.gen';
+import type { DeleteRecipeApiRecipesRecipeIdDeleteData, DeleteRecipeApiRecipesRecipeIdDeleteError, DeleteRecipeApiRecipesRecipeIdDeleteResponse, ExtractRecipeApiRecipesExtractPostData, ExtractRecipeApiRecipesExtractPostError, ExtractRecipeApiRecipesExtractPostResponse, GetJobApiJobsJobIdGetData, GetJobApiJobsJobIdGetError, GetJobApiJobsJobIdGetResponse, GetRecipeApiRecipesRecipeIdGetData, GetRecipeApiRecipesRecipeIdGetError, GetRecipeApiRecipesRecipeIdGetResponse, GetRecipeCoverApiRecipesRecipeIdCoverGetData, GetRecipeCoverApiRecipesRecipeIdCoverGetError, GetSpendApiSpendGetData, GetSpendApiSpendGetError, GetSpendApiSpendGetResponse, HealthApiHealthGetData, HealthApiHealthGetResponse, ListJobsApiJobsGetData, ListJobsApiJobsGetError, ListJobsApiJobsGetResponse, ListRecipesApiRecipesGetData, ListRecipesApiRecipesGetError, ListRecipesApiRecipesGetResponse, PatchRecipeApiRecipesRecipeIdPatchData, PatchRecipeApiRecipesRecipeIdPatchError, PatchRecipeApiRecipesRecipeIdPatchResponse, UploadRecipeVideoApiRecipesUploadPostData, UploadRecipeVideoApiRecipesUploadPostError, UploadRecipeVideoApiRecipesUploadPostResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -264,6 +264,27 @@ export const patchRecipeApiRecipesRecipeIdPatchMutation = (options?: Partial<Opt
     };
     return mutationOptions;
 };
+
+export const getRecipeCoverApiRecipesRecipeIdCoverGetQueryKey = (options: Options<GetRecipeCoverApiRecipesRecipeIdCoverGetData>) => createQueryKey('getRecipeCoverApiRecipesRecipeIdCoverGet', options);
+
+/**
+ * Get Recipe Cover
+ *
+ * Stream the poster keyframe. One 404 covers every miss — no recipe, no
+ * cover generated, file gone from the archive.
+ */
+export const getRecipeCoverApiRecipesRecipeIdCoverGetOptions = (options: Options<GetRecipeCoverApiRecipesRecipeIdCoverGetData>) => queryOptions<unknown, GetRecipeCoverApiRecipesRecipeIdCoverGetError, unknown, ReturnType<typeof getRecipeCoverApiRecipesRecipeIdCoverGetQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getRecipeCoverApiRecipesRecipeIdCoverGet({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getRecipeCoverApiRecipesRecipeIdCoverGetQueryKey(options)
+});
 
 export const getSpendApiSpendGetQueryKey = (options?: Options<GetSpendApiSpendGetData>) => createQueryKey('getSpendApiSpendGet', options);
 

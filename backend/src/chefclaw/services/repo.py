@@ -12,6 +12,7 @@ row locks live only inside the claim and the atomic store.
 """
 
 import uuid
+from collections.abc import Sequence
 from decimal import Decimal
 from typing import Any, Protocol
 
@@ -109,7 +110,12 @@ class JobStore(Protocol):
         documents: list[RecipeDocument],
         *,
         extraction_meta: dict[str, Any],
+        cover_paths: Sequence[str | None] | None = None,
     ) -> list[uuid.UUID] | None: ...
+
+    async def list_recipes_missing_covers(self) -> list[Recipe]: ...
+
+    async def set_recipe_cover(self, recipe_id: uuid.UUID, cover_path: str) -> None: ...
 
     async def reconcile_interrupted(self) -> int: ...
 
@@ -276,9 +282,11 @@ class PostgresJobStore:
         documents: list[RecipeDocument],
         *,
         extraction_meta: dict[str, Any],
+        cover_paths: Sequence[str | None] | None = None,
     ) -> list[uuid.UUID] | None:
         """ATOMIC multi-dish store: N recipe inserts + the job's flip to
-        ``stored`` in ONE transaction (§16.4). Returns the new recipe ids, or
+        ``stored`` in ONE transaction (§16.4) — ``cover_paths[i]`` (best-effort,
+        None = no cover) rides in the same rows. Returns the new recipe ids, or
         ``None`` when UNIQUE(platform, canonical_id, dish_index) fired — a
         raced duplicate the caller adopts instead of failing."""
         source_url = job.payload["url"]
@@ -295,6 +303,11 @@ class PostgresJobStore:
                             canonical_id=job.canonical_id,
                             dish_index=index,
                             status="stored",
+                            cover_path=(
+                                cover_paths[index]
+                                if cover_paths is not None and index < len(cover_paths)
+                                else None
+                            ),
                             document=document.model_dump(mode="json"),
                             extraction_meta=extraction_meta,
                         )
@@ -316,6 +329,18 @@ class PostgresJobStore:
             return recipe_ids
         except IntegrityError:
             return None  # raced duplicate — caller adopts the existing rows
+
+    async def list_recipes_missing_covers(self) -> list[Recipe]:
+        """Startup cover backfill: recipes stored before the cover stage."""
+        stmt = select(Recipe).where(Recipe.cover_path.is_(None)).order_by(Recipe.created_at)
+        async with self._sessionmaker() as session:
+            return list((await session.execute(stmt)).scalars().all())
+
+    async def set_recipe_cover(self, recipe_id: uuid.UUID, cover_path: str) -> None:
+        async with self._sessionmaker() as session, session.begin():
+            await session.execute(
+                update(Recipe).where(Recipe.id == recipe_id).values(cover_path=cover_path)
+            )
 
     async def reconcile_interrupted(self) -> int:
         """Startup reconcile: any job stranded mid-stage by a restart becomes

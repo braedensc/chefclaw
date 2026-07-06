@@ -117,6 +117,10 @@ class Recipe(Base):
         ARRAY(Text), nullable=False, server_default=text("'{}'::text[]")
     )
     user_notes: Mapped[str | None] = mapped_column(Text)
+    # Poster keyframe in the media archive (server filesystem path). NEVER
+    # exposed by the API — RecipeSummary derives has_cover from it and the
+    # /cover endpoint streams the file. NULL = no cover (best-effort stage).
+    cover_path: Mapped[str | None] = mapped_column(Text)
     # Never user-editable — only tags and user_notes are PATCH-able.
     document: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
     extraction_meta: Mapped[dict[str, Any]] = mapped_column(

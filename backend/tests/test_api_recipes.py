@@ -70,6 +70,7 @@ def make_recipe_row(**overrides) -> Recipe:
         status="stored",
         tags=["pork"],
         user_notes=None,
+        cover_path=None,
         document=document,
         extraction_meta={"model_id": "fake-extractor"},
         created_at=datetime(2026, 7, 1, tzinfo=UTC),
@@ -332,6 +333,46 @@ async def test_list_recipes_page_shape_and_filter_passthrough(
     }
 
 
+async def test_list_recipes_projects_card_fields_from_document(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    row = make_recipe_row(cover_path="/data/media/bilibili/BVtest00001-p1/cover-0.jpg")
+
+    async def fake_list(session, owner_id, **kwargs):
+        return [row], 1
+
+    monkeypatch.setattr(recipes_service, "list_recipes", fake_list)
+    async with client_for(build_app()) as client:
+        response = await client.get("/api/recipes", headers=bearer(TEST_TOKEN))
+    item = response.json()["items"][0]
+    # Projected VERBATIM from the stored validated document (Hard Rule 7):
+    assert item["has_cover"] is True
+    assert item["difficulty"] == "medium"
+    assert item["total_time_minutes"] == 75
+    assert item["ingredient_count"] == 3
+    assert "cover_path" not in item  # the filesystem path never leaves the API
+
+
+async def test_list_recipes_projections_none_safe_on_partial_documents(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    empty = make_recipe_row(document={})
+    partial = make_recipe_row(document={"total_time_minutes": 40}, canonical_id="BVother")
+
+    async def fake_list(session, owner_id, **kwargs):
+        return [empty, partial], 2
+
+    monkeypatch.setattr(recipes_service, "list_recipes", fake_list)
+    async with client_for(build_app()) as client:
+        response = await client.get("/api/recipes", headers=bearer(TEST_TOKEN))
+    first, second = response.json()["items"]
+    assert (first["has_cover"], first["difficulty"]) == (False, None)
+    assert (first["total_time_minutes"], first["ingredient_count"]) == (None, None)
+    assert second["total_time_minutes"] == 40
+    assert second["difficulty"] is None
+    assert second["ingredient_count"] is None
+
+
 # ─── GET /api/recipes/{id} ───────────────────────────────────────────────────
 
 
@@ -351,6 +392,58 @@ async def test_get_recipe_detail_includes_document(monkeypatch: pytest.MonkeyPat
     assert body["source_url"] == FAKE_URL
     assert missing.status_code == 404
     assert missing.json()["error_type"] == "not_found"
+
+
+# ─── GET /api/recipes/{id}/cover ─────────────────────────────────────────────
+
+
+async def test_get_cover_200_image_bytes_and_cache_header(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    media_dir = tmp_path / "media"
+    cover_dir = media_dir / "bilibili" / "BVtest00001-p1"
+    cover_dir.mkdir(parents=True)
+    cover_file = cover_dir / "cover-0.jpg"
+    cover_file.write_bytes(b"\xff\xd8fake jpeg bytes")
+    row = make_recipe_row(cover_path=str(cover_file))
+
+    async def fake_get(session, owner_id, recipe_id):
+        return row if recipe_id == row.id else None
+
+    monkeypatch.setattr(recipes_service, "get_recipe", fake_get)
+    settings = Settings(chefclaw_api_token=TEST_TOKEN, media_dir=str(media_dir))
+    async with client_for(build_app(settings=settings)) as client:
+        response = await client.get(f"/api/recipes/{row.id}/cover", headers=bearer(TEST_TOKEN))
+    assert response.status_code == 200
+    assert response.content == b"\xff\xd8fake jpeg bytes"
+    assert response.headers["content-type"] == "image/jpeg"
+    assert response.headers["cache-control"] == "private, max-age=86400"
+
+
+async def test_get_cover_404_variants(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    """One 404 shape for every miss: unknown recipe, no cover generated, file
+    gone from the archive — and (belt-and-braces) a path escaping media_dir."""
+    media_dir = tmp_path / "media"
+    media_dir.mkdir()
+    outside = tmp_path / "outside.jpg"
+    outside.write_bytes(b"escaped")
+    no_cover = make_recipe_row(cover_path=None)
+    file_gone = make_recipe_row(cover_path=str(media_dir / "x" / "cover-0.jpg"))
+    escapes_root = make_recipe_row(cover_path=str(outside))
+    rows = {row.id: row for row in (no_cover, file_gone, escapes_root)}
+
+    async def fake_get(session, owner_id, recipe_id):
+        return rows.get(recipe_id)
+
+    monkeypatch.setattr(recipes_service, "get_recipe", fake_get)
+    settings = Settings(chefclaw_api_token=TEST_TOKEN, media_dir=str(media_dir))
+    async with client_for(build_app(settings=settings)) as client:
+        for recipe_id in (uuid.uuid4(), no_cover.id, file_gone.id, escapes_root.id):
+            response = await client.get(
+                f"/api/recipes/{recipe_id}/cover", headers=bearer(TEST_TOKEN)
+            )
+            assert response.status_code == 404
+            assert response.json()["error_type"] == "not_found"
 
 
 # ─── PATCH /api/recipes/{id} ─────────────────────────────────────────────────
@@ -431,6 +524,7 @@ async def test_delete_recipe_204_and_404(monkeypatch: pytest.MonkeyPatch) -> Non
     [
         ("GET", "/api/recipes"),
         ("GET", f"/api/recipes/{uuid.uuid4()}"),
+        ("GET", f"/api/recipes/{uuid.uuid4()}/cover"),
         ("GET", "/api/jobs"),
         ("GET", f"/api/jobs/{uuid.uuid4()}"),
         ("PATCH", f"/api/recipes/{uuid.uuid4()}"),

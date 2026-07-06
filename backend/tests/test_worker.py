@@ -8,6 +8,7 @@ exercised by the golden DB tier (test_worker_db.py, `-m golden`).
 
 import asyncio
 import uuid
+from collections.abc import Sequence
 from pathlib import Path
 
 import pytest
@@ -36,6 +37,32 @@ class RecordingSleeper:
         self.calls.append(seconds)
 
 
+class FakeCoverGenerator:
+    """Injectable cover generator: writes real cover-<i>.jpg files without
+    ever touching ffmpeg (CI tier). Records calls for path/fraction asserts."""
+
+    def __init__(self, fail: bool = False, error: Exception | None = None) -> None:
+        self.fail = fail
+        self.error = error
+        self.calls: list[tuple[Path, Path, list[float]]] = []
+
+    async def __call__(
+        self, video_path: Path, target_dir: Path, fractions: Sequence[float]
+    ) -> list[str | None]:
+        self.calls.append((video_path, target_dir, list(fractions)))
+        if self.error is not None:
+            raise self.error
+        if self.fail:
+            return [None] * len(fractions)
+        target_dir.mkdir(parents=True, exist_ok=True)
+        covers: list[str | None] = []
+        for index in range(len(fractions)):
+            out_path = target_dir / f"cover-{index}.jpg"
+            out_path.write_bytes(b"fake jpeg bytes")
+            covers.append(str(out_path))
+        return covers
+
+
 def make_settings(tmp_path: Path, **overrides) -> Settings:
     defaults = dict(
         chefclaw_api_token="test-token",
@@ -61,6 +88,7 @@ def make_worker(
     source: FakeSource,
     settings: Settings,
     extractor: FakeExtractor,
+    cover_generator: FakeCoverGenerator | None = None,
 ) -> tuple[Worker, RecordingSleeper]:
     sleeper = RecordingSleeper()
     worker = Worker(
@@ -68,6 +96,7 @@ def make_worker(
         adapters=[source],
         settings=settings,
         extractor_factory=lambda _settings: extractor,
+        cover_generator=cover_generator or FakeCoverGenerator(),  # never real ffmpeg in CI
         sleeper=sleeper,
         jitter=lambda: 0.25,  # deterministic politeness delay: 2 + 3*0.25 = 2.75
     )
@@ -577,7 +606,7 @@ class ConflictNoRowsStore(FakeJobStore):
     """store_results reports the UNIQUE violation but NO racer rows exist —
     the inconsistent-datastore shape (a non-dedupe IntegrityError)."""
 
-    async def store_results(self, job, documents, *, extraction_meta):
+    async def store_results(self, job, documents, *, extraction_meta, cover_paths=None):
         return None
 
 
@@ -707,6 +736,7 @@ async def test_run_forever_survives_store_failure_mid_job(tmp_path: Path) -> Non
         adapters=[source],
         settings=settings,
         extractor_factory=lambda _s: extractor,
+        cover_generator=FakeCoverGenerator(),
         sleeper=YieldingSleeper(),
         jitter=lambda: 0.0,
     )
@@ -768,12 +798,230 @@ async def test_media_retention_keep_moves_into_archive(tmp_path: Path) -> None:
     job = await claim_and_process(worker, store)
 
     archive_dir = tmp_path / "media" / "bilibili" / "BVtest00001-p1"
-    archived = list(archive_dir.iterdir())
-    assert len(archived) == 1
+    archived = sorted(archive_dir.iterdir())
+    videos = [path for path in archived if path.suffix == ".mp4"]
+    assert len(videos) == 1
+    assert archive_dir / "cover-0.jpg" in archived  # the cover stage wrote next to it
     meta = store.recipes[0].extraction_meta
-    assert meta["retained_media"] == [str(archived[0])]
+    assert meta["retained_media"] == [str(videos[0])]  # covers are NOT retained media
     # Scratch is still cleaned even when media was retained:
     assert not (tmp_path / "scratch" / "chefclaw-jobs" / str(job.id)).exists()
+
+
+# ─── covers (poster keyframes — strictly best-effort) ────────────────────────
+
+
+async def test_cover_happy_path_stores_cover_path_atomically(tmp_path: Path) -> None:
+    store, source = FakeJobStore(), make_source()
+    settings = make_settings(tmp_path, media_retention="keep")
+    covers = FakeCoverGenerator()
+    worker, _ = make_worker(store, source, settings, FakeExtractor(), covers)
+
+    await enqueue_extract(store, OWNER_ID, FAKE_URL, [source], settings)
+    job = await claim_and_process(worker, store)
+
+    assert job.status == "stored"
+    archive_dir = tmp_path / "media" / "bilibili" / "BVtest00001-p1"
+    assert store.recipes[0].cover_path == str(archive_dir / "cover-0.jpg")
+    assert (archive_dir / "cover-0.jpg").is_file()
+    # keep ⇒ the frame came from the RETAINED archive file, not scratch:
+    video_path, target_dir, fractions = covers.calls[0]
+    assert video_path.parent == archive_dir
+    assert target_dir == archive_dir
+    assert fractions == [pytest.approx(0.5)]  # single dish: (0+1)/(1+1)
+
+
+async def test_cover_uses_scratch_download_when_retention_discard(tmp_path: Path) -> None:
+    store, source = FakeJobStore(), make_source()
+    settings = make_settings(tmp_path)  # media_retention="discard"
+    covers = FakeCoverGenerator()
+    worker, _ = make_worker(store, source, settings, FakeExtractor(), covers)
+
+    await enqueue_extract(store, OWNER_ID, FAKE_URL, [source], settings)
+    await claim_and_process(worker, store)
+
+    video_path, _, _ = covers.calls[0]
+    assert "chefclaw-jobs" in str(video_path)  # scratch download, not archive
+    assert store.recipes[0].cover_path is not None
+
+
+@pytest.mark.parametrize(
+    "cover_kwargs",
+    [dict(fail=True), dict(error=RuntimeError("ffmpeg exploded"))],
+)
+async def test_cover_failure_still_stores_with_none(tmp_path: Path, cover_kwargs: dict) -> None:
+    """A cover failure (per-dish None or the generator raising) must NEVER
+    fail or delay the job's store."""
+    store, source = FakeJobStore(), make_source()
+    settings = make_settings(tmp_path)
+    worker, _ = make_worker(
+        store, source, settings, FakeExtractor(), FakeCoverGenerator(**cover_kwargs)
+    )
+
+    await enqueue_extract(store, OWNER_ID, FAKE_URL, [source], settings)
+    job = await claim_and_process(worker, store)
+
+    assert job.status == "stored"
+    assert len(job.result_recipe_ids) == 1
+    assert store.recipes[0].cover_path is None
+
+
+async def test_multi_dish_covers_distinct_paths_and_spread_fractions(tmp_path: Path) -> None:
+    store, source = FakeJobStore(), make_source()
+    settings = make_settings(tmp_path)
+    dish_two = default_dish()
+    dish_two["dish_name"] = {"en": "Second dish", "original": "第二道菜"}
+    covers = FakeCoverGenerator()
+    worker, _ = make_worker(
+        store, source, settings, FakeExtractor(dishes=[default_dish(), dish_two]), covers
+    )
+
+    await enqueue_extract(store, OWNER_ID, FAKE_URL, [source], settings)
+    job = await claim_and_process(worker, store)
+
+    assert job.status == "stored"
+    archive_dir = tmp_path / "media" / "bilibili" / "BVtest00001-p1"
+    assert [r.cover_path for r in store.recipes] == [
+        str(archive_dir / "cover-0.jpg"),
+        str(archive_dir / "cover-1.jpg"),
+    ]
+    # Sibling covers spread across the video: dish i at (i+1)/(N+1).
+    _, _, fractions = covers.calls[0]
+    assert fractions == [pytest.approx(1 / 3), pytest.approx(2 / 3)]
+
+
+async def test_upload_job_cover_lands_under_local_platform(tmp_path: Path) -> None:
+    store = FakeJobStore()
+    settings = make_settings(tmp_path)
+    video = tmp_path / "saved.mp4"
+    video.write_bytes(b"uploaded video")
+    await enqueue_upload(store, OWNER_ID, video, None, None, settings)
+
+    covers = FakeCoverGenerator()
+    worker, _ = make_worker(store, make_source(), settings, FakeExtractor(), covers)
+    job = await claim_and_process(worker, store)
+
+    assert job.status == "stored"
+    expected = tmp_path / "media" / "local" / job.canonical_id / "cover-0.jpg"
+    assert store.recipes[0].cover_path == str(expected)
+
+
+# ─── cover backfill (one-shot on worker startup, best-effort) ────────────────
+
+
+async def test_backfill_generates_covers_from_archived_videos(tmp_path: Path) -> None:
+    store = FakeJobStore()
+    settings = make_settings(tmp_path)
+    recipe = store.seed_recipe(cover_path=None)
+    archive_dir = tmp_path / "media" / "bilibili" / "BVfake000-p1"
+    archive_dir.mkdir(parents=True)
+    (archive_dir / "BVfake000.mp4").write_bytes(b"retained video")
+    covers = FakeCoverGenerator()
+    worker, _ = make_worker(store, make_source(), settings, FakeExtractor(), covers)
+
+    await worker.backfill_covers()
+
+    assert recipe.cover_path == str(archive_dir / "cover-0.jpg")
+    video_path, _, fractions = covers.calls[0]
+    assert video_path == archive_dir / "BVfake000.mp4"
+    assert fractions == [pytest.approx(0.5)]
+
+
+async def test_backfill_skips_recipes_without_an_archived_video(tmp_path: Path) -> None:
+    store = FakeJobStore()
+    settings = make_settings(tmp_path)
+    no_video = store.seed_recipe(cover_path=None)  # no media dir at all
+    covered = store.seed_recipe(canonical_id="BVdone", cover_path="/data/media/x/cover-0.jpg")
+    covers = FakeCoverGenerator()
+    worker, _ = make_worker(store, make_source(), settings, FakeExtractor(), covers)
+
+    await worker.backfill_covers()
+
+    assert covers.calls == []  # nothing to generate from — and no crash
+    assert no_video.cover_path is None
+    assert covered.cover_path == "/data/media/x/cover-0.jpg"  # untouched
+
+
+async def test_backfill_generator_failure_never_raises(tmp_path: Path) -> None:
+    store = FakeJobStore()
+    settings = make_settings(tmp_path)
+    recipe = store.seed_recipe(cover_path=None)
+    archive_dir = tmp_path / "media" / "bilibili" / "BVfake000-p1"
+    archive_dir.mkdir(parents=True)
+    (archive_dir / "video.mp4").write_bytes(b"retained video")
+    worker, _ = make_worker(
+        store,
+        make_source(),
+        settings,
+        FakeExtractor(),
+        FakeCoverGenerator(error=RuntimeError("ffmpeg exploded")),
+    )
+
+    await worker.backfill_covers()  # best-effort: swallowed and logged
+
+    assert recipe.cover_path is None
+
+
+async def test_run_forever_backfills_once_when_enabled(tmp_path: Path) -> None:
+    store = FakeJobStore()
+    settings = make_settings(tmp_path)
+    recipe = store.seed_recipe(cover_path=None)
+    archive_dir = tmp_path / "media" / "bilibili" / "BVfake000-p1"
+    archive_dir.mkdir(parents=True)
+    (archive_dir / "video.mp4").write_bytes(b"retained video")
+    covers = FakeCoverGenerator()
+    worker = Worker(
+        store=store,
+        adapters=[make_source()],
+        settings=settings,
+        extractor_factory=lambda _s: FakeExtractor(),
+        cover_generator=covers,
+        backfill_covers_on_start=True,
+        sleeper=YieldingSleeper(),
+        jitter=lambda: 0.0,
+    )
+
+    task = asyncio.create_task(worker.run_forever())
+    try:
+        for _ in range(5000):
+            if recipe.cover_path is not None:
+                break
+            await asyncio.sleep(0)
+        assert recipe.cover_path == str(archive_dir / "cover-0.jpg")
+        assert len(covers.calls) == 1  # one-shot, not per idle loop
+    finally:
+        task.cancel()
+        with pytest.raises(asyncio.CancelledError):
+            await task
+
+
+async def test_run_forever_skips_backfill_by_default(tmp_path: Path) -> None:
+    """The flag defaults OFF: a worker built without it never runs the
+    backfill (unit-test posture; only the app lifespan turns it on)."""
+    store = FakeJobStore()
+    settings = make_settings(tmp_path)
+    recipe = store.seed_recipe(cover_path=None)
+    covers = FakeCoverGenerator()
+    worker = Worker(
+        store=store,
+        adapters=[make_source()],
+        settings=settings,
+        extractor_factory=lambda _s: FakeExtractor(),
+        cover_generator=covers,
+        sleeper=YieldingSleeper(),
+        jitter=lambda: 0.0,
+    )
+
+    task = asyncio.create_task(worker.run_forever())
+    try:
+        for _ in range(200):
+            await asyncio.sleep(0)
+    finally:
+        task.cancel()
+        with pytest.raises(asyncio.CancelledError):
+            await task
+    assert covers.calls == []
+    assert recipe.cover_path is None
 
 
 # ─── default_source_adapters (CHEFCLAW_SOURCES selection, §16.9) ─────────────

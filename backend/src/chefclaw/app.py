@@ -237,6 +237,9 @@ async def _lifespan(app: FastAPI):
         store=PostgresJobStore(db.get_sessionmaker(), settings),
         adapters=default_source_adapters(settings),
         settings=settings,
+        # One-shot best-effort cover backfill for recipes stored before the
+        # cover stage existed (defaults OFF so tests never shell out).
+        backfill_covers_on_start=True,
     )
     task = asyncio.create_task(worker.run_forever(), name="chefclaw-extraction-worker")
     # Health reads aliveness off this: a done() task = the worker died while
