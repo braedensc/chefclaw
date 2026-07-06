@@ -1,0 +1,256 @@
+"""In-memory JobStore fake — the CI-tier stand-in for PostgresJobStore.
+
+The models are postgres-only (JSONB/ARRAY/uuidv7), so the no-database tier
+drives the worker through this fake of the :class:`chefclaw.services.repo.
+JobStore` seam. ORM instances are used as the data currency (constructing
+them needs no database — only executing SQL does), so the worker code paths
+are identical in both tiers.
+"""
+
+import uuid
+from datetime import UTC, datetime, timedelta
+from decimal import Decimal
+from typing import Any
+
+from chefclaw.documents import RecipeDocument
+from chefclaw.extractors import ExtractionUsage
+from chefclaw.models import Job, Recipe
+from chefclaw.services.repo import ACTIVE_STATUSES, RUNNING_STATUSES
+
+_EPOCH = datetime(2026, 1, 1, tzinfo=UTC)
+
+
+class FakeJobStore:
+    """Faithful in-memory JobStore.
+
+    Failure injection:
+    - ``budget_failure`` — raised by check_budget (Budget/Config errors).
+    - ``fail_store_once`` — the next store_results simulates the raced
+      UNIQUE(platform, canonical_id, dish_index) violation: it returns None
+      AND materializes the racer's rows (as a concurrent writer would have).
+    """
+
+    def __init__(self) -> None:
+        self.jobs: dict[uuid.UUID, Job] = {}
+        self.recipes: list[Recipe] = []
+        self.spend_rows: list[dict[str, Any]] = []
+        self.budget_failure: Exception | None = None
+        self.fail_store_once = False
+        self.budget_checks = 0
+        self._clock = 0
+
+    # ── helpers for tests ────────────────────────────────────────────────────
+
+    def _tick(self) -> datetime:
+        self._clock += 1
+        return _EPOCH + timedelta(seconds=self._clock)
+
+    def seed_job(self, **overrides: Any) -> Job:
+        now = self._tick()
+        fields: dict[str, Any] = {
+            "id": uuid.uuid4(),
+            "owner_id": uuid.uuid4(),
+            "type": "extract",
+            "payload": {"url": "https://example.test/v", "fetch_url": "https://example.test/v"},
+            "platform": "bilibili",
+            "canonical_id": "BVfake000-p1",
+            "status": "pending",
+            "attempts": 0,
+            "error_type": None,
+            "error_detail": None,
+            "result_recipe_ids": [],
+            "created_at": now,
+            "updated_at": now,
+        }
+        fields.update(overrides)
+        job = Job(**fields)
+        self.jobs[job.id] = job
+        return job
+
+    def seed_recipe(self, **overrides: Any) -> Recipe:
+        fields: dict[str, Any] = {
+            "id": uuid.uuid4(),
+            "owner_id": uuid.uuid4(),
+            "title_en": "Seeded dish",
+            "title_original": "预置菜",
+            "platform": "bilibili",
+            "canonical_id": "BVfake000-p1",
+            "source_url": "https://example.test/v",
+            "dish_index": 0,
+            "status": "stored",
+            "tags": [],
+            "user_notes": None,
+            "document": {},
+            "extraction_meta": {},
+            "created_at": self._tick(),
+        }
+        fields.update(overrides)
+        recipe = Recipe(**fields)
+        self.recipes.append(recipe)
+        return recipe
+
+    # ── JobStore surface ─────────────────────────────────────────────────────
+
+    async def find_active_job(self, platform: str, canonical_id: str) -> Job | None:
+        candidates = [
+            job
+            for job in self.jobs.values()
+            if job.platform == platform
+            and job.canonical_id == canonical_id
+            and job.status in ACTIVE_STATUSES
+        ]
+        return min(candidates, key=lambda job: job.created_at) if candidates else None
+
+    async def find_completed_job_with_recipes(
+        self, platform: str, canonical_id: str
+    ) -> Job | None:
+        if not any(
+            recipe.platform == platform and recipe.canonical_id == canonical_id
+            for recipe in self.recipes
+        ):
+            return None
+        stored = [
+            job
+            for job in self.jobs.values()
+            if job.platform == platform
+            and job.canonical_id == canonical_id
+            and job.status == "stored"
+        ]
+        return max(stored, key=lambda job: job.created_at) if stored else None
+
+    async def insert_job(
+        self,
+        *,
+        owner_id: uuid.UUID,
+        job_type: str,
+        payload: dict[str, Any],
+        platform: str,
+        canonical_id: str,
+    ) -> Job:
+        return self.seed_job(
+            owner_id=owner_id,
+            type=job_type,
+            payload=payload,
+            platform=platform,
+            canonical_id=canonical_id,
+        )
+
+    async def get_job(self, job_id: uuid.UUID, owner_id: uuid.UUID) -> Job | None:
+        job = self.jobs.get(job_id)
+        if job is None or job.owner_id != owner_id:
+            return None
+        return job
+
+    async def claim_next_job(self) -> Job | None:
+        pending = [job for job in self.jobs.values() if job.status == "pending"]
+        if not pending:
+            return None
+        job = min(pending, key=lambda j: j.created_at)
+        job.status = "downloading"
+        job.attempts += 1
+        job.updated_at = self._tick()
+        return job
+
+    async def set_status(self, job_id: uuid.UUID, status: str) -> None:
+        self.jobs[job_id].status = status
+
+    async def requeue(self, job_id: uuid.UUID) -> None:
+        self.jobs[job_id].status = "pending"
+
+    async def mark_failed(self, job_id: uuid.UUID, error_type: str, error_detail: str) -> None:
+        job = self.jobs[job_id]
+        job.status = "failed"
+        job.error_type = error_type
+        job.error_detail = error_detail
+
+    async def find_recipe_ids(self, platform: str, canonical_id: str) -> list[uuid.UUID]:
+        rows = [
+            recipe
+            for recipe in self.recipes
+            if recipe.platform == platform and recipe.canonical_id == canonical_id
+        ]
+        return [recipe.id for recipe in sorted(rows, key=lambda r: r.dish_index)]
+
+    async def adopt_recipes(self, job_id: uuid.UUID, recipe_ids: list[uuid.UUID]) -> None:
+        job = self.jobs[job_id]
+        job.status = "stored"
+        job.result_recipe_ids = list(recipe_ids)
+        job.error_type = None
+        job.error_detail = None
+
+    async def store_results(
+        self,
+        job: Job,
+        documents: list[RecipeDocument],
+        *,
+        extraction_meta: dict[str, Any],
+    ) -> list[uuid.UUID] | None:
+        if self.fail_store_once:
+            # Simulate the raced duplicate: the "other writer" already
+            # committed rows for this canonical identity.
+            self.fail_store_once = False
+            for index, document in enumerate(documents):
+                self.seed_recipe(
+                    owner_id=job.owner_id,
+                    platform=job.platform,
+                    canonical_id=job.canonical_id,
+                    dish_index=index,
+                    title_en=document.dish_name.en,
+                    title_original=document.dish_name.original,
+                    document=document.model_dump(mode="json"),
+                )
+            return None
+        recipe_ids: list[uuid.UUID] = []
+        for index, document in enumerate(documents):
+            recipe = self.seed_recipe(
+                owner_id=job.owner_id,
+                platform=job.platform,
+                canonical_id=job.canonical_id,
+                source_url=job.payload["url"],
+                dish_index=index,
+                title_en=document.dish_name.en,
+                title_original=document.dish_name.original,
+                document=document.model_dump(mode="json"),
+                extraction_meta=extraction_meta,
+            )
+            recipe_ids.append(recipe.id)
+        job.status = "stored"
+        job.result_recipe_ids = recipe_ids
+        job.error_type = None
+        job.error_detail = None
+        return recipe_ids
+
+    async def reconcile_interrupted(self) -> int:
+        count = 0
+        for job in self.jobs.values():
+            if job.status in RUNNING_STATUSES:
+                job.status = "failed"
+                job.error_type = "interrupted"
+                job.error_detail = "reconciled by fake store"
+                count += 1
+        return count
+
+    async def check_budget(self, owner_id: uuid.UUID) -> None:
+        self.budget_checks += 1
+        if self.budget_failure is not None:
+            raise self.budget_failure
+
+    async def record_spend(
+        self,
+        *,
+        job_id: uuid.UUID,
+        owner_id: uuid.UUID,
+        usage: ExtractionUsage,
+        cost_usd: Decimal,
+    ) -> None:
+        self.spend_rows.append(
+            {
+                "job_id": job_id,
+                "owner_id": owner_id,
+                "model": usage.model_id,
+                "tokens_in": usage.tokens_in,
+                "tokens_out": usage.tokens_out,
+                "tokens_thinking": usage.tokens_thinking,
+                "cost_usd": cost_usd,
+            }
+        )

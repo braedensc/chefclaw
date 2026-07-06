@@ -46,7 +46,11 @@ Normalized spine + JSONB document.
 URLs cannot dedupe (b23.tv short links + tracking params; Rednote per-share
 `xsec_token`), so uniqueness keys on canonical identity. The canonical-id check
 gates the paid model call, after resolution. `DELETE` is a **hard delete** for
-MVP; re-extraction semantics are a named future ADR (see docs/ARCHITECTURE.md).
+MVP **and re-opens extraction** — the dedupe check returns a completed job only
+while its recipes still exist, so re-pasting a deleted recipe's URL enqueues a
+fresh (paid) job (golden-tested; see
+adr/2026-07-06-data-model-and-dedupe.md). Re-extraction semantics are a named
+future ADR (see docs/ARCHITECTURE.md).
 
 Reserved (dormant until later pillars): `times_cooked`, per-ingredient
 `nutrition_ref` inside `document`. A meal-log/plan-history table arrives with M6
@@ -58,8 +62,8 @@ Reserved (dormant until later pillars): `times_cooked`, per-ingredient
 |---|---|---|
 | `id` | uuid pk | `uuidv7()` |
 | `owner_id` | uuid fk → users | |
-| `type` | text | `extract` for now |
-| `payload` | jsonb | |
+| `type` | text | `extract` \| `upload` |
+| `payload` | jsonb | stores both `url` (provenance) and `fetch_url` (resolved) — retries never re-resolve, preserving a Rednote `xsec_token` |
 | `platform` / `canonical_id` | text | real columns (queryable) for the active-job dedupe check |
 | `status` | text | `pending` \| `downloading` \| `extracting` \| `validating` \| `stored` \| `failed` |
 | `attempts` | int, default 0 | max 3, then terminal `failed` |
@@ -67,15 +71,21 @@ Reserved (dormant until later pillars): `times_cooked`, per-ingredient
 | `result_recipe_ids` | uuid[] | multi-dish results |
 | `created_at` / `updated_at` | timestamptz | claim index on `(status, created_at)` |
 
-Worker semantics (Phase 2, constraints recorded now): claimed via
-`FOR UPDATE SKIP LOCKED`; **strictly serial execution**; the N-recipe insert and
-the job's flip to `stored` happen in **one transaction**; startup reconcile marks
-orphaned running jobs `failed`/`interrupted` — never auto-re-run paid work.
+Worker semantics (shipped — full record in
+adr/2026-07-06-jobs-without-broker.md): claimed via
+`FOR UPDATE SKIP LOCKED` with `attempts` incremented at claim; **strictly
+serial execution**; the N-recipe insert and the job's flip to `stored` happen
+in **one transaction**; startup reconcile marks orphaned running jobs
+`failed`/`interrupted` — never auto-re-run paid work.
 
 ## llm_spend
 
 The cost ledger — written **per model attempt, including failures** (that's when
-spend runs hot and `extraction_meta` would undercount).
+spend runs hot and `extraction_meta` would undercount). A failed attempt whose
+error carried no token accounting is recorded with **zero tokens** — the row
+still counts toward the daily attempt cap (which counts rows, not dollars);
+dollar undercounting on failures is a known limitation until typed errors
+carry usage.
 
 | Column | Type | Notes |
 |---|---|---|

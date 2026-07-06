@@ -15,6 +15,7 @@ dependencies = [
     "yt-dlp>=2026.7.4",
     "google-genai>=2.10.0",
     "httpx>=0.28.1",
+    "python-multipart>=0.0.32",
 ]
 
 [dependency-groups]
@@ -36,6 +37,12 @@ packages = ["src/chefclaw"]
 testpaths = ["tests"]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
+markers = [
+    "golden: DB-tier tests needing a throwaway local postgres on 127.0.0.1:55432 (run explicitly: uv run pytest -m golden). NEVER the real compose DB.",
+]
+# Golden tests are deselected by default (CI and plain `uv run pytest` have no
+# database); an explicit CLI `-m golden` overrides this.
+addopts = "-m \"not golden\""
 
 [tool.ruff]
 line-length = 100
