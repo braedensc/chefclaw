@@ -1,0 +1,21 @@
+# Keep the build context small and clean — and keep reference material out of
+# any image layer (planning/ is gitignored personal reference; docs aren't
+# needed at runtime).
+.git
+.claude
+.husky
+docs
+planning
+node_modules
+**/node_modules
+frontend/dist
+backend/.venv
+**/__pycache__
+**/.pytest_cache
+**/.ruff_cache
+test-results
+playwright-report
+.env*
+!.env.example
+cookies*
+*.cookies

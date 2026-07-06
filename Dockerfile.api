@@ -1,0 +1,43 @@
+# chefclaw prod-mode image: the api serves the built SPA same-origin (no CORS,
+# no token-in-bundle problem — CLAUDE.md stack table). Built by compose.yaml.
+#
+# Stage 1 builds the frontend inside the npm workspace. --ignore-scripts skips
+# the root `prepare` (husky) lifecycle — the husky binary isn't installed by a
+# workspace-filtered ci, and there is no .git in the build context anyway.
+# Stage 2 mirrors backend/Dockerfile (kept for api-only builds) and layers the
+# SPA on top.
+
+FROM node:22-alpine AS webbuild
+WORKDIR /build
+COPY package.json package-lock.json ./
+COPY frontend ./frontend
+RUN npm ci -w frontend --ignore-scripts
+RUN npm run build -w frontend
+
+FROM python:3.13-slim
+COPY --from=ghcr.io/astral-sh/uv:0.11.26 /uv /uvx /bin/
+
+WORKDIR /app
+ENV UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy
+
+COPY backend/pyproject.toml backend/uv.lock ./
+RUN uv sync --frozen --no-dev --no-install-project
+
+COPY backend/src ./src
+COPY backend/alembic.ini ./
+COPY backend/alembic ./alembic
+RUN uv sync --frozen --no-dev
+
+COPY --from=webbuild /build/frontend/dist /app/static
+
+ENV PATH="/app/.venv/bin:$PATH" \
+    CHEFCLAW_HOST=0.0.0.0 \
+    CHEFCLAW_PORT=8000 \
+    CHEFCLAW_STATIC_DIR=/app/static
+
+EXPOSE 8000
+
+# chefclaw.main runs uvicorn with workers=1 — exactly ONE worker process is a
+# hard constraint of the no-broker design (see backend/src/chefclaw/main.py).
+CMD ["python", "-m", "chefclaw.main"]

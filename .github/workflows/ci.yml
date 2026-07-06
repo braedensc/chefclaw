@@ -9,12 +9,13 @@ name: CI
 # can't skip it).
 #
 # PHASED ACTIVATION (merge-then-require, docs/LESSONS.md):
-#   Phase 0 (this file): one job — "Secret scan + forbidden paths" — the only
-#     job that can pass before any app code exists. It carries the kit-CI steps
-#     forward (hook battery, JSON/YAML validation, placeholder regression).
-#   Phase 1 adds: backend (ruff, pytest), frontend (eslint, tsc -b, vitest),
-#     the openapi-ts drift check, and a non-required Playwright smoke — each
-#     flipped to a required context only AFTER it has reported green on main:
+#   Phase 0: "Secret scan + forbidden paths" — carries the kit-CI steps forward
+#     (hook battery, JSON/YAML validation, placeholder regression). The ONLY
+#     required context until the Phase-1 jobs have reported green on main.
+#   Phase 1 (landed with the walking skeleton): Backend (ruff + pytest),
+#     Lint / Typecheck / Test (frontend), OpenAPI drift (both toolchains),
+#     E2E (smoke) — smoke stays NON-required by design (docs/TESTING.md).
+#     Flip each to required only AFTER it has reported green on main:
 #       gh api -X POST repos/<owner>/<repo>/branches/main/protection/required_status_checks/contexts \
 #         -f 'contexts[]=<job name>'
 #
@@ -97,3 +98,150 @@ jobs:
 
       - name: secretlint (scan all tracked files)
         run: git ls-files -z | xargs -0 npx secretlint --secretlintrc .secretlintrc.json
+
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
+
+      - name: Sync dependencies (frozen)
+        run: uv sync --frozen
+
+      - name: ruff
+        run: uv run ruff check .
+
+      - name: pytest (no database — unit tier only; docs/TESTING.md)
+        run: uv run pytest -q
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: ESLint
+        run: npm run lint
+
+      - name: Prettier (check)
+        run: npm run format:check
+
+  typecheck:
+    name: Typecheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: tsc -b
+        run: npm run typecheck
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Unit + component tests (Vitest)
+        run: npm test
+
+  # The end-to-end typed-client contract: the backend's exported openapi.json and
+  # the committed generated client must both be reproducible byte-for-byte. If
+  # either drifts from the code, this fails — regenerate and commit
+  # (`uv run python -m chefclaw.export_openapi openapi.json` in backend/, then
+  # `npm run generate:client -w frontend`).
+  drift:
+    name: OpenAPI drift
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies (both toolchains)
+        run: |
+          npm ci
+          cd backend && uv sync --frozen
+
+      - name: Re-export OpenAPI schema
+        run: cd backend && uv run python -m chefclaw.export_openapi openapi.json
+
+      - name: Regenerate typed client
+        run: npm run generate:client -w frontend
+
+      - name: Committed schema + client must match the code
+        run: git diff --exit-code -- backend/openapi.json frontend/src/client
+
+  # E2E smoke. Deliberately NOT a required check (promote once proven stable) so
+  # a flaky browser run can't wedge main. Boots the built app with DUMMY env —
+  # no database, no secrets (docs/TESTING.md: smoke-in-CI vs golden-local-only).
+  e2e:
+    name: E2E (smoke)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright browser (chromium)
+        run: npx playwright install --with-deps chromium
+
+      - name: Run E2E smoke
+        run: npm run test:e2e

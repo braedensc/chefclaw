@@ -1,8 +1,7 @@
 # Setup
 
-Dev-machine setup for **chefclaw**. Honest scope note: the app code (backend/,
-frontend/, compose.yaml) lands in **Phase 1** — today the repo is the kit's guardrails
-plus docs, and every command in "Works today" actually works.
+Dev-machine setup for **chefclaw**. Every command below works today — the Phase 1
+walking skeleton (backend/, frontend/, compose.yaml) has landed.
 
 ---
 
@@ -14,8 +13,8 @@ plus docs, and every command in "Works today" actually works.
 | git + `gh` | any recent | `gh auth status` must succeed (PRs, CI watching) |
 | Python 3 | ≥ 3.9 | Runs the Claude Code hooks; stdlib only, no pip installs |
 | Node + npm | ≥ 20 (repo pins **22** via `.nvmrc`) | Kit tooling now; Vite app from Phase 1 |
-| Docker Desktop | compose v2 | Needed from Phase 1 (postgres, api, sidecar) |
-| uv | latest | **Not yet installed on this machine** — `brew install uv`; needed from Phase 1 (backend/) |
+| Docker Desktop | compose v2 | postgres + api stack (sidecar from Phase 2) |
+| uv | ≥ 0.11 | `brew install uv` — the backend/ toolchain |
 
 > **Node gotcha:** nvm does **not** apply in non-interactive shells — Claude Code's
 > shell and git hooks get the nvm *default* Node, not your terminal's
@@ -28,12 +27,31 @@ plus docs, and every command in "Works today" actually works.
 
 ```bash
 gh repo clone <owner>/chefclaw && cd chefclaw
-npm install            # installs husky + secretlint; pre-commit hook is now live
+npm install            # installs husky + secretlint + frontend workspace deps
 npm run test:hooks     # hook battery — green means the guardrails are alive
+git config core.hooksPath   # MUST print .husky/_ — if empty, run: npm run prepare
+cd backend && uv sync && cd ..   # backend venv
 ```
+
+> **Verify the pre-commit layer actually wired** (the `git config` line above): on
+> one machine `npm install`'s husky `prepare` silently failed to set
+> `core.hooksPath`, which disables the local secret scan without any error. If it
+> prints nothing, `npm run prepare` fixes it. (Bootstrap PR #1 notes.)
 
 The Claude Code PreToolUse/Stop hooks need no install — they ship in `.claude/` and
 are active from the first session.
+
+**Run the full stack** (prod-mode: the api serves the built SPA same-origin):
+
+```bash
+CHEFCLAW_API_TOKEN=pick-something docker compose up -d --build
+open http://127.0.0.1:8000        # paste the same token into the token gate
+# once .env.local exists, prefer: docker compose --env-file .env.local up -d
+```
+
+**Dev loop** (hot reload): `docker compose up -d postgres migrate` for the DB, then
+`uv run python -m chefclaw.main` in backend/ and `npm run dev` at the root (Vite on
+127.0.0.1:5173, proxying `/api` to the api).
 
 ---
 
@@ -47,8 +65,8 @@ the *local* and *host* store; GitHub Actions secrets is the CI store (currently 
 
 | Var | Needed from | Meaning |
 |---|---|---|
-| `CHEFCLAW_API_TOKEN` | Phase 1 | API bearer token. **Server secret at birth**: never a `VITE_*` var, never in the JS bundle. Entered once in the UI → localStorage. |
-| `DATABASE_URL` | Phase 1 | Postgres connection string (local compose DB). |
+| `CHEFCLAW_API_TOKEN` | Phase 1 | API bearer token. **Server secret at birth**: never a `VITE_*` var, never in the JS bundle. Entered once in the UI → localStorage. Empty ⇒ the api 401s every request with instructions (disabled-closed). |
+| `DB_HOST` / `DB_PORT` / `DB_USER` / `DB_PASSWORD` / `DB_NAME` | Phase 1 | Postgres connection **parts** — the app assembles the URL so no URL-with-password string ever exists in a file. Defaults match the local compose stack. |
 | `GEMINI_API_KEY` | Phase 2 | Extraction model. Free tier is training-eligible → public cooking videos only; paid tier is a precondition for any personal data. |
 | `DASHSCOPE_API_KEY` | Phase 4 | Qwen fallback extractor (config-flagged). |
 | `XHS_COOKIE` / `XHS_USER_AGENT` | Phase 2 | Rednote session cookie + the browser UA it was captured with. **Key-grade secret** — a session credential to a real account. |
@@ -62,19 +80,32 @@ the *local* and *host* store; GitHub Actions secrets is the CI store (currently 
 
 ## Commands
 
-**Works today:**
-
 ```bash
-npm install                                       # husky + secretlint wiring
-npm run test:hooks                                # hook block/allow battery
-npm run lint:secrets                              # secretlint over tracked files
-python3 scripts/check_placeholders.py --bootstrapped  # no {{…}} tokens remain
+# Stack
+docker compose up -d --build              # postgres + migrate + api (SPA at :8000)
+docker compose down                       # containers only — volumes ALWAYS survive
+
+# Backend (in backend/)
+uv run pytest -q                          # unit tier — no DB needed
+uv run ruff check .
+uv run alembic upgrade head               # against the compose DB (parts env)
+uv run python -m chefclaw.export_openapi openapi.json   # regen schema (drift-checked)
+
+# Frontend / workspace root
+npm run dev                               # Vite dev server, /api proxied to :8000
+npm test · npm run lint · npm run format:check · npm run typecheck
+npm run test:e2e                          # Playwright smoke (no DB, dummy env)
+npm run generate:client -w frontend       # regen typed client (drift-checked)
+
+# Kit guardrails
+npm run test:hooks                        # hook block/allow battery
+npm run lint:secrets                      # secretlint over tracked files
+python3 scripts/check_placeholders.py --bootstrapped
 ```
 
-**Lands in Phase 1** (listed so nobody hunts for them; they do not exist yet):
-`docker compose up` (full stack) · `uv sync` / `uv run pytest` / `uv run alembic
-upgrade head` (backend/) · `npm run dev` / `npm test` (frontend/) · typed-client
-regeneration + CI drift check (@hey-api/openapi-ts).
+**Regenerating the API contract:** any backend route/schema change ⇒ re-export
+`openapi.json`, regenerate the client, commit both — the "OpenAPI drift" CI job
+fails otherwise.
 
 ---
 
@@ -99,14 +130,15 @@ is called server-side in the worker, where the browser can't intercept it.
 
 ---
 
-## Local services (compose — lands in Phase 1/2)
+## Local services
 
-| Service | Address | Phase | Notes |
+| Service | Address | Status | Notes |
 |---|---|---|---|
-| postgres | 127.0.0.1:5432 | 1 | Postgres 18; **named volume, irreplaceable data** (see kit inversion) |
-| api | 127.0.0.1:8000 | 1 | FastAPI, **exactly one uvicorn worker** (hard constraint of the no-broker job design); serves the SPA same-origin in prod-mode; media archive on a named volume |
-| web | 127.0.0.1:5173 | 1 | Vite dev server, proxies `/api` to the api |
-| xhs sidecar | **internal network only — no host port** | 2 | Its API is unauthenticated, so it is never published to the host; image pinned to a digest |
+| postgres | 127.0.0.1:5432 | live | Postgres 18; volume `chefclaw_pgdata` — **irreplaceable data** (see kit inversion) |
+| migrate | one-shot | live | `alembic upgrade head`, exits; the api waits for it |
+| api | 127.0.0.1:8000 | live | FastAPI, **exactly one uvicorn worker** (no-broker constraint); serves the built SPA same-origin; volume `chefclaw_media` reserved for the Phase-2 archive |
+| Vite dev server | 127.0.0.1:5173 | host-run (`npm run dev`) | proxies `/api` to the api — same-origin holds in dev |
+| xhs sidecar | **internal network only — no host port** | Phase 2 | Its API is unauthenticated, so it is never published to the host; image pinned to a digest |
 
 All published ports bind to `127.0.0.1` — nothing listens on the LAN.
 
@@ -122,5 +154,7 @@ All published ports bind to `127.0.0.1` — nothing listens on the LAN.
   terminal (docs/SECURITY.md runbook).
 - **Old Node in hooks or scripts** — the nvm non-interactive gotcha above:
   `nvm alias default 22`, or export the absolute Node path (docs/LESSONS.md).
-- **`uv: command not found`** — it isn't installed yet; `brew install uv`
-  (needed from Phase 1, not before).
+- **`uv: command not found`** — `brew install uv`.
+- **api answers 401 to everything** — `CHEFCLAW_API_TOKEN` is unset in the api's
+  environment (disabled-closed by design). Set it inline or via
+  `docker compose --env-file .env.local up`.

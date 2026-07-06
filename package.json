@@ -8,15 +8,25 @@
   },
   "description": "ChefClaw — personal food & health intelligence system: structured bilingual recipe extraction from Bilibili/Rednote cooking videos, with nutrition, meal-planning, and fitness pillars to follow",
   "type": "module",
+  "workspaces": [
+    "frontend"
+  ],
   "scripts": {
     "test:hooks": "python3 .claude/hooks/test_hooks.py",
     "lint:secrets": "git ls-files -z | xargs -0 secretlint --secretlintrc .secretlintrc.json",
-    "prepare": "husky"
+    "prepare": "husky",
+    "dev": "npm run dev -w frontend",
+    "lint": "npm run lint -w frontend",
+    "format:check": "npm run format:check -w frontend",
+    "typecheck": "npm run typecheck -w frontend",
+    "test": "npm run test -w frontend",
+    "test:e2e": "npm run test:e2e -w frontend"
   },
   "devDependencies": {
     "@secretlint/secretlint-rule-pattern": "^13.0.2",
     "@secretlint/secretlint-rule-preset-recommend": "^13.0.2",
     "husky": "^9.1.7",
+    "lint-staged": "^17.0.8",
     "secretlint": "^13.0.2"
   }
 }
