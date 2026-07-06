@@ -71,6 +71,15 @@ its phase or milestone opens, with a design pass over
 
 **Future — explicitly reserved:**
 
+- **Multi-user / commercialization** — turning chefclaw from a personal
+  single-user app into a hosted service (sold or free) is a business + legal
+  shift, not just a technical one (plan §0.1/§1). Assessed but **not decided**:
+  see [docs/MULTI-USER-FEASIBILITY.md](MULTI-USER-FEASIBILITY.md) for the full
+  legality + feasibility audit (the fetch model is the gate — user-upload-only
+  is the cheapest safe path; link-paste-for-others crosses the ToS/
+  redistribution line). This ADR gets written only if/when a hosted path is
+  actually chosen, opening with a counsel session and the change-list in that
+  audit. Until then multi-user stays out of scope (v2 plan V2-D).
 - **Re-extraction semantics** — what happens when a stored recipe's source is
   extracted again (prompt v2, resolution escalation, model swap). Deferred at
   MVP (DELETE is a hard delete; a duplicate paste returns the existing job);
