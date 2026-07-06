@@ -106,6 +106,12 @@ export function recipeSummary(
     tags: [],
     status: 'stored',
     created_at: '2026-07-06T00:00:00Z',
+    // Card projections mirror cannedDocument(); has_cover false = the
+    // gradient-fallback path, so cover tests opt in explicitly.
+    has_cover: false,
+    difficulty: 'medium',
+    total_time_minutes: 75,
+    ingredient_count: 2,
     ...overrides,
   };
 }
@@ -123,6 +129,10 @@ export function recipeDetail(
     tags: [],
     status: 'stored',
     created_at: '2026-07-06T00:00:00Z',
+    has_cover: false,
+    difficulty: 'medium',
+    total_time_minutes: 75,
+    ingredient_count: 2,
     source_url: 'fake://golden-1',
     user_notes: null,
     document: cannedDocument(),

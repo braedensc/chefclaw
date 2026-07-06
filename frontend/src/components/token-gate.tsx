@@ -3,17 +3,18 @@ import type { FormEvent, ReactNode } from 'react';
 
 import { clearToken, getToken, saveToken } from '../token';
 import { TokenContext } from '../token-context';
+import { PuppyChef } from './brand/puppy-chef';
 
 interface TokenGateProps {
   children: ReactNode;
 }
 
 /**
- * Gates the app on the API token: without one in localStorage it shows a
- * centered paste-your-token card; with one it renders its children inside a
- * TokenContext that exposes clearToken (used by the header button and the
- * 401 recovery paths). The token only ever lives in this browser's
- * localStorage.
+ * Gates the app on the API token: without one in localStorage it shows the
+ * first-run night-kitchen welcome (mockup B's "token gate" vignette); with
+ * one it renders its children inside a TokenContext that exposes clearToken
+ * (used by the header button and the 401 recovery paths). The token only
+ * ever lives in this browser's localStorage.
  */
 export function TokenGate({ children }: TokenGateProps) {
   const [token, setTokenState] = useState<string | null>(() => getToken());
@@ -37,36 +38,57 @@ export function TokenGate({ children }: TokenGateProps) {
 
   if (token === null) {
     return (
-      <main className="min-h-screen bg-neutral-950 text-neutral-100">
-        <div className="flex min-h-screen items-center justify-center p-4">
-          <form
-            onSubmit={handleSubmit}
-            className="w-full max-w-sm rounded-xl border border-neutral-800 bg-neutral-900 p-6 shadow-lg"
-          >
-            <h1 className="text-lg font-semibold text-neutral-100">chefclaw</h1>
-            <p className="mt-2 text-sm text-neutral-400">
-              Paste your CHEFCLAW_API_TOKEN — stored only in this browser
-            </p>
-            <label className="sr-only" htmlFor="api-token">
-              API token
-            </label>
-            <input
-              id="api-token"
-              type="password"
-              autoComplete="off"
-              value={draft}
-              onChange={(event) => setDraft(event.target.value)}
-              placeholder="API token"
-              className="mt-4 w-full rounded-md border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-600 focus:border-emerald-500 focus:outline-none"
-            />
-            <button
-              type="submit"
-              className="mt-4 w-full rounded-md bg-emerald-600 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-500"
+      <main className="text-ink flex min-h-screen items-center justify-center p-4">
+        <form
+          onSubmit={handleSubmit}
+          className="rounded-card border-line bg-panel-deep relative w-full max-w-md border px-6 pt-9 pb-6 sm:px-8"
+        >
+          <span className="rounded-chip border-line-bright bg-night text-ink-faint absolute -top-2.5 left-4 border px-2.5 py-0.5 font-display text-[9.5px] font-bold tracking-[0.24em] uppercase">
+            Token gate · first run
+          </span>
+          <PuppyChef
+            variant="hero"
+            animated
+            size={150}
+            className="mx-auto block"
+            label="The chefclaw puppy chef, waving hello"
+          />
+          <h1 className="text-warm glow-text-warm mt-3 text-center font-display text-lg font-extrabold tracking-[0.22em] uppercase">
+            Welcome to the night kitchen{' '}
+            {/* whitespace-nowrap: the ZH greeting must never break mid-phrase */}
+            <span
+              lang="zh"
+              className="text-gold glow-text-gold font-body text-base font-medium tracking-[0.1em] whitespace-nowrap normal-case"
             >
-              Save token
-            </button>
-          </form>
-        </div>
+              · 欢迎光临
+            </span>
+          </h1>
+          <p className="text-ink-dim mt-3 text-center text-sm leading-relaxed">
+            chefclaw watches the cooking video, then writes the dish down
+            properly — bilingual, structured, yours to keep.
+          </p>
+          <label className="sr-only" htmlFor="api-token">
+            API token
+          </label>
+          <input
+            id="api-token"
+            type="password"
+            autoComplete="off"
+            value={draft}
+            onChange={(event) => setDraft(event.target.value)}
+            placeholder="paste token to open the stall"
+            className="rounded-field border-line-bright bg-night text-ink placeholder:text-ink-faint focus:border-gold focus:glow-gold mt-5 h-11 w-full border px-4 font-mono text-sm tracking-[0.12em] focus:outline-none"
+          />
+          <button
+            type="submit"
+            className="rounded-field border-gold/65 bg-gold/10 text-warm glow-gold glow-text-gold hover:bg-gold/20 mt-3 h-11 w-full border font-display text-sm font-bold tracking-[0.16em] uppercase transition-colors"
+          >
+            Save token
+          </button>
+          <p className="text-ink-faint mt-4 text-center text-[11px]">
+            Paste your CHEFCLAW_API_TOKEN — stored only in this browser
+          </p>
+        </form>
       </main>
     );
   }

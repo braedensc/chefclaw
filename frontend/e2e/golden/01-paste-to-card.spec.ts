@@ -37,10 +37,15 @@ test('paste a link, watch the chip to stored, browse the card and detail', async
   await page.getByRole('button', { name: 'Extract' }).click();
 
   // The job chip appears inline with a live (non-terminal) status — the
-  // worker's politeness jitter guarantees a visible active window.
+  // worker's politeness jitter guarantees a visible active window. Chips
+  // speak the cooking-stage vocabulary (src/lib/cooking-stages.ts, V2-E);
+  // the jobs DRAWER keeps the sober statusLabel words (spec 02 asserts
+  // "Stored" there).
   const chip = page.getByRole('status').filter({ hasText: PASTE_URL });
   await expect(chip).toBeVisible();
-  await expect(chip).toContainText(/Queued|Downloading|Extracting|Validating/);
+  await expect(chip).toContainText(
+    /in the queue|fetching the video|reading the recipe|checking the notes/,
+  );
 
   // On stored the chip morphs into the card: card in the grid, chip gone.
   const card = page.getByRole('link', { name: new RegExp(DISH_EN) });

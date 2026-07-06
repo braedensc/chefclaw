@@ -1,6 +1,7 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type { RecipeDetail } from '../client/types.gen';
 import { recipeDetail } from '../test/fixtures';
 import { genState, resetGenState } from '../test/gen-mock';
 import { renderApp } from '../test/render-app';
@@ -45,9 +46,52 @@ describe('RecipeDetailPage', () => {
     expect(
       await screen.findByText(/Skim until the surface foam is gone/),
     ).toBeInTheDocument();
-    expect(screen.getByText('Visual cue:')).toBeInTheDocument();
-    expect(screen.getByText('Technique:')).toBeInTheDocument();
+    expect(screen.getByText('Visual cue')).toBeInTheDocument();
+    expect(screen.getByText('Technique')).toBeInTheDocument();
     expect(screen.getByText(/Duration: 1小时/)).toBeInTheDocument();
+  });
+
+  it('renders the cover hero when the recipe has a cover', async () => {
+    genState.recipesById['r1'] = recipeDetail({ has_cover: true });
+
+    renderApp('/recipes/r1');
+
+    // In jsdom the blob fetch never succeeds, so CoverImage shows its
+    // platform-tinted fallback — role img + the alt name either way.
+    expect(
+      await screen.findByRole('img', { name: /cover photo/ }),
+    ).toBeInTheDocument();
+    // One heading carries both languages; EN-title selectors still match.
+    expect(
+      screen.getByRole('heading', { name: /Red-braised pork belly/ }),
+    ).toBeInTheDocument();
+  });
+
+  it('shows no cover hero when has_cover is false', async () => {
+    genState.recipesById['r1'] = recipeDetail({ has_cover: false });
+
+    renderApp('/recipes/r1');
+
+    await screen.findByRole('heading', { name: /Red-braised pork belly/ });
+    expect(
+      screen.queryByRole('img', { name: /cover photo/ }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows the sleeping pup while the recipe loads', async () => {
+    // A never-settling thenable keeps the detail query pending forever, so
+    // the loading state is stable to assert against.
+    genState.recipesById['r1'] = new Promise<never>(
+      () => undefined,
+    ) as unknown as RecipeDetail;
+
+    renderApp('/recipes/r1');
+
+    expect(await screen.findByText(/plating up/)).toBeInTheDocument();
+    expect(screen.getByText('上菜中')).toBeInTheDocument();
+    expect(
+      document.querySelector('svg[data-variant="sleeping"]'),
+    ).not.toBeNull();
   });
 
   it('opens the raw-JSON drawer with document + extraction_meta', async () => {

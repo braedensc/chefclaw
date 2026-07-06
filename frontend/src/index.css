@@ -1,1 +1,250 @@
+/* chefclaw design system — NEON NIGHT-MARKET (夜市 at midnight).
+   Visual source of truth: planning/design-bakeoff/direction-b-neon-night-market.html
+   (palette, halo treatment, type, surfaces) with direction A's storybook puppy
+   mascot. The discipline: neon lives in box-shadow/text-shadow halos on 1px
+   hairline borders, NEVER flat fills; black space stays generous. */
+
+/* Display face is self-hosted (@fontsource) — CI e2e runs with no network and
+   prod is same-origin, so no CDN/link tags ever. CJK deliberately stays on
+   system fonts: PingFang on Apple devices, Noto Sans CJK elsewhere. */
+@import '@fontsource/barlow-condensed/500.css';
+@import '@fontsource/barlow-condensed/600.css';
+@import '@fontsource/barlow-condensed/700.css';
+
 @import 'tailwindcss';
+
+@theme {
+  /* ---- neon night-market palette ---- */
+  /* "night", not "base": a --color-base token would make Tailwind compile
+     text-base as a COLOR (black text), shadowing the font-size utility. */
+  --color-night: #050505; /* pavement black — page ground */
+  --color-panel: #0b0b0d; /* card / stall front */
+  --color-panel-deep: #08080a; /* recessed panel */
+  --color-line: #1d1d23; /* hairline border */
+  --color-line-bright: #26262c; /* hover / inner hairline */
+  --color-ink: #f2f0ec; /* primary text */
+  --color-ink-dim: #9a9ba6; /* secondary text */
+  --color-ink-faint: #63646e; /* captions, labels */
+  --color-chili: #ff2d55; /* chili neon — primary action */
+  --color-chili-bright: #ff4d6d; /* chili bright — rednote accent */
+  --color-cyan: #35e0ff; /* electric cyan — focus, links, bilibili */
+  --color-gold: #ffd60a; /* signage gold — active jobs, token gate */
+  --color-violet: #b478ff; /* violet wash — background pools only */
+  --color-warm: #ffe9c9; /* warm white — headings, local uploads */
+
+  /* ---- type ---- */
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif;
+  --font-display:
+    'Barlow Condensed', 'Avenir Next Condensed', 'Futura', 'Arial Narrow',
+    'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC',
+    sans-serif;
+  --font-mono:
+    ui-monospace, 'SF Mono', Menlo, Monaco, 'Cascadia Mono', monospace;
+
+  /* ---- surface radii: 10–12px cards/fields, small chips ---- */
+  --radius-card: 12px;
+  --radius-field: 10px;
+  --radius-chip: 6px;
+}
+
+/* Platform hues are aliases of the neon accents (inline: utilities emit the
+   referenced accent var directly). `font-body` = `font-sans`, named for the
+   design spec's display/body/mono triad. */
+@theme inline {
+  --color-platform-bilibili: var(--color-cyan);
+  --color-platform-rednote: var(--color-chili-bright);
+  --color-platform-local: var(--color-warm);
+  --font-body: var(--font-sans);
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  body {
+    min-height: 100vh;
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    /* pavement reflections: faint cyan / chili / violet pools on black */
+    background:
+      radial-gradient(
+        900px 480px at 86% -8%,
+        color-mix(in srgb, var(--color-cyan) 7%, transparent),
+        transparent 62%
+      ),
+      radial-gradient(
+        760px 460px at 6% -6%,
+        color-mix(in srgb, var(--color-chili) 8%, transparent),
+        transparent 60%
+      ),
+      radial-gradient(
+        1100px 640px at 50% 110%,
+        color-mix(in srgb, var(--color-violet) 6%, transparent),
+        transparent 62%
+      ),
+      var(--color-night);
+  }
+
+  ::selection {
+    background-color: color-mix(in srgb, var(--color-cyan) 30%, transparent);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-cyan);
+    outline-offset: 2px;
+  }
+}
+
+/* ---- neon halo utilities ----
+   Pair with a hairline border in the same accent (e.g. `border
+   border-chili/60 glow-chili`) — the shadow is the halo, the border is the
+   tube. glow-* = box-shadow (panels, buttons), glow-text-* = text-shadow
+   (signage type), glow-drop-* = drop-shadow (SVG marks). */
+
+@utility glow-chili {
+  box-shadow:
+    0 0 18px -2px color-mix(in srgb, var(--color-chili) 45%, transparent),
+    inset 0 0 16px color-mix(in srgb, var(--color-chili) 12%, transparent);
+}
+@utility glow-cyan {
+  box-shadow:
+    0 0 18px -2px color-mix(in srgb, var(--color-cyan) 45%, transparent),
+    inset 0 0 16px color-mix(in srgb, var(--color-cyan) 12%, transparent);
+}
+@utility glow-gold {
+  box-shadow:
+    0 0 18px -2px color-mix(in srgb, var(--color-gold) 45%, transparent),
+    inset 0 0 16px color-mix(in srgb, var(--color-gold) 12%, transparent);
+}
+@utility glow-warm {
+  box-shadow:
+    0 0 18px -2px color-mix(in srgb, var(--color-warm) 40%, transparent),
+    inset 0 0 16px color-mix(in srgb, var(--color-warm) 10%, transparent);
+}
+@utility glow-violet {
+  box-shadow:
+    0 0 18px -2px color-mix(in srgb, var(--color-violet) 45%, transparent),
+    inset 0 0 16px color-mix(in srgb, var(--color-violet) 12%, transparent);
+}
+
+@utility glow-text-chili {
+  text-shadow:
+    0 0 9px color-mix(in srgb, var(--color-chili) 90%, transparent),
+    0 0 22px color-mix(in srgb, var(--color-chili) 50%, transparent);
+}
+@utility glow-text-cyan {
+  text-shadow:
+    0 0 9px color-mix(in srgb, var(--color-cyan) 90%, transparent),
+    0 0 22px color-mix(in srgb, var(--color-cyan) 50%, transparent);
+}
+@utility glow-text-gold {
+  text-shadow:
+    0 0 9px color-mix(in srgb, var(--color-gold) 90%, transparent),
+    0 0 22px color-mix(in srgb, var(--color-gold) 50%, transparent);
+}
+@utility glow-text-warm {
+  text-shadow: 0 0 14px color-mix(in srgb, var(--color-warm) 40%, transparent);
+}
+
+@utility glow-drop-chili {
+  filter: drop-shadow(
+    0 0 6px color-mix(in srgb, var(--color-chili) 50%, transparent)
+  );
+}
+@utility glow-drop-cyan {
+  filter: drop-shadow(
+    0 0 6px color-mix(in srgb, var(--color-cyan) 50%, transparent)
+  );
+}
+@utility glow-drop-gold {
+  filter: drop-shadow(
+    0 0 6px color-mix(in srgb, var(--color-gold) 50%, transparent)
+  );
+}
+@utility glow-drop-warm {
+  filter: drop-shadow(
+    0 0 6px color-mix(in srgb, var(--color-warm) 45%, transparent)
+  );
+}
+
+/* ---- motion ----
+   Every animation the design system defines rides behind reduced-motion;
+   with it enabled these classes are inert and the art renders static. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes pup-bob {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-7px);
+    }
+  }
+  @keyframes pup-wave {
+    0%,
+    100% {
+      transform: rotate(0deg);
+    }
+    50% {
+      transform: rotate(7deg);
+    }
+  }
+  @keyframes steam-rise {
+    0% {
+      transform: translateY(5px);
+      opacity: 0;
+    }
+    35% {
+      opacity: 0.75;
+    }
+    100% {
+      transform: translateY(-11px);
+      opacity: 0;
+    }
+  }
+  /* classic neon flicker — the sign browns out twice a loop */
+  @keyframes neon-flicker {
+    0%,
+    5.5%,
+    7%,
+    43%,
+    45.5%,
+    47%,
+    100% {
+      opacity: 1;
+    }
+    6% {
+      opacity: 0.35;
+    }
+    44.5% {
+      opacity: 0.55;
+    }
+    46.2% {
+      opacity: 0.85;
+    }
+  }
+
+  .pup-bob {
+    animation: pup-bob 3.6s ease-in-out infinite;
+  }
+  /* callers set transform-origin (the pose's shoulder point) inline */
+  .pup-wave {
+    animation: pup-wave 3.6s ease-in-out infinite;
+  }
+  .steam-wisp {
+    animation: steam-rise 2.8s ease-in-out infinite;
+  }
+  .steam-wisp-2 {
+    animation-delay: 0.9s;
+  }
+  .steam-wisp-3 {
+    animation-delay: 1.8s;
+  }
+  .neon-flicker {
+    animation: neon-flicker 7s linear infinite;
+  }
+}
