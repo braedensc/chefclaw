@@ -36,6 +36,8 @@ _EXTRACT_RESPONSES = {
     502: {"model": ErrorBody},
     503: {"model": ErrorBody},
 }
+# /upload can additionally 413 (over MAX_UPLOAD_MB) — the size cap.
+_UPLOAD_RESPONSES = {**_EXTRACT_RESPONSES, 413: {"model": ErrorBody}}
 
 
 @router.post(
@@ -66,7 +68,7 @@ async def extract_recipe(
     "/upload",
     status_code=202,
     response_model=JobOut,
-    responses=_EXTRACT_RESPONSES,
+    responses=_UPLOAD_RESPONSES,
 )
 async def upload_recipe_video(
     response: Response,
@@ -86,9 +88,20 @@ async def upload_recipe_video(
     incoming_dir.mkdir(parents=True, exist_ok=True)
     suffix = Path(file.filename or "upload.bin").suffix
     tmp_path = incoming_dir / f"{uuid.uuid4().hex}{suffix}"
+    # Backstop to the pre-parse middleware cap: a client that omitted
+    # Content-Length (chunked) slips past the middleware, so bound the bytes we
+    # actually write here — the pipeline must never receive an over-cap file.
+    max_upload_bytes = settings.max_upload_mb * 1024 * 1024
+    written = 0
     try:
         with tmp_path.open("wb") as out:
             while chunk := await file.read(_UPLOAD_CHUNK_BYTES):
+                written += len(chunk)
+                if written > max_upload_bytes:
+                    raise errors.UploadTooLargeError(
+                        f"upload exceeds the {settings.max_upload_mb} MB limit "
+                        "(MAX_UPLOAD_MB) — save a shorter or lower-resolution clip"
+                    )
                 out.write(chunk)
         job, existing = await jobs_service.enqueue_upload(
             store,

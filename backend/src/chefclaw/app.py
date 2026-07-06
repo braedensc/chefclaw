@@ -12,10 +12,11 @@ import uuid
 from contextlib import asynccontextmanager
 from datetime import UTC, date, datetime
 from pathlib import Path
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal
 
 import httpx
 from fastapi import APIRouter, Depends, FastAPI, Request
+from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -251,9 +252,73 @@ async def _lifespan(app: FastAPI):
             await task
 
 
+_UPLOAD_PATH = "/api/recipes/upload"
+
+
+class UploadSizeLimitMiddleware:
+    """Reject an oversized tier-2 upload with a typed 413 BEFORE the body is
+    read (security residual, V2-A/D). This MUST be middleware, not a route
+    dependency: FastAPI parses (and Starlette spools to disk) the multipart
+    body *before* dependencies run, so a dependency-level check would fire
+    only after the disk was already filled. The cap lives on ``app.state`` so
+    tests can dial it down without rebuilding the app.
+
+    Content-Length covers every real browser/mobile upload (they all send it);
+    a client that omits it (chunked) slips past here and is bounded instead by
+    the handler's streaming guard, which caps the bytes the pipeline actually
+    receives. Fully closing the chunked case (an ASGI receive-counter) is a
+    V2-D audit item — the residual is a token-holder using a custom client on
+    a Tailscale-gated, single-user box.
+    """
+
+    def __init__(self, app: object) -> None:
+        self.app = app
+
+    async def __call__(self, scope: Any, receive: Any, send: Any) -> None:
+        if (
+            scope["type"] == "http"
+            and scope.get("method") == "POST"
+            and scope.get("path") == _UPLOAD_PATH
+        ):
+            max_bytes = getattr(scope["app"].state, "max_upload_bytes", None)
+            if max_bytes is not None:
+                declared = _content_length(scope)
+                if declared is not None and declared > max_bytes:
+                    mb = max_bytes / (1024 * 1024)
+                    response = JSONResponse(
+                        status_code=413,
+                        content={
+                            "error_type": "upload_too_large",
+                            "detail": (
+                                f"upload exceeds the {mb:.0f} MB limit (MAX_UPLOAD_MB) — "
+                                "save a shorter or lower-resolution clip"
+                            ),
+                        },
+                    )
+                    await response(scope, receive, send)
+                    return
+        await self.app(scope, receive, send)
+
+
+def _content_length(scope: Any) -> int | None:
+    for key, value in scope["headers"]:
+        if key == b"content-length":
+            try:
+                return int(value)
+            except ValueError:
+                return None
+    return None
+
+
 def create_app() -> FastAPI:
     """Build the application: API routes, then the SPA mount (prod mode)."""
     app = FastAPI(title="chefclaw", version="0.1.0", lifespan=_lifespan)
+    # Enforced cap for the tier-2 upload endpoint; the middleware reads it off
+    # app.state so tests can lower it without a rebuild.
+    app.state.max_upload_bytes = get_settings().max_upload_mb * 1024 * 1024
+    # Order matters (last added = outermost): the upload cap is added first so
+    # it sits INSIDE the request log — a rejected 413 upload still gets logged.
+    app.add_middleware(UploadSizeLimitMiddleware)
     # Structured request log for /api/* (method/path/status/latency/owner —
     # never query strings, headers, or bodies). Logging + Sentry themselves
     # are configured at the PROCESS entrypoint (main.py), not here — the app

@@ -173,6 +173,51 @@ async def test_upload_202_then_rehash_200(tmp_path: Path) -> None:
     assert second.json()["id"] == body["id"]
 
 
+async def test_upload_413_when_content_length_exceeds_cap(tmp_path: Path) -> None:
+    """The middleware rejects an over-cap upload via Content-Length BEFORE the
+    body is parsed — so the handler never runs and nothing is spooled to our
+    incoming dir (an unbounded upload endpoint could otherwise fill the disk)."""
+    store = FakeJobStore()
+    settings = Settings(chefclaw_api_token=TEST_TOKEN, scratch_dir=str(tmp_path))
+    app = build_app(store, settings=settings)
+    app.state.max_upload_bytes = 100  # tiny cap; the multipart body far exceeds it
+    async with client_for(app) as client:
+        resp = await client.post(
+            "/api/recipes/upload",
+            files={"file": ("big.mp4", b"x" * 500, "video/mp4")},
+            headers=bearer(TEST_TOKEN),
+        )
+    assert resp.status_code == 413
+    body = resp.json()
+    assert body["error_type"] == "upload_too_large"
+    assert "MAX_UPLOAD_MB" in body["detail"]
+    # Rejected pre-parse: the handler never created its incoming dir.
+    assert not (tmp_path / "chefclaw-uploads" / "incoming").exists()
+
+
+async def test_upload_streaming_guard_rejects_over_settings_cap(tmp_path: Path) -> None:
+    """Backstop for a Content-Length-less (chunked) upload: the middleware
+    passes (body < the default app-state cap), and the handler's streaming
+    guard bounds the bytes it writes to MAX_UPLOAD_MB, aborting with a typed
+    413 and cleaning up the partial file."""
+    store = FakeJobStore()
+    settings = Settings(
+        chefclaw_api_token=TEST_TOKEN, scratch_dir=str(tmp_path), max_upload_mb=1
+    )
+    app = build_app(store, settings=settings)  # app.state cap stays the 500 MB default
+    over_cap = b"x" * (1024 * 1024 + 2048)  # > 1 MB, the settings cap
+    async with client_for(app) as client:
+        resp = await client.post(
+            "/api/recipes/upload",
+            files={"file": ("big.mp4", over_cap, "video/mp4")},
+            headers=bearer(TEST_TOKEN),
+        )
+    assert resp.status_code == 413
+    assert resp.json()["error_type"] == "upload_too_large"
+    incoming = tmp_path / "chefclaw-uploads" / "incoming"
+    assert not incoming.exists() or not any(incoming.iterdir())
+
+
 # ─── GET /api/jobs/{id} ──────────────────────────────────────────────────────
 
 
