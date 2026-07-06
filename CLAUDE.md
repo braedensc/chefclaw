@@ -1,145 +1,283 @@
 # CLAUDE.md
 
-Guidance for Claude Code when working in **this repository — the claude-project-kit
-template itself.** Claude Code auto-loads this file every session, so it's where a
-session learns the rules without a human pasting them.
-
-> **Two audiences, two files:**
-> - **This `CLAUDE.md`** applies when you're *maintaining the kit* (editing hooks,
->   docs, workflow templates).
-> - **`docs/CLAUDE-template.md`** is the fill-in template that *becomes a new
->   project's* `CLAUDE.md` at bootstrap — it replaces this file. If you're in a fresh
->   copy of this template starting a real project, **run `BOOTSTRAP-PROMPT.md` first**;
->   don't follow this file.
+This file provides guidance to Claude Code when working with code in this repository.
 
 ---
 
-## What this is
+## What This Is
 
-A GitHub **template repo** that ships a Claude Code hook suite, git-level secret
-scanning, CI, deploy/backup/keepalive workflow templates, and process docs — distilled
-from a production build (see `README.md`). The kit **self-hosts its own hooks**: the
-guardrails below are live in this repo and guarded your predecessors' work from PR #1.
+**chefclaw** — a personal food & health intelligence web app. Single user today,
+designed deploy-ready and never assuming forever-single-user (`users` table +
+`owner_id` on every user-owned row from migration #1; auth behind a swappable
+dependency). MVP: paste a Bilibili or Rednote cooking-video link → async pipeline
+(yt-dlp / XHS-Downloader sidecar → Gemini video extraction → Pydantic validation) →
+structured bilingual recipe (Chinese originals preserved) in a browsable library;
+a multi-dish video yields multiple related recipes. The one-line invariant that must
+always hold: **never fabricate food data** (Hard Rule 7 below). Public repo,
+AGPL-3.0-or-later.
 
-**Stack** (the kit is infrastructure, not an app): Python 3 hooks (`.claude/hooks/`),
-POSIX `sh` git hooks (`.husky/`), GitHub Actions (`.github/workflows/` + inert
-`templates/workflows/`), skills (`.claude/skills/`), a devcontainer, a project-MCP
-example (`.mcp.json.example`), Markdown docs, and a tiny `package.json`.
-
----
-
-## The guardrails you're working under (know these — they're enforced, not advisory)
-
-The PreToolUse hook (`.claude/hooks/pre-tool-use.py`) **blocks** these in real time;
-the model cannot bypass them. A block is the system working — **branch/fix and retry,
-never work around it.** Full reference: `.claude/hooks/README.md`.
-
-- **Branch guard** — no `Edit`/`Write`/`git commit` on `main`/`master`. Branch first:
-  `git checkout -b <type>/<short-kebab-desc>` (type ∈ feat|fix|chore|refactor|docs).
-- **Branch-naming guard** — the branch must match `<type>/<short-kebab-desc>`. Rename
-  an auto-generated `claude/<codename>` worktree branch before working
-  (`git branch -m <type>/<desc>`).
-- **Cross-worktree guard** — no `Edit`/`Write` into a *different* worktree than your
-  session (it would land silently past the branch guard). Prefer `git -C <dir>` over a
-  persisted `cd`.
-- **Merged-PR guard** — no `git commit`/`git push` on a branch whose PR already merged
-  (the commit would be stranded). Branch fresh off updated `main`.
-- **Never-merge guard** — **`gh pr merge` (including `--auto`) is blocked. Merging is
-  the human's action only.** Open the PR (`gh pr create`) and stop. Never enable
-  auto-merge. (Even *mentioning* `gh pr merge` in a shell command — e.g. a grep
-  pattern — trips it; that's expected.)
-- **Self-protection** — **you cannot edit the hook scripts (`pre-tool-use.py`,
-  `audit.py`, `stop-pr-check.py`) or `.claude/settings.json`.** Edit/Write and Bash
-  mutations (`>`, `sed -i`, `cp`/`mv`/`rm`, `git checkout/restore`, inline `-c`/`-e`)
-  of them are blocked; reads are fine. **To change one: write the new version to a
-  scratch file, validate it, then hand the human a terminal command to apply it**
-  (e.g. a small `--write` patch script). This is by design — a guard you can edit is
-  theater. Compose + validate *before* the change lands, since the running hook
-  forbids editing itself and a syntax error fails closed. (docs/LESSONS.md.)
-- **Secrets / destructive ops** — no reading/writing `.env*`/`*.pem`/`*.key`, no
-  embedding secret values, no `rm -rf`, no `curl|sh`, no push to `main`, no bare
-  `--force`. Stack-specific remote-DB guards are fenced in the hook.
-
-**Stop hook** (`.claude/hooks/stop-pr-check.py`) blocks *ending a turn* on a pushed
-branch that has **no PR**, a PR with **failing CI**, or a **DIRTY** (conflict) PR. So:
-open the PR, then watch CI to green (`gh pr checks <n> --watch`) before calling a task
-done. A DIRTY PR is *not* green — GitHub skips the required CI, so side checks alone can
-look passing; rebase, resolve, force-push.
-
-Two non-enforcing complements: `.claude/settings.json` also carries native
-`permissions.deny` rules that hard-block reads of secret files independently of the
-Python hook (deny wins even under `bypassPermissions`); and
-`.claude/hooks/session-start.py` is an *advisory* SessionStart hook that injects repo
-orientation at startup — deliberately **not** self-protected, since it informs rather
-than blocks.
+**Reference material** (under `planning/`, gitignored — read it to port logic, never
+commit it): `planning/chefclaw-plan.md` — the full build plan (vision, data model,
+phases, security/cost posture, grocery-pillar appendix). It contains personal details;
+nothing personal from it is ever copied into committed files.
 
 ---
 
-## Conventions
+## Stack
 
-- **Commits:** conventional (`feat:`/`fix:`/`chore:`/`refactor:`/`docs:`). Write
-  messages to a file and use `git commit -F` / `gh pr create --body-file` (also dodges
-  the hook's prose scanners).
-- **PRs:** scannable in under a minute — 2–3 sentence what/why, one-line bullets, one
-  verification line, depth in `<details>`, ≤ ~150 visible words. After committing on a
-  feature branch, push and open the PR without asking. **Then stop — you never merge.**
-- **Docs are right-sized:** fix any doc a change makes stale in the same PR; don't
-  expand proactively. New ADR (`docs/adr/YYYY-MM-DD-slug.md`, no numbers) only for a
-  decision that changes the kit's shape, a guard, or the security model.
-- **Every hook/workflow edit updates the battery + docs in lockstep:** add a
-  `test_hooks.py` case for any guard you change, and keep
-  `docs/COLLABORATION.md`'s enforcement section + `.claude/hooks/README.md` in sync.
-- **On a hard environment block, explain the fix and HALT** — no sandbox-disabling,
-  shims, or symlink hacks.
+| Layer | Technology |
+|---|---|
+| Frontend | Vite 8 + React 19 + TypeScript (strict) SPA — served same-origin by the api in prod; Vite proxy in dev |
+| Server state | TanStack Query v5; typed client generated by @hey-api/openapi-ts (drift-checked in CI from Phase 1) |
+| UI state | TanStack Router v1; `useState`/context — no Redux, ever |
+| Styling | Tailwind CSS (major pinned at scaffold) |
+| Backend | Python 3.13 + uv, FastAPI, Pydantic v2, SQLAlchemy 2.0 async + Alembic |
+| Database | PostgreSQL 18 (Docker, native `uuidv7()`) |
+| Jobs | In-process asyncio worker; `jobs` table claimed via `FOR UPDATE SKIP LOCKED` — no broker |
+| Hosting | Local `docker compose`, all ports on 127.0.0.1; deploy is a committed post-MVP milestone (Tailscale first) |
+| AI | Gemini 2.5 Flash video extraction (thinking disabled), DashScope/Qwen fallback — called server-side in the worker only, never from the frontend |
+| Testing | pytest + httpx `ASGITransport`; Vitest 4 + Testing Library; Playwright CI smoke (boots-and-renders, dummy env, **no database**); golden paste-to-card suite is **LOCAL ONLY** with fake adapters |
+
+Layout: **npm workspaces** — root `package.json` is kit tooling + workspace root;
+`frontend/` (Vite app) and `backend/` (uv project) land in Phase 1.
 
 ---
 
 ## Commands
 
+> Keep this real: every command here must work today. Node version is pinned in
+> `.nvmrc` — run `nvm use` first if your shell defaults elsewhere.
+
 ```bash
-npm run test:hooks      # the block/allow battery (must stay green; also runs in CI)
-npm run lint:secrets    # secretlint over all tracked files
-python3 scripts/check_placeholders.py   # {{…}} tokens used == documented in PLACEHOLDERS.md
-npm install             # installs husky + secretlint, wires the pre-commit hook
+npm install                                        # husky + secretlint, wires pre-commit
+npm run test:hooks                                 # hook block/allow battery (must stay green)
+npm run lint:secrets                               # secretlint over all tracked files
+python3 scripts/check_placeholders.py --bootstrapped  # no stray {{…}} tokens
 ```
 
-CI (`.github/workflows/ci.yml`, job **Kit checks**) runs the battery, JSON/YAML
-validation, the forbidden-paths gate, placeholder integrity, and secretlint on every
-PR. `main` is protected (that context required, admins enforced).
+**Lands in Phase 1** (listed so no one invents variants — none of these work yet):
+`docker compose up --watch` (postgres + api + web + xhs sidecar) · `npm run dev`
+(frontend workspace) · `uv run pytest` / `uv run ruff check` (in `backend/`) ·
+`uv run alembic upgrade head` · typed-client generation + CI drift check.
+
+**Skills** (`.claude/skills/<name>/SKILL.md`, invoked `/name`): the kit ships `/ship`
+(commit → push → PR → watch CI → stop) and `/new-adr`. Add project-specific ones for
+repeatable rituals. Reserve `disable-model-invocation: true` (user-only) for the
+genuinely *irreversible or expensive* — a real deploy, anything that spends money;
+routine git rituals like `/ship` are fine for Claude to run, since the hooks still
+bound them. Bundled skills already exist (`/code-review`, `/security-review`, `/debug`,
+`/run`, `/verify`) — don't reinvent them.
+
+**Cost & memory:** delegate search/read to `model: haiku` subagents; keep the main
+model for judgment. `CLAUDE.md` is *authored* rules (loaded every session); the
+machine-local `MEMORY.md` auto-memory is Claude-*discovered* learnings — don't conflate.
 
 ---
 
-## Skills
+## Architecture
 
-Custom `/`-commands live in `.claude/skills/<name>/SKILL.md` (the current form —
-commands were folded into skills in 2026; `.claude/commands/*.md` still works as
-legacy).
+```
+.claude/            hooks (PreToolUse guardrails, Stop PR check), settings, skills
+.github/workflows/  CI — secret scan + forbidden paths today; app jobs land with Phase 1
+.husky/             pre-commit: secretlint
+docs/               SETUP, SERVICES, SECURITY, COLLABORATION, TESTING, LESSONS,
+                    ARCHITECTURE (the ADR index) + adr/ (one file per decision)
+planning/           gitignored reference material — never staged, never committed
+scripts/            check_placeholders.py today; backup.sh lands in Phase 4
+backend/            (Phase 1) uv project — FastAPI transport, framework-free services,
+                    adapters (SourceAdapter/ExtractorAdapter), asyncio worker, Alembic
+frontend/           (Phase 1) Vite + React SPA — generated typed client, TanStack
+compose.yaml        (Phase 1) postgres + api + web + xhs sidecar (internal network only)
+.env.example        the env contract, placeholder values only (humans create .env.local)
+package.json        npm workspace root: kit tooling (husky, secretlint) + workspace scripts
+```
 
-- **`/ship <summary>`** — the kit's ship ritual: commit (`-F`) → push → PR
-  (`--body-file`) → watch CI → **stop** (never merges). You can invoke it, and Claude
-  may run it when a task is done — it does nothing Claude can't already do (merging
-  stays blocked), so it just packages the routine reliably.
-- **`/new-adr <slug>`** — scaffolds a dated ADR + index row.
-
-Before reinventing, note the bundled skills Claude Code already ships: `/code-review`,
-`/security-review`, `/debug`, `/run`, `/verify`, `/loop`.
-
-## Cost & memory
-
-- **Delegate cheaply:** fan search/read work to subagents with `model: haiku` (or set
-  `CLAUDE_CODE_SUBAGENT_MODEL`); reserve the main model for judgment. Verify model
-  IDs/pricing against live docs before asserting (they move faster than any cutoff).
-- **Two memory layers, don't conflate them:** `CLAUDE.md` (this file) is *authored*
-  rules loaded every session; `~/.claude/projects/<proj>/memory/MEMORY.md` is
-  Claude-*discovered* learnings, machine-local and gitignored. Write durable
-  conventions here; let auto-memory hold session-to-session findings.
+Layering rule: all logic lives in a framework-free Python service layer; FastAPI
+routers are a thin transport (MCP and mobile are later clients of the same REST API);
+everything external sits behind a small, documented adapter interface.
 
 ---
 
-## Where the depth lives
+## Conventions
 
-`docs/SECURITY.md` (3-layer model, secrets stores, self-protection, runbooks) ·
-`docs/COLLABORATION.md` (branch/worktree/parallel-session protocol + the enforcement
-list) · `docs/TESTING.md` · `docs/LESSONS.md` (every gotcha, incl. the self-protection
-build-before-lock lesson) · `docs/STACK-RATIONALE.md` · `.claude/hooks/README.md` ·
-`docs/adr/` (why the kit is shaped as it is).
+**Types:** strict mode everywhere. Pydantic validation at every boundary (API in/out,
+extractor output, job payloads); the inferred/generated type IS the type — one source
+of truth (`openapi.json` → generated TS client, never hand-written).
+
+**Files:** small and focused. Logic lives in pure service/lib modules; components stay
+presentational. Three similar files beat a premature abstraction.
+
+**Naming:** backend PEP 8 `snake_case`; frontend kebab-case filenames, PascalCase
+components, camelCase variables.
+
+**Commits:** conventional commits — `feat:`, `fix:`, `chore:`, `refactor:`, `docs:`.
+No direct commits to `main`; all work via feature branches + PR. CI must pass before
+merge. Write messages to a file and use `git commit -F` / `gh pr create --body-file`.
+
+**PRs:** bodies scannable in under a minute — 2–3 plain sentences of what/why, one-line
+bullets for changes, one verification line. Everything deeper goes in a `<details>`
+block, never the visible body. Target ≤ ~150 visible words. After committing on a
+feature branch, push and open the PR without asking.
+
+**Working agreements (every session):** explain any tool or service the owner may not
+know in a few plain sentences (what + why) before adopting it. Flag any security risk
+and any recurring cost BEFORE incurring it; default to free tiers. When a project
+surfaces a transferable lesson or security improvement, PR it back to the template
+repo this project was bootstrapped from (its URL + commit are recorded in the
+bootstrap PR).
+
+**Docs lifecycle (docs-as-scaffolding, then right-sized):**
+- **Bootstrap phase:** heavy discipline on purpose — an ADR per significant PR,
+  SETUP/SERVICES kept current, co-located READMEs. The docs let cold sessions (and
+  future-you) reconstruct the system while it's being built.
+- **Post-launch:** dial it down — a new ADR only for a decision that changes
+  architecture, a security boundary, or an external service. Fix any doc a change makes
+  **stale** in the same PR, but don't expand docs proactively.
+
+---
+
+## Branch Workflow (do this automatically — never wait to be told)
+
+Full workflow, worktrees, and team conventions: `docs/COLLABORATION.md`.
+
+**At the start of any new task — before your first `Edit`/`Write` — check the branch
+and create one if needed:**
+
+```bash
+git rev-parse --abbrev-ref HEAD          # what branch am I on?
+git checkout main && git pull --ff-only  # start from latest (skip if offline/no remote)
+git checkout -b <type>/<short-kebab-desc>
+```
+
+- **Branch name:** `<type>/<short-kebab-desc>`, type ∈ `feat | fix | chore | refactor | docs`.
+  A hook *enforces* this — rename an auto-generated `claude/<codename>` worktree branch
+  before working (`git branch -m <type>/<desc>`).
+- **One task = one branch = one PR.** Small and short-lived.
+- **The hooks enforce this:** `Edit`/`Write`/`git commit` are *blocked* on `main` or a
+  mis-named branch; writes into a *different worktree* are blocked; so are
+  `git commit`/`git push` on a branch whose PR already **merged**, and `gh pr merge` in
+  any form. A block isn't a bug — branch fresh (or fix the path) and retry; never work
+  around it.
+- **Ordered/generated files are serialized** (Alembic migrations, the generated TS
+  client): pull latest main immediately before generating one; never two generating
+  branches in parallel.
+- **Open a PR when the task is done** (`gh pr create`) — and stop there. **Merging is
+  the human's action only: never run `gh pr merge` (including `--auto`), never enable
+  auto-merge.** Opening the PR is the end of Claude's involvement.
+- **Watch CI to green before considering the task done:** `gh pr checks <n> --watch`.
+  On a red check: read the failing job's log, fix, push, re-watch — never hand back a
+  red PR. Local checks passing is necessary, not sufficient; the PR's CI status is
+  the source of truth. **A `DIRTY` (conflicted) PR is not green** — GitHub skips the
+  required CI entirely, so only side checks report; rebase, resolve, force-push. (A
+  Stop hook also blocks ending a turn with no PR, a failing check, or a DIRTY PR.)
+- **Before a follow-up commit to an open PR, confirm it's still open**
+  (`gh pr view <n> --json state`) — a commit pushed to a merged PR's branch is
+  silently orphaned. If merged, branch fresh off updated `main`. (Also enforced by
+  the merged-PR hook guard.)
+
+---
+
+## Hard Rules
+
+These apply every session without exception:
+
+1. **`planning/` is reference, never published.** It is gitignored. Never stage,
+   commit, or push anything from it. Reading it to port logic is expected; copying its
+   files is not. Reference material: `planning/chefclaw-plan.md`. Nothing personal
+   from it (stores, address, spend, health data) ever lands in a committed file —
+   this repo is public.
+
+2. **Secrets are never output.** Never echo, log, comment, or paste the value of any
+   API key, token, password, or private key. Reference by name only
+   (e.g. `settings.GEMINI_API_KEY`). Platform cookies (`XHS_COOKIE`, `BILIBILI_COOKIE`)
+   are session credentials to real accounts — treat them as key-grade secrets.
+
+3. **No secret values in code.** If a secret value appears in any file about to be
+   committed, block and flag it. Only `.env.example` (placeholder values) is committed.
+   Claude never writes `.env*` files at all (hook-enforced) — the human creates
+   `.env.local`.
+
+4. **Admin/server keys are server-only.** `GEMINI_API_KEY`, `DASHSCOPE_API_KEY`,
+   `XHS_COOKIE`, and `CHEFCLAW_API_TOKEN` must never appear in any frontend file or
+   client bundle — never as a `VITE_*` var (that would compile it into public JS).
+   The API token is a server secret at birth; the SPA receives it once via the UI,
+   not the build.
+
+5. **No direct or force push to `main`.** All changes via PR. CI is the unbypassable
+   gate.
+
+6. **On a hard environment block, explain the fix and HALT.** If every path is blocked
+   (broken hook, permission wall, dead auth), surface what's wrong + the exact fix
+   command and wait — no sandbox-disabling, shim files, symlink hacks, or other clever
+   workarounds. A deadlock is a signal, not a challenge.
+
+7. **Never fabricate food data.** Quantities are captured verbatim from the source
+   ("两大勺", "适量", "200g" only if stated) — the extractor never estimates weights
+   from visuals. Estimated or derived values (added later by the nutrition pillar)
+   live in separate, explicitly-flagged fields and never overwrite raw captures.
+
+---
+
+## Security Model (three independent layers)
+
+1. **Claude Code hooks** (`PreToolUse`) — guard real-time tool calls; the model cannot
+   bypass these, and cannot edit them: the hook scripts + `settings.json` are
+   self-protected (human-only — changes come as a terminal command you run).
+2. **Git pre-commit hooks** (Husky + secretlint) — guard commit contents locally
+   (bypassable with `--no-verify`, caught by CI).
+3. **CI + branch protection** — the unbypassable gate on every PR.
+
+Plus, free on this public repo: GitHub secret scanning + push protection + Dependabot.
+Secrets stores for this self-hosted compose app: `.env.local` (local **and** host —
+human-created, hook-blocked for Claude) and GitHub Actions secrets (CI — currently
+none needed). Full model, stores, runbooks: `docs/SECURITY.md`.
+
+At the data layer: `owner_id` on every user-owned row from migration #1. The recipe
+`document` JSONB is **never user-editable** — only `tags` and `user_notes` are
+(PATCH-able); Pydantic validation at every boundary.
+
+---
+
+## Key Design Decisions
+
+Living, load-bearing constraints — do not re-derive these differently:
+
+- **Exactly ONE uvicorn worker process** for the api, and the in-process job worker
+  executes jobs **strictly serially** — both are hard constraints of the no-broker
+  design, not tuning knobs.
+- **Dedupe on canonical identity, not raw URL:** `SourceAdapter` resolves
+  `platform` + native id (BV id + part, note id); `UNIQUE(platform, canonical_id,
+  dish_index)` in migration #1. The raw pasted URL is kept as provenance only. The
+  canonical-id dedupe check gates the paid model call, after resolution.
+- **`POST /api/recipes/extract` always returns the JOB resource** — 202 (new) or 200
+  (existing active-or-completed job); `result_recipe_ids` carries the recipes. It
+  never returns a recipe body.
+- **Auth from the first slice:** bearer `CHEFCLAW_API_TOKEN` behind a swappable
+  FastAPI dependency; the SPA token flow (entered once in the UI → localStorage →
+  `Authorization` header) lands in Phase 1. **`/api/health` is not publicly exempt.**
+- **Multi-dish stores atomically:** the N-recipe insert and the job's status flip to
+  `stored` happen in ONE database transaction.
+- **`DELETE /api/recipes/{id}` is a hard delete for MVP.** `recipes.status` values are
+  enumerated at Phase 1. Re-extraction semantics are deferred to a named future ADR —
+  it must not fall through the cracks.
+- **Media retention lives on a NAMED volume** (compose); scratch space is ephemeral.
+  The PreToolUse hook guards **both** irreplaceable volumes (DB + media) against
+  destruction.
+- **KIT INVERSION — the local Docker DB holds irreplaceable production data** (the kit
+  default assumes local = disposable). pytest and the golden suite run against a
+  **separate test database/compose project**, never the real one; localhost SQL stays
+  frictionless for Alembic; volume-destroying commands (`down -v`, `volume rm`,
+  `volume prune`, `system prune --volumes`, `compose rm -v`) are hook-blocked.
+- **Budget guardrails fail closed:** `MONTHLY_LLM_BUDGET_USD` /
+  `MAX_EXTRACTION_ATTEMPTS_PER_DAY` unset or unparseable ⇒ NO paid calls, surfaced as
+  a typed config error. The `llm_spend` ledger is written per model attempt
+  **including failures**; budget + daily-cap check runs before EVERY paid call.
+- **npm-workspaces layout:** root `package.json` = kit tooling + workspace root;
+  `frontend/` and `backend/` are the workspaces (Phase 1).
+- **ToS posture, stated plainly:** automated downloading violates the platforms' ToS.
+  This is personal use — single-user volume, built-in delays, no redistribution. The
+  XHS sidecar sits on the internal compose network only (no published host port; its
+  API is unauthenticated) and is pinned to an image digest.
+
+Full decision log with rationale: `docs/ARCHITECTURE.md` (index) + `docs/adr/`
+(one file per decision — see `docs/adr/README.md` for the convention).

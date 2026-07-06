@@ -1,118 +1,92 @@
-# claude-project-kit
+# chefclaw
 
-[![Kit checks](https://github.com/braedensc/claude-project-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/braedensc/claude-project-kit/actions/workflows/ci.yml)
+[![CI](https://github.com/braedensc/chefclaw/actions/workflows/ci.yml/badge.svg)](https://github.com/braedensc/chefclaw/actions/workflows/ci.yml)
 
-**Claude Code is at its best with permission prompts off — and that's dangerous.**
-This template makes it safe: a GitHub template repo that starts your project with a
-tested hook suite that hard-blocks the failure modes (secret reads, pushes to `main`,
-self-merged PRs, edits to the guards themselves), git-level secret scanning, CI gates,
-ready-to-adapt deploy/backup workflows, and the process docs that keep multi-session
-agentic development coherent.
+**Status: pre-MVP, bootstrap stage** — repo scaffolding and guardrails only; no app
+code yet. Built with Claude Code from the
+[claude-project-kit](https://github.com/braedensc/claude-project-kit) template.
 
-Everything here is **distilled, not invented** — generalized from
-[todoclaw](https://github.com/braedensc/todoclaw), a production app built with Claude
-Code in a 10-day staged build, plus its retrospective. Every generalized file carries
-a provenance header saying where it came from and what was verified in production.
-(Headers cite todoclaw-internal artifacts — `ADR-00xx`, PR numbers, `SERVICES.md` —
-as provenance breadcrumbs; they aren't links into *this* repo.) MIT licensed.
+## What it is
 
-## Prerequisites
+chefclaw is a single-user, self-hosted **food & health intelligence** web app. The
+MVP loop: paste a Bilibili or Rednote (Xiaohongshu) cooking-video link → an async
+pipeline downloads the video, extracts a structured recipe with a multimodal LLM
+(Gemini 2.5 Flash), validates it, and files it into a browsable bilingual library —
+ingredients, steps, visual cues, and tips, with the original Chinese preserved
+alongside English. A video demonstrating several dishes yields several related
+recipes.
 
-| Tool | Version | Why |
-|---|---|---|
-| macOS or Linux | POSIX shell | Hooks are `python3` + `sh`. **Windows: not supported natively — use WSL2** |
-| git + [GitHub CLI](https://cli.github.com) (`gh`), authenticated | recent | The workflow guards (merged-PR, Stop-hook PR checks) query GitHub via `gh` and fail open without it |
-| Python 3 | 3.9+ on `PATH` as `python3` | Every hook + the self-check scripts |
-| Node.js | ≥ 20 (see `.nvmrc`) + npm | husky + secretlint (layer 2), regardless of your app's stack |
+One product invariant governs everything: **food data is never fabricated.**
+Quantities are captured verbatim from the source ("两大勺", "适量") — never estimated
+from visuals. Derived or estimated values, when later pillars add them, live in
+separate, explicitly-flagged fields and never overwrite raw captures.
 
-## Quickstart
+The recipe library is pillar 1 of a four-pillar vision; the later pillars plug into
+the substrate it creates (schema seams and adapter interfaces exist from day one,
+speculative code does not):
 
-1. **Use this template** (button above) → create your repo → clone it.
-   (CLI: `gh repo create <name> --template braedensc/claude-project-kit --clone`)
-2. Open a fresh **Claude Code** session in the clone — the hooks are already active.
-3. Paste the prompt from **[BOOTSTRAP-PROMPT.md](BOOTSTRAP-PROMPT.md)**. It interviews
-   you for stack choices, adapts every stack-specific file, fills every placeholder
-   ([PLACEHOLDERS.md](PLACEHOLDERS.md)), deletes what doesn't apply, and runs the
-   kit's self-checks. You keep the human-only steps (secrets, dashboards, branch
-   protection).
+| # | Pillar | Job | Status |
+|---|--------|-----|--------|
+| 1 | **Recipe** | Bilibili/Rednote video → structured bilingual recipe library | **MVP — building now** |
+| 2 | Diet / Nutrition | Macros & micros per recipe; balance across days and past meals | Later — seams left |
+| 3 | Meal planning + Grocery | Weekly plan from library + goals; shopping lists; store optimization | Later — seams left |
+| 4 | Fitness | Ingest training data; recipe-vs-current-targets feedback (the loop-closer) | Later — seams left |
 
-**What you'll see on first open** (all expected — none of it is broken):
+Single user today, but designed deploy-ready: `owner_id` on every user-owned row
+from migration #1, auth behind a swappable dependency, and the API — not the UI —
+as the product (MCP and mobile become later clients of the same REST surface).
 
-- A one-time **workspace trust** dialog, and a **Bypass Permissions warning** —
-  the kit ships `defaultMode: bypassPermissions` *because* the hooks hard-block the
-  dangerous operations in every mode. Uncomfortable anyway? Flip it to `acceptEdits`
-  in `.claude/settings.local.json` — every guard still enforces.
-- A short **orientation line** injected at session start (branch, PR, dirty tree) —
-  that's the SessionStart hook.
-- Occasional **hook blocks** (e.g. editing on `main`) — that's the system working;
-  branch and retry, exactly as the block message says.
-- A growing `.claude/audit.log` (gitignored) — the local record of every command.
+## Stack
 
-## What's inside
+| Layer | Choice |
+|-------|--------|
+| Backend | Python 3.13 + uv · FastAPI · Pydantic v2 · SQLAlchemy 2.0 async + Alembic |
+| Database | PostgreSQL 18 (Docker, native `uuidv7()`) |
+| Jobs | In-process asyncio worker over a `jobs` table (`FOR UPDATE SKIP LOCKED`) — no broker; API pinned to one uvicorn worker, jobs run strictly serially |
+| Frontend | Vite 8 + React 19 + TypeScript strict SPA (served same-origin by the API in prod) · TanStack Query v5 + Router v1 · Tailwind |
+| API client | Generated by @hey-api/openapi-ts; drift-checked in CI |
+| Extraction | yt-dlp (Bilibili) · XHS-Downloader sidecar (Rednote, internal network only) · Gemini 2.5 Flash video extraction, thinking disabled, fail-closed budget guardrails |
+| Testing | pytest + httpx ASGITransport · Vitest 4 + Testing Library · Playwright CI smoke (no DB); golden paste-to-card suite runs local-only |
+
+## Repo layout
 
 | Path | What it is |
-|---|---|
-| `.claude/` | Settings (hooks wiring + native `permissions.deny`) + the PreToolUse/PostToolUse/Stop hook suite + advisory SessionStart hook + `test_hooks.py` (the block/allow battery, runs in CI) — [hooks/README.md](.claude/hooks/README.md) |
-| `.claude/skills/` | `/ship` (commit → push → PR → watch CI → stop) and `/new-adr` custom slash-commands |
-| `.husky/` + `.secretlintrc.json` | Layer-2 pre-commit: branch block, forbidden paths, worktree-aware secretlint |
-| `.github/workflows/ci.yml` | The kit's own CI (battery, JSON/YAML validation, forbidden paths, secretlint, placeholder integrity) |
-| `.github/pull_request_template.md` | The concise-PR format (≤ ~150 visible words, depth in `<details>`) |
-| `templates/workflows/` | **Inert** app-project workflows — CI, deploy-on-green, backup-cron, keepalive, `@claude` Action — activated by `git mv` at bootstrap ([templates/README.md](templates/README.md)) |
-| `.devcontainer/` | Minimal Claude-Code devcontainer + hardening/firewall notes for sandboxed autonomous runs |
-| `.mcp.json.example` | Project-scoped MCP config example (`${VAR}` secrets only) |
-| `docs/SECURITY.md` | The layered security model, secrets stores, runbooks |
-| `docs/TESTING.md` | The pyramid as built: smoke-in-CI vs DB-backed-golden-local-only + the harness blueprint |
-| `docs/COLLABORATION.md` | Branch workflow, worktrees, the parallel-session protocol |
-| `docs/STACK-RATIONALE.md` | Every stack choice, tagged TRANSFERABLE vs STACK-SPECIFIC |
-| `docs/LESSONS.md` | The gotcha catalog — every entry cost a failed run or a deadlock |
-| `docs/adr/` | Date+slug ADR convention (no numbers — collision-proof) + the kit's own ADRs |
-| `CLAUDE.md` | The kit's own auto-loaded context (guardrails + conventions) — a worked example; bootstrap replaces it with your project's |
-| `docs/CLAUDE-template.md` | Fill-in `CLAUDE.md` for the new project (Hard Rules verbatim) |
-| `BOOTSTRAP-PROMPT.md` / `PLACEHOLDERS.md` | The adaptation UX + the complete `{{…}}` token inventory |
-| `scripts/check_placeholders.py` | CI-enforced: tokens used == tokens documented (`--bootstrapped`: zero remain) |
+|------|-----------|
+| `.claude/` | Claude Code hook suite (guardrails, self-protected) + settings + skills |
+| `.husky/` + `.secretlintrc.json` | Pre-commit secret scanning and forbidden-path checks |
+| `.github/workflows/` | CI (hook battery, secret scan, forbidden paths, validation) |
+| `docs/` | Security model, collaboration protocol, testing strategy, ADRs |
+| `scripts/` | Kit self-checks (placeholder integrity); backup script lands in Phase 4 |
+| `backend/`, `frontend/` | uv project and Vite app — land in Phase 1 (npm workspaces) |
 
-## How stack-specific is it?
+Build order: Phase 1 walking skeleton → Phase 2 extraction pipeline → Phase 3
+library UI → Phase 4 hardening (encrypted scheduled backups, health surface) →
+deploy as a committed post-MVP milestone.
 
-The worked example is a JS full-stack app, but the core is stack-agnostic — **one repo
-serves any workflow** (web, CLI, mobile, data); bootstrap adapts or deletes the
-coupled parts rather than you forking variants:
+## Personal use & ToS
 
-| Layer | Coupling |
-|---|---|
-| `.claude/` hooks, skills, settings, battery | **Universal** (python3 + git + gh; the Supabase DB guards are a clearly-fenced example section) |
-| docs: COLLABORATION, LESSONS, SECURITY, adr convention | **Universal** |
-| `.husky/` + secretlint (+ `package.json`) | Node-based tooling — kept even in non-Node projects (it only guards commits), or swap to lefthook/pre-commit + gitleaks |
-| `templates/workflows/*` | Worked examples (npm / Supabase / Vercel) — **adapt or delete at bootstrap**; the gating skeletons transfer |
-| docs: TESTING, STACK-RATIONALE | Flavored examples of universal patterns — keep the shape, swap the tools |
+Plainly: automated downloading of videos violates Bilibili's and Xiaohongshu's terms
+of service. This project's posture is **strictly personal use** — a single user,
+low volume with built-in delays, anonymous access where quality permits, and **no
+redistribution** of extracted content. Original-language data is preserved and every
+recipe keeps attribution and a link to its source. Platform cookies are session
+credentials to real accounts and are treated as key-grade secrets: never committed,
+guarded by every layer of the repo's secret-scanning stack. The repo ships code, not
+credentials.
 
-## Philosophy
+## License
 
-- **Walking skeleton first, local-first, ship-last.** Prove the thinnest end-to-end
-  slice (repo → CI → deploy) before widening it with features; develop against a free,
-  disposable local stack; production changes only through reviewed, gated pipelines.
-- **Defense in depth — three independent layers.** Claude Code hooks (the model can't
-  bypass), git pre-commit hooks (fast local mirror), CI + branch protection (the
-  unbypassable gate). See [docs/SECURITY.md](docs/SECURITY.md).
-- **Bypass is earned by hooks.** `settings.json` ships
-  `permissions.defaultMode: bypassPermissions` *only because* the hook suite
-  hard-blocks the dangerous operations in every mode. The two ship together or not at
-  all.
-- **Docs as scaffolding, then right-sized.** Heavy ADR/docs discipline while building
-  (cold sessions reconstruct the system from written context), dialed down explicitly
-  at launch. Written context is how isolated agent sessions coordinate.
-- **Guards match operations, not prose — and get tested.** Every guard is verified by
-  a 90+-case block/allow battery that runs in CI forever; edit a hook, add a case.
+**AGPL-3.0-or-later** (see [LICENSE](LICENSE)). Files derived from the
+claude-project-kit template remain under their original MIT license; that
+attribution is preserved in [NOTICE](NOTICE).
 
-## Keep the kit living
+## Docs
 
-Bootstrapped a project and learned something transferable — a guard, a gotcha, a
-better template? **PRs welcome** ([CONTRIBUTING.md](CONTRIBUTING.md)). `main` is the
-only supported version; bootstrap records the kit commit you started from.
-
-## The kit protects itself
-
-This repo runs its own medicine: the hooks guarded the kit's construction from PR #1
-(the branch guard forced PR-flow from the first commit), the battery + secretlint run
-on every PR, `main` is protected by the same merge-then-require sequence the docs
-teach — and the hooks are self-protected, so not even the agent that built them can
-edit them. See [docs/adr/](docs/adr/).
+- [`docs/SETUP.md`](docs/SETUP.md) — dev-machine setup: what works today vs.
+  what lands with Phase 1
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — architecture rules + ADR
+  index (adapter contracts land with Phase 2)
+- [`docs/SERVICES.md`](docs/SERVICES.md) — external services, keys, and
+  provisioning
+- [`docs/SECURITY.md`](docs/SECURITY.md) — the layered security model, secrets
+  stores, and runbooks

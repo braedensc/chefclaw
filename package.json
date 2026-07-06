@@ -1,12 +1,12 @@
 {
-  "name": "claude-project-kit",
-  "version": "1.0.0",
+  "name": "chefclaw",
+  "version": "0.1.0",
   "private": true,
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "engines": {
     "node": ">=20"
   },
-  "description": "Full-stack project template: Claude Code hook suite, CI/CD patterns, 3-layer security model, process docs — distilled from a production build",
+  "description": "ChefClaw — personal food & health intelligence system: structured bilingual recipe extraction from Bilibili/Rednote cooking videos, with nutrition, meal-planning, and fitness pillars to follow",
   "type": "module",
   "scripts": {
     "test:hooks": "python3 .claude/hooks/test_hooks.py",
@@ -14,6 +14,7 @@
     "prepare": "husky"
   },
   "devDependencies": {
+    "@secretlint/secretlint-rule-pattern": "^13.0.2",
     "@secretlint/secretlint-rule-preset-recommend": "^13.0.2",
     "husky": "^9.1.7",
     "secretlint": "^13.0.2"
