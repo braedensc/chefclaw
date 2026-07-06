@@ -65,6 +65,10 @@ npm test · npm run lint · npm run format:check · npm run typecheck
 npm run test:e2e                       # Playwright smoke — dummy env, NO database
 npm run generate:client -w frontend    # after re-exporting openapi.json; commit both
 
+# Golden suite (LOCAL ONLY — its own isolated stack: tmpfs DB, fake adapters)
+docker compose -f compose.golden.yaml up -d --build   # project chefclaw-golden, :8100
+npm run test:golden                    # paste→card end-to-end; then plain `down`
+
 # Kit guardrails
 npm run test:hooks                     # hook block/allow battery (must stay green)
 npm run lint:secrets                   # secretlint over all tracked files

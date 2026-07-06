@@ -141,6 +141,11 @@ class FakeJobStore:
             return None
         return job
 
+    async def list_jobs(self, owner_id: uuid.UUID, limit: int = 20) -> list[Job]:
+        mine = [job for job in self.jobs.values() if job.owner_id == owner_id]
+        mine.sort(key=lambda job: job.updated_at, reverse=True)
+        return mine[:limit]
+
     async def claim_next_job(self) -> Job | None:
         pending = [job for job in self.jobs.values() if job.status == "pending"]
         if not pending:

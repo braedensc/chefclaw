@@ -97,6 +97,12 @@ npm test · npm run lint · npm run format:check · npm run typecheck
 npm run test:e2e                          # Playwright smoke (no DB, dummy env)
 npm run generate:client -w frontend       # regen typed client (drift-checked)
 
+# Golden suite (LOCAL ONLY): its own compose stack — tmpfs DB, fake adapters,
+# project chefclaw-golden on 127.0.0.1:8100/55433 — never the real one.
+docker compose -f compose.golden.yaml up -d --build
+npm run test:golden
+docker compose -f compose.golden.yaml down   # plain down — it has no volumes
+
 # Kit guardrails
 npm run test:hooks                        # hook block/allow battery
 npm run lint:secrets                      # secretlint over tracked files

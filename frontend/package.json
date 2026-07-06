@@ -13,6 +13,7 @@
     "typecheck": "tsc -b",
     "test": "vitest run",
     "test:e2e": "playwright test --config e2e/playwright.smoke.config.ts",
+    "test:golden": "playwright test --config e2e/playwright.golden.config.ts",
     "generate:client": "openapi-ts"
   },
   "dependencies": {

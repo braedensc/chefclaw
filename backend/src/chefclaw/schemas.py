@@ -14,7 +14,7 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 __all__ = [
     "ErrorBody",
@@ -51,8 +51,36 @@ class JobOut(BaseModel):
     error_type: str | None
     error_detail: str | None
     result_recipe_ids: list[uuid.UUID]
+    # The user's originally pasted URL (payload provenance). The UI's retry
+    # affordance re-POSTs it: a failed job is never ACTIVE for dedupe, so the
+    # re-POST creates a fresh job (jobs ADR).
+    url: str | None = None
     created_at: datetime
     updated_at: datetime
+
+    @model_validator(mode="before")
+    @classmethod
+    def _lift_url_from_payload(cls, data: Any) -> Any:
+        """ORM ``Job`` → dict of the contract fields, with ``url`` lifted out
+        of the internal ``payload`` JSON (the payload itself never leaves the
+        API). Dicts pass through untouched."""
+        if isinstance(data, dict) or not hasattr(data, "payload"):
+            return data
+        payload = data.payload or {}
+        return {
+            "id": data.id,
+            "type": data.type,
+            "status": data.status,
+            "platform": data.platform,
+            "canonical_id": data.canonical_id,
+            "attempts": data.attempts,
+            "error_type": data.error_type,
+            "error_detail": data.error_detail,
+            "result_recipe_ids": data.result_recipe_ids,
+            "url": payload.get("url"),
+            "created_at": data.created_at,
+            "updated_at": data.updated_at,
+        }
 
 
 class RecipeSummary(BaseModel):

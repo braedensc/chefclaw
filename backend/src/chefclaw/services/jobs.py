@@ -72,7 +72,30 @@ Sleeper = Callable[[float], Awaitable[None]]
 
 def default_source_adapters(settings: Settings) -> list[SourceAdapter]:
     """The URL-matched platform adapters (LocalFileSource is upload-only and
-    deliberately never registered — see sources/__init__.py)."""
+    deliberately never registered — see sources/__init__.py).
+
+    ``CHEFCLAW_SOURCES=fake`` (the golden-suite stack, plan §16.9) swaps in
+    the canned FakeSource. Its platform is a REAL enum value ("bilibili")
+    because document SourceInfo validation rejects a stored dish whose
+    provenance platform isn't one. Any other unknown value is a typed
+    ConfigError — a typo must never silently pick the real platform adapters
+    (fail-closed, §16.8 pattern).
+    """
+    if settings.chefclaw_sources == "fake":
+        from chefclaw.sources.fake import FakeSource
+
+        return [
+            FakeSource(
+                platform="bilibili",
+                canonical_id="fake-golden-1",
+                match_prefixes=("fake://",),
+            )
+        ]
+    if settings.chefclaw_sources != "real":
+        raise errors.ConfigError(
+            f"Unknown CHEFCLAW_SOURCES value {settings.chefclaw_sources!r} — "
+            "expected 'real' or 'fake'."
+        )
     from chefclaw.sources.bilibili import BilibiliSource
     from chefclaw.sources.rednote import RednoteSource
 

@@ -10,6 +10,9 @@ const frontendRoot = fileURLToPath(new URL('..', import.meta.url));
 // lands in Phase 3; it does not live here.
 export default defineConfig({
   testDir: e2eDir,
+  // The DB-backed golden suite lives in e2e/golden with its OWN config
+  // (playwright.golden.config.ts) — CI must structurally never run it.
+  testIgnore: ['**/golden/**'],
   timeout: 30_000,
   fullyParallel: true,
   reporter: 'list',

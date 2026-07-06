@@ -45,6 +45,10 @@ class Settings(BaseSettings):
     gemini_media_resolution: str = "low"  # escalate only if overlay text is missed
 
     # ── Sources (Phase 2) ───────────────────────────────────────────────────
+    # Source-adapter selection (plan §16.9 golden-suite split): "real" registers
+    # the platform adapters; "fake" swaps in the canned FakeSource so the golden
+    # stack never touches a platform. Unknown values fail closed (ConfigError).
+    chefclaw_sources: str = "real"
     # Rednote access is TIERED (plan §16.10): guest (no cookie) is the default;
     # a hard-isolated throwaway cookie is tier 1; the main account NEVER.
     xhs_sidecar_url: str = ""  # in compose: http://xhs:<port>; empty = source disabled
