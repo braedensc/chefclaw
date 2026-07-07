@@ -2,7 +2,7 @@ import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { RecipeDetail } from '../client/types.gen';
-import { recipeDetail } from '../test/fixtures';
+import { healthResponse, recipeDetail } from '../test/fixtures';
 import { genState, resetGenState } from '../test/gen-mock';
 import { renderApp } from '../test/render-app';
 
@@ -74,6 +74,8 @@ describe('RecipeDetailPage', () => {
 
   it('enqueues a cover job from the Regenerate illustration control', async () => {
     genState.recipesById['r1'] = recipeDetail({ id: 'r1', has_image: true });
+    // The illustration control only shows in an illustration cover mode.
+    genState.health = healthResponse({ cover_mode: 'gemini' });
     genState.regenerateIllustration.mockResolvedValue({});
 
     renderApp('/recipes/r1');
@@ -92,12 +94,25 @@ describe('RecipeDetailPage', () => {
 
   it('labels the cover control Generate when the recipe has no image yet', async () => {
     genState.recipesById['r1'] = recipeDetail({ id: 'r1', has_image: false });
+    genState.health = healthResponse({ cover_mode: 'gemini' });
 
     renderApp('/recipes/r1');
 
     expect(
       await screen.findByRole('button', { name: 'Generate illustration' }),
     ).toBeInTheDocument();
+  });
+
+  it('hides the illustration control in the default sprite cover mode', async () => {
+    genState.recipesById['r1'] = recipeDetail({ id: 'r1', has_image: true });
+    // Default health cover_mode is 'sprite' — there is no illustration to
+    // (re)generate, so the legacy control must not appear.
+    renderApp('/recipes/r1');
+
+    await screen.findByRole('heading', { name: /Red-braised pork belly/ });
+    expect(
+      screen.queryByRole('button', { name: /illustration/ }),
+    ).not.toBeInTheDocument();
   });
 
   it('shows no illustration hero when has_image is false', async () => {

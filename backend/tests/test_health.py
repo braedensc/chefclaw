@@ -38,6 +38,7 @@ async def test_health_200_full_shape(client: AsyncClient, ping_ok: None) -> None
         "backup_finished_at": None,
         "extractor": "fake",  # the conftest Settings default
         "model": "fake-extractor",
+        "cover_mode": "sprite",  # V2-F default cover mode
         "spend_month_usd": None,
         # V2-A: caps are null (conftest Settings leave the budget pair unset —
         # fail-closed), the ledger reads are stubbed to None, no lifespan ran
