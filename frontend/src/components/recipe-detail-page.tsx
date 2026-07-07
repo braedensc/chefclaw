@@ -135,7 +135,7 @@ export function RecipeDetailPage() {
 function SectionHeading({ en, zh }: { en: string; zh?: string }) {
   return (
     <h2 className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
-      <span className="font-display text-[15px] font-bold tracking-[0.22em] text-warm uppercase glow-text-warm">
+      <span className="font-display text-[16px] font-extrabold tracking-[0.22em] text-warm uppercase glow-text-warm">
         {en}
       </span>
       {zh != null && (

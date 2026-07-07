@@ -41,13 +41,13 @@ export function SettingsPage() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="text-warm glow-text-warm font-display text-xl font-extrabold tracking-[0.24em] uppercase">
+      <h1 className="text-warm glow-text-warm font-display text-[22px] font-extrabold tracking-[0.24em] uppercase">
         Settings
       </h1>
       <p className="text-ink-faint mt-1 font-display text-[10px] font-semibold tracking-[0.3em] uppercase">
         <span
           lang="zh"
-          className="text-gold/60 font-body font-medium tracking-[0.22em]"
+          className="font-body font-medium tracking-[0.22em] text-[#8a7a58]"
         >
           后厨状态
         </span>{' '}

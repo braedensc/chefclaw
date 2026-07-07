@@ -33,12 +33,12 @@ describe('PuppyChef', () => {
     expect(moving.querySelector('.neon-flicker')).not.toBeNull();
   });
 
-  it('renders the simplified mark variant square', () => {
+  it('renders the mark variant as the full pup (224:200 aspect)', () => {
     const { container } = render(<PuppyChef variant="mark" size={32} />);
     const svg = container.querySelector('svg');
     expect(svg).toHaveAttribute('data-variant', 'mark');
     expect(svg).toHaveAttribute('width', '32');
-    expect(svg).toHaveAttribute('height', '32');
+    expect(svg).toHaveAttribute('height', String((32 * 200) / 224));
   });
 
   it('renders the sleeping variant', () => {

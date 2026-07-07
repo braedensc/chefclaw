@@ -84,7 +84,7 @@ export function RecipeCard({
             <>
               <h3
                 lang="zh"
-                className={`text-[22px] leading-tight font-semibold tracking-[0.04em] text-white ${accent.titleGlow}`}
+                className={`text-[23px] leading-tight font-semibold tracking-[0.04em] text-white ${accent.titleGlow}`}
               >
                 {zhTitle}
               </h3>
