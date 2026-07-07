@@ -127,8 +127,8 @@ class FakeJobStore:
         owner_id: uuid.UUID,
         job_type: str,
         payload: dict[str, Any],
-        platform: str,
-        canonical_id: str,
+        platform: str | None,
+        canonical_id: str | None,
     ) -> Job:
         return self.seed_job(
             owner_id=owner_id,
@@ -137,6 +137,34 @@ class FakeJobStore:
             platform=platform,
             canonical_id=canonical_id,
         )
+
+    async def find_active_illustration_job(self, recipe_id: uuid.UUID) -> Job | None:
+        candidates = [
+            job
+            for job in self.jobs.values()
+            if job.type == "illustration"
+            and job.status in ("pending", "illustrating")
+            and str(recipe_id) in (job.payload.get("recipe_ids") or [])
+        ]
+        return min(candidates, key=lambda job: job.created_at) if candidates else None
+
+    async def load_recipes_for_illustration(
+        self, job_id: uuid.UUID, recipe_ids: list[uuid.UUID]
+    ) -> list[RecipeImageRef]:
+        wanted = {str(rid) for rid in recipe_ids}
+        rows = [recipe for recipe in self.recipes if str(recipe.id) in wanted]
+        return [
+            RecipeImageRef(
+                recipe.id,
+                recipe.owner_id,
+                job_id,
+                recipe.platform,
+                recipe.canonical_id,
+                recipe.dish_index,
+                recipe.document,
+            )
+            for recipe in sorted(rows, key=lambda r: r.dish_index)
+        ]
 
     async def get_job(self, job_id: uuid.UUID, owner_id: uuid.UUID) -> Job | None:
         job = self.jobs.get(job_id)

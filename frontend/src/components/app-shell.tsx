@@ -21,7 +21,20 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen text-ink">
-      <header className="sticky top-0 z-20 border-b border-line bg-night/95 backdrop-blur">
+      <header className="relative sticky top-0 z-20 border-b border-line bg-night/95 backdrop-blur">
+        {/* always-on neon underglow along the header's bottom edge — a small
+            persistent lit element so the storefront reads as "open" even with
+            no active job; fades to transparent at the corners like a tube. */}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-px opacity-50"
+          style={{
+            background:
+              'linear-gradient(90deg, transparent, color-mix(in srgb, var(--color-cyan) 50%, transparent) 30%, color-mix(in srgb, var(--color-chili) 42%, transparent) 70%, transparent)',
+            boxShadow:
+              '0 1px 12px color-mix(in srgb, var(--color-cyan) 22%, transparent)',
+          }}
+        />
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-2 px-4 sm:gap-4">
           {/* aria-label keeps the home link's accessible name a stable
               "chefclaw" — the visible wordmark uppercases via CSS. */}
@@ -39,6 +52,17 @@ export function AppShell({ children }: { children: ReactNode }) {
               <span className="font-display text-[21px] leading-none font-extrabold tracking-[0.17em] uppercase sm:text-[26px]">
                 <span className="text-warm glow-text-warm">chef</span>
                 <span className="text-chili-bright glow-text-chili">claw</span>
+                {/* the storefront's "open" pip — a small always-lit sign so the
+                    header reads as live even at rest (decorative, not a jobs
+                    badge). */}
+                <span
+                  aria-hidden="true"
+                  className="ml-1.5 inline-block h-[7px] w-[7px] rounded-full bg-gold align-middle"
+                  style={{
+                    boxShadow:
+                      '0 0 8px 1px color-mix(in srgb, var(--color-gold) 80%, transparent)',
+                  }}
+                />
               </span>
               <span className="text-ink-faint hidden font-display text-[9.5px] leading-none font-semibold tracking-[0.34em] uppercase sm:block">
                 <span

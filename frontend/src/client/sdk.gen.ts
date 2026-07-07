@@ -2,7 +2,7 @@
 
 import { type Client, type ClientMeta, formDataBodySerializer, type Options as Options2, type RequestResult, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { DeleteRecipeApiRecipesRecipeIdDeleteData, DeleteRecipeApiRecipesRecipeIdDeleteErrors, DeleteRecipeApiRecipesRecipeIdDeleteResponses, ExtractRecipeApiRecipesExtractPostData, ExtractRecipeApiRecipesExtractPostErrors, ExtractRecipeApiRecipesExtractPostResponses, GetJobApiJobsJobIdGetData, GetJobApiJobsJobIdGetErrors, GetJobApiJobsJobIdGetResponses, GetRecipeApiRecipesRecipeIdGetData, GetRecipeApiRecipesRecipeIdGetErrors, GetRecipeApiRecipesRecipeIdGetResponses, GetRecipeImageApiRecipesRecipeIdImageGetData, GetRecipeImageApiRecipesRecipeIdImageGetErrors, GetRecipeImageApiRecipesRecipeIdImageGetResponses, GetSpendApiSpendGetData, GetSpendApiSpendGetErrors, GetSpendApiSpendGetResponses, HealthApiHealthGetData, HealthApiHealthGetResponses, ListJobsApiJobsGetData, ListJobsApiJobsGetErrors, ListJobsApiJobsGetResponses, ListRecipesApiRecipesGetData, ListRecipesApiRecipesGetErrors, ListRecipesApiRecipesGetResponses, PatchRecipeApiRecipesRecipeIdPatchData, PatchRecipeApiRecipesRecipeIdPatchErrors, PatchRecipeApiRecipesRecipeIdPatchResponses, UploadRecipeVideoApiRecipesUploadPostData, UploadRecipeVideoApiRecipesUploadPostErrors, UploadRecipeVideoApiRecipesUploadPostResponses } from './types.gen';
+import type { DeleteRecipeApiRecipesRecipeIdDeleteData, DeleteRecipeApiRecipesRecipeIdDeleteErrors, DeleteRecipeApiRecipesRecipeIdDeleteResponses, ExtractRecipeApiRecipesExtractPostData, ExtractRecipeApiRecipesExtractPostErrors, ExtractRecipeApiRecipesExtractPostResponses, GetJobApiJobsJobIdGetData, GetJobApiJobsJobIdGetErrors, GetJobApiJobsJobIdGetResponses, GetRecipeApiRecipesRecipeIdGetData, GetRecipeApiRecipesRecipeIdGetErrors, GetRecipeApiRecipesRecipeIdGetResponses, GetRecipeImageApiRecipesRecipeIdImageGetData, GetRecipeImageApiRecipesRecipeIdImageGetErrors, GetRecipeImageApiRecipesRecipeIdImageGetResponses, GetSpendApiSpendGetData, GetSpendApiSpendGetErrors, GetSpendApiSpendGetResponses, HealthApiHealthGetData, HealthApiHealthGetResponses, ListJobsApiJobsGetData, ListJobsApiJobsGetErrors, ListJobsApiJobsGetResponses, ListRecipesApiRecipesGetData, ListRecipesApiRecipesGetErrors, ListRecipesApiRecipesGetResponses, PatchRecipeApiRecipesRecipeIdPatchData, PatchRecipeApiRecipesRecipeIdPatchErrors, PatchRecipeApiRecipesRecipeIdPatchResponses, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostData, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostErrors, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostResponses, UploadRecipeVideoApiRecipesUploadPostData, UploadRecipeVideoApiRecipesUploadPostErrors, UploadRecipeVideoApiRecipesUploadPostResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -119,6 +119,22 @@ export const patchRecipeApiRecipesRecipeIdPatch = <ThrowOnError extends boolean 
         'Content-Type': 'application/json',
         ...options.headers
     }
+});
+
+/**
+ * Regenerate Illustration
+ *
+ * Enqueue an illustration job to (re)generate this recipe's cover — the
+ * detail-page 'Regenerate illustration' affordance and the jobs-drawer Retry
+ * for a failed illustration job both land here. Owner-scoped: a recipe that
+ * isn't the caller's is a 404 (never enqueue paid work for another owner).
+ * 202 when a fresh job was enqueued, 200 when an active illustration job for
+ * this recipe already exists (dedupe).
+ */
+export const regenerateIllustrationApiRecipesRecipeIdIllustrationPost = <ThrowOnError extends boolean = false>(options: Options<RegenerateIllustrationApiRecipesRecipeIdIllustrationPostData, ThrowOnError>): RequestResult<RegenerateIllustrationApiRecipesRecipeIdIllustrationPostResponses, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostErrors, ThrowOnError> => (options.client ?? client).post<RegenerateIllustrationApiRecipesRecipeIdIllustrationPostResponses, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/recipes/{recipe_id}/illustration',
+    ...options
 });
 
 /**

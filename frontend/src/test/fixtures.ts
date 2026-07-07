@@ -22,6 +22,7 @@ export function jobOut(overrides: Partial<JobOut> = {}): JobOut {
     error_type: null,
     error_detail: null,
     result_recipe_ids: [],
+    recipe_ids: [],
     created_at: '2026-07-06T00:00:00Z',
     updated_at: '2026-07-06T00:00:00Z',
     url: 'fake://golden-1',

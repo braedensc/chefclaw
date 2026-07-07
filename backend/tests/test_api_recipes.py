@@ -486,6 +486,80 @@ async def test_get_image_404_variants(monkeypatch: pytest.MonkeyPatch, tmp_path:
             assert response.json()["error_type"] == "not_found"
 
 
+# ─── POST /api/recipes/{id}/illustration ─────────────────────────────────────
+
+
+async def test_regenerate_illustration_202_enqueues_job(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Owner's recipe → a fresh illustration job (202), keyed to that recipe;
+    the payload url is absent (recipe_ids carry the target)."""
+    store = FakeJobStore()
+    row = make_recipe_row()
+
+    async def fake_get(session, owner_id, recipe_id):
+        return row if (recipe_id == row.id and owner_id == OWNER_ID) else None
+
+    monkeypatch.setattr(recipes_service, "get_recipe", fake_get)
+    async with client_for(build_app(store)) as client:
+        response = await client.post(
+            f"/api/recipes/{row.id}/illustration", headers=bearer(TEST_TOKEN)
+        )
+    assert response.status_code == 202
+    body = response.json()
+    assert body["type"] == "illustration"
+    assert body["status"] == "pending"
+    assert body["recipe_ids"] == [str(row.id)]
+    assert body["platform"] is None  # keyed to the recipe, not a source identity
+    assert body["url"] is None
+    assert "payload" not in body
+    # A real pending illustration job now exists in the store:
+    assert [j.type for j in store.jobs.values()] == ["illustration"]
+
+
+async def test_regenerate_illustration_dedupes_active_job_200(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A second regenerate while an illustration job is still active returns
+    THAT job (200) — the paid image call is deduped."""
+    store = FakeJobStore()
+    row = make_recipe_row()
+
+    async def fake_get(session, owner_id, recipe_id):
+        return row
+
+    monkeypatch.setattr(recipes_service, "get_recipe", fake_get)
+    async with client_for(build_app(store)) as client:
+        first = await client.post(
+            f"/api/recipes/{row.id}/illustration", headers=bearer(TEST_TOKEN)
+        )
+        second = await client.post(
+            f"/api/recipes/{row.id}/illustration", headers=bearer(TEST_TOKEN)
+        )
+    assert first.status_code == 202
+    assert second.status_code == 200
+    assert second.json()["id"] == first.json()["id"]
+    assert len(store.jobs) == 1  # no twin
+
+
+async def test_regenerate_illustration_404_for_missing_or_other_owner(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A recipe that isn't the caller's (or doesn't exist) is a 404 — never
+    enqueue paid work for another owner's recipe."""
+    store = FakeJobStore()
+
+    async def fake_get(session, owner_id, recipe_id):
+        return None  # not found / not owned
+
+    monkeypatch.setattr(recipes_service, "get_recipe", fake_get)
+    async with client_for(build_app(store)) as client:
+        response = await client.post(
+            f"/api/recipes/{uuid.uuid4()}/illustration", headers=bearer(TEST_TOKEN)
+        )
+    assert response.status_code == 404
+    assert response.json()["error_type"] == "not_found"
+    assert store.jobs == {}  # nothing enqueued
+
+
 # ─── PATCH /api/recipes/{id} ─────────────────────────────────────────────────
 
 
@@ -622,6 +696,7 @@ async def test_delete_recipe_204_and_404(monkeypatch: pytest.MonkeyPatch) -> Non
         ("GET", f"/api/recipes/{uuid.uuid4()}/image"),
         ("GET", "/api/jobs"),
         ("GET", f"/api/jobs/{uuid.uuid4()}"),
+        ("POST", f"/api/recipes/{uuid.uuid4()}/illustration"),
         ("PATCH", f"/api/recipes/{uuid.uuid4()}"),
         ("DELETE", f"/api/recipes/{uuid.uuid4()}"),
     ],

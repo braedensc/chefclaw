@@ -15,7 +15,7 @@ import uuid
 from decimal import Decimal
 from typing import Any, NamedTuple, Protocol
 
-from sqlalchemy import select, text, update
+from sqlalchemy import func, select, text, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
@@ -23,9 +23,10 @@ from chefclaw import spend
 from chefclaw.config import Settings
 from chefclaw.documents import EstimatedAttributes, RecipeDocument
 from chefclaw.extractors import ExtractionUsage
-from chefclaw.models import Job, JobStatus, Recipe
+from chefclaw.models import Job, JobStatus, JobType, Recipe
 
 __all__ = [
+    "ACTIVE_ILLUSTRATION_STATUSES",
     "ACTIVE_STATUSES",
     "RUNNING_STATUSES",
     "JobStore",
@@ -37,11 +38,12 @@ __all__ = [
 
 
 class RecipeImageRef(NamedTuple):
-    """The slice of a recipe the illustration backfill needs — deliberately
-    not the full ORM row (extraction_meta JSONB would ride along for nothing).
-    Carries the ``document`` (the prompt is built from its text fields),
-    ``owner_id`` + ``job_id`` (to budget-gate + attribute the spend row), and
-    the media-path parts."""
+    """The slice of a recipe the illustration path needs — deliberately not the
+    full ORM row (extraction_meta JSONB would ride along for nothing). Carries
+    the ``document`` (the prompt is built from its text fields), ``owner_id``
+    (to budget-gate) and ``job_id`` (the jobs row the image spend is attributed
+    to — the originating extract job for a backfill, or the illustration job
+    itself when driving one), and the media-path parts."""
 
     id: uuid.UUID
     owner_id: uuid.UUID
@@ -52,19 +54,33 @@ class RecipeImageRef(NamedTuple):
     document: dict[str, Any]
 
 # A job in any of these states already owns its (platform, canonical_id) —
-# the dedupe check returns it instead of enqueueing a twin.
+# the dedupe check returns it instead of enqueueing a twin. ``illustrating``
+# rides along for consistency; illustration jobs carry a null platform so they
+# never actually match the canonical-identity dedupe.
 ACTIVE_STATUSES: tuple[str, ...] = (
     JobStatus.PENDING.value,
     JobStatus.DOWNLOADING.value,
     JobStatus.EXTRACTING.value,
     JobStatus.VALIDATING.value,
+    JobStatus.ILLUSTRATING.value,
+)
+# The states an ACTIVE illustration job occupies — the per-recipe illustration
+# dedupe returns such a job instead of enqueueing a twin (the paid image call
+# is deduped exactly like extraction).
+ACTIVE_ILLUSTRATION_STATUSES: tuple[str, ...] = (
+    JobStatus.PENDING.value,
+    JobStatus.ILLUSTRATING.value,
 )
 # Mid-flight states a restart strands — startup reconcile flips these to
 # failed/interrupted (explicit human retry only; never auto-rerun paid work).
+# An ``illustrating`` job stranded by a restart is cheap to re-run, but stays
+# on the explicit-retry path for consistency (the startup backfill also
+# re-enqueues any recipe it left image-less).
 RUNNING_STATUSES: tuple[str, ...] = (
     JobStatus.DOWNLOADING.value,
     JobStatus.EXTRACTING.value,
     JobStatus.VALIDATING.value,
+    JobStatus.ILLUSTRATING.value,
 )
 
 # The §4 claim: one pending job, oldest first, skipping rows another claimer
@@ -100,9 +116,15 @@ class JobStore(Protocol):
         owner_id: uuid.UUID,
         job_type: str,
         payload: dict[str, Any],
-        platform: str,
-        canonical_id: str,
+        platform: str | None,
+        canonical_id: str | None,
     ) -> Job: ...
+
+    async def find_active_illustration_job(self, recipe_id: uuid.UUID) -> Job | None: ...
+
+    async def load_recipes_for_illustration(
+        self, job_id: uuid.UUID, recipe_ids: list[uuid.UUID]
+    ) -> list[RecipeImageRef]: ...
 
     async def get_job(self, job_id: uuid.UUID, owner_id: uuid.UUID) -> Job | None: ...
 
@@ -204,9 +226,12 @@ class PostgresJobStore:
         owner_id: uuid.UUID,
         job_type: str,
         payload: dict[str, Any],
-        platform: str,
-        canonical_id: str,
+        platform: str | None,
+        canonical_id: str | None,
     ) -> Job:
+        # platform/canonical_id are null for illustration jobs (they are keyed
+        # to recipe ids in the payload, not a source identity — so they never
+        # collide with the extract/upload canonical-identity dedupe).
         job = Job(
             owner_id=owner_id,
             type=job_type,
@@ -219,6 +244,64 @@ class PostgresJobStore:
             await session.commit()
             await session.refresh(job)  # load the server defaults (id, timestamps…)
         return job
+
+    async def find_active_illustration_job(self, recipe_id: uuid.UUID) -> Job | None:
+        """The per-recipe illustration dedupe: an ACTIVE illustration job whose
+        payload ``recipe_ids`` already lists this recipe wins (return it) — the
+        paid image call is deduped exactly like extraction, so spamming
+        Regenerate (or a restart re-running the startup backfill) never stacks
+        duplicate paid jobs on one recipe."""
+        stmt = (
+            select(Job)
+            .where(
+                Job.type == JobType.ILLUSTRATION.value,
+                Job.status.in_(ACTIVE_ILLUSTRATION_STATUSES),
+                # jsonb_exists(payload -> 'recipe_ids', '<id>'): does the JSONB
+                # string array contain this id? (the function form of `?`,
+                # which avoids the operator/bind-parameter clash).
+                func.jsonb_exists(Job.payload["recipe_ids"], str(recipe_id)),
+            )
+            .order_by(Job.created_at)
+            .limit(1)
+        )
+        async with self._sessionmaker() as session:
+            return (await session.execute(stmt)).scalars().first()
+
+    async def load_recipes_for_illustration(
+        self, job_id: uuid.UUID, recipe_ids: list[uuid.UUID]
+    ) -> list[RecipeImageRef]:
+        """The recipe slices an illustration job (re)generates covers for,
+        ordered by dish_index. ``job_id`` is the illustration job itself — its
+        own image spend is attributed there. A recipe id with no row (hard
+        delete since enqueue) is simply absent from the result."""
+        if not recipe_ids:
+            return []
+        stmt = (
+            select(
+                Recipe.id,
+                Recipe.owner_id,
+                Recipe.platform,
+                Recipe.canonical_id,
+                Recipe.dish_index,
+                Recipe.document,
+            )
+            .where(Recipe.id.in_(recipe_ids))
+            .order_by(Recipe.dish_index)
+        )
+        async with self._sessionmaker() as session:
+            rows = (await session.execute(stmt)).all()
+        return [
+            RecipeImageRef(
+                id=row.id,
+                owner_id=row.owner_id,
+                job_id=job_id,
+                platform=row.platform,
+                canonical_id=row.canonical_id,
+                dish_index=row.dish_index,
+                document=row.document,
+            )
+            for row in rows
+        ]
 
     async def get_job(self, job_id: uuid.UUID, owner_id: uuid.UUID) -> Job | None:
         stmt = select(Job).where(Job.id == job_id, Job.owner_id == owner_id)

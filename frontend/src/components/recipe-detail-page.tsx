@@ -8,13 +8,15 @@ import {
   deleteRecipeApiRecipesRecipeIdDeleteMutation,
   getRecipeApiRecipesRecipeIdGetOptions,
   getRecipeApiRecipesRecipeIdGetQueryKey,
+  listJobsApiJobsGetQueryKey,
   listRecipesApiRecipesGetOptions,
   listRecipesApiRecipesGetQueryKey,
   patchRecipeApiRecipesRecipeIdPatchMutation,
+  regenerateIllustrationApiRecipesRecipeIdIllustrationPostMutation,
 } from '../client/@tanstack/react-query.gen';
 import type { RecipeDetail } from '../client/types.gen';
 import { apiErrorMessage } from '../lib/error-message';
-import { asRecipeDoc } from '../lib/recipe-document';
+import { asRecipeDoc, englishQuantity } from '../lib/recipe-document';
 import type { IngredientDoc, RecipeDoc, StepDoc } from '../lib/recipe-document';
 import { CoverImage } from './brand/cover-image';
 import { DIFFICULTY_WORDS, DifficultyScale } from './brand/difficulty-scale';
@@ -208,7 +210,58 @@ function RecipeHero({ detail, doc }: { detail: RecipeDetail; doc: RecipeDoc }) {
         </div>
       )}
       <HeroMeta detail={detail} doc={doc} />
+      <RegenerateIllustration
+        recipeId={detail.id}
+        hasImage={detail.has_image ?? false}
+      />
     </header>
+  );
+}
+
+/**
+ * Enqueue a fresh cover illustration (its own retriable job). The new image
+ * appears once the worker processes the job — so this confirms the enqueue and
+ * points at the Jobs drawer rather than optimistically swapping the cover.
+ */
+function RegenerateIllustration({
+  recipeId,
+  hasImage,
+}: {
+  recipeId: string;
+  hasImage: boolean;
+}) {
+  const queryClient = useQueryClient();
+  const regenerate = useMutation({
+    ...regenerateIllustrationApiRecipesRecipeIdIllustrationPostMutation(),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: listJobsApiJobsGetQueryKey(),
+      });
+    },
+  });
+
+  return (
+    <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
+      <button
+        type="button"
+        disabled={regenerate.isPending}
+        onClick={() => regenerate.mutate({ path: { recipe_id: recipeId } })}
+        className="rounded-field border border-line-bright px-3.5 py-1.5 font-display text-[11px] font-semibold tracking-[0.16em] text-ink-dim uppercase transition hover:border-cyan/55 hover:text-cyan disabled:opacity-50"
+      >
+        {hasImage ? 'Regenerate illustration' : 'Generate illustration'}
+      </button>
+      {regenerate.isSuccess && !regenerate.isPending && (
+        <span className="text-xs text-gold">
+          Queued — the new cover appears once it&rsquo;s cooked. Track it in
+          Jobs.
+        </span>
+      )}
+      {regenerate.isError && (
+        <span role="alert" className="text-xs text-chili-bright">
+          {apiErrorMessage(regenerate.error)}
+        </span>
+      )}
+    </div>
   );
 }
 
@@ -289,47 +342,60 @@ function IngredientsSection({ ingredients }: { ingredients: IngredientDoc[] }) {
         </button>
       </div>
       <ul className="mt-4 divide-y divide-line">
-        {ingredients.map((ingredient, index) => (
-          <li
-            key={index}
-            className="flex items-baseline justify-between gap-4 py-3"
-          >
-            {showOriginal ? (
-              // Original names, with the source's raw_text captured verbatim.
-              <>
-                <span lang="zh" className="text-base text-ink">
-                  {ingredient.name.original ?? ingredient.name.en}
-                </span>
-                <span lang="zh" className="text-right text-base text-ink-dim">
-                  {ingredient.raw_text}
-                </span>
-              </>
-            ) : (
-              // EN names; quantities always shown from raw_text (Hard Rule 7
-              // — never a normalized/derived number).
-              <>
-                <span className="flex min-w-0 items-baseline gap-2.5">
-                  <span className="text-base text-ink">
-                    {ingredient.name.en ?? ingredient.name.original}
+        {ingredients.map((ingredient, index) => {
+          // In EN mode, show English units when the source stated an
+          // unambiguous value+unit ("两大勺" → "2 tbsp"); fall back to the
+          // verbatim raw_text otherwise ("适量"). This is a faithful
+          // translation of a stated amount, never a derived number — the 原文
+          // toggle still shows the raw capture (Hard Rule 7 intact).
+          const enAmount = ingredient.quantity
+            ? englishQuantity(ingredient.quantity)
+            : null;
+          return (
+            <li
+              key={index}
+              className="flex items-baseline justify-between gap-4 py-3"
+            >
+              {showOriginal ? (
+                // Original names, with the source's raw_text captured verbatim.
+                <>
+                  <span lang="zh" className="text-base text-ink">
+                    {ingredient.name.original ?? ingredient.name.en}
                   </span>
-                  {ingredient.prep_state != null && (
-                    <span className="font-display text-[11px] tracking-[0.14em] text-ink-faint uppercase">
-                      {ingredient.prep_state}
+                  <span lang="zh" className="text-right text-base text-ink-dim">
+                    {ingredient.raw_text}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className="flex min-w-0 items-baseline gap-2.5">
+                    <span className="text-base text-ink">
+                      {ingredient.name.en ?? ingredient.name.original}
                     </span>
-                  )}
-                </span>
-                {ingredient.quantity?.raw_text != null && (
-                  <span
-                    lang="zh"
-                    className="shrink-0 text-right text-base text-warm"
-                  >
-                    {ingredient.quantity.raw_text}
+                    {ingredient.prep_state != null && (
+                      <span className="font-display text-[11px] tracking-[0.14em] text-ink-faint uppercase">
+                        {ingredient.prep_state}
+                      </span>
+                    )}
                   </span>
-                )}
-              </>
-            )}
-          </li>
-        ))}
+                  {ingredient.quantity != null &&
+                    (enAmount != null ? (
+                      <span className="shrink-0 text-right text-base text-warm">
+                        {enAmount}
+                      </span>
+                    ) : (
+                      <span
+                        lang="zh"
+                        className="shrink-0 text-right text-base text-warm"
+                      >
+                        {ingredient.quantity.raw_text}
+                      </span>
+                    ))}
+                </>
+              )}
+            </li>
+          );
+        })}
       </ul>
     </section>
   );

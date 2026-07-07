@@ -163,6 +163,10 @@ export type JobOut = {
      */
     platform: string | null;
     /**
+     * Recipe Ids
+     */
+    recipe_ids?: Array<string>;
+    /**
      * Result Recipe Ids
      */
     result_recipe_ids: Array<string>;
@@ -857,6 +861,44 @@ export type PatchRecipeApiRecipesRecipeIdPatchResponses = {
 };
 
 export type PatchRecipeApiRecipesRecipeIdPatchResponse = PatchRecipeApiRecipesRecipeIdPatchResponses[keyof PatchRecipeApiRecipesRecipeIdPatchResponses];
+
+export type RegenerateIllustrationApiRecipesRecipeIdIllustrationPostData = {
+    body?: never;
+    path: {
+        /**
+         * Recipe Id
+         */
+        recipe_id: string;
+    };
+    query?: never;
+    url: '/api/recipes/{recipe_id}/illustration';
+};
+
+export type RegenerateIllustrationApiRecipesRecipeIdIllustrationPostErrors = {
+    /**
+     * Not Found
+     */
+    404: ErrorBody;
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type RegenerateIllustrationApiRecipesRecipeIdIllustrationPostError = RegenerateIllustrationApiRecipesRecipeIdIllustrationPostErrors[keyof RegenerateIllustrationApiRecipesRecipeIdIllustrationPostErrors];
+
+export type RegenerateIllustrationApiRecipesRecipeIdIllustrationPostResponses = {
+    /**
+     * Existing active illustration job (dedupe hit)
+     */
+    200: JobOut;
+    /**
+     * Successful Response
+     */
+    202: JobOut;
+};
+
+export type RegenerateIllustrationApiRecipesRecipeIdIllustrationPostResponse = RegenerateIllustrationApiRecipesRecipeIdIllustrationPostResponses[keyof RegenerateIllustrationApiRecipesRecipeIdIllustrationPostResponses];
 
 export type GetRecipeImageApiRecipesRecipeIdImageGetData = {
     body?: never;

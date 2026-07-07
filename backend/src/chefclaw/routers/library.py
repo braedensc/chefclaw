@@ -16,10 +16,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from chefclaw import db
 from chefclaw.auth import require_owner
 from chefclaw.config import Settings, get_settings
-from chefclaw.routers.deps import error_response
-from chefclaw.schemas import ErrorBody, RecipeDetail, RecipePage, RecipePatch, RecipeSummary
+from chefclaw.routers.deps import error_response, get_job_store
+from chefclaw.schemas import ErrorBody, JobOut, RecipeDetail, RecipePage, RecipePatch, RecipeSummary
+from chefclaw.services import jobs as jobs_service
 from chefclaw.services import recipes as recipes_service
 from chefclaw.services.recipes import Sort
+from chefclaw.services.repo import JobStore
 
 router = APIRouter(prefix="/api/recipes", tags=["recipes"])
 
@@ -100,6 +102,36 @@ async def get_recipe_image(
         media_type="image/jpeg",
         headers={"Cache-Control": "private, max-age=86400"},
     )
+
+
+@router.post(
+    "/{recipe_id}/illustration",
+    status_code=202,
+    response_model=JobOut,
+    responses={
+        200: {"model": JobOut, "description": "Existing active illustration job (dedupe hit)"},
+        **_NOT_FOUND,
+    },
+)
+async def regenerate_illustration(
+    recipe_id: uuid.UUID,
+    response: Response,
+    owner_id: Annotated[uuid.UUID, Depends(require_owner)],
+    session: Annotated[AsyncSession, Depends(db.get_session)],
+    store: Annotated[JobStore, Depends(get_job_store)],
+) -> JobOut | JSONResponse:
+    """Enqueue an illustration job to (re)generate this recipe's cover — the
+    detail-page 'Regenerate illustration' affordance and the jobs-drawer Retry
+    for a failed illustration job both land here. Owner-scoped: a recipe that
+    isn't the caller's is a 404 (never enqueue paid work for another owner).
+    202 when a fresh job was enqueued, 200 when an active illustration job for
+    this recipe already exists (dedupe)."""
+    recipe = await recipes_service.get_recipe(session, owner_id, recipe_id)
+    if recipe is None:
+        return error_response(404, "not_found", f"no recipe {recipe_id}")
+    job, existing = await jobs_service.enqueue_illustration(store, owner_id, recipe_id)
+    response.status_code = 200 if existing else 202
+    return JobOut.model_validate(job)
 
 
 @router.patch("/{recipe_id}", response_model=RecipeDetail, responses=_NOT_FOUND)

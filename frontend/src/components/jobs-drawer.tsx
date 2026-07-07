@@ -4,6 +4,7 @@ import {
   extractRecipeApiRecipesExtractPostMutation,
   listJobsApiJobsGetOptions,
   listJobsApiJobsGetQueryKey,
+  regenerateIllustrationApiRecipesRecipeIdIllustrationPostMutation,
 } from '../client/@tanstack/react-query.gen';
 import type { JobOut } from '../client/types.gen';
 import { apiErrorMessage } from '../lib/error-message';
@@ -35,13 +36,20 @@ export function JobsDrawer({ onClose }: JobsDrawerProps) {
     refetchInterval: JOB_POLL_MS,
   });
 
+  const invalidateJobs = () =>
+    void queryClient.invalidateQueries({
+      queryKey: listJobsApiJobsGetQueryKey(),
+    });
+
+  // Extract/upload jobs retry by re-POSTing the pasted url; illustration jobs
+  // retry by re-enqueueing an illustration job for their recipe.
   const retry = useMutation({
     ...extractRecipeApiRecipesExtractPostMutation(),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({
-        queryKey: listJobsApiJobsGetQueryKey(),
-      });
-    },
+    onSuccess: invalidateJobs,
+  });
+  const retryIllustration = useMutation({
+    ...regenerateIllustrationApiRecipesRecipeIdIllustrationPostMutation(),
+    onSuccess: invalidateJobs,
   });
 
   const sorted = [...(jobs.data ?? [])].sort((a, b) => {
@@ -81,12 +89,13 @@ export function JobsDrawer({ onClose }: JobsDrawerProps) {
       </div>
 
       <div className="flex-1 overflow-y-auto p-4">
-        {retry.isError && (
+        {(retry.isError || retryIllustration.isError) && (
           <p
             role="alert"
             className="mb-3 rounded-field border border-chili/40 bg-chili/5 p-2.5 text-xs text-chili-bright"
           >
-            Retry failed — {apiErrorMessage(retry.error)}
+            Retry failed —{' '}
+            {apiErrorMessage(retry.error ?? retryIllustration.error)}
           </p>
         )}
         {jobs.isPending && (
@@ -106,8 +115,11 @@ export function JobsDrawer({ onClose }: JobsDrawerProps) {
               <JobRow
                 key={job.id}
                 job={job}
-                retryPending={retry.isPending}
+                retryPending={retry.isPending || retryIllustration.isPending}
                 onRetry={(url) => retry.mutate({ body: { url } })}
+                onRetryIllustration={(recipeId) =>
+                  retryIllustration.mutate({ path: { recipe_id: recipeId } })
+                }
               />
             ))}
           </ul>
@@ -140,10 +152,17 @@ interface JobRowProps {
   job: JobOut;
   retryPending: boolean;
   onRetry: (url: string) => void;
+  onRetryIllustration: (recipeId: string) => void;
 }
 
-function JobRow({ job, retryPending, onRetry }: JobRowProps) {
+function JobRow({
+  job,
+  retryPending,
+  onRetry,
+  onRetryIllustration,
+}: JobRowProps) {
   const active = !isTerminalStatus(job.status);
+  const isIllustration = job.type === 'illustration';
   const statusClass =
     job.status === 'failed'
       ? 'text-chili-bright'
@@ -161,7 +180,7 @@ function JobRow({ job, retryPending, onRetry }: JobRowProps) {
         <span className="flex min-w-0 items-center gap-2">
           {job.platform != null && <PlatformBadge platform={job.platform} />}
           <span className="truncate font-mono text-xs text-ink-dim">
-            {job.canonical_id ?? '—'}
+            {isIllustration ? 'Cover illustration' : (job.canonical_id ?? '—')}
           </span>
         </span>
         <span className="flex shrink-0 items-center gap-1.5">
@@ -189,6 +208,7 @@ function JobRow({ job, retryPending, onRetry }: JobRowProps) {
             errorType={job.error_type}
             retryPending={retryPending}
             onRetry={onRetry}
+            onRetryIllustration={onRetryIllustration}
           />
         </div>
       )}
@@ -201,6 +221,7 @@ interface JobErrorActionProps {
   errorType: string;
   retryPending: boolean;
   onRetry: (url: string) => void;
+  onRetryIllustration: (recipeId: string) => void;
 }
 
 /** Maps the typed error taxonomy onto UI actions (plan §7 screen 3). */
@@ -209,8 +230,26 @@ function JobErrorAction({
   errorType,
   retryPending,
   onRetry,
+  onRetryIllustration,
 }: JobErrorActionProps) {
   if (RETRYABLE_ERROR_TYPES.has(errorType)) {
+    // Illustration jobs retry by re-enqueueing an illustration job for their
+    // recipe (never re-POSTing an extract url — they have none).
+    if (job.type === 'illustration') {
+      const recipeId = job.recipe_ids?.[0];
+      return (
+        <button
+          type="button"
+          disabled={recipeId == null || retryPending}
+          onClick={() => {
+            if (recipeId != null) onRetryIllustration(recipeId);
+          }}
+          className="mt-2 rounded-field border border-cyan/60 bg-cyan/10 px-3.5 py-1.5 font-display text-[11px] font-bold tracking-[0.16em] text-cyan uppercase glow-cyan transition hover:bg-cyan/20 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Retry
+        </button>
+      );
+    }
     // Upload jobs cannot be re-queued from a link: their url is either a
     // local:// placeholder (no source adapter matches — a guaranteed 400) or
     // a provenance URL, and re-POSTing that would silently turn the §16.10
