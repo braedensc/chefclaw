@@ -24,7 +24,12 @@ from google.genai import types as genai_types
 
 from chefclaw.errors import ConfigError, ExtractionFailedError, RateLimitedError
 from chefclaw.extractors import ExtractionOutcome, ExtractionUsage
-from chefclaw.extractors.prompt import PROMPT_VERSION, load_prompt, with_source_context
+from chefclaw.extractors.prompt import (
+    PROMPT_VERSION,
+    load_prompt,
+    with_cover_catalog,
+    with_source_context,
+)
 
 __all__ = ["PROMPT_VERSION", "GeminiExtractor", "load_prompt"]
 
@@ -136,7 +141,9 @@ class GeminiExtractor:
         source_title: str | None,
         source_duration_seconds: int | None,
     ) -> genai_types.GenerateContentResponse:
-        prompt = with_source_context(self._prompt, source_title, source_duration_seconds)
+        prompt = with_cover_catalog(
+            with_source_context(self._prompt, source_title, source_duration_seconds)
+        )
 
         config = genai_types.GenerateContentConfig(
             temperature=_TEMPERATURE,

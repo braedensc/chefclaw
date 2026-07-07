@@ -3,9 +3,11 @@
 Operational procedures for the running chefclaw stack. Companions: `docs/SETUP.md`
 (commands, env contract), `docs/SERVICES.md` (provisioning, which store holds what),
 `docs/SECURITY.md` (incident + key-rotation runbooks). The stack's health surface is
-`GET /api/health` — it is **not** auth-exempt, so read it through the Settings screen
-or with `curl -s -H "Authorization: Bearer $CHEFCLAW_API_TOKEN" http://127.0.0.1:8000/api/health`
-(the token resolves from your shell env; never paste its value inline).
+`GET /api/health` — it is **not** auth-exempt. On the local dev stack (fake auth
+provider) it needs no credential: `curl -s http://127.0.0.1:8000/api/health`. On a
+`vps` deploy (Google OAuth, M2) it requires a valid `chefclaw_session` cookie — read
+it through the Settings screen, or via `scripts/prod-smoke.sh` with `CHEFCLAW_SESSION`
+set (§4 step 10). The legacy bearer token no longer gates it.
 
 ---
 
@@ -233,15 +235,31 @@ volumes.
 
 ---
 
-## 4. Deploy (VPS + Tailscale)
+## 4. Deploy (VPS — public TLS ingress, or Tailscale-private)
 
-Turn-key procedure for the M-Deploy posture (ADR:
-`docs/adr/2026-07-06-m-deploy-vps-and-rednote-escalation.md`): **any mainstream
-x86 VPS**, **Tailscale-first access, zero public exposure** — every published
-port stays `127.0.0.1`-bound on the VPS (compose.yaml already does this) and
-`tailscale serve` fronts the api toward the tailnet only. Install commands
-below were verified current against the official docs on 2026-07-06; re-verify
-on deploy day if months have passed.
+Turn-key VPS procedure. Every step is shared **except the last-mile TLS
+termination (step 7)**, where two ingress postures diverge:
+
+- **Public TLS — the M4 product path** (ADRs
+  `2026-07-06-m-deploy-vps-and-rednote-escalation.md` §"M4 amendment" +
+  `2026-07-07-path-b-multi-user-product.md`). A reverse proxy (**Caddy**)
+  terminates HTTPS on a real domain in front of `127.0.0.1:8000`. **Auth is the
+  security boundary now** (Google OAuth + opaque sessions, M2) — the app is
+  *meant* to be internet-reachable, so **80/443 are public while 8000/5432 stay
+  loopback-only**. This supersedes the V2-B "Tailscale-private, zero public
+  exposure" endgame for the product. Go public only after the go/no-go gates in
+  [`docs/DEPLOY_CHECKLIST.md`](DEPLOY_CHECKLIST.md) — notably the **upload-only
+  hosted-mode carve** (Path-B), which is a prerequisite that has **not shipped
+  yet** (see the checklist gate).
+- **Tailscale-private — interim / dev / personal single-user.** `tailscale
+  serve` fronts the api toward the tailnet only; nothing is internet-facing.
+  Lower ceremony (no domain, no cert management), and the only posture where the
+  **full link-paste + Rednote sidecar pipeline** belongs (Path-B keeps platform
+  fetch self-host-only). The right choice to shake out the stack before going
+  public.
+
+Install commands below were verified current against the official docs on
+2026-07-06; re-verify on deploy day if months have passed.
 
 **Host choice (2026-07-06):** the steps are provider-agnostic — only the
 dashboard in step 1 differs. Any standard x86 VPS with **≥ 2 GB RAM**
@@ -253,11 +271,20 @@ extraction) running **Ubuntu LTS** works:
 - **DigitalOcean** Basic droplet (2 GB, ~$12/mo) — the most recognizable
   personal-project cloud with the best beginner docs. Also Linode/Vultr.
 - Oracle Always Free (ARM, $0) stays viable but adds an arm64 multi-arch build
-  and free-tier capacity friction — skip it if paying a few dollars is fine.
+  (see step 6's build-architecture note) and free-tier capacity friction — skip
+  it if paying a few dollars is fine.
+
+**Public path also needs a domain (queued for you):** the M4 public-TLS ingress
+requires a **domain name** with an **A record** (and **AAAA** if the VPS has
+IPv6) pointing at the VPS's public IP, propagated *before* step 7 — Caddy's
+ACME/Let's Encrypt challenge needs the name to resolve to this host. The
+Tailscale-private path needs no domain (Tailscale supplies the `*.ts.net` name
++ cert). Record the domain + registrar in `docs/SERVICES.md` §7.
 
 1. **Provision** *(you, in dashboards)*: create the server (2 GB+ RAM),
    **Ubuntu LTS**, SSH key auth (no password login). Record the date/host/
-   provider in `docs/SERVICES.md` §7.
+   provider in `docs/SERVICES.md` §7. *(Tailscale-private only:* also do step 3;
+   the public path can skip Tailscale entirely.)
 2. **Install Docker Engine + compose plugin** (official apt repo —
    docs.docker.com/engine/install/ubuntu):
 
@@ -291,9 +318,10 @@ extraction) running **Ubuntu LTS** works:
 4. **Clone the repo** to the documented path (the systemd units and this
    runbook assume it): `sudo git clone https://github.com/<owner>/chefclaw /opt/chefclaw`.
 5. **HUMAN creates `/opt/chefclaw/.env.local` on the server** (Claude is
-   hook-blocked from `.env*` everywhere, including here). Exactly these vars
-   (contract + placeholders: `.env.example`):
-   - `CHEFCLAW_API_TOKEN` — fresh token, not the local dev one
+   hook-blocked from `.env*` everywhere, including here). Contract + placeholders:
+   `.env.example`. Baseline vars (both postures):
+   - `CHEFCLAW_API_TOKEN` — fresh token, not the local dev one (LEGACY — no
+     longer gates requests post-M2, but set a real value anyway)
    - `GEMINI_API_KEY`
    - `MONTHLY_LLM_BUDGET_USD` + `MAX_EXTRACTION_ATTEMPTS_PER_DAY` (fail-closed pair)
    - `CHEFCLAW_BACKUP_DIR` + `BACKUP_GPG_PASSPHRASE` (backup pair — passphrase
@@ -303,6 +331,23 @@ extraction) running **Ubuntu LTS** works:
    - `SENTRY_DSN` + `VITE_SENTRY_DSN` + `SENTRY_ENVIRONMENT=vps` (observability
      — V2-A ADR; empty DSNs are legal and simply disable Sentry)
    - optionally `DB_PASSWORD` (postgres stays loopback-bound either way)
+
+   **Auth + invites (M2 — REQUIRED on any `vps` deploy; the boot fails CLOSED
+   otherwise).** Because you set `SENTRY_ENVIRONMENT=vps` above, the startup
+   guard (`auth.assert_prod_auth_safe`) refuses to boot with the `fake` auth or
+   `fake` email provider — an unset/typo'd auth var can never silently
+   authenticate everyone as one owner:
+   - `CHEFCLAW_AUTH_PROVIDER=google` + `GOOGLE_OAUTH_CLIENT_ID` +
+     `GOOGLE_OAUTH_CLIENT_SECRET` + `GOOGLE_OAUTH_REDIRECT_URL`
+     (`https://<domain>/api/auth/google/callback`, or the `*.ts.net` URL for the
+     Tailscale path). The **secret is server-only** — never a `VITE_*` var.
+   - `CHEFCLAW_EMAIL=ses` + `EMAIL_FROM` (verified SES sender) + `SES_REGION`
+     (SES send creds come from the instance IAM role / boto3 chain, not an env
+     key). `PUBLIC_BASE_URL=https://<domain>` (drives invite links + the OAuth
+     redirect; no trailing slash).
+   - `BOOTSTRAP_ADMIN_EMAIL=<your email>` — the first Google sign-in whose
+     verified email matches this adopts the seed-admin row + existing library;
+     empty disables bootstrap-claim entirely.
 6. **Start the stack** — export the release SHA first so Sentry events carry
    the deployed commit (plain `up -d --build` without it works too, just
    untagged):
@@ -316,9 +361,75 @@ extraction) running **Ubuntu LTS** works:
    must show only `127.0.0.1`. Logs are structured JSON on stdout: read them
    with `sudo docker compose logs -f api` (each line carries method/path/
    status/latency for requests, job_id/stage for worker events).
-7. **Front the api toward the tailnet** (syntax verified 2026-07-06;
-   Tailscale auto-provisions the TLS cert — if HTTPS certificates aren't
-   enabled for the tailnet yet, the command tells you and links the console
+
+   > **Build architecture (multi-arch).** `docker compose up --build` builds
+   > `Dockerfile.api` **natively for the VPS's own architecture** — on a standard
+   > x86 VPS you build *on the box*, so there is nothing to cross-build. Two cases
+   > need `buildx` + QEMU emulation instead:
+   > - **Cross-building x86 → ARM** (targeting Oracle Ampere / AWS Graviton, or
+   >   building on an Apple-silicon Mac to ship an image to an x86 host). Enable
+   >   the emulator once, then build for the target platform:
+   >
+   >   ```bash
+   >   docker run --privileged --rm tonistiigi/binfmt --install all   # register QEMU (once)
+   >   docker buildx build --platform linux/arm64 -f Dockerfile.api .  # or linux/amd64
+   >   # multi-arch in one shot (needs a registry): --platform linux/amd64,linux/arm64 --push
+   >   ```
+   > - The `node:22-alpine` + `python:3.13-slim` bases are already multi-arch, so
+   >   buildx pulls the right variant automatically; only the emulator is extra.
+   >   Emulated builds are slow (minutes of QEMU) — **building on the target host
+   >   is the documented flow; prefer it unless you have a reason to cross-build.**
+7. **Terminate TLS — pick the posture:**
+
+   **Option A — public TLS via Caddy (the M4 product path).** Caddy is a tiny
+   reverse proxy that obtains and **auto-renews** a Let's Encrypt certificate for
+   your domain and proxies HTTPS to the loopback api. Run it as a **host service**
+   (not in compose) so the stack stays entirely `127.0.0.1`-bound and Caddy is
+   the only public listener (80/443). Prereq: the domain's DNS A/AAAA record from
+   the host-choice note must already resolve to this VPS.
+
+   ```bash
+   # Install Caddy from its official apt repo (caddyserver.com/docs/install):
+   sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https curl
+   curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' \
+     | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+   curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' \
+     | sudo tee /etc/apt/sources.list.d/caddy-stable.list
+   sudo apt update && sudo apt install -y caddy
+   ```
+
+   Replace `/etc/caddy/Caddyfile` with exactly (your domain, one upstream):
+
+   ```caddyfile
+   yourdomain.example {
+       reverse_proxy 127.0.0.1:8000
+   }
+   ```
+
+   ```bash
+   sudo systemctl reload caddy   # provisions the cert on first load (needs :80 reachable)
+   sudo systemctl enable caddy   # start on boot (the apt package usually enables it already)
+   ```
+
+   Caddy does the HTTP→HTTPS redirect, HTTP/2, and — critically — **automatic
+   cert renewal** (~30 days before expiry, no cron). It forwards
+   `X-Forwarded-Proto: https` upstream automatically; the app builds its OAuth
+   redirect + invite links from the explicit `GOOGLE_OAUTH_REDIRECT_URL` /
+   `PUBLIC_BASE_URL` you set in step 5, so no extra proxy-header wiring is needed.
+   Verify: `curl -sI https://yourdomain.example/ | head -1` → `HTTP/2 200`.
+
+   > **nginx + certbot alternative** (only if you already run nginx): a `server`
+   > block with `proxy_pass http://127.0.0.1:8000;` + `proxy_set_header Host
+   > $host;` / `X-Forwarded-Proto $scheme;`, then `sudo certbot --nginx -d
+   > yourdomain.example` for the cert (certbot installs its own systemd renewal
+   > timer). Caddy is the documented default because auto-HTTPS + auto-renewal are
+   > built in — fewer moving parts for a single upstream (M4 amendment,
+   > `2026-07-06-m-deploy-vps-and-rednote-escalation.md`).
+
+   **Option B — Tailscale-private (interim / dev).** No domain, no public
+   exposure; `tailscale serve` fronts the api toward the tailnet only, TLS via
+   Tailscale's auto-provisioned certs (syntax verified 2026-07-06 — if HTTPS
+   certificates aren't enabled for the tailnet yet, the command links the console
    toggle):
 
    ```bash
@@ -326,28 +437,41 @@ extraction) running **Ubuntu LTS** works:
    tailscale serve status        # verify; `sudo tailscale serve --https=443 off` disables
    ```
 
-8. **Phone:** install the Tailscale app, sign in to the same tailnet, then
-   open `https://<vps-hostname>.<tailnet>.ts.net` and paste the API token
-   into the token gate once.
+8. **First sign-in:** open `https://<domain>` (Option A) or
+   `https://<vps-hostname>.<tailnet>.ts.net` (Option B) and click **Sign in with
+   Google** (there is no token gate anymore — M2). The first sign-in whose
+   verified email equals `BOOTSTRAP_ADMIN_EMAIL` adopts the seed-admin row and
+   the existing recipe library; everyone else needs a pending invite you send
+   from the admin screen. (Option B on the phone: install Tailscale, join the
+   same tailnet, then open the URL.)
 9. **Install the backup schedule** (systemd, not launchd — the VPS has no
    launchd): follow the header of `ops/chefclaw-backup.service.example`
    (copy both units to `/etc/systemd/system/`, enable the **timer**, run the
    service once by hand, check `journalctl -u chefclaw-backup.service`).
-10. **Verify end-to-end** with the scripted smoke check (run from a
-    tailnet-connected machine, e.g. your Mac — the token comes from the env,
-    never an argument):
+10. **Verify end-to-end** with the scripted smoke check (run from a machine that
+    can reach the URL, e.g. your Mac). The headless checks need no secret; to
+    also exercise the authenticated 200, sign in first and pass the
+    `chefclaw_session` cookie via `CHEFCLAW_SESSION` (env only, never an
+    argument — see the script header):
 
     ```bash
-    CHEFCLAW_API_TOKEN=<the-server-token> sh scripts/prod-smoke.sh \
-      https://<host>.<tailnet>.ts.net <server-public-ip>
+    # Public (Option A):
+    CHEFCLAW_SESSION=<cookie-from-your-browser> sh scripts/prod-smoke.sh \
+      https://<domain> <server-public-ip>
+    # Tailscale (Option B): same, with the https://<host>.<tailnet>.ts.net URL.
     ```
 
-    It asserts reachability, that auth is enforced (401 without a token, 200
-    with), that `db`/`worker` are healthy, and — given the public IP — that
-    **8000/5432 are NOT reachable publicly** (the zero-public-exposure
-    invariant). Then open the Settings screen (all green) and paste one real
-    link per platform; **watch the rednote job especially** — this is the first
-    datacenter-IP test of the guest tier (see §5 if it degrades).
+    It asserts reachability (SPA 200), that auth is enforced (401 without a
+    session, 200 with), that `db`/`worker` are healthy, and — given the public
+    IP — that **8000/5432 are NOT reachable publicly** (the loopback-only
+    invariant; only 80/443, or the tailnet, are ingress). Then open the Settings
+    screen (all green) and add one recipe end-to-end:
+    - **Public / hosted (upload-only per Path-B):** upload a saved cooking video
+      through the UI and confirm it extracts to a card.
+    - **Tailscale-private (full pipeline):** paste one real link per platform;
+      **watch the rednote job especially** — this is the first datacenter-IP test
+      of the guest tier (see §5 if it degrades). Link-paste + the Rednote sidecar
+      belong to this posture only.
 
 ---
 

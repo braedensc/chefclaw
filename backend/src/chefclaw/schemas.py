@@ -32,6 +32,9 @@ __all__ = [
     "SpendDay",
     "SpendModelSlice",
     "SpendSummaryOut",
+    "UserAdminList",
+    "UserAdminPatch",
+    "UserAdminRow",
 ]
 
 
@@ -44,6 +47,35 @@ class MeOut(BaseModel):
     name: str
     email: str
     is_admin: bool
+
+
+class UserAdminRow(BaseModel):
+    """One member as the admin sees them (GET /api/admin/users). ``real_covers_
+    enabled`` is the per-user private-real-frame grant the owner toggles;
+    ``is_admin`` is server-derived and read-only here."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    email: str
+    display_name: str | None = None
+    is_admin: bool
+    status: str
+    real_covers_enabled: bool
+
+
+class UserAdminList(BaseModel):
+    items: list[UserAdminRow]
+
+
+class UserAdminPatch(BaseModel):
+    """The owner-settable per-user fields (PATCH /api/admin/users/{id}).
+    ``extra="forbid"`` — only ``real_covers_enabled`` is settable here; nothing
+    can grant admin or change identity through this surface (critique M9)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    real_covers_enabled: bool
 
 
 class InviteCreate(BaseModel):
@@ -186,6 +218,12 @@ class RecipeSummary(BaseModel):
     dish_index: int
     status: str
     tags: list[str]
+    # The assigned curated dish-sprite id (V2-F) — the DEFAULT card cover,
+    # rendered INLINE from the bundled SVG catalog. Non-secret and safe to
+    # expose (it's a decorative default, not food data). ``has_image`` (a real
+    # frame or generated illustration served via /image) takes precedence over
+    # the sprite; the sprite is the fallback when has_image is false.
+    cover_sprite_id: str | None = None
     has_image: bool = False
     difficulty: str | None = None
     total_time_minutes: int | None = None

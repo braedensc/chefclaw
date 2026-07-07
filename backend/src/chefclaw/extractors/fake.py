@@ -13,7 +13,7 @@ from pathlib import Path
 
 from chefclaw.extractors import ExtractionOutcome, ExtractionUsage
 
-FAKE_PROMPT_VERSION = "v3"
+FAKE_PROMPT_VERSION = "v4"
 FAKE_MODEL_ID = "fake-extractor"
 
 # One realistic bilingual dish matching the §5 document shape MINUS the source
@@ -89,6 +89,11 @@ _DEFAULT_DISH: dict = {
     # Auto-tags (v3): split out into the user-editable `tags` column as a smart
     # default — categorical assessments, not verbatim capture.
     "tags": ["braise", "pork", "classic"],
+    # Cover-sprite pick (v4): the model's choice from the catalog menu, split out
+    # by validate_extraction and resolved against the catalog. A real, known id —
+    # the deterministic matcher would independently pick the same one, so the
+    # fixture exercises the trusted-model-id path deterministically.
+    "cover_sprite_id": "red-braised-pork",
 }
 
 _DEFAULT_USAGE = ExtractionUsage(

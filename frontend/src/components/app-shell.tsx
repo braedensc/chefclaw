@@ -6,9 +6,12 @@ import { useAuth } from '../auth-context';
 import { PuppyChef } from './brand/puppy-chef';
 import { JobsDrawer } from './jobs-drawer';
 
-/** Quiet caps text control — the shared look for the header's right-side nav. */
+/** Quiet caps text control — the shared look for the header's right-side nav.
+ * `tap-target` gives each a ≥44px hit area on touch devices (V2-C) while the
+ * compact desktop caps stay unchanged; mobile tracking is tightened so the full
+ * Admin·Settings·Jobs·Sign-out row fits on a 375px phone. */
 const HEADER_CONTROL =
-  'px-0.5 py-1.5 font-display text-[11px] font-semibold whitespace-nowrap uppercase tracking-[0.1em] text-ink-faint transition-colors hover:text-cyan hover:glow-text-cyan sm:px-2 sm:text-[11.5px] sm:tracking-[0.2em]';
+  'tap-target px-0.5 py-1.5 font-display text-[11px] font-semibold whitespace-nowrap uppercase tracking-[0.06em] text-ink-faint transition-colors hover:text-cyan hover:glow-text-cyan sm:px-2 sm:text-[11.5px] sm:tracking-[0.2em]';
 
 /**
  * The chrome around every token-gated screen: the neon storefront header
@@ -46,10 +49,10 @@ export function AppShell({ children }: { children: ReactNode }) {
             <PuppyChef
               variant="mark"
               size={44}
-              className="glow-drop-chili h-auto w-9 sm:w-11"
+              className="glow-drop-chili h-auto w-8 sm:w-11"
             />
             <span className="flex flex-col gap-1">
-              <span className="font-display text-[21px] leading-none font-extrabold tracking-[0.17em] uppercase sm:text-[26px]">
+              <span className="font-display text-[18px] leading-none font-extrabold tracking-[0.14em] uppercase sm:text-[26px] sm:tracking-[0.17em]">
                 <span className="text-warm glow-text-warm">chef</span>
                 <span className="text-chili-bright glow-text-chili">claw</span>
                 {/* the storefront's "open" pip — a small always-lit sign so the

@@ -139,7 +139,19 @@ Rules that fall out of this:
   case never depends on backups.
 - **Append-only logs**: audit/history tables get SELECT + INSERT only, denormalized
   columns, and **no FK to mutable rows** — record lifecycle and log lifecycle can never
-  conflict.
+  conflict. (V2-F's `cover_misses` follows this: denormalized dish text, and its one
+  `recipe_id` link is nullable + `ON DELETE SET NULL`, so a hard recipe delete never
+  cascades a diagnostic away.)
+- **Private real-frame covers are double-gated + viewer-aware** (V2-F, ADR
+  2026-07-07-cover-system-sprites-and-private-frames): a stored real video frame reaches
+  a viewer ONLY when the global `CHEFCLAW_REAL_COVERS` switch AND that user's owner-set
+  `real_covers_enabled` are both true — enforced at BOTH the API projection (`has_image`)
+  and the `/image` serving endpoint (an ungranted request is an indistinguishable 404, no
+  enumeration oracle). Both gates default OFF (pure sprites), so multi-user/public mode is
+  sprite-only by construction and a creator frame never crosses to an ungranted viewer.
+  Sprites carry no such risk — they're original authored art. The grant is set only via
+  the owner-only `PATCH /api/admin/users/{id}` (`extra="forbid"`, so no admin/identity
+  escalation through that surface).
 - **Identity is never a parameter**: server-side functions run as the caller
   (`SECURITY INVOKER`) with the user id derived from auth context, so no caller can
   address another user's rows. Global system state (budget ledgers, caches) lives in

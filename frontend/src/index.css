@@ -221,6 +221,25 @@
   );
 }
 
+/* ---- touch targets (V2-C) ----
+   On COARSE pointers (phones, tablets) every control these sit on gets a ≥44px
+   hit area (WCAG 2.5.5) — without inflating the deliberately-compact desktop
+   mouse UI, which uses a fine pointer and so sees none of this. Unlayered on
+   purpose: the min-height must win over Tailwind's padding-derived height.
+   `tap-target` also re-centers a text button/link's label in the taller box;
+   `tap-field` only floors an input/select/textarea (no display change). */
+@media (pointer: coarse) {
+  .tap-target {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+  }
+  .tap-field {
+    min-height: 44px;
+  }
+}
+
 /* ---- motion ----
    Every animation the design system defines rides behind reduced-motion;
    with it enabled these classes are inert and the art renders static. */
@@ -256,6 +275,45 @@
       opacity: 0;
     }
   }
+  /* jobs panel entrance (V2-C): the bottom sheet slides UP from the bottom
+     edge on a phone; the ≥sm right rail slides in FROM THE RIGHT. One class,
+     branched by viewport so the same <aside> reads native on each. */
+  @keyframes sheet-up {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+  @keyframes slide-in-right {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+  .jobs-enter {
+    animation: sheet-up 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  @media (min-width: 640px) {
+    .jobs-enter {
+      animation: slide-in-right 220ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+  }
+  .scrim-in {
+    animation: scrim-fade 200ms ease-out;
+  }
+  @keyframes scrim-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
   /* classic neon flicker — the sign browns out twice a loop */
   @keyframes neon-flicker {
     0%,

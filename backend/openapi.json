@@ -504,6 +504,17 @@
             "title": "Canonical Id",
             "type": "string"
           },
+          "cover_sprite_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cover Sprite Id"
+          },
           "created_at": {
             "format": "date-time",
             "title": "Created At",
@@ -770,6 +781,17 @@
           "canonical_id": {
             "title": "Canonical Id",
             "type": "string"
+          },
+          "cover_sprite_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cover Sprite Id"
           },
           "created_at": {
             "format": "date-time",
@@ -1043,6 +1065,83 @@
         "title": "SpendSummaryOut",
         "type": "object"
       },
+      "UserAdminList": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/UserAdminRow"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "UserAdminList",
+        "type": "object"
+      },
+      "UserAdminPatch": {
+        "additionalProperties": false,
+        "description": "The owner-settable per-user fields (PATCH /api/admin/users/{id}).\n``extra=\"forbid\"`` — only ``real_covers_enabled`` is settable here; nothing\ncan grant admin or change identity through this surface (critique M9).",
+        "properties": {
+          "real_covers_enabled": {
+            "title": "Real Covers Enabled",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "real_covers_enabled"
+        ],
+        "title": "UserAdminPatch",
+        "type": "object"
+      },
+      "UserAdminRow": {
+        "description": "One member as the admin sees them (GET /api/admin/users). ``real_covers_\nenabled`` is the per-user private-real-frame grant the owner toggles;\n``is_admin`` is server-derived and read-only here.",
+        "properties": {
+          "display_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name"
+          },
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_admin": {
+            "title": "Is Admin",
+            "type": "boolean"
+          },
+          "real_covers_enabled": {
+            "title": "Real Covers Enabled",
+            "type": "boolean"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "is_admin",
+          "status",
+          "real_covers_enabled"
+        ],
+        "title": "UserAdminRow",
+        "type": "object"
+      },
       "ValidationError": {
         "properties": {
           "ctx": {
@@ -1278,6 +1377,92 @@
           }
         },
         "summary": "Revoke Invite",
+        "tags": [
+          "invites"
+        ]
+      }
+    },
+    "/api/admin/users": {
+      "get": {
+        "description": "Every member + their private real-frame grant (V2-F). NEVER a secret —\nno token_hash, no oauth subject.",
+        "operationId": "list_users_api_admin_users_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserAdminList"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Users",
+        "tags": [
+          "invites"
+        ]
+      }
+    },
+    "/api/admin/users/{user_id}": {
+      "patch": {
+        "description": "Grant/revoke one member's PRIVATE real-frame covers (V2-F). Owner-only\n(require_admin); ``real_covers_enabled`` is the ONLY settable field (the\nbody schema is ``extra=\"forbid\"``, so no admin/identity escalation).",
+        "operationId": "set_user_real_covers_api_admin_users__user_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "User Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserAdminPatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserAdminRow"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Set User Real Covers",
         "tags": [
           "invites"
         ]
@@ -2094,7 +2279,7 @@
     },
     "/api/recipes/{recipe_id}/image": {
       "get": {
-        "description": "Stream the generated illustration. One 404 covers every miss — no\nrecipe, no illustration generated yet, file gone from the archive.",
+        "description": "Stream the recipe's cover image (a generated illustration, or a PRIVATE\nreal video frame). One 404 covers every miss — no recipe, no image yet, file\ngone, OR (V2-F) a private real frame requested by an ungranted viewer: a\nframe NEVER reaches an ungranted viewer even by direct URL.",
         "operationId": "get_recipe_image_api_recipes__recipe_id__image_get",
         "parameters": [
           {

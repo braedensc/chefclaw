@@ -21,9 +21,10 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from chefclaw import spend
 from chefclaw.config import Settings
+from chefclaw.covers import AssignmentMiss
 from chefclaw.documents import EstimatedAttributes, RecipeDocument
 from chefclaw.extractors import ExtractionUsage
-from chefclaw.models import Job, JobStatus, JobType, Recipe
+from chefclaw.models import CoverMiss, Job, JobStatus, JobType, Recipe, User
 
 __all__ = [
     "ACTIVE_ILLUSTRATION_STATUSES",
@@ -32,7 +33,9 @@ __all__ = [
     "JobStore",
     "PostgresJobStore",
     "PostgresSpendReader",
+    "RecipeFrameRef",
     "RecipeImageRef",
+    "RecipeSpriteRef",
     "SpendReader",
 ]
 
@@ -52,6 +55,32 @@ class RecipeImageRef(NamedTuple):
     canonical_id: str
     dish_index: int
     document: dict[str, Any]
+
+
+class RecipeSpriteRef(NamedTuple):
+    """The slice the sprite-assignment backfill needs: the ``document`` (dish
+    name + cuisine) and stored auto-``tags`` feed the deterministic matcher;
+    ``owner_id`` scopes any logged miss."""
+
+    id: uuid.UUID
+    owner_id: uuid.UUID
+    document: dict[str, Any]
+    tags: list[str]
+
+
+class RecipeFrameRef(NamedTuple):
+    """The slice the private real-frame backfill needs: media-path parts +
+    ``document``/``extraction_meta`` (to locate a still-retained source video and
+    its duration). Only recipes whose OWNER is real-covers-granted are returned."""
+
+    id: uuid.UUID
+    owner_id: uuid.UUID
+    platform: str
+    canonical_id: str
+    dish_index: int
+    document: dict[str, Any]
+    extraction_meta: dict[str, Any]
+
 
 # A job in any of these states already owns its (platform, canonical_id) —
 # the dedupe check returns it instead of enqueueing a twin. ``illustrating``
@@ -152,9 +181,22 @@ class JobStore(Protocol):
         documents: list[RecipeDocument],
         estimates: list[EstimatedAttributes | None],
         tags: list[list[str]],
+        cover_sprite_ids: list[str],
         *,
         extraction_meta: dict[str, Any],
     ) -> list[uuid.UUID] | None: ...
+
+    async def record_cover_misses(
+        self,
+        owner_id: uuid.UUID,
+        entries: list[tuple[uuid.UUID | None, AssignmentMiss]],
+    ) -> None: ...
+
+    async def list_recipes_missing_sprites(self) -> list[RecipeSpriteRef]: ...
+
+    async def set_recipe_sprite(self, recipe_id: uuid.UUID, sprite_id: str) -> None: ...
+
+    async def list_recipes_for_frame_backfill(self) -> list[RecipeFrameRef]: ...
 
     async def list_recipes_missing_images(self) -> list[RecipeImageRef]: ...
 
@@ -405,18 +447,19 @@ class PostgresJobStore:
         documents: list[RecipeDocument],
         estimates: list[EstimatedAttributes | None],
         tags: list[list[str]],
+        cover_sprite_ids: list[str],
         *,
         extraction_meta: dict[str, Any],
     ) -> list[uuid.UUID] | None:
         """ATOMIC multi-dish store: N recipe inserts + the job's flip to
         ``stored`` in ONE transaction (§16.4). ``image_url`` lands NULL here —
-        illustrations are generated best-effort AFTER this commit (never inside
-        the paid-work crash-loss window) and persisted via set_recipe_image.
-        Derived ``estimated`` attributes (spiciness/difficulty — kept SEPARATE
-        from the verbatim document, Hard Rule 7) are stored atomically here.
-        Auto-``tags`` (0–3 sanitized labels) seed the user-editable
-        ``recipes.tags`` column as a smart default — the user can edit them
-        later via RecipePatch.
+        a real frame or illustration is generated best-effort AFTER this commit
+        (never inside the paid-work crash-loss window). The assigned
+        ``cover_sprite_id`` (V2-F) IS stored atomically here (it's resolved
+        before the store and is the DEFAULT card cover). Derived ``estimated``
+        attributes (spiciness/difficulty — kept SEPARATE from the verbatim
+        document, Hard Rule 7) and auto-``tags`` (0–3 sanitized labels, seeding
+        the user-editable column) are stored atomically too.
         Returns the new recipe ids, or ``None`` when UNIQUE(platform,
         canonical_id, dish_index) fired — a raced duplicate the caller adopts
         instead of failing."""
@@ -435,6 +478,7 @@ class PostgresJobStore:
                             dish_index=index,
                             status="stored",
                             tags=dish_tags,
+                            cover_sprite_id=sprite_id,
                             document=document.model_dump(mode="json"),
                             estimated=(
                                 estimate.model_dump(mode="json")
@@ -443,8 +487,8 @@ class PostgresJobStore:
                             ),
                             extraction_meta=extraction_meta,
                         )
-                        for index, (document, estimate, dish_tags) in enumerate(
-                            zip(documents, estimates, tags, strict=False)
+                        for index, (document, estimate, dish_tags, sprite_id) in enumerate(
+                            zip(documents, estimates, tags, cover_sprite_ids, strict=False)
                         )
                     ]
                     session.add_all(rows)
@@ -499,6 +543,79 @@ class PostgresJobStore:
                 .where(Recipe.id == recipe_id)
                 .values(image_url=image_url, image_style_version=style_version)
             )
+
+    # ── covers (sprite assignment + miss log + private real-frame backfill) ──
+
+    async def record_cover_misses(
+        self,
+        owner_id: uuid.UUID,
+        entries: list[tuple[uuid.UUID | None, AssignmentMiss]],
+    ) -> None:
+        """Append cover-assignment misses to the ``cover_misses`` log — the ONLY
+        input the future cover gardener consumes. Append-only; best-effort at the
+        call site (a miss-log write must never fail an extraction)."""
+        if not entries:
+            return
+        async with self._sessionmaker() as session, session.begin():
+            session.add_all(
+                CoverMiss(
+                    owner_id=owner_id,
+                    recipe_id=recipe_id,
+                    dish_name_en=miss.dish_name_en,
+                    dish_name_original=miss.dish_name_original,
+                    cuisine_type=miss.cuisine_type,
+                    tags=list(miss.tags),
+                    suggested_sprite_id=miss.suggested_sprite_id,
+                    resolved_sprite_id=miss.resolved_sprite_id,
+                    score=miss.score,
+                    reason=miss.reason,
+                )
+                for recipe_id, miss in entries
+            )
+
+    async def list_recipes_missing_sprites(self) -> list[RecipeSpriteRef]:
+        """Sprite-assignment backfill input: recipes with no ``cover_sprite_id``
+        yet (stored before V2-F, or a crash between store and assignment). The
+        document + stored auto-tags feed the deterministic matcher."""
+        stmt = (
+            select(Recipe.id, Recipe.owner_id, Recipe.document, Recipe.tags)
+            .where(Recipe.cover_sprite_id.is_(None))
+            .order_by(Recipe.created_at)
+        )
+        async with self._sessionmaker() as session:
+            rows = (await session.execute(stmt)).all()
+        return [RecipeSpriteRef(*row) for row in rows]
+
+    async def set_recipe_sprite(self, recipe_id: uuid.UUID, sprite_id: str) -> None:
+        async with self._sessionmaker() as session, session.begin():
+            await session.execute(
+                update(Recipe)
+                .where(Recipe.id == recipe_id)
+                .values(cover_sprite_id=sprite_id)
+            )
+
+    async def list_recipes_for_frame_backfill(self) -> list[RecipeFrameRef]:
+        """Private real-frame backfill input: recipes with no ``image_url`` whose
+        OWNER is real-covers-granted. Scoped by the per-user grant at the DB
+        (a frame is never captured for an ungranted owner); the worker then only
+        grabs one when the source video is still on disk (retention=keep)."""
+        stmt = (
+            select(
+                Recipe.id,
+                Recipe.owner_id,
+                Recipe.platform,
+                Recipe.canonical_id,
+                Recipe.dish_index,
+                Recipe.document,
+                Recipe.extraction_meta,
+            )
+            .join(User, User.id == Recipe.owner_id)
+            .where(Recipe.image_url.is_(None), User.real_covers_enabled.is_(True))
+            .order_by(Recipe.created_at)
+        )
+        async with self._sessionmaker() as session:
+            rows = (await session.execute(stmt)).all()
+        return [RecipeFrameRef(*row) for row in rows]
 
     async def reconcile_interrupted(self) -> int:
         """Startup reconcile: any job stranded mid-stage by a restart becomes

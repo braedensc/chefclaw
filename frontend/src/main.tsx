@@ -23,3 +23,19 @@ createRoot(rootElement).render(
     </QueryClientProvider>
   </StrictMode>,
 );
+
+// PWA (V2-C): register the service worker in PRODUCTION builds only — never
+// during Vite dev/HMR, and never under an automated browser
+// (`navigator.webdriver`, true in Playwright) so the smoke + golden suites stay
+// deterministic. The SW uses a standard lifecycle (no skipWaiting/clients.claim,
+// see public/sw.js), so it never controls the page that registered it;
+// registration is best-effort — a failure must never break the app.
+if (
+  import.meta.env.PROD &&
+  'serviceWorker' in navigator &&
+  !navigator.webdriver
+) {
+  window.addEventListener('load', () => {
+    void navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
