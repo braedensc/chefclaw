@@ -42,7 +42,12 @@ import httpx
 
 from chefclaw.errors import ConfigError, ExtractionFailedError, RateLimitedError
 from chefclaw.extractors import ExtractionOutcome, ExtractionUsage
-from chefclaw.extractors.prompt import PROMPT_VERSION, load_prompt, with_source_context
+from chefclaw.extractors.prompt import (
+    PROMPT_VERSION,
+    load_prompt,
+    with_cover_catalog,
+    with_source_context,
+)
 
 if TYPE_CHECKING:
     from chefclaw.config import Settings
@@ -118,7 +123,9 @@ class QwenExtractor:
         video_bytes = video_path.read_bytes()
         mime_type = mimetypes.guess_type(video_path.name)[0] or "video/mp4"
         data_url = f"data:{mime_type};base64,{base64.b64encode(video_bytes).decode('ascii')}"
-        prompt = with_source_context(self._prompt, source_title, source_duration_seconds)
+        prompt = with_cover_catalog(
+            with_source_context(self._prompt, source_title, source_duration_seconds)
+        )
         return {
             "model": self._model_id,
             "temperature": _TEMPERATURE,

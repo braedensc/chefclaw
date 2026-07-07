@@ -91,4 +91,79 @@ describe('CoverImage', () => {
     );
     expect(container.querySelector('img')).toBeNull();
   });
+
+  // ── V2-F: inline sprite covers ────────────────────────────────────────────
+
+  it('renders the assigned sprite inline without fetching when hasImage is false', () => {
+    const { container } = renderCover({
+      hasImage: false,
+      coverSpriteId: 'red-braised-pork',
+    });
+
+    const img = container.querySelector('img');
+    expect(img).not.toBeNull();
+    expect(img).toHaveAttribute('data-cover-sprite', 'red-braised-pork');
+    expect(img).toHaveAttribute('alt', '红烧肉 cover');
+    // The sprite is a bundled static asset — no auth'd /image blob fetch.
+    expect(genState.image).not.toHaveBeenCalled();
+    expect(container.querySelector('[data-cover-fallback]')).toBeNull();
+  });
+
+  it('renders the generic unknown-dish sprite as the final assigned fallback', () => {
+    const { container } = renderCover({
+      hasImage: false,
+      coverSpriteId: 'unknown-dish',
+    });
+    expect(
+      container.querySelector('[data-cover-sprite="unknown-dish"]'),
+    ).not.toBeNull();
+    expect(container.querySelector('[data-cover-fallback]')).toBeNull();
+  });
+
+  it('falls back to the gradient when the sprite id is unknown', () => {
+    const { container } = renderCover({
+      hasImage: false,
+      coverSpriteId: 'not-a-real-sprite-id',
+    });
+    expect(container.querySelector('[data-cover-fallback]')).not.toBeNull();
+    expect(container.querySelector('img')).toBeNull();
+  });
+
+  it('shows the served image over the sprite when both are available', async () => {
+    const blob = new Blob(['jpeg-bytes'], { type: 'image/jpeg' });
+    genState.image.mockResolvedValue(blob);
+
+    const { container } = renderCover({
+      hasImage: true,
+      coverSpriteId: 'red-braised-pork',
+    });
+
+    await waitFor(() =>
+      expect(container.querySelector('img')).toHaveAttribute(
+        'src',
+        'blob:mock-cover',
+      ),
+    );
+    // The served frame wins — it is NOT the sprite.
+    expect(
+      container.querySelector('img')?.getAttribute('data-cover-sprite'),
+    ).toBeNull();
+  });
+
+  it('falls back to the sprite (not the gradient) when a served image errors', async () => {
+    genState.image.mockRejectedValue(new Error('image fetch failed (404)'));
+
+    const { container } = renderCover({
+      hasImage: true,
+      coverSpriteId: 'red-braised-pork',
+    });
+
+    await waitFor(() => expect(genState.image).toHaveBeenCalled());
+    await waitFor(() =>
+      expect(
+        container.querySelector('[data-cover-sprite="red-braised-pork"]'),
+      ).not.toBeNull(),
+    );
+    expect(container.querySelector('[data-cover-fallback]')).toBeNull();
+  });
 });

@@ -14,10 +14,18 @@ from typing import Any, Literal
 from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from chefclaw.config import Settings
 from chefclaw.documents import EstimatedAttributes
-from chefclaw.models import Recipe
+from chefclaw.models import Recipe, User
 
-__all__ = ["delete_recipe", "get_recipe", "list_recipes", "patch_recipe"]
+__all__ = [
+    "delete_recipe",
+    "frames_are_gated",
+    "get_recipe",
+    "list_recipes",
+    "owner_real_covers_enabled",
+    "patch_recipe",
+]
 
 _UNSET: Any = object()  # sentinel: distinguish "not provided" from explicit None
 
@@ -124,6 +132,29 @@ async def patch_recipe(
         )
     await session.commit()
     return recipe
+
+
+def frames_are_gated(settings: Settings) -> bool:
+    """Whether a stored ``image_url`` might be a PRIVATE real video frame that
+    must be gated per-viewer (V2-F). Only sprite mode with the global
+    ``CHEFCLAW_REAL_COVERS`` switch on ever captures real frames — in every
+    other config ``image_url`` is a cross-servable generated illustration, so
+    ``has_image`` / ``/image`` keep their pre-V2-F behavior (no grant read, no
+    test churn). When this is true the caller must consult
+    :func:`owner_real_covers_enabled` before revealing/serving the image."""
+    return settings.chefclaw_real_covers and settings.chefclaw_image_generator == "sprite"
+
+
+async def owner_real_covers_enabled(
+    session: AsyncSession, owner_id: uuid.UUID
+) -> bool:
+    """The requesting owner's private real-frame grant. A missing user row (the
+    unit-tier fake owner has none) is treated as NOT granted — fail closed, a
+    frame never leaks to an unknown/ungranted viewer."""
+    granted = await session.scalar(
+        select(User.real_covers_enabled).where(User.id == owner_id)
+    )
+    return bool(granted)
 
 
 async def delete_recipe(

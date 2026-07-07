@@ -303,6 +303,10 @@ export type RecipeDetail = {
      */
     canonical_id: string;
     /**
+     * Cover Sprite Id
+     */
+    cover_sprite_id?: string | null;
+    /**
      * Created At
      */
     created_at: string;
@@ -462,6 +466,10 @@ export type RecipeSummary = {
      */
     canonical_id: string;
     /**
+     * Cover Sprite Id
+     */
+    cover_sprite_id?: string | null;
+    /**
      * Created At
      */
     created_at: string;
@@ -619,6 +627,64 @@ export type SpendSummaryOut = {
 };
 
 /**
+ * UserAdminList
+ */
+export type UserAdminList = {
+    /**
+     * Items
+     */
+    items: Array<UserAdminRow>;
+};
+
+/**
+ * UserAdminPatch
+ *
+ * The owner-settable per-user fields (PATCH /api/admin/users/{id}).
+ * ``extra="forbid"`` — only ``real_covers_enabled`` is settable here; nothing
+ * can grant admin or change identity through this surface (critique M9).
+ */
+export type UserAdminPatch = {
+    /**
+     * Real Covers Enabled
+     */
+    real_covers_enabled: boolean;
+};
+
+/**
+ * UserAdminRow
+ *
+ * One member as the admin sees them (GET /api/admin/users). ``real_covers_
+ * enabled`` is the per-user private-real-frame grant the owner toggles;
+ * ``is_admin`` is server-derived and read-only here.
+ */
+export type UserAdminRow = {
+    /**
+     * Display Name
+     */
+    display_name?: string | null;
+    /**
+     * Email
+     */
+    email: string;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Is Admin
+     */
+    is_admin: boolean;
+    /**
+     * Real Covers Enabled
+     */
+    real_covers_enabled: boolean;
+    /**
+     * Status
+     */
+    status: string;
+};
+
+/**
  * ValidationError
  */
 export type ValidationError = {
@@ -752,6 +818,56 @@ export type RevokeInviteApiAdminInvitesInviteIdRevokePostResponses = {
      */
     200: unknown;
 };
+
+export type ListUsersApiAdminUsersGetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/admin/users';
+};
+
+export type ListUsersApiAdminUsersGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: UserAdminList;
+};
+
+export type ListUsersApiAdminUsersGetResponse = ListUsersApiAdminUsersGetResponses[keyof ListUsersApiAdminUsersGetResponses];
+
+export type SetUserRealCoversApiAdminUsersUserIdPatchData = {
+    body: UserAdminPatch;
+    path: {
+        /**
+         * User Id
+         */
+        user_id: string;
+    };
+    query?: never;
+    url: '/api/admin/users/{user_id}';
+};
+
+export type SetUserRealCoversApiAdminUsersUserIdPatchErrors = {
+    /**
+     * Not Found
+     */
+    404: ErrorBody;
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type SetUserRealCoversApiAdminUsersUserIdPatchError = SetUserRealCoversApiAdminUsersUserIdPatchErrors[keyof SetUserRealCoversApiAdminUsersUserIdPatchErrors];
+
+export type SetUserRealCoversApiAdminUsersUserIdPatchResponses = {
+    /**
+     * Successful Response
+     */
+    200: UserAdminRow;
+};
+
+export type SetUserRealCoversApiAdminUsersUserIdPatchResponse = SetUserRealCoversApiAdminUsersUserIdPatchResponses[keyof SetUserRealCoversApiAdminUsersUserIdPatchResponses];
 
 export type GoogleCallbackApiAuthGoogleCallbackGetData = {
     body?: never;

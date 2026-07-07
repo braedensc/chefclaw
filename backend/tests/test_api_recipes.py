@@ -400,6 +400,90 @@ async def test_list_recipes_projections_none_safe_on_partial_documents(
     assert second["ingredient_count"] is None
 
 
+# ─── V2-F: cover_sprite_id passthrough + private real-frame gating ───────────
+
+
+def _sprite_frame_settings() -> Settings:
+    """Config where a stored image_url is a PRIVATE real frame that must be
+    gated per-viewer (sprite mode + the global real-covers switch on)."""
+    return Settings(
+        chefclaw_api_token=TEST_TOKEN,
+        chefclaw_image_generator="sprite",
+        chefclaw_real_covers=True,
+    )
+
+
+async def test_list_includes_cover_sprite_id(monkeypatch: pytest.MonkeyPatch) -> None:
+    row = make_recipe_row(cover_sprite_id="red-braised-pork")
+
+    async def fake_list(session, owner_id, **kwargs):
+        return [row], 1
+
+    monkeypatch.setattr(recipes_service, "list_recipes", fake_list)
+    async with client_for(build_app()) as client:
+        response = await client.get("/api/recipes", headers=bearer(TEST_TOKEN))
+    assert response.json()["items"][0]["cover_sprite_id"] == "red-braised-pork"
+
+
+async def test_real_frame_hidden_from_ungranted_viewer(monkeypatch: pytest.MonkeyPatch) -> None:
+    """An ungranted viewer never sees a private real frame — has_image reads
+    False so the card falls back to the inline sprite; the id still ships."""
+    row = make_recipe_row(
+        image_url="/data/media/o/bilibili/BV/frame-0.jpg",
+        cover_sprite_id="red-braised-pork",
+    )
+
+    async def fake_list(session, owner_id, **kwargs):
+        return [row], 1
+
+    async def no_grant(session, owner_id):
+        return False
+
+    monkeypatch.setattr(recipes_service, "list_recipes", fake_list)
+    monkeypatch.setattr(recipes_service, "owner_real_covers_enabled", no_grant)
+    async with client_for(build_app(settings=_sprite_frame_settings())) as client:
+        response = await client.get("/api/recipes", headers=bearer(TEST_TOKEN))
+    item = response.json()["items"][0]
+    assert item["has_image"] is False
+    assert item["cover_sprite_id"] == "red-braised-pork"
+
+
+async def test_real_frame_shown_to_granted_viewer(monkeypatch: pytest.MonkeyPatch) -> None:
+    row = make_recipe_row(image_url="/data/media/o/bilibili/BV/frame-0.jpg")
+
+    async def fake_list(session, owner_id, **kwargs):
+        return [row], 1
+
+    async def granted(session, owner_id):
+        return True
+
+    monkeypatch.setattr(recipes_service, "list_recipes", fake_list)
+    monkeypatch.setattr(recipes_service, "owner_real_covers_enabled", granted)
+    async with client_for(build_app(settings=_sprite_frame_settings())) as client:
+        response = await client.get("/api/recipes", headers=bearer(TEST_TOKEN))
+    assert response.json()["items"][0]["has_image"] is True
+
+
+async def test_image_endpoint_404s_a_private_frame_for_ungranted_viewer(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Direct /image access to a private frame by an ungranted viewer is a 404
+    — the grant is enforced at the serving endpoint, not just the projection."""
+    row = make_recipe_row(image_url="/data/media/o/bilibili/BV/frame-0.jpg")
+
+    async def fake_get(session, owner_id, recipe_id):
+        return row
+
+    async def no_grant(session, owner_id):
+        return False
+
+    monkeypatch.setattr(recipes_service, "get_recipe", fake_get)
+    monkeypatch.setattr(recipes_service, "owner_real_covers_enabled", no_grant)
+    async with client_for(build_app(settings=_sprite_frame_settings())) as client:
+        response = await client.get(f"/api/recipes/{row.id}/image", headers=bearer(TEST_TOKEN))
+    assert response.status_code == 404
+
+
 # ─── GET /api/recipes/{id} ───────────────────────────────────────────────────
 
 
