@@ -16,6 +16,31 @@ export interface QuantityDoc {
   unit_type: string | null;
 }
 
+// Clean display of a JSON-sourced number: drop float noise and trailing zeros
+// (500 → "500", 0.5 → "0.5"). The value comes verbatim from the source's stated
+// amount — this only formats it for display, it never rounds or converts.
+function formatQuantityValue(value: number): string {
+  return Number.parseFloat(value.toFixed(4)).toString();
+}
+
+/**
+ * The English-unit rendering of a quantity for English mode — e.g. "2 tbsp",
+ * "500 g", "3 piece". Returns null when the source did not state an unambiguous
+ * value + unit (e.g. "适量", or a "碗" of unknown size); callers fall back to
+ * `raw_text` (the verbatim original) in that case.
+ *
+ * This never derives, estimates, or converts: `value`/`unit` are the
+ * extractor's explicit, unambiguous split of a *stated* amount (郫县豆瓣酱两大勺
+ * → value 2 / unit "tbsp"), the same faithful translation as `name.en` — not a
+ * fabricated number. Hard Rule 7 stays intact.
+ */
+export function englishQuantity(quantity: QuantityDoc): string | null {
+  if (quantity.value == null || quantity.unit == null) {
+    return null;
+  }
+  return `${formatQuantityValue(quantity.value)} ${quantity.unit}`;
+}
+
 export interface IngredientDoc {
   raw_text: string;
   name: BilingualText;

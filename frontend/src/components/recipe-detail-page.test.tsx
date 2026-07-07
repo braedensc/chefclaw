@@ -21,9 +21,12 @@ describe('RecipeDetailPage', () => {
 
     renderApp('/recipes/r1');
 
-    // Default: EN names, quantities straight from quantity.raw_text.
+    // Default (EN mode): a stated value+unit renders in English units
+    // ("500克" → "500 g"); an approx quantity with no unit falls back to the
+    // verbatim raw_text ("适量").
     expect(await screen.findByText('pork belly')).toBeInTheDocument();
-    expect(screen.getByText('500克')).toBeInTheDocument();
+    expect(screen.getByText('500 g')).toBeInTheDocument();
+    expect(screen.queryByText('500克')).not.toBeInTheDocument();
     expect(screen.getByText('适量')).toBeInTheDocument();
     expect(screen.queryByText('五花肉500克')).not.toBeInTheDocument();
 
@@ -32,9 +35,11 @@ describe('RecipeDetailPage', () => {
     fireEvent.click(toggle);
     expect(toggle).toHaveAttribute('aria-pressed', 'true');
 
-    // Toggled: original names + the full raw_text captured verbatim.
+    // Toggled (原文): original names + the full raw_text captured verbatim,
+    // and the English unit is gone (the raw 克 is back).
     expect(screen.getByText('五花肉500克')).toBeInTheDocument();
     expect(screen.getByText('盐适量')).toBeInTheDocument();
+    expect(screen.queryByText('500 g')).not.toBeInTheDocument();
     expect(screen.queryByText('pork belly')).not.toBeInTheDocument();
   });
 
