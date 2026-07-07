@@ -3,7 +3,8 @@
 One cover per dish: dish *i* of *N* takes the frame at ``duration * (i+1)/(N+1)``
 so sibling covers from a multi-dish video spread across it instead of all
 showing the same opening shot. Duration comes from ffprobe; when it can't be
-read the frame falls back to a fixed 3s seek.
+read the seek falls back to ``3s + 2s * dish_index`` so siblings still differ
+(a seek past EOF just fails that frame — None, acceptable).
 
 STRICTLY BEST-EFFORT: every failure (missing binary, nonzero exit, timeout,
 unreadable/tiny file) logs and yields ``None`` for that dish — cover
@@ -20,15 +21,20 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-__all__ = ["CoverGenerator", "archived_video_path", "cover_fractions", "generate_covers"]
+__all__ = ["CoverGenerator", "archived_video_path", "cover_frames", "generate_covers"]
 
-# (video_path, target_dir, fractions) -> per-dish cover paths (None = no
-# cover). fractions[i] is dish i's position in the video as a 0..1 fraction;
-# the file lands at target_dir/cover-<i>.jpg.
-CoverGenerator = Callable[[Path, Path, Sequence[float]], Awaitable[list[str | None]]]
+# (video_path, target_dir, frames) -> {dish_index: cover path | None}.
+# frames pairs each dish_index with its 0..1 position in the video; each
+# produced file lands at target_dir/cover-<dish_index>.jpg. The pairing lets
+# the backfill regenerate ONLY missing dishes at their true full-group spread.
+CoverGenerator = Callable[
+    [Path, Path, Sequence[tuple[int, float]]], Awaitable[dict[int, str | None]]
+]
 
 _SUBPROCESS_TIMEOUT_SECONDS = 30.0
-_FALLBACK_SEEK_SECONDS = 3.0  # when ffprobe can't read a duration
+# When ffprobe can't read a duration: stagger per dish so siblings differ.
+_FALLBACK_SEEK_SECONDS = 3.0
+_FALLBACK_SEEK_STEP_SECONDS = 2.0
 # 960px wide is plenty for a library card; -2 keeps the encoder-required even
 # height; -q:v 3 is visually clean JPEG at a fraction of the frame size.
 _FFMPEG_ARGS = ("-frames:v", "1", "-vf", "scale=960:-2", "-q:v", "3")
@@ -36,9 +42,16 @@ _FFMPEG_ARGS = ("-frames:v", "1", "-vf", "scale=960:-2", "-q:v", "3")
 _VIDEO_SUFFIXES = frozenset({".mp4", ".m4v", ".mov", ".mkv", ".webm", ".flv", ".ts"})
 
 
-def cover_fractions(dish_count: int) -> list[float]:
-    """Dish i of N sits at (i+1)/(N+1) — spread, never the exact start/end."""
-    return [(index + 1) / (dish_count + 1) for index in range(dish_count)]
+def cover_frames(
+    dish_count: int, indices: Sequence[int] | None = None
+) -> list[tuple[int, float]]:
+    """(dish_index, fraction) pairs: dish i of N sits at (i+1)/(N+1) — spread,
+    never the exact start/end. ``indices`` narrows to a subset (the backfill
+    regenerates only the MISSING dishes) while ``dish_count`` stays the TRUE
+    group size so the spread matches the covers that already exist."""
+    if indices is None:
+        indices = range(dish_count)
+    return [(index, (index + 1) / (dish_count + 1)) for index in indices]
 
 
 def archived_video_path(media_dir: Path) -> Path | None:
@@ -97,35 +110,41 @@ def _extract_frame(video_path: Path, timestamp: float, out_path: Path) -> bool:
 
 
 def _generate_covers_sync(
-    video_path: Path, target_dir: Path, fractions: Sequence[float]
-) -> list[str | None]:
+    video_path: Path, target_dir: Path, frames: Sequence[tuple[int, float]]
+) -> dict[int, str | None]:
+    covers: dict[int, str | None] = {dish_index: None for dish_index, _ in frames}
     try:
         target_dir.mkdir(parents=True, exist_ok=True)
     except OSError:
         logger.warning("cover generation skipped — cannot create %s", target_dir)
-        return [None] * len(fractions)
+        return covers
     duration = _probe_duration(video_path)
-    covers: list[str | None] = []
-    for index, fraction in enumerate(fractions):
-        out_path = target_dir / f"cover-{index}.jpg"
-        timestamp = duration * fraction if duration is not None else _FALLBACK_SEEK_SECONDS
-        if _extract_frame(video_path, timestamp, out_path):
-            covers.append(str(out_path))
+    for dish_index, fraction in frames:
+        out_path = target_dir / f"cover-{dish_index}.jpg"
+        if duration is not None:
+            timestamp = duration * fraction
         else:
-            logger.info("no cover for %s frame %d (ffmpeg failed)", video_path.name, index)
-            covers.append(None)
+            # Unknown duration: stagger per dish so siblings still differ; a
+            # too-long seek just fails that frame (None, acceptable).
+            timestamp = _FALLBACK_SEEK_SECONDS + _FALLBACK_SEEK_STEP_SECONDS * dish_index
+        if _extract_frame(video_path, timestamp, out_path):
+            covers[dish_index] = str(out_path)
+        else:
+            logger.info(
+                "no cover for %s dish %d (ffmpeg failed)", video_path.name, dish_index
+            )
     return covers
 
 
 async def generate_covers(
-    video_path: Path, target_dir: Path, fractions: Sequence[float]
-) -> list[str | None]:
+    video_path: Path, target_dir: Path, frames: Sequence[tuple[int, float]]
+) -> dict[int, str | None]:
     """The production :data:`CoverGenerator`: subprocess work off the event
     loop (the same to_thread pattern as the source adapters). Never raises."""
     try:
         return await asyncio.to_thread(
-            _generate_covers_sync, video_path, target_dir, list(fractions)
+            _generate_covers_sync, video_path, target_dir, list(frames)
         )
     except Exception:
         logger.warning("cover generation failed for %s", video_path, exc_info=True)
-        return [None] * len(fractions)
+        return {dish_index: None for dish_index, _ in frames}

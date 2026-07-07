@@ -34,15 +34,36 @@ def _run_recorder(calls: list[list[str]], *, probe_stdout: bytes | None, ffmpeg_
     return fake_run
 
 
-# ─── fraction math ───────────────────────────────────────────────────────────
+# ─── frame math ──────────────────────────────────────────────────────────────
 
 
 @pytest.mark.parametrize(
     ("dish_count", "expected"),
-    [(1, [0.5]), (2, [1 / 3, 2 / 3]), (3, [0.25, 0.5, 0.75])],
+    [
+        (1, [(0, 0.5)]),
+        (2, [(0, 1 / 3), (1, 2 / 3)]),
+        (3, [(0, 0.25), (1, 0.5), (2, 0.75)]),
+    ],
 )
-def test_cover_fractions_spread_across_the_video(dish_count: int, expected: list[float]) -> None:
-    assert covers.cover_fractions(dish_count) == pytest.approx(expected)
+def test_cover_frames_spread_across_the_video(
+    dish_count: int, expected: list[tuple[int, float]]
+) -> None:
+    frames = covers.cover_frames(dish_count)
+    assert [index for index, _ in frames] == [index for index, _ in expected]
+    assert [fraction for _, fraction in frames] == pytest.approx(
+        [fraction for _, fraction in expected]
+    )
+
+
+def test_cover_frames_subset_keeps_the_full_group_spread() -> None:
+    """The backfill's shape: only dish 1 of a 3-dish group is missing — its
+    fraction must be the 3-dish spread's 2/4, not a 1-dish 1/2 of a different
+    N."""
+    assert covers.cover_frames(3, [1]) == [(1, pytest.approx(0.5))]
+    assert covers.cover_frames(4, [0, 2]) == [
+        (0, pytest.approx(0.2)),
+        (2, pytest.approx(0.6)),
+    ]
 
 
 # ─── generate_covers (production generator, subprocess faked) ────────────────
@@ -59,28 +80,59 @@ async def test_generate_covers_seeks_at_duration_times_fraction(
     video.write_bytes(b"not really a video")
     target_dir = tmp_path / "archive"
 
-    result = await covers.generate_covers(video, target_dir, [1 / 3, 2 / 3])
+    result = await covers.generate_covers(video, target_dir, [(0, 1 / 3), (1, 2 / 3)])
 
-    assert result == [str(target_dir / "cover-0.jpg"), str(target_dir / "cover-1.jpg")]
+    assert result == {
+        0: str(target_dir / "cover-0.jpg"),
+        1: str(target_dir / "cover-1.jpg"),
+    }
     assert (target_dir / "cover-0.jpg").is_file()
     ffmpeg_calls = [call for call in calls if call[0] == "ffmpeg"]
     seeks = [call[call.index("-ss") + 1] for call in ffmpeg_calls]
     assert seeks == ["40.000", "80.000"]  # 120s * 1/3, 120s * 2/3
 
 
-async def test_generate_covers_falls_back_to_3s_without_duration(
+async def test_generate_covers_names_files_by_dish_index(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
+    """A missing-only backfill frame set writes cover-<dish_index>.jpg, never
+    positional cover-0 for whatever came first."""
+    calls: list[list[str]] = []
+    monkeypatch.setattr(
+        covers.subprocess, "run", _run_recorder(calls, probe_stdout=b"100.0\n")
+    )
+    video = tmp_path / "video.mp4"
+    video.write_bytes(b"not really a video")
+    target_dir = tmp_path / "archive"
+
+    result = await covers.generate_covers(video, target_dir, [(2, 0.75)])
+
+    assert result == {2: str(target_dir / "cover-2.jpg")}
+    assert (target_dir / "cover-2.jpg").is_file()
+    assert not (target_dir / "cover-0.jpg").exists()
+
+
+async def test_generate_covers_fallback_staggers_seek_per_dish(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """Unknown duration: seek 3s + 2s * dish_index so siblings still differ
+    (a too-long seek just fails that frame — None, acceptable)."""
     calls: list[list[str]] = []
     monkeypatch.setattr(covers.subprocess, "run", _run_recorder(calls, probe_stdout=None))
     video = tmp_path / "video.mp4"
     video.write_bytes(b"tiny fake file")
 
-    result = await covers.generate_covers(video, tmp_path / "archive", [0.5])
+    result = await covers.generate_covers(
+        video, tmp_path / "archive", [(0, 1 / 3), (2, 0.75)]
+    )
 
-    assert result == [str(tmp_path / "archive" / "cover-0.jpg")]
-    ffmpeg_call = next(call for call in calls if call[0] == "ffmpeg")
-    assert ffmpeg_call[ffmpeg_call.index("-ss") + 1] == "3.000"
+    assert result == {
+        0: str(tmp_path / "archive" / "cover-0.jpg"),
+        2: str(tmp_path / "archive" / "cover-2.jpg"),
+    }
+    ffmpeg_calls = [call for call in calls if call[0] == "ffmpeg"]
+    seeks = [call[call.index("-ss") + 1] for call in ffmpeg_calls]
+    assert seeks == ["3.000", "7.000"]  # 3.0 + 2.0 * dish_index
 
 
 async def test_generate_covers_ffmpeg_failure_yields_none(
@@ -90,8 +142,8 @@ async def test_generate_covers_ffmpeg_failure_yields_none(
     monkeypatch.setattr(
         covers.subprocess, "run", _run_recorder(calls, probe_stdout=b"60.0\n", ffmpeg_ok=False)
     )
-    result = await covers.generate_covers(tmp_path / "video.mp4", tmp_path / "a", [0.5])
-    assert result == [None]
+    result = await covers.generate_covers(tmp_path / "video.mp4", tmp_path / "a", [(0, 0.5)])
+    assert result == {0: None}
 
 
 async def test_generate_covers_missing_binary_yields_none(
@@ -101,19 +153,21 @@ async def test_generate_covers_missing_binary_yields_none(
         raise FileNotFoundError(args[0])
 
     monkeypatch.setattr(covers.subprocess, "run", no_binary)
-    result = await covers.generate_covers(tmp_path / "video.mp4", tmp_path / "a", [1 / 3, 2 / 3])
-    assert result == [None, None]
+    result = await covers.generate_covers(
+        tmp_path / "video.mp4", tmp_path / "a", [(0, 1 / 3), (1, 2 / 3)]
+    )
+    assert result == {0: None, 1: None}
 
 
 async def test_generate_covers_never_raises(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
-    def exploding(video_path, target_dir, fractions):
+    def exploding(video_path, target_dir, frames):
         raise RuntimeError("boom")
 
     monkeypatch.setattr(covers, "_generate_covers_sync", exploding)
-    result = await covers.generate_covers(tmp_path / "video.mp4", tmp_path / "a", [0.5])
-    assert result == [None]
+    result = await covers.generate_covers(tmp_path / "video.mp4", tmp_path / "a", [(0, 0.5)])
+    assert result == {0: None}
 
 
 # ─── archived_video_path (backfill input discovery) ──────────────────────────

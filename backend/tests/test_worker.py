@@ -38,28 +38,34 @@ class RecordingSleeper:
 
 
 class FakeCoverGenerator:
-    """Injectable cover generator: writes real cover-<i>.jpg files without
-    ever touching ffmpeg (CI tier). Records calls for path/fraction asserts."""
+    """Injectable cover generator: writes real cover-<dish_index>.jpg files
+    without ever touching ffmpeg (CI tier). Records calls for path/frame
+    asserts; ``hang`` blocks forever (store-before-covers / backfill tests)."""
 
-    def __init__(self, fail: bool = False, error: Exception | None = None) -> None:
+    def __init__(
+        self, fail: bool = False, error: Exception | None = None, hang: bool = False
+    ) -> None:
         self.fail = fail
         self.error = error
-        self.calls: list[tuple[Path, Path, list[float]]] = []
+        self.hang = hang
+        self.calls: list[tuple[Path, Path, list[tuple[int, float]]]] = []
 
     async def __call__(
-        self, video_path: Path, target_dir: Path, fractions: Sequence[float]
-    ) -> list[str | None]:
-        self.calls.append((video_path, target_dir, list(fractions)))
+        self, video_path: Path, target_dir: Path, frames: Sequence[tuple[int, float]]
+    ) -> dict[int, str | None]:
+        self.calls.append((video_path, target_dir, list(frames)))
+        if self.hang:
+            await asyncio.Event().wait()  # blocks until cancelled
         if self.error is not None:
             raise self.error
         if self.fail:
-            return [None] * len(fractions)
+            return {index: None for index, _ in frames}
         target_dir.mkdir(parents=True, exist_ok=True)
-        covers: list[str | None] = []
-        for index in range(len(fractions)):
+        covers: dict[int, str | None] = {}
+        for index, _fraction in frames:
             out_path = target_dir / f"cover-{index}.jpg"
             out_path.write_bytes(b"fake jpeg bytes")
-            covers.append(str(out_path))
+            covers[index] = str(out_path)
         return covers
 
 
@@ -606,7 +612,7 @@ class ConflictNoRowsStore(FakeJobStore):
     """store_results reports the UNIQUE violation but NO racer rows exist —
     the inconsistent-datastore shape (a non-dedupe IntegrityError)."""
 
-    async def store_results(self, job, documents, *, extraction_meta, cover_paths=None):
+    async def store_results(self, job, documents, *, extraction_meta):
         return None
 
 
@@ -808,10 +814,10 @@ async def test_media_retention_keep_moves_into_archive(tmp_path: Path) -> None:
     assert not (tmp_path / "scratch" / "chefclaw-jobs" / str(job.id)).exists()
 
 
-# ─── covers (poster keyframes — strictly best-effort) ────────────────────────
+# ─── covers (poster keyframes — strictly best-effort, post-store) ────────────
 
 
-async def test_cover_happy_path_stores_cover_path_atomically(tmp_path: Path) -> None:
+async def test_cover_happy_path_persists_cover_after_store(tmp_path: Path) -> None:
     store, source = FakeJobStore(), make_source()
     settings = make_settings(tmp_path, media_retention="keep")
     covers = FakeCoverGenerator()
@@ -823,26 +829,32 @@ async def test_cover_happy_path_stores_cover_path_atomically(tmp_path: Path) -> 
     assert job.status == "stored"
     archive_dir = tmp_path / "media" / "bilibili" / "BVtest00001-p1"
     assert store.recipes[0].cover_path == str(archive_dir / "cover-0.jpg")
+    assert Path(store.recipes[0].cover_path).is_absolute()  # media root is resolve()d
     assert (archive_dir / "cover-0.jpg").is_file()
-    # keep ⇒ the frame came from the RETAINED archive file, not scratch:
-    video_path, target_dir, fractions = covers.calls[0]
+    # The frame came from the RETAINED archive file, never scratch:
+    video_path, target_dir, frames = covers.calls[0]
     assert video_path.parent == archive_dir
     assert target_dir == archive_dir
-    assert fractions == [pytest.approx(0.5)]  # single dish: (0+1)/(1+1)
+    assert frames == [(0, pytest.approx(0.5))]  # single dish: (0+1)/(1+1)
 
 
-async def test_cover_uses_scratch_download_when_retention_discard(tmp_path: Path) -> None:
+async def test_discard_retention_never_writes_covers(tmp_path: Path) -> None:
+    """media_retention=discard (the golden/CI stacks): no scratch-sourced
+    covers, nothing persisted under media_dir — has_cover simply stays
+    false."""
     store, source = FakeJobStore(), make_source()
     settings = make_settings(tmp_path)  # media_retention="discard"
     covers = FakeCoverGenerator()
     worker, _ = make_worker(store, source, settings, FakeExtractor(), covers)
 
     await enqueue_extract(store, OWNER_ID, FAKE_URL, [source], settings)
-    await claim_and_process(worker, store)
+    job = await claim_and_process(worker, store)
 
-    video_path, _, _ = covers.calls[0]
-    assert "chefclaw-jobs" in str(video_path)  # scratch download, not archive
-    assert store.recipes[0].cover_path is not None
+    assert job.status == "stored"
+    assert covers.calls == []  # the generator never ran
+    assert store.recipes[0].cover_path is None
+    media_dir = tmp_path / "media"
+    assert not media_dir.exists() or not any(media_dir.rglob("*"))
 
 
 @pytest.mark.parametrize(
@@ -851,9 +863,9 @@ async def test_cover_uses_scratch_download_when_retention_discard(tmp_path: Path
 )
 async def test_cover_failure_still_stores_with_none(tmp_path: Path, cover_kwargs: dict) -> None:
     """A cover failure (per-dish None or the generator raising) must NEVER
-    fail or delay the job's store."""
+    fail the job — the recipes are already stored when covers run."""
     store, source = FakeJobStore(), make_source()
-    settings = make_settings(tmp_path)
+    settings = make_settings(tmp_path, media_retention="keep")
     worker, _ = make_worker(
         store, source, settings, FakeExtractor(), FakeCoverGenerator(**cover_kwargs)
     )
@@ -866,9 +878,36 @@ async def test_cover_failure_still_stores_with_none(tmp_path: Path, cover_kwargs
     assert store.recipes[0].cover_path is None
 
 
+async def test_cover_generator_hang_cannot_lose_the_paid_store(tmp_path: Path) -> None:
+    """The paid-work crash-loss window fix: the atomic store commits BEFORE
+    cover generation, so a wedged ffmpeg (slow/corrupt video) can no longer
+    delay or lose paid extraction — a crash mid-covers is healed by the
+    startup backfill."""
+    store, source = FakeJobStore(), make_source()
+    settings = make_settings(tmp_path, media_retention="keep")
+    covers = FakeCoverGenerator(hang=True)
+    worker, _ = make_worker(store, source, settings, FakeExtractor(), covers)
+
+    await enqueue_extract(store, OWNER_ID, FAKE_URL, [source], settings)
+    job = await store.claim_next_job()
+    assert job is not None
+    task = asyncio.create_task(worker.process(job))
+    for _ in range(5000):
+        if job.status == "stored":
+            break
+        await asyncio.sleep(0)
+
+    assert job.status == "stored"  # recipes landed while the generator hangs
+    assert len(job.result_recipe_ids) == 1
+    assert store.recipes[0].cover_path is None  # the backfill's job now
+    task.cancel()
+    with pytest.raises(asyncio.CancelledError):
+        await task
+
+
 async def test_multi_dish_covers_distinct_paths_and_spread_fractions(tmp_path: Path) -> None:
     store, source = FakeJobStore(), make_source()
-    settings = make_settings(tmp_path)
+    settings = make_settings(tmp_path, media_retention="keep")
     dish_two = default_dish()
     dish_two["dish_name"] = {"en": "Second dish", "original": "第二道菜"}
     covers = FakeCoverGenerator()
@@ -886,13 +925,13 @@ async def test_multi_dish_covers_distinct_paths_and_spread_fractions(tmp_path: P
         str(archive_dir / "cover-1.jpg"),
     ]
     # Sibling covers spread across the video: dish i at (i+1)/(N+1).
-    _, _, fractions = covers.calls[0]
-    assert fractions == [pytest.approx(1 / 3), pytest.approx(2 / 3)]
+    _, _, frames = covers.calls[0]
+    assert frames == [(0, pytest.approx(1 / 3)), (1, pytest.approx(2 / 3))]
 
 
 async def test_upload_job_cover_lands_under_local_platform(tmp_path: Path) -> None:
     store = FakeJobStore()
-    settings = make_settings(tmp_path)
+    settings = make_settings(tmp_path, media_retention="keep")
     video = tmp_path / "saved.mp4"
     video.write_bytes(b"uploaded video")
     await enqueue_upload(store, OWNER_ID, video, None, None, settings)
@@ -922,9 +961,38 @@ async def test_backfill_generates_covers_from_archived_videos(tmp_path: Path) ->
     await worker.backfill_covers()
 
     assert recipe.cover_path == str(archive_dir / "cover-0.jpg")
-    video_path, _, fractions = covers.calls[0]
+    video_path, _, frames = covers.calls[0]
     assert video_path == archive_dir / "BVfake000.mp4"
-    assert fractions == [pytest.approx(0.5)]
+    assert frames == [(0, pytest.approx(0.5))]
+
+
+async def test_backfill_partial_group_regenerates_only_missing_at_true_fractions(
+    tmp_path: Path,
+) -> None:
+    """A partially-covered multi-dish group: fractions come from the group's
+    TRUE dish count (covered siblings included, max(dish_index)+1 over ALL
+    rows), only the MISSING dishes are requested, and existing sibling covers
+    are never overwritten."""
+    store = FakeJobStore()
+    settings = make_settings(tmp_path)
+    archive_dir = tmp_path / "media" / "bilibili" / "BVfake000-p1"
+    archive_dir.mkdir(parents=True)
+    (archive_dir / "BVfake000.mp4").write_bytes(b"retained video")
+    covered_zero = store.seed_recipe(dish_index=0, cover_path=str(archive_dir / "cover-0.jpg"))
+    missing_one = store.seed_recipe(dish_index=1, cover_path=None)
+    covered_two = store.seed_recipe(dish_index=2, cover_path=str(archive_dir / "cover-2.jpg"))
+    covers = FakeCoverGenerator()
+    worker, _ = make_worker(store, make_source(), settings, FakeExtractor(), covers)
+
+    await worker.backfill_covers()
+
+    # Only dish 1 was requested, at the 3-dish spread's (1+1)/(3+1) = 0.5 —
+    # never a 1-dish 0.5-of-a-different-N by accident of the missing count:
+    _, _, frames = covers.calls[0]
+    assert frames == [(1, pytest.approx(2 / 4))]
+    assert missing_one.cover_path == str(archive_dir / "cover-1.jpg")
+    assert covered_zero.cover_path == str(archive_dir / "cover-0.jpg")  # untouched
+    assert covered_two.cover_path == str(archive_dir / "cover-2.jpg")  # untouched
 
 
 async def test_backfill_skips_recipes_without_an_archived_video(tmp_path: Path) -> None:
@@ -989,10 +1057,54 @@ async def test_run_forever_backfills_once_when_enabled(tmp_path: Path) -> None:
             await asyncio.sleep(0)
         assert recipe.cover_path == str(archive_dir / "cover-0.jpg")
         assert len(covers.calls) == 1  # one-shot, not per idle loop
+        assert worker.backfill_task is not None  # the handle is exposed
     finally:
         task.cancel()
         with pytest.raises(asyncio.CancelledError):
             await task
+
+
+async def test_backfill_runs_in_background_without_delaying_job_claims(tmp_path: Path) -> None:
+    """The one-shot backfill is a BACKGROUND task: a slow/wedged ffmpeg pass
+    must never delay the first job claim. (Job execution stays strictly
+    serial — the backfill only runs ffmpeg subprocesses + row updates.)"""
+    store = FakeJobStore()
+    settings = make_settings(tmp_path)  # discard: the live job never calls the generator
+    stale = store.seed_recipe(cover_path=None, canonical_id="BVstale")
+    archive_dir = tmp_path / "media" / "bilibili" / "BVstale"
+    archive_dir.mkdir(parents=True)
+    (archive_dir / "video.mp4").write_bytes(b"retained video")
+    covers = FakeCoverGenerator(hang=True)  # the backfill wedges on its generator
+    source = make_source()
+    worker = Worker(
+        store=store,
+        adapters=[source],
+        settings=settings,
+        extractor_factory=lambda _s: FakeExtractor(),
+        cover_generator=covers,
+        backfill_covers_on_start=True,
+        sleeper=YieldingSleeper(),
+        jitter=lambda: 0.0,
+    )
+    job, _ = await enqueue_extract(store, OWNER_ID, FAKE_URL, [source], settings)
+
+    task = asyncio.create_task(worker.run_forever())
+    try:
+        for _ in range(5000):
+            if job.status == "stored":
+                break
+            await asyncio.sleep(0)
+        assert job.status == "stored"  # claimed + processed while the backfill hangs
+        assert worker.backfill_task is not None
+        assert not worker.backfill_task.done()
+        assert stale.cover_path is None
+    finally:
+        task.cancel()
+        with pytest.raises(asyncio.CancelledError):
+            await task
+    # Worker shutdown cancels the backfill with it:
+    with pytest.raises(asyncio.CancelledError):
+        await worker.backfill_task
 
 
 async def test_run_forever_skips_backfill_by_default(tmp_path: Path) -> None:
@@ -1020,6 +1132,7 @@ async def test_run_forever_skips_backfill_by_default(tmp_path: Path) -> None:
         task.cancel()
         with pytest.raises(asyncio.CancelledError):
             await task
+    assert worker.backfill_task is None
     assert covers.calls == []
     assert recipe.cover_path is None
 

@@ -1,12 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 
-import { getToken } from '../../token';
+import { getRecipeCoverApiRecipesRecipeIdCoverGetOptions } from '../../client/@tanstack/react-query.gen';
+import { fallbackCoverGradient, platformAccent } from './platform-accents';
+import { SteamWisps } from './steam-wisps';
 
-// The authed recipe-cover image. <img> can't send an Authorization header, so
-// the cover bytes come down via an authed fetch → blob → object URL. Loading
-// and error states show the same platform-tinted fallback as hasCover=false —
-// no spinner flash; empty covers still look intentional.
+// The authed recipe-cover image, fetched through the generated SDK — auth and
+// ApiError mapping live centrally in src/api.ts. <img> can't send an
+// Authorization header, so the cover bytes come down as a blob → object URL.
+// Loading and error states show the same platform-tinted fallback as
+// hasCover=false — no spinner flash; empty covers still look intentional.
 
 export interface CoverImageProps {
   recipeId: string;
@@ -17,15 +20,6 @@ export interface CoverImageProps {
   className?: string;
 }
 
-// Platform accent for the fallback's corner spill (tokens in src/index.css).
-const PLATFORM_TINTS: Record<string, string> = {
-  bilibili: 'var(--color-platform-bilibili)',
-  rednote: 'var(--color-platform-rednote)',
-  local: 'var(--color-platform-local)',
-};
-
-const FALLBACK_TINT = 'var(--color-warm)';
-
 // Legibility scrim baked over every state — dark bottom ~45% so overlaid
 // titles read (direction B's .nn-cover::after treatment).
 const SCRIM =
@@ -33,39 +27,24 @@ const SCRIM =
 
 /** Refined dark gradient in the platform hue + subtle steam wisps. */
 function FallbackArt({ platform, alt }: { platform: string; alt: string }) {
-  const tint = PLATFORM_TINTS[platform] ?? FALLBACK_TINT;
+  const { tint } = platformAccent(platform);
   return (
     <div
       role="img"
       aria-label={alt}
       data-cover-fallback
       className="absolute inset-0"
-      style={{
-        background: `radial-gradient(95% 85% at 100% 0%, color-mix(in srgb, ${tint} 15%, transparent), transparent 58%), linear-gradient(160deg, #101014 0%, var(--color-panel) 55%, #060608 100%)`,
-      }}
+      style={{ background: fallbackCoverGradient(tint, 15) }}
     >
       <svg
         viewBox="0 0 64 64"
         aria-hidden="true"
         className="absolute top-1/2 left-1/2 h-1/3 w-auto -translate-x-1/2 -translate-y-1/2 opacity-60"
       >
-        <g stroke="#f4e9d4" strokeWidth="2.4" strokeLinecap="round" fill="none">
-          <path
-            className="steam-wisp"
-            d="M22 46 C20 42 24 39 22 34"
-            opacity=".35"
-          />
-          <path
-            className="steam-wisp steam-wisp-2"
-            d="M32 44 C30 40 34 37 32 31"
-            opacity=".45"
-          />
-          <path
-            className="steam-wisp steam-wisp-3"
-            d="M42 46 C40 42 44 39 42 34"
-            opacity=".35"
-          />
-        </g>
+        <SteamWisps
+          transform="translate(0 24)"
+          opacities={[0.35, 0.45, 0.35]}
+        />
       </svg>
     </div>
   );
@@ -79,36 +58,32 @@ export function CoverImage({
   className,
 }: CoverImageProps) {
   const coverQuery = useQuery({
-    queryKey: ['recipe-cover', recipeId],
-    queryFn: async () => {
-      const token = getToken();
-      const response = await fetch(`/api/recipes/${recipeId}/cover`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-      });
-      if (!response.ok) {
-        throw new Error(`cover fetch failed (${response.status})`);
-      }
-      return response.blob();
-    },
+    ...getRecipeCoverApiRecipesRecipeIdCoverGetOptions({
+      path: { recipe_id: recipeId },
+    }),
     enabled: hasCover,
-    // The cover never changes for a stored recipe — fetch once per session.
+    // The cover never changes for a stored recipe — fetch once per session
+    // and never evict (the default 5-min gcTime would re-download the bytes
+    // on back-navigation).
     staleTime: Infinity,
+    gcTime: Infinity,
     retry: false,
   });
 
-  // Object URL is created here and revoked in the effect cleanup — effect
-  // (not useMemo) so StrictMode's double-invoke never leaks a URL.
-  const blob = coverQuery.data ?? null;
-  const [objectUrl, setObjectUrl] = useState<string | null>(null);
+  // The generated response type is `unknown`; the client parses the image
+  // bytes to a Blob. The object URL is derived synchronously (useMemo) so
+  // the image paints on the same render the blob lands — no post-paint
+  // flash from a useState-in-effect double render; the effect cleanup
+  // revokes the previous URL on change/unmount.
+  const blob = coverQuery.data instanceof Blob ? coverQuery.data : null;
+  const objectUrl = useMemo(
+    () => (blob === null ? null : URL.createObjectURL(blob)),
+    [blob],
+  );
   useEffect(() => {
-    if (!blob) {
-      setObjectUrl(null);
-      return;
-    }
-    const url = URL.createObjectURL(blob);
-    setObjectUrl(url);
-    return () => URL.revokeObjectURL(url);
-  }, [blob]);
+    if (objectUrl === null) return;
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [objectUrl]);
 
   const showImage = hasCover && objectUrl !== null && !coverQuery.isError;
 

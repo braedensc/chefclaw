@@ -8,15 +8,12 @@ import {
 } from '../client/@tanstack/react-query.gen';
 import type { JobOut } from '../client/types.gen';
 import { apiErrorMessage } from '../lib/error-message';
+import { STRIP_LIGHT } from './brand/platform-accents';
 
 interface PasteBarProps {
   /** Called with the job resource (202 new / 200 dedupe hit) — adds a chip. */
   onJob: (job: JobOut) => void;
 }
-
-// The stall's neon strip light along the top edge (direction B .nn-paste::before).
-const STRIP_LIGHT =
-  'linear-gradient(90deg, transparent, var(--color-chili) 22%, var(--color-gold) 50%, var(--color-cyan) 78%, transparent)';
 
 /**
  * The core-loop entry point, pinned at the top of the library — direction B's

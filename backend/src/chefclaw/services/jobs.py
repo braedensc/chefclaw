@@ -26,7 +26,7 @@ import shutil
 import tempfile
 import time
 import uuid
-from collections.abc import Awaitable, Callable, Sequence
+from collections.abc import Awaitable, Callable, Mapping, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -40,14 +40,14 @@ from chefclaw.extractors import (
     extractor_model_id,
     get_extractor,
 )
-from chefclaw.models import Job, JobStatus, Recipe
+from chefclaw.models import Job, JobStatus
 from chefclaw.services.covers import (
     CoverGenerator,
     archived_video_path,
-    cover_fractions,
+    cover_frames,
     generate_covers,
 )
-from chefclaw.services.repo import JobStore
+from chefclaw.services.repo import JobStore, RecipeCoverRef
 from chefclaw.sources import CanonicalRef, FetchedMedia, SourceAdapter, resolve_source
 from chefclaw.sources.localfile import LocalFileSource
 
@@ -243,6 +243,9 @@ class Worker:
         # it on for the one-shot startup pass.
         self._cover_generator = cover_generator
         self._backfill_covers_on_start = backfill_covers_on_start
+        # The one-shot backfill's task handle (run_forever spawns it in the
+        # background) — exposed for tests and cancelled on worker shutdown.
+        self.backfill_task: asyncio.Task[None] | None = None
         self._sleeper = sleeper
         self._jitter = jitter
         self._idle_seconds = idle_seconds
@@ -254,51 +257,64 @@ class Worker:
         hiccup (compose boots services in parallel; CI smoke has no DB at
         all) — it just idles and retries."""
         reconciled = False
-        while True:
-            if not reconciled:
+        try:
+            while True:
+                if not reconciled:
+                    try:
+                        flipped = await self.store.reconcile_interrupted()
+                        if flipped:
+                            logger.warning("reconciled %d interrupted job(s) to failed", flipped)
+                        reconciled = True
+                    except Exception:
+                        logger.debug("startup reconcile failed (db not up yet?)", exc_info=True)
+                        await self._sleeper(self._idle_seconds)
+                        continue
+                    if self._backfill_covers_on_start and self.backfill_task is None:
+                        # One-shot, best-effort, never raises — spawned in the
+                        # BACKGROUND so a slow ffmpeg pass never delays the
+                        # first claim. Job execution stays strictly serial:
+                        # the backfill only runs ffmpeg subprocesses + row
+                        # updates, which is acceptable concurrency.
+                        self.backfill_task = asyncio.create_task(
+                            self.backfill_covers(), name="chefclaw-cover-backfill"
+                        )
                 try:
-                    flipped = await self.store.reconcile_interrupted()
-                    if flipped:
-                        logger.warning("reconciled %d interrupted job(s) to failed", flipped)
-                    reconciled = True
+                    job = await self.store.claim_next_job()
                 except Exception:
-                    logger.debug("startup reconcile failed (db not up yet?)", exc_info=True)
+                    logger.warning("job claim failed; retrying", exc_info=True)
                     await self._sleeper(self._idle_seconds)
                     continue
-                if self._backfill_covers_on_start:
-                    await self.backfill_covers()  # one-shot, best-effort, never raises
-            try:
-                job = await self.store.claim_next_job()
-            except Exception:
-                logger.warning("job claim failed; retrying", exc_info=True)
-                await self._sleeper(self._idle_seconds)
-                continue
-            if job is None:
-                await self._sleeper(self._idle_seconds)
-                continue
-            try:
-                await self.process(job)
-            except Exception as exc:
-                # process() only leaks an exception when the STORE itself
-                # failed (db outage mid-job: set_status/requeue/mark_failed
-                # raised). The job is left mid-stage for the next boot's
-                # reconcile — but the worker task MUST survive: a dead task
-                # means no job ever runs again while the api looks healthy.
-                logger.exception(
-                    "job %s processing leaked an error (db outage?); "
-                    "leaving it mid-stage for reconcile",
-                    job.id,
-                    extra={"job_id": str(job.id), "stage": "store"},
-                )
-                observability.capture_job_failure(
-                    exc,
-                    job_id=job.id,
-                    stage="store",
-                    error_type="store_failure",
-                    platform=job.platform,
-                    attempt=job.attempts,
-                )
-                await self._sleeper(self._idle_seconds)
+                if job is None:
+                    await self._sleeper(self._idle_seconds)
+                    continue
+                try:
+                    await self.process(job)
+                except Exception as exc:
+                    # process() only leaks an exception when the STORE itself
+                    # failed (db outage mid-job: set_status/requeue/mark_failed
+                    # raised). The job is left mid-stage for the next boot's
+                    # reconcile — but the worker task MUST survive: a dead task
+                    # means no job ever runs again while the api looks healthy.
+                    logger.exception(
+                        "job %s processing leaked an error (db outage?); "
+                        "leaving it mid-stage for reconcile",
+                        job.id,
+                        extra={"job_id": str(job.id), "stage": "store"},
+                    )
+                    observability.capture_job_failure(
+                        exc,
+                        job_id=job.id,
+                        stage="store",
+                        error_type="store_failure",
+                        platform=job.platform,
+                        attempt=job.attempts,
+                    )
+                    await self._sleeper(self._idle_seconds)
+        finally:
+            # Worker shutdown takes the backfill with it (best-effort work —
+            # the next boot's backfill picks up whatever it left missing).
+            if self.backfill_task is not None:
+                self.backfill_task.cancel()
 
     # ── one job, claim to terminal ───────────────────────────────────────────
 
@@ -544,10 +560,11 @@ class Worker:
         if retention_warnings:
             extraction_meta["warnings"].extend(retention_warnings)
 
-        cover_paths = await self._generate_covers(job, media, retained, len(documents))
-
+        # The atomic store comes FIRST — covers must never sit inside the
+        # paid-work crash-loss window (a wedged ffmpeg before the store would
+        # reconcile to interrupted and a human retry would re-pay).
         recipe_ids = await self.store.store_results(
-            job, documents, extraction_meta=extraction_meta, cover_paths=cover_paths
+            job, documents, extraction_meta=extraction_meta
         )
         if recipe_ids is None:
             # UNIQUE(platform, canonical_id, dish_index) fired: a raced
@@ -564,6 +581,10 @@ class Worker:
                 err.retryable = False
                 raise err
             await self.store.adopt_recipes(job.id, recipe_ids)
+            return recipe_ids  # the racer's rows — their own cover pass owns them
+        # Covers AFTER the commit: best-effort, and a crash between the store
+        # and here is healed by the startup backfill (its documented job).
+        await self._store_covers(job, media, retained, recipe_ids)
         return recipe_ids
 
     async def _record_attempt(self, job: Job, usage: ExtractionUsage | None) -> None:
@@ -586,81 +607,118 @@ class Worker:
             cost_usd=spend.estimate_cost(usage),
         )
 
-    # ── covers (poster keyframes — strictly best-effort) ─────────────────────
+    # ── covers (poster keyframes — strictly best-effort, post-store) ─────────
 
-    async def _generate_covers(
-        self, job: Job, media: FetchedMedia, retained: list[str], dish_count: int
-    ) -> list[str | None]:
-        """One poster keyframe per dish, from the retained archive file
-        (media_retention=keep) or the scratch download. STRICTLY BEST-EFFORT:
-        any failure yields None for that dish — a cover must never fail or
-        delay the job's store."""
+    def _media_root(self) -> Path:
+        # resolve() so every persisted cover_path is absolute — the /cover
+        # route serves only files that resolve under this same root.
+        return Path(self._settings.media_dir).resolve()
+
+    async def _store_covers(
+        self, job: Job, media: FetchedMedia, retained: list[str], recipe_ids: Sequence[uuid.UUID]
+    ) -> None:
+        """One poster keyframe per dish, generated AFTER the atomic store and
+        persisted per row via set_recipe_cover. STRICTLY BEST-EFFORT: any
+        failure just leaves cover_path NULL (the backfill may heal it later).
+        Covers come from the RETAINED archive file ONLY — with
+        media_retention=discard nothing is ever written under media_dir
+        (has_cover simply stays false, e.g. the golden/CI stacks)."""
+        if self._settings.media_retention != "keep":
+            return
         try:
             video_path = self._cover_source_video(media, retained)
             if video_path is None:
-                return [None] * dish_count
-            target_dir = Path(self._settings.media_dir) / job.platform / job.canonical_id
-            covers = list(
-                await self._cover_generator(video_path, target_dir, cover_fractions(dish_count))
+                return
+            target_dir = self._media_root() / job.platform / job.canonical_id
+            dish_count = len(recipe_ids)
+            await self._generate_and_persist_covers(
+                video_path,
+                target_dir,
+                cover_frames(dish_count),
+                dict(enumerate(recipe_ids)),
             )
         except Exception:
             logger.warning(
-                "job %s cover generation failed; storing without covers", job.id, exc_info=True
+                "job %s cover generation failed; recipes stored without covers",
+                job.id,
+                exc_info=True,
             )
-            return [None] * dish_count
-        # Defensive length normalization — the store zips covers onto dishes.
-        return covers[:dish_count] + [None] * (dish_count - len(covers))
 
     @staticmethod
     def _cover_source_video(media: FetchedMedia, retained: list[str]) -> Path | None:
         # media_retention=keep MOVED the download into the archive — the
-        # retained entry with the download's filename is the video; discard
-        # mode leaves it in scratch (cleaned only after the store).
+        # retained entry with the download's filename is the video. No scratch
+        # fallback: covers are generated from the retained archive file only.
         for entry in retained:
             path = Path(entry)
             if path.name == media.video_path.name and path.is_file():
                 return path
-        if media.video_path.is_file():
-            return media.video_path
         return None
 
+    async def _generate_and_persist_covers(
+        self,
+        video_path: Path,
+        target_dir: Path,
+        frames: Sequence[tuple[int, float]],
+        recipe_id_by_dish: Mapping[int, uuid.UUID],
+    ) -> int:
+        """The shared generate→persist path (live post-store stage AND the
+        startup backfill): run the generator once for ``frames``, then point
+        each produced cover-<dish_index>.jpg at its recipe row. Returns how
+        many covers landed."""
+        covers = await self._cover_generator(video_path, target_dir, frames)
+        persisted = 0
+        for dish_index, cover in covers.items():
+            recipe_id = recipe_id_by_dish.get(dish_index)
+            if cover is None or recipe_id is None:
+                continue
+            await self.store.set_recipe_cover(recipe_id, cover)
+            persisted += 1
+        return persisted
+
     async def backfill_covers(self) -> None:
-        """One-shot startup backfill (strictly serial, best-effort): recipes
-        stored before the cover stage existed get a poster keyframe from
-        their retained archive video. Never raises — a failed backfill must
-        never take the worker down."""
+        """One-shot startup backfill (best-effort): any recipe missing a cover
+        — stored before the cover stage existed, OR stored by a run that
+        crashed between the atomic store and its post-store cover pass — gets
+        a poster keyframe from its retained archive video. Never raises — a
+        failed backfill must never take the worker down."""
         try:
             missing = await self.store.list_recipes_missing_covers()
+            if not missing:
+                return
+            # TRUE dish count per group (covered siblings included): a
+            # partially-covered group keeps the same (i+1)/(N+1) spread its
+            # existing covers were cut at.
+            dish_counts = await self.store.group_dish_counts()
         except Exception:
             logger.warning("cover backfill: could not list recipes", exc_info=True)
             return
-        if not missing:
-            return
         generated = skipped = 0
-        groups: dict[tuple[str, str], list[Recipe]] = {}
+        groups: dict[tuple[str, str], list[RecipeCoverRef]] = {}
         for recipe in missing:
             groups.setdefault((recipe.platform, recipe.canonical_id), []).append(recipe)
+        media_root = self._media_root()
         for (platform, canonical_id), recipes in groups.items():
             try:
-                media_dir = Path(self._settings.media_dir) / platform / canonical_id
+                media_dir = media_root / platform / canonical_id
                 video_path = archived_video_path(media_dir)
                 if video_path is None:
                     skipped += len(recipes)
                     continue
-                # Same spread as the live stage: dish i sits at (i+1)/(N+1).
-                dish_count = max(recipe.dish_index for recipe in recipes) + 1
-                covers = await self._cover_generator(
-                    video_path, media_dir, cover_fractions(dish_count)
+                dish_count = dish_counts.get(
+                    (platform, canonical_id),
+                    max(recipe.dish_index for recipe in recipes) + 1,
                 )
-                for recipe in recipes:
-                    cover = (
-                        covers[recipe.dish_index] if recipe.dish_index < len(covers) else None
-                    )
-                    if cover is None:
-                        skipped += 1
-                        continue
-                    await self.store.set_recipe_cover(recipe.id, cover)
-                    generated += 1
+                # Only the MISSING dishes are generated — sibling covers that
+                # already exist are never overwritten.
+                landed = await self._generate_and_persist_covers(
+                    video_path,
+                    media_dir,
+                    cover_frames(dish_count, [recipe.dish_index for recipe in recipes]),
+                    {recipe.dish_index: recipe.id for recipe in recipes},
+                )
+                generated += landed
+                skipped += len(recipes) - landed
             except Exception:
                 skipped += len(recipes)
                 logger.warning(

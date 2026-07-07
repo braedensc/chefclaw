@@ -10,11 +10,11 @@ local = warm white), condensed-caps Latin display type over ZH-first bilingual t
 landed as **Tailwind v4 `@theme` tokens** plus a small set of brand components. The
 mascot is the **claw-family puppy chef** (the same real dog behind todoclaw's icon, in
 a toque), not a food-themed character. Recipe cards and the detail page carry **real
-poster frames extracted from the retained source video**: a best-effort ffmpeg worker
-stage writes one JPEG per dish into the media archive, `cover_path` is stored in the
-same transaction as the recipes, and covers are served owner-scoped via
-`GET /api/recipes/{id}/cover` (the SPA fetches them with the bearer header into blob
-URLs — `<img>` alone cannot authenticate).
+poster frames extracted from the retained source video**: after the recipes are
+stored, a best-effort ffmpeg stage writes one JPEG per dish into the media archive
+and updates `cover_path` per recipe; covers are served owner-scoped via
+`GET /api/recipes/{id}/cover` (the SPA fetches them through the generated client into
+blob URLs — `<img>` alone cannot authenticate).
 
 ## Why
 
@@ -28,15 +28,26 @@ URLs — `<img>` alone cannot authenticate).
   retained (`MEDIA_RETENTION=keep`) and ffmpeg is already in the api image (DASH
   merge), so real covers cost one worker stage — no new service, pennies of storage.
   Multi-dish videos get frames at `duration * (i+1)/(N+1)` so sibling cards differ.
-  **Best-effort by design:** a cover failure logs and stores `NULL`; it never fails or
-  delays the job (the recipe is the product, the cover is garnish). A one-shot startup
-  backfill covers pre-existing recipes. Rejected: thumbnails via the extractor model
-  (paid, unnecessary) and public/static serving (violates owner-scoping — covers are
-  served through the authed route with the path `resolve()`d under `media_dir`).
-- **Card facts are projections, not new truth:** `RecipeSummary` gains
-  `has_cover` / `difficulty` / `total_time_minutes` / `ingredient_count`, all projected
-  verbatim from the already-validated document (Hard Rule 7: nothing derived, nothing
-  estimated). The filesystem `cover_path` is never exposed in the API.
+  **Best-effort, outside the paid-work window:** covers run AFTER the atomic store —
+  a hung ffmpeg or a crash can never delay or lose paid extraction (the recipe is the
+  product, the cover is garnish); a failure logs and leaves `cover_path` NULL. The
+  one-shot startup backfill (a non-blocking background task) is the reconciler for
+  both pre-existing recipes and any store-then-crash gap. Covers come only from the
+  retained archive — `MEDIA_RETENTION=discard` writes nothing to the media volume,
+  as discard promises. Rejected: thumbnails via the extractor model (paid,
+  unnecessary); public/static serving (violates owner-scoping — covers go through
+  the authed route with the path `resolve()`d under `media_dir`);
+  covers-inside-the-store-transaction (aesthetic atomicity is not worth coupling the
+  paid path to ffmpeg). Accepted tradeoff: a permanently corrupt archived video is
+  re-attempted once per process start, bounded by the 30s subprocess timeouts —
+  revisit with a persisted attempted-marker if boot logs ever show repeated backfill
+  failures.
+- **Card facts come from the validated document, never invented:** `RecipeSummary`
+  gains `has_cover` / `difficulty` / `total_time_minutes` / `ingredient_count` —
+  difficulty and time lifted verbatim; `ingredient_count` is the structural length
+  of the ingredients list (a count of entries, not a food quantity — Hard Rule 7
+  governs food data like amounts and weights). The filesystem `cover_path` is never
+  exposed in the API.
 - **Type that respects both languages:** ZH dish names lead (system CJK stacks —
   PingFang SC on Apple devices, Noto fallback elsewhere; a CJK webfont would cost
   megabytes for no gain on the owner's devices), with self-hosted Barlow Condensed

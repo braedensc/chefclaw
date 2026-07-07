@@ -13,6 +13,8 @@ import {
   RETRYABLE_ERROR_TYPES,
   statusLabel,
 } from '../lib/job-status';
+import { STRIP_LIGHT } from './brand/platform-accents';
+import { SteamWisps } from './brand/steam-wisps';
 import { PlatformBadge } from './platform-badge';
 
 interface JobsDrawerProps {
@@ -57,7 +59,8 @@ export function JobsDrawer({ onClose }: JobsDrawerProps) {
       {/* neon strip light along the top of the stall (B's paste-bar ::before) */}
       <div
         aria-hidden="true"
-        className="h-px shrink-0 bg-[linear-gradient(90deg,transparent,var(--color-chili)_22%,var(--color-gold)_50%,var(--color-cyan)_78%,transparent)] opacity-80"
+        className="h-px shrink-0 opacity-80"
+        style={{ background: STRIP_LIGHT }}
       />
       <div className="flex items-center justify-between border-b border-line px-4 py-3">
         <span className="flex items-baseline gap-2">
@@ -116,34 +119,19 @@ export function JobsDrawer({ onClose }: JobsDrawerProps) {
 
 /** Simmering-pot accent for active rows — wisps animate reduced-motion-guarded. */
 function SteamAccent() {
+  // The viewBox frames the shared 64-space trio at the same on-screen size,
+  // position, and stroke weight the old hand-drawn 24-space copy had.
   return (
     <svg
-      viewBox="0 0 24 24"
+      viewBox="14 -6 36 36"
       aria-hidden="true"
       className="size-4 shrink-0 text-warm"
     >
-      <g
+      <SteamWisps
         stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        fill="none"
-      >
-        <path
-          className="steam-wisp"
-          d="M7 19 C5.5 15.5 9 13 7 9"
-          opacity=".45"
-        />
-        <path
-          className="steam-wisp steam-wisp-2"
-          d="M12 20 C10.5 16 14 13.5 12 8.5"
-          opacity=".65"
-        />
-        <path
-          className="steam-wisp steam-wisp-3"
-          d="M17 19 C15.5 15.5 19 13 17 9"
-          opacity=".45"
-        />
-      </g>
+        strokeWidth={3}
+        opacities={[0.45, 0.65, 0.45]}
+      />
     </svg>
   );
 }

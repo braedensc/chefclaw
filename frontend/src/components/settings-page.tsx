@@ -7,6 +7,7 @@ import {
   healthApiHealthGetOptions,
 } from '../client/@tanstack/react-query.gen';
 import type { HealthResponse } from '../client/types.gen';
+import { CHILI_BTN, CYAN_BTN } from '../lib/button-styles';
 import { useTokenActions } from '../token-context';
 
 /**
@@ -18,14 +19,6 @@ export const HEALTH_POLL_MS = 15_000;
 
 /** Spend-history window requested from GET /api/spend (V2-A). */
 export const SPEND_HISTORY_DAYS = 30;
-
-/** Chili primary action — the neon-tube button for the loud recovery path. */
-const CHILI_BTN =
-  'rounded-field border border-chili/70 bg-chili/10 px-3 py-1.5 font-display text-xs font-bold uppercase tracking-[0.14em] text-chili-bright glow-text-chili transition-colors hover:bg-chili/20';
-
-/** Cyan ghost action — the quiet retry affordance. */
-const CYAN_BTN =
-  'rounded-field border border-cyan/50 px-3 py-1.5 font-display text-xs font-semibold uppercase tracking-[0.14em] text-cyan transition-colors hover:bg-cyan/10 hover:glow-text-cyan';
 
 /**
  * Screen 4 (plan §7): Settings/health — which extractor/model is live,

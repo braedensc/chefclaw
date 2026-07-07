@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 
+import { STAGES } from '../../src/lib/cooking-stages';
 import { seedToken, wipeRecipes } from './helpers';
 
 // The core-loop golden path (plan §16.9): paste → job chip → stored card →
@@ -22,6 +23,15 @@ import { seedToken, wipeRecipes } from './helpers';
 const PASTE_URL = 'fake://golden-e2e-1';
 const DISH_EN = 'Red-braised pork belly';
 
+// Active-stage chip copy comes from the SAME map the chip renders
+// (src/lib/cooking-stages.ts) — spec and UI copy stay in lockstep.
+const ACTIVE_STAGE_COPY = new RegExp(
+  Object.values(STAGES)
+    .filter((stage) => stage.step !== null)
+    .map((stage) => stage.copy.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+    .join('|'),
+);
+
 test.beforeEach(async ({ request }) => {
   await wipeRecipes(request);
 });
@@ -43,9 +53,7 @@ test('paste a link, watch the chip to stored, browse the card and detail', async
   // "Stored" there).
   const chip = page.getByRole('status').filter({ hasText: PASTE_URL });
   await expect(chip).toBeVisible();
-  await expect(chip).toContainText(
-    /in the queue|fetching the video|reading the recipe|checking the notes/,
-  );
+  await expect(chip).toContainText(ACTIVE_STAGE_COPY);
 
   // On stored the chip morphs into the card: card in the grid, chip gone.
   const card = page.getByRole('link', { name: new RegExp(DISH_EN) });

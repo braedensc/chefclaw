@@ -47,15 +47,15 @@ async def _noop_sleep(_seconds: float) -> None:
     return None
 
 
-async def _fake_cover_generator(video_path, target_dir, fractions):
+async def _fake_cover_generator(video_path, target_dir, frames):
     """Cover seam double: real files, no ffmpeg (the golden tier is about
     real SQL, not real frame extraction)."""
     target_dir.mkdir(parents=True, exist_ok=True)
-    covers: list[str | None] = []
-    for index in range(len(fractions)):
+    covers: dict[int, str | None] = {}
+    for index, _fraction in frames:
         out_path = target_dir / f"cover-{index}.jpg"
         out_path.write_bytes(b"jpg")
-        covers.append(str(out_path))
+        covers[index] = str(out_path)
     return covers
 
 
@@ -91,8 +91,8 @@ async def owner_id(sessionmaker) -> uuid.UUID:
         return user.id
 
 
-def golden_settings(tmp_path: Path) -> Settings:
-    return Settings(
+def golden_settings(tmp_path: Path, **overrides) -> Settings:
+    defaults = dict(
         chefclaw_api_token="golden-test",
         monthly_llm_budget_usd="10",
         max_extraction_attempts_per_day="25",
@@ -101,6 +101,8 @@ def golden_settings(tmp_path: Path) -> Settings:
         scratch_dir=str(tmp_path / "scratch"),
         media_dir=str(tmp_path / "media"),
     )
+    defaults.update(overrides)
+    return Settings(**defaults)
 
 
 def make_store(sessionmaker, tmp_path: Path) -> PostgresJobStore:
@@ -129,9 +131,10 @@ async def test_skip_locked_claim_is_exclusive(sessionmaker, owner_id, tmp_path: 
 
 async def test_atomic_store_and_ledger(sessionmaker, owner_id, tmp_path: Path) -> None:
     """Full pipeline against real SQL: N-row insert + job flip in one
-    transaction, spend ledgered, dedupe visible to a re-enqueue."""
-    store = make_store(sessionmaker, tmp_path)
-    settings = golden_settings(tmp_path)
+    transaction, spend ledgered, covers persisted POST-store (real
+    set_recipe_cover UPDATEs), dedupe visible to a re-enqueue."""
+    settings = golden_settings(tmp_path, media_retention="keep")
+    store = PostgresJobStore(sessionmaker, settings)
     source = FakeSource(platform="bilibili", canonical_id="BVgolden003-p1")
     dish_two = default_dish()
     dish_two["dish_name"] = {"en": "Second dish", "original": "第二道菜"}
@@ -161,8 +164,10 @@ async def test_atomic_store_and_ledger(sessionmaker, owner_id, tmp_path: Path) -
     assert stored_job.result_recipe_ids == [r.id for r in recipes]
     assert recipes[0].document["source"]["url"] == FAKE_URL
     assert spend_count == 1
-    # Covers rode the SAME transaction: per-dish cover-<i>.jpg on each row.
-    archive_dir = Path(settings.media_dir) / "bilibili" / "BVgolden003-p1"
+    # Covers persisted AFTER the atomic store (per-row set_recipe_cover
+    # UPDATEs from the resolved media root) — never inside the paid-work
+    # crash-loss window.
+    archive_dir = Path(settings.media_dir).resolve() / "bilibili" / "BVgolden003-p1"
     assert [r.cover_path for r in recipes] == [
         str(archive_dir / "cover-0.jpg"),
         str(archive_dir / "cover-1.jpg"),

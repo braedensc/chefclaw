@@ -18,6 +18,10 @@ import { asRecipeDoc } from '../lib/recipe-document';
 import type { IngredientDoc, RecipeDoc, StepDoc } from '../lib/recipe-document';
 import { ChiliScale } from './brand/chili-scale';
 import { CoverImage } from './brand/cover-image';
+import {
+  fallbackCoverGradient,
+  platformAccent,
+} from './brand/platform-accents';
 import { PuppyChef } from './brand/puppy-chef';
 import { PlatformBadge } from './platform-badge';
 
@@ -140,25 +144,12 @@ function SectionHeading({ en, zh }: { en: string; zh?: string }) {
   );
 }
 
-// Platform-hued halo for the ZH display title (B's .nn-zht treatment) and the
-// no-cover header's corner tint (same hues CoverImage uses for its fallback).
-const PLATFORM_TITLE_GLOW: Record<string, string> = {
-  bilibili: 'glow-text-cyan',
-  rednote: 'glow-text-chili',
-  local: 'glow-text-warm',
-};
-
-const PLATFORM_TINTS: Record<string, string> = {
-  bilibili: 'var(--color-platform-bilibili)',
-  rednote: 'var(--color-platform-rednote)',
-  local: 'var(--color-platform-local)',
-};
-
 function RecipeHero({ detail, doc }: { detail: RecipeDetail; doc: RecipeDoc }) {
   const zhTitle = detail.title_original;
   const enTitle = detail.title_en;
-  const glow = PLATFORM_TITLE_GLOW[detail.platform] ?? 'glow-text-warm';
-  const tint = PLATFORM_TINTS[detail.platform] ?? 'var(--color-warm)';
+  // Platform-hued halo for the ZH display title (B's .nn-zht treatment) and
+  // the no-cover header's corner tint (same hues CoverImage's fallback uses).
+  const { titleGlow: glow, tint } = platformAccent(detail.platform);
 
   // One heading holds both languages: ZH leads with the platform halo, EN runs
   // as tracked condensed caps — so heading-by-EN-title selectors still match.
@@ -207,9 +198,7 @@ function RecipeHero({ detail, doc }: { detail: RecipeDetail; doc: RecipeDoc }) {
       ) : (
         <div
           className="relative overflow-hidden rounded-card border border-line p-5 sm:p-7"
-          style={{
-            background: `radial-gradient(95% 85% at 100% 0%, color-mix(in srgb, ${tint} 13%, transparent), transparent 58%), linear-gradient(160deg, #101014 0%, var(--color-panel) 55%, #060608 100%)`,
-          }}
+          style={{ background: fallbackCoverGradient(tint, 13) }}
         >
           <span className="mb-3 inline-block">
             <PlatformBadge platform={detail.platform} />

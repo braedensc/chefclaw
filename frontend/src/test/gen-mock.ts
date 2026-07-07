@@ -44,6 +44,12 @@ interface GenState {
   upload: MutationMock;
   patch: MutationMock;
   deleteRecipe: MutationMock;
+  /**
+   * CoverImage's blob fetch — resolve with a Blob to show a cover; the
+   * default (resolving undefined) errors the query, so covers fall back to
+   * the platform tile unless a test opts in.
+   */
+  cover: MutationMock;
 }
 
 export const genState: GenState = {
@@ -59,6 +65,7 @@ export const genState: GenState = {
   upload: mutationMock(),
   patch: mutationMock(),
   deleteRecipe: mutationMock(),
+  cover: mutationMock(),
 };
 
 export function resetGenState(): void {
@@ -74,6 +81,7 @@ export function resetGenState(): void {
   genState.upload = mutationMock();
   genState.patch = mutationMock();
   genState.deleteRecipe = mutationMock();
+  genState.cover = mutationMock();
 }
 
 /** The `_id` discriminators match the real generated module's createQueryKey. */
@@ -102,6 +110,26 @@ export function genMockModule() {
         const job = genState.jobsById[options.path.job_id];
         if (!job) throw new Error(`gen-mock: no job ${options.path.job_id}`);
         return job;
+      },
+    }),
+
+    getRecipeCoverApiRecipesRecipeIdCoverGetQueryKey: (options: {
+      path: { recipe_id: string };
+    }) => [
+      { _id: 'getRecipeCoverApiRecipesRecipeIdCoverGet', path: options.path },
+    ],
+    getRecipeCoverApiRecipesRecipeIdCoverGetOptions: (options: {
+      path: { recipe_id: string };
+    }) => ({
+      queryKey: [
+        { _id: 'getRecipeCoverApiRecipesRecipeIdCoverGet', path: options.path },
+      ],
+      queryFn: async () => {
+        const cover = await genState.cover(options);
+        if (cover === undefined) {
+          throw new Error(`gen-mock: no cover for ${options.path.recipe_id}`);
+        }
+        return cover;
       },
     }),
 

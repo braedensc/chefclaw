@@ -394,6 +394,26 @@ async def test_get_recipe_detail_includes_document(monkeypatch: pytest.MonkeyPat
     assert missing.json()["error_type"] == "not_found"
 
 
+async def test_get_recipe_detail_preserves_has_cover_through_revalidation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """FastAPI re-validates the response as a dumped dict (carrying a
+    ``document`` key but no ``cover_path``): the projection validator must
+    keep the already-computed has_cover, not recompute it to false."""
+    row = make_recipe_row(cover_path="/data/media/bilibili/BVtest00001-p1/cover-0.jpg")
+
+    async def fake_get(session, owner_id, recipe_id):
+        return row if recipe_id == row.id else None
+
+    monkeypatch.setattr(recipes_service, "get_recipe", fake_get)
+    async with client_for(build_app()) as client:
+        response = await client.get(f"/api/recipes/{row.id}", headers=bearer(TEST_TOKEN))
+    body = response.json()
+    assert body["has_cover"] is True
+    assert body["ingredient_count"] == 3
+    assert "cover_path" not in body  # the filesystem path never leaves the API
+
+
 # ─── GET /api/recipes/{id}/cover ─────────────────────────────────────────────
 
 

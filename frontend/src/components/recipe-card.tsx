@@ -3,37 +3,16 @@ import { Link } from '@tanstack/react-router';
 import type { RecipeSummary } from '../client/types.gen';
 import { ChiliScale } from './brand/chili-scale';
 import { CoverImage } from './brand/cover-image';
+import { platformAccent } from './brand/platform-accents';
 import { PlatformBadge } from './platform-badge';
 
 /** Position of a card within a multi-dish video (only passed when count>1). */
 export interface SiblingInfo {
   /** 0-based position among the video's dishes (ordered by dish_index). */
   index: number;
-  count: number;
+  /** Total dishes in the group, or null when unknown (filtered/paged view). */
+  count: number | null;
 }
-
-// Platform accents: hover rim + halo on the card, matching halo on the ZH
-// title (direction B's .nn-card--* custom-property trick, spelled out so
-// Tailwind sees every class statically).
-const CARD_ACCENTS: Record<string, { hover: string; title: string }> = {
-  bilibili: {
-    hover: 'hover:border-platform-bilibili/60 hover:glow-cyan',
-    title: 'glow-text-cyan',
-  },
-  rednote: {
-    hover: 'hover:border-platform-rednote/60 hover:glow-chili',
-    title: 'glow-text-chili',
-  },
-  local: {
-    hover: 'hover:border-platform-local/50 hover:glow-warm',
-    title: 'glow-text-warm',
-  },
-};
-
-const FALLBACK_ACCENT = {
-  hover: 'hover:border-line-bright hover:glow-warm',
-  title: 'glow-text-warm',
-};
 
 const CIRCLED_DIGITS = ['①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩'];
 
@@ -54,7 +33,14 @@ export function RecipeCard({
   recipe: RecipeSummary;
   sibling?: SiblingInfo;
 }) {
-  const accent = CARD_ACCENTS[recipe.platform] ?? FALLBACK_ACCENT;
+  const accent = platformAccent(recipe.platform);
+  // A non-zero dish_index proves a multi-dish video even when filters or
+  // paging hide the siblings — the ticket then renders without a total.
+  const ticket =
+    sibling ??
+    (recipe.dish_index > 0
+      ? { index: recipe.dish_index, count: null }
+      : undefined);
   const zhTitle = recipe.title_original;
   const enTitle = recipe.title_en;
   const altTitle = enTitle ?? zhTitle ?? 'Untitled dish';
@@ -67,7 +53,7 @@ export function RecipeCard({
     <Link
       to="/recipes/$id"
       params={{ id: recipe.id }}
-      className={`block h-full overflow-hidden rounded-card border border-line bg-panel transition duration-300 motion-safe:hover:-translate-y-1 ${accent.hover}`}
+      className={`block h-full overflow-hidden rounded-card border border-line bg-panel transition duration-300 motion-safe:hover:-translate-y-1 ${accent.cardHover}`}
     >
       <div className="relative">
         <CoverImage
@@ -80,13 +66,15 @@ export function RecipeCard({
         <span className="absolute top-2.5 right-2.5">
           <PlatformBadge platform={recipe.platform} />
         </span>
-        {sibling && (
+        {ticket && (
           <span className="absolute top-2.5 left-2.5 rounded-chip border border-dashed border-gold/45 bg-night/70 px-2 py-0.5 font-display text-[9.5px] font-semibold tracking-[0.16em] text-[#a08d55] uppercase">
             same video ·{' '}
             <b className="glow-text-gold font-bold text-gold">
-              {circled(sibling.index + 1)}
+              {circled(ticket.index + 1)}
             </b>
-            <span className="text-[#5c5645]"> / {circled(sibling.count)}</span>
+            {ticket.count !== null && (
+              <span className="text-[#5c5645]"> / {circled(ticket.count)}</span>
+            )}
           </span>
         )}
         <div className="absolute right-4 bottom-2.5 left-4">
@@ -94,7 +82,7 @@ export function RecipeCard({
             <>
               <h3
                 lang="zh"
-                className={`text-[22px] leading-tight font-semibold tracking-[0.04em] text-white ${accent.title}`}
+                className={`text-[22px] leading-tight font-semibold tracking-[0.04em] text-white ${accent.titleGlow}`}
               >
                 {zhTitle}
               </h3>
@@ -106,7 +94,7 @@ export function RecipeCard({
             </>
           ) : (
             <h3
-              className={`font-display text-lg font-semibold tracking-[0.14em] text-white uppercase ${accent.title}`}
+              className={`font-display text-lg font-semibold tracking-[0.14em] text-white uppercase ${accent.titleGlow}`}
             >
               {enTitle ?? 'Untitled dish'}
             </h3>

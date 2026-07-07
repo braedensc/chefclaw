@@ -9,6 +9,7 @@ import {
 import type { JobOut } from '../client/types.gen';
 import { cookingStage } from '../lib/cooking-stages';
 import { isTerminalStatus, JOB_POLL_MS } from '../lib/job-status';
+import { SteamWisps } from './brand/steam-wisps';
 
 interface JobChipProps {
   initialJob: JobOut;
@@ -40,17 +41,7 @@ function SimmeringPot() {
         </linearGradient>
       </defs>
       <ellipse cx="32" cy="57.5" rx="15" ry="3.2" fill="#f5a623" />
-      <g stroke="#f4e9d4" strokeWidth="2.4" strokeLinecap="round" fill="none">
-        <path className="steam-wisp" d="M22 22 C20 18 24 15 22 10" />
-        <path
-          className="steam-wisp steam-wisp-2"
-          d="M32 20 C30 16 34 13 32 7"
-        />
-        <path
-          className="steam-wisp steam-wisp-3"
-          d="M42 22 C40 18 44 15 42 10"
-        />
-      </g>
+      <SteamWisps />
       <ellipse
         cx="32"
         cy="31"

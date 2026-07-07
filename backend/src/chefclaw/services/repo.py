@@ -12,11 +12,10 @@ row locks live only inside the claim and the atomic store.
 """
 
 import uuid
-from collections.abc import Sequence
 from decimal import Decimal
-from typing import Any, Protocol
+from typing import Any, NamedTuple, Protocol
 
-from sqlalchemy import select, text, update
+from sqlalchemy import func, select, text, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
@@ -32,8 +31,20 @@ __all__ = [
     "JobStore",
     "PostgresJobStore",
     "PostgresSpendReader",
+    "RecipeCoverRef",
     "SpendReader",
 ]
+
+
+class RecipeCoverRef(NamedTuple):
+    """The slice of a recipe the cover backfill needs — deliberately not a
+    full ORM row (the document/extraction_meta JSONB would ride along for
+    nothing)."""
+
+    id: uuid.UUID
+    platform: str
+    canonical_id: str
+    dish_index: int
 
 # A job in any of these states already owns its (platform, canonical_id) —
 # the dedupe check returns it instead of enqueueing a twin.
@@ -110,10 +121,11 @@ class JobStore(Protocol):
         documents: list[RecipeDocument],
         *,
         extraction_meta: dict[str, Any],
-        cover_paths: Sequence[str | None] | None = None,
     ) -> list[uuid.UUID] | None: ...
 
-    async def list_recipes_missing_covers(self) -> list[Recipe]: ...
+    async def list_recipes_missing_covers(self) -> list[RecipeCoverRef]: ...
+
+    async def group_dish_counts(self) -> dict[tuple[str, str], int]: ...
 
     async def set_recipe_cover(self, recipe_id: uuid.UUID, cover_path: str) -> None: ...
 
@@ -282,13 +294,14 @@ class PostgresJobStore:
         documents: list[RecipeDocument],
         *,
         extraction_meta: dict[str, Any],
-        cover_paths: Sequence[str | None] | None = None,
     ) -> list[uuid.UUID] | None:
         """ATOMIC multi-dish store: N recipe inserts + the job's flip to
-        ``stored`` in ONE transaction (§16.4) — ``cover_paths[i]`` (best-effort,
-        None = no cover) rides in the same rows. Returns the new recipe ids, or
-        ``None`` when UNIQUE(platform, canonical_id, dish_index) fired — a
-        raced duplicate the caller adopts instead of failing."""
+        ``stored`` in ONE transaction (§16.4). ``cover_path`` lands NULL here —
+        covers are generated best-effort AFTER this commit (never inside the
+        paid-work crash-loss window) and persisted via set_recipe_cover.
+        Returns the new recipe ids, or ``None`` when UNIQUE(platform,
+        canonical_id, dish_index) fired — a raced duplicate the caller adopts
+        instead of failing."""
         source_url = job.payload["url"]
         try:
             async with self._sessionmaker() as session:
@@ -303,11 +316,6 @@ class PostgresJobStore:
                             canonical_id=job.canonical_id,
                             dish_index=index,
                             status="stored",
-                            cover_path=(
-                                cover_paths[index]
-                                if cover_paths is not None and index < len(cover_paths)
-                                else None
-                            ),
                             document=document.model_dump(mode="json"),
                             extraction_meta=extraction_meta,
                         )
@@ -330,11 +338,31 @@ class PostgresJobStore:
         except IntegrityError:
             return None  # raced duplicate — caller adopts the existing rows
 
-    async def list_recipes_missing_covers(self) -> list[Recipe]:
-        """Startup cover backfill: recipes stored before the cover stage."""
-        stmt = select(Recipe).where(Recipe.cover_path.is_(None)).order_by(Recipe.created_at)
+    async def list_recipes_missing_covers(self) -> list[RecipeCoverRef]:
+        """Startup cover backfill input. Column-only select — never the full
+        ORM rows (document/extraction_meta JSONB stay unloaded)."""
+        stmt = (
+            select(Recipe.id, Recipe.platform, Recipe.canonical_id, Recipe.dish_index)
+            .where(Recipe.cover_path.is_(None))
+            .order_by(Recipe.created_at)
+        )
         async with self._sessionmaker() as session:
-            return list((await session.execute(stmt)).scalars().all())
+            rows = (await session.execute(stmt)).all()
+        return [RecipeCoverRef(*row) for row in rows]
+
+    async def group_dish_counts(self) -> dict[tuple[str, str], int]:
+        """max(dish_index)+1 per (platform, canonical_id), over ALL rows —
+        the TRUE dish count the backfill's fraction spread needs (a partially
+        covered group must not shrink to just its cover-less rows)."""
+        stmt = select(
+            Recipe.platform, Recipe.canonical_id, func.max(Recipe.dish_index)
+        ).group_by(Recipe.platform, Recipe.canonical_id)
+        async with self._sessionmaker() as session:
+            rows = (await session.execute(stmt)).all()
+        return {
+            (platform, canonical_id): max_index + 1
+            for platform, canonical_id, max_index in rows
+        }
 
     async def set_recipe_cover(self, recipe_id: uuid.UUID, cover_path: str) -> None:
         async with self._sessionmaker() as session, session.begin():

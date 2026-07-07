@@ -8,7 +8,6 @@ are identical in both tiers.
 """
 
 import uuid
-from collections.abc import Sequence
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from typing import Any
@@ -16,7 +15,7 @@ from typing import Any
 from chefclaw.documents import RecipeDocument
 from chefclaw.extractors import ExtractionUsage
 from chefclaw.models import Job, Recipe
-from chefclaw.services.repo import ACTIVE_STATUSES, RUNNING_STATUSES
+from chefclaw.services.repo import ACTIVE_STATUSES, RUNNING_STATUSES, RecipeCoverRef
 
 _EPOCH = datetime(2026, 1, 1, tzinfo=UTC)
 
@@ -191,7 +190,6 @@ class FakeJobStore:
         documents: list[RecipeDocument],
         *,
         extraction_meta: dict[str, Any],
-        cover_paths: Sequence[str | None] | None = None,
     ) -> list[uuid.UUID] | None:
         if self.fail_store_once:
             # Simulate the raced duplicate: the "other writer" already
@@ -210,6 +208,8 @@ class FakeJobStore:
             return None
         recipe_ids: list[uuid.UUID] = []
         for index, document in enumerate(documents):
+            # cover_path lands NULL — covers are persisted post-store via
+            # set_recipe_cover (never inside the paid-work crash-loss window).
             recipe = self.seed_recipe(
                 owner_id=job.owner_id,
                 platform=job.platform,
@@ -218,11 +218,6 @@ class FakeJobStore:
                 dish_index=index,
                 title_en=document.dish_name.en,
                 title_original=document.dish_name.original,
-                cover_path=(
-                    cover_paths[index]
-                    if cover_paths is not None and index < len(cover_paths)
-                    else None
-                ),
                 document=document.model_dump(mode="json"),
                 extraction_meta=extraction_meta,
             )
@@ -233,8 +228,19 @@ class FakeJobStore:
         job.error_detail = None
         return recipe_ids
 
-    async def list_recipes_missing_covers(self) -> list[Recipe]:
-        return [recipe for recipe in self.recipes if recipe.cover_path is None]
+    async def list_recipes_missing_covers(self) -> list[RecipeCoverRef]:
+        return [
+            RecipeCoverRef(recipe.id, recipe.platform, recipe.canonical_id, recipe.dish_index)
+            for recipe in self.recipes
+            if recipe.cover_path is None
+        ]
+
+    async def group_dish_counts(self) -> dict[tuple[str, str], int]:
+        counts: dict[tuple[str, str], int] = {}
+        for recipe in self.recipes:
+            key = (recipe.platform, recipe.canonical_id)
+            counts[key] = max(counts.get(key, 0), recipe.dish_index + 1)
+        return counts
 
     async def set_recipe_cover(self, recipe_id: uuid.UUID, cover_path: str) -> None:
         for recipe in self.recipes:

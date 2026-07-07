@@ -14,7 +14,9 @@ export interface CookingStage {
   total: number;
 }
 
-const STAGES: Record<string, { copy: string; step: number | null }> = {
+// Exported so the golden suite builds its chip-copy assertion from these
+// exact strings — copy edits here can never drift from the spec.
+export const STAGES: Record<string, { copy: string; step: number | null }> = {
   pending: { copy: 'in the queue… 排队中', step: 1 },
   downloading: { copy: 'fetching the video… 取片中', step: 2 },
   extracting: { copy: 'reading the recipe… 正在读菜谱', step: 3 },

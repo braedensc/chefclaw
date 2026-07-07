@@ -305,11 +305,13 @@ export type RecipePatch = {
 /**
  * RecipeSummary
  *
- * Library-card shape (list endpoint). The card fields (``difficulty`` /
- * ``total_time_minutes`` / ``ingredient_count``) are PROJECTED verbatim from
- * the stored validated document — never computed food facts (Hard Rule 7).
- * ``has_cover`` is derived from the server-side ``cover_path``, which itself
- * never leaves the API (the /cover endpoint streams the file).
+ * Library-card shape (list endpoint). ``difficulty`` /
+ * ``total_time_minutes`` are lifted VERBATIM from the stored validated
+ * document; ``ingredient_count`` is the length of its ingredients list — a
+ * structural count, not a food quantity (Hard Rule 7 governs food data like
+ * amounts/weights, which stay verbatim inside the document). ``has_cover``
+ * derives from the server-side ``cover_path``, which itself never leaves
+ * the API (the /cover endpoint streams the file).
  */
 export type RecipeSummary = {
     /**

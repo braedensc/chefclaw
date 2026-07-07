@@ -197,6 +197,26 @@ describe('LibraryPage', () => {
     expect(screen.getByText('②')).toBeInTheDocument();
   });
 
+  it('keeps a total-less same-video ticket on a filtered lone card with dish_index > 0', async () => {
+    // Filters/pagination hid the siblings — dish_index alone must still mark
+    // the card as one dish of a multi-dish video (no invented total).
+    genState.recipesPage = recipePage([
+      recipeSummary({
+        id: 'r2',
+        dish_index: 1,
+        title_en: 'Braised greens',
+        title_original: '烧青菜',
+      }),
+    ]);
+
+    renderApp('/');
+
+    await screen.findByRole('link', { name: /Braised greens/ });
+    const ticket = screen.getByText(/same video/);
+    expect(ticket).toHaveTextContent('②');
+    expect(ticket).not.toHaveTextContent('/');
+  });
+
   it('empty state offers a Paste-a-link button that focuses the paste bar', async () => {
     renderApp('/');
 

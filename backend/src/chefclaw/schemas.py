@@ -86,12 +86,18 @@ class JobOut(BaseModel):
         }
 
 
+# The RecipeSummary fields _project_from_document computes rather than copies.
+_PROJECTED_FIELDS = frozenset({"has_cover", "difficulty", "total_time_minutes", "ingredient_count"})
+
+
 class RecipeSummary(BaseModel):
-    """Library-card shape (list endpoint). The card fields (``difficulty`` /
-    ``total_time_minutes`` / ``ingredient_count``) are PROJECTED verbatim from
-    the stored validated document — never computed food facts (Hard Rule 7).
-    ``has_cover`` is derived from the server-side ``cover_path``, which itself
-    never leaves the API (the /cover endpoint streams the file)."""
+    """Library-card shape (list endpoint). ``difficulty`` /
+    ``total_time_minutes`` are lifted VERBATIM from the stored validated
+    document; ``ingredient_count`` is the length of its ingredients list — a
+    structural count, not a food quantity (Hard Rule 7 governs food data like
+    amounts/weights, which stay verbatim inside the document). ``has_cover``
+    derives from the server-side ``cover_path``, which itself never leaves
+    the API (the /cover endpoint streams the file)."""
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -109,37 +115,40 @@ class RecipeSummary(BaseModel):
     ingredient_count: int | None = None
     created_at: datetime
 
-    @model_validator(mode="before")
-    @classmethod
-    def _project_from_document(cls, data: Any) -> Any:
-        """ORM ``Recipe`` → dict of the contract fields plus the document
-        projections (same shape as JobOut._lift_url_from_payload). Dicts pass
-        through untouched."""
-        if isinstance(data, dict) or not hasattr(data, "document"):
-            return data
-        document = data.document or {}
+    @staticmethod
+    def _document_projections(document: Any) -> dict[str, Any]:
+        document = document if isinstance(document, dict) else {}
         ingredients = document.get("ingredients")
         return {
-            "id": data.id,
-            "title_en": data.title_en,
-            "title_original": data.title_original,
-            "platform": data.platform,
-            "canonical_id": data.canonical_id,
-            "dish_index": data.dish_index,
-            "status": data.status,
-            "tags": data.tags,
-            "has_cover": data.cover_path is not None,
             "difficulty": document.get("difficulty"),
             "total_time_minutes": document.get("total_time_minutes"),
             "ingredient_count": len(ingredients) if isinstance(ingredients, list) else None,
-            "created_at": data.created_at,
-            # RecipeDetail (subclass) fields ride along; the summary shape
-            # ignores extras on validation.
-            "source_url": data.source_url,
-            "user_notes": data.user_notes,
-            "document": data.document,
-            "extraction_meta": data.extraction_meta,
         }
+
+    @model_validator(mode="before")
+    @classmethod
+    def _project_from_document(cls, data: Any) -> Any:
+        """ORM ``Recipe`` → the contract fields (copied generically from
+        ``cls.model_fields``, so RecipeDetail's extras ride along without a
+        hand-kept list) plus the computed projections. Dicts pass through —
+        re-projected only when they carry a ``document`` key."""
+        if isinstance(data, dict):
+            if "document" not in data:
+                return data
+            projected = {**data, **cls._document_projections(data["document"])}
+            if "cover_path" in data:
+                projected["has_cover"] = data["cover_path"] is not None
+            return projected
+        if not hasattr(data, "document"):
+            return data
+        projected = {
+            name: getattr(data, name)
+            for name in cls.model_fields
+            if name not in _PROJECTED_FIELDS and hasattr(data, name)
+        }
+        projected.update(cls._document_projections(data.document))
+        projected["has_cover"] = data.cover_path is not None
+        return projected
 
 
 class RecipeDetail(RecipeSummary):

@@ -2,8 +2,15 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { TOKEN_STORAGE_KEY } from '../../token';
+import { genState, resetGenState } from '../../test/gen-mock';
 import { CoverImage } from './cover-image';
+
+// Mock the generated query-options module — component tests never real-fetch.
+// Auth headers and ApiError mapping live centrally in src/api.ts, so this
+// component's contract is only "ask the client for the blob".
+vi.mock('../../client/@tanstack/react-query.gen', async () =>
+  (await import('../../test/gen-mock')).genMockModule(),
+);
 
 // jsdom implements neither createObjectURL nor revokeObjectURL — stub both so
 // the blob → object-URL lifecycle is observable.
@@ -31,14 +38,12 @@ function renderCover(props: Partial<Parameters<typeof CoverImage>[0]> = {}) {
 
 describe('CoverImage', () => {
   beforeEach(() => {
+    resetGenState();
     createObjectURL.mockClear();
     revokeObjectURL.mockClear();
   });
 
   it('renders the platform-tinted fallback without fetching when hasCover is false', () => {
-    const fetchMock = vi.fn();
-    vi.stubGlobal('fetch', fetchMock);
-
     const { container } = renderCover({ hasCover: false });
 
     expect(container.querySelector('[data-cover-fallback]')).not.toBeNull();
@@ -46,17 +51,12 @@ describe('CoverImage', () => {
       screen.getByRole('img', { name: '红烧肉 cover' }),
     ).toBeInTheDocument();
     expect(container.querySelector('img')).toBeNull();
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(genState.cover).not.toHaveBeenCalled();
   });
 
-  it('fetches the cover with the bearer token and shows the blob object URL', async () => {
-    localStorage.setItem(TOKEN_STORAGE_KEY, 'placeholder-token');
+  it('fetches the cover through the generated client and shows the blob object URL', async () => {
     const blob = new Blob(['jpeg-bytes'], { type: 'image/jpeg' });
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      blob: () => Promise.resolve(blob),
-    });
-    vi.stubGlobal('fetch', fetchMock);
+    genState.cover.mockResolvedValue(blob);
 
     const { container, unmount } = renderCover({ hasCover: true });
 
@@ -70,9 +70,9 @@ describe('CoverImage', () => {
       'alt',
       '红烧肉 cover',
     );
-    expect(fetchMock).toHaveBeenCalledWith('/api/recipes/r1/cover', {
-      headers: { Authorization: 'Bearer placeholder-token' },
-    });
+    expect(genState.cover).toHaveBeenCalledWith(
+      expect.objectContaining({ path: { recipe_id: 'r1' } }),
+    );
     expect(createObjectURL).toHaveBeenCalledWith(blob);
 
     // effect cleanup revokes the object URL
@@ -81,12 +81,11 @@ describe('CoverImage', () => {
   });
 
   it('falls back to the platform tile when the cover fetch errors', async () => {
-    const fetchMock = vi.fn().mockResolvedValue({ ok: false, status: 404 });
-    vi.stubGlobal('fetch', fetchMock);
+    genState.cover.mockRejectedValue(new Error('cover fetch failed (404)'));
 
     const { container } = renderCover({ hasCover: true, platform: 'rednote' });
 
-    await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+    await waitFor(() => expect(genState.cover).toHaveBeenCalled());
     await waitFor(() =>
       expect(container.querySelector('[data-cover-fallback]')).not.toBeNull(),
     );

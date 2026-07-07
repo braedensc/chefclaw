@@ -546,7 +546,7 @@
         "type": "object"
       },
       "RecipeSummary": {
-        "description": "Library-card shape (list endpoint). The card fields (``difficulty`` /\n``total_time_minutes`` / ``ingredient_count``) are PROJECTED verbatim from\nthe stored validated document — never computed food facts (Hard Rule 7).\n``has_cover`` is derived from the server-side ``cover_path``, which itself\nnever leaves the API (the /cover endpoint streams the file).",
+        "description": "Library-card shape (list endpoint). ``difficulty`` /\n``total_time_minutes`` are lifted VERBATIM from the stored validated\ndocument; ``ingredient_count`` is the length of its ingredients list — a\nstructural count, not a food quantity (Hard Rule 7 governs food data like\namounts/weights, which stay verbatim inside the document). ``has_cover``\nderives from the server-side ``cover_path``, which itself never leaves\nthe API (the /cover endpoint streams the file).",
         "properties": {
           "canonical_id": {
             "title": "Canonical Id",
