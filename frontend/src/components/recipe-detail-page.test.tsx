@@ -170,6 +170,70 @@ describe('RecipeDetailPage', () => {
     );
   });
 
+  it('PATCHes corrected estimates, sending both levels as an owner override', async () => {
+    genState.recipesById['r1'] = recipeDetail();
+    genState.patch.mockResolvedValue(
+      recipeDetail({ estimated_source: 'user' }),
+    );
+
+    renderApp('/recipes/r1');
+
+    // Fixture starts spiciness=2 (medium) / difficulty=1 (easy), source derived.
+    // Correcting only spiciness still sends both — the pair shares one provenance.
+    fireEvent.change(await screen.findByLabelText('Spiciness'), {
+      target: { value: '3' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Save ratings' }));
+
+    await waitFor(() =>
+      expect(genState.patch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          path: { recipe_id: 'r1' },
+          body: {
+            estimated_spiciness_level: 3,
+            estimated_difficulty_level: 1,
+          },
+        }),
+      ),
+    );
+  });
+
+  it('clears an estimate by sending an explicit null level', async () => {
+    genState.recipesById['r1'] = recipeDetail();
+    genState.patch.mockResolvedValue(recipeDetail());
+
+    renderApp('/recipes/r1');
+
+    fireEvent.change(await screen.findByLabelText('Difficulty'), {
+      target: { value: '' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Save ratings' }));
+
+    await waitFor(() =>
+      expect(genState.patch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: {
+            estimated_spiciness_level: 2,
+            estimated_difficulty_level: null,
+          },
+        }),
+      ),
+    );
+  });
+
+  it('drops the "(estimated)" flag on the hero once the owner has overridden', async () => {
+    genState.recipesById['r1'] = recipeDetail({ estimated_source: 'user' });
+
+    renderApp('/recipes/r1');
+
+    // source "user" ⇒ the hero scales read as the owner's values, not estimates.
+    expect(
+      await screen.findByLabelText('Spiciness: medium'),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText('Difficulty: easy')).toBeInTheDocument();
+    expect(screen.queryByLabelText(/\(estimated\)/)).not.toBeInTheDocument();
+  });
+
   it('hard-deletes only after the explicit confirm step', async () => {
     genState.recipesById['r1'] = recipeDetail();
     genState.deleteRecipe.mockResolvedValue(undefined);

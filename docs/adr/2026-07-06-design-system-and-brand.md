@@ -102,5 +102,7 @@ before any full-library backfill (gated by the existing monthly/daily caps).
 
 **Deferred, with triggers:** user-uploaded photos of the *cooked* dish (Braeden wants
 this — needs an upload surface + a second image slot); a separate retriable
-`illustration` job type if per-recipe re-generation from the UI is wanted; an
-owner-editable classification for the two estimates; PWA/manifest polish (V2-C).
+`illustration` job type if per-recipe re-generation from the UI is wanted; ~~an
+owner-editable classification for the two estimates~~ (resolved 2026-07-07 —
+[Owner-editable estimates & the derived-vs-user merge posture](2026-07-07-owner-editable.md));
+PWA/manifest polish (V2-C).

@@ -384,6 +384,21 @@
             ],
             "title": "Estimated Difficulty Level"
           },
+          "estimated_source": {
+            "anyOf": [
+              {
+                "enum": [
+                  "derived",
+                  "user"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimated Source"
+          },
           "estimated_spiciness_level": {
             "anyOf": [
               {
@@ -536,8 +551,34 @@
       },
       "RecipePatch": {
         "additionalProperties": false,
-        "description": "The ONLY user-editable fields. extra='forbid' rejects document edits.",
+        "description": "The user-editable fields. extra='forbid' rejects document edits.\n\n``tags`` / ``user_notes`` are free metadata; the two ``estimated_*`` fields\nlet the owner CORRECT the derived 0–3 estimates (a provided value re-flags\nthe ``estimated`` column ``source=\"user\"``, taking precedence over the\nmodel's derivation — see ``services.recipes.patch_recipe``). All are\noptional; only fields actually present in the body are applied\n(``model_fields_set``), so an explicit ``null`` clears while an absent field\nis untouched. ``strict=True`` on the estimate ints blocks bool→int coercion\n(``True`` is not ``spiciness_level=1``) — the same guard the document schema\nkeeps.",
         "properties": {
+          "estimated_difficulty_level": {
+            "anyOf": [
+              {
+                "maximum": 3.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimated Difficulty Level"
+          },
+          "estimated_spiciness_level": {
+            "anyOf": [
+              {
+                "maximum": 3.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimated Spiciness Level"
+          },
           "tags": {
             "anyOf": [
               {
@@ -568,7 +609,7 @@
         "type": "object"
       },
       "RecipeSummary": {
-        "description": "Library-card shape (list endpoint). ``difficulty`` /\n``total_time_minutes`` are lifted VERBATIM from the stored validated\ndocument; ``ingredient_count`` is the length of its ingredients list — a\nstructural count, not a food quantity (Hard Rule 7 governs food data like\namounts/weights, which stay verbatim inside the document). ``has_image``\nderives from the server-side ``image_url`` (the generated illustration\npath), which itself never leaves the API (the /image endpoint streams the\nfile). ``estimated_spiciness_level`` / ``estimated_difficulty_level`` are\nthe DERIVED estimates projected from the separate ``estimated`` column —\nflagged 'estimated' in the UI, never inside the verbatim document.",
+        "description": "Library-card shape (list endpoint). ``difficulty`` /\n``total_time_minutes`` are lifted VERBATIM from the stored validated\ndocument; ``ingredient_count`` is the length of its ingredients list — a\nstructural count, not a food quantity (Hard Rule 7 governs food data like\namounts/weights, which stay verbatim inside the document). ``has_image``\nderives from the server-side ``image_url`` (the generated illustration\npath), which itself never leaves the API (the /image endpoint streams the\nfile). ``estimated_spiciness_level`` / ``estimated_difficulty_level`` are\nthe 0–3 estimates projected from the separate ``estimated`` column (never\ninside the verbatim document); ``estimated_source`` says whether they are the\nmodel's ``\"derived\"`` guess (flag 'estimated' in the UI) or an owner\n``\"user\"`` correction.",
         "properties": {
           "canonical_id": {
             "title": "Canonical Id",
@@ -604,6 +645,21 @@
               }
             ],
             "title": "Estimated Difficulty Level"
+          },
+          "estimated_source": {
+            "anyOf": [
+              {
+                "enum": [
+                  "derived",
+                  "user"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimated Source"
           },
           "estimated_spiciness_level": {
             "anyOf": [

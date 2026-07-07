@@ -105,8 +105,14 @@ export function RecipeCard({
       </div>
       {hasMeta && (
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 px-4 pt-3 pb-1 font-display text-[11px] font-semibold tracking-[0.14em] text-ink-dim uppercase">
-          <SpicinessScale level={recipe.estimated_spiciness_level} />
-          <DifficultyScale level={recipe.estimated_difficulty_level} />
+          <SpicinessScale
+            level={recipe.estimated_spiciness_level}
+            estimated={recipe.estimated_source !== 'user'}
+          />
+          <DifficultyScale
+            level={recipe.estimated_difficulty_level}
+            estimated={recipe.estimated_source !== 'user'}
+          />
           {recipe.total_time_minutes != null && (
             <span>{recipe.total_time_minutes} min</span>
           )}

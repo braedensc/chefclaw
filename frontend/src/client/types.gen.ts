@@ -217,6 +217,10 @@ export type RecipeDetail = {
      */
     estimated_difficulty_level?: number | null;
     /**
+     * Estimated Source
+     */
+    estimated_source?: 'derived' | 'user' | null;
+    /**
      * Estimated Spiciness Level
      */
     estimated_spiciness_level?: number | null;
@@ -297,9 +301,27 @@ export type RecipePage = {
 /**
  * RecipePatch
  *
- * The ONLY user-editable fields. extra='forbid' rejects document edits.
+ * The user-editable fields. extra='forbid' rejects document edits.
+ *
+ * ``tags`` / ``user_notes`` are free metadata; the two ``estimated_*`` fields
+ * let the owner CORRECT the derived 0–3 estimates (a provided value re-flags
+ * the ``estimated`` column ``source="user"``, taking precedence over the
+ * model's derivation — see ``services.recipes.patch_recipe``). All are
+ * optional; only fields actually present in the body are applied
+ * (``model_fields_set``), so an explicit ``null`` clears while an absent field
+ * is untouched. ``strict=True`` on the estimate ints blocks bool→int coercion
+ * (``True`` is not ``spiciness_level=1``) — the same guard the document schema
+ * keeps.
  */
 export type RecipePatch = {
+    /**
+     * Estimated Difficulty Level
+     */
+    estimated_difficulty_level?: number | null;
+    /**
+     * Estimated Spiciness Level
+     */
+    estimated_spiciness_level?: number | null;
     /**
      * Tags
      */
@@ -321,8 +343,10 @@ export type RecipePatch = {
  * derives from the server-side ``image_url`` (the generated illustration
  * path), which itself never leaves the API (the /image endpoint streams the
  * file). ``estimated_spiciness_level`` / ``estimated_difficulty_level`` are
- * the DERIVED estimates projected from the separate ``estimated`` column —
- * flagged 'estimated' in the UI, never inside the verbatim document.
+ * the 0–3 estimates projected from the separate ``estimated`` column (never
+ * inside the verbatim document); ``estimated_source`` says whether they are the
+ * model's ``"derived"`` guess (flag 'estimated' in the UI) or an owner
+ * ``"user"`` correction.
  */
 export type RecipeSummary = {
     /**
@@ -345,6 +369,10 @@ export type RecipeSummary = {
      * Estimated Difficulty Level
      */
     estimated_difficulty_level?: number | null;
+    /**
+     * Estimated Source
+     */
+    estimated_source?: 'derived' | 'user' | null;
     /**
      * Estimated Spiciness Level
      */

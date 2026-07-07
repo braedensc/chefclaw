@@ -316,6 +316,65 @@ async def test_hard_delete_reopens_extraction(sessionmaker, owner_id, tmp_path: 
     assert len(extractor.calls) == 2  # the re-extract really re-ran the model
 
 
+async def test_patch_recipe_estimate_edit_flags_source_user(
+    sessionmaker, owner_id, tmp_path: Path
+) -> None:
+    """Owner corrections to the derived estimates persist through REAL SQL
+    (JSONB column reassignment) and re-flag ``source="user"`` — the merge
+    posture the design ADR left open. The untouched level rides along, and the
+    whole object becomes owner-authored so a future re-derivation must respect
+    it. Owner-scoping still holds."""
+    from chefclaw.services import recipes as recipes_service
+
+    store = make_store(sessionmaker, tmp_path)
+    settings = golden_settings(tmp_path)
+    source = FakeSource(platform="bilibili", canonical_id="BVgolden007-p1")
+    worker = Worker(
+        store=store,
+        adapters=[source],
+        settings=settings,
+        extractor_factory=lambda _s: FakeExtractor(),
+        image_generator_factory=_fake_image_factory,
+        sleeper=_noop_sleep,
+    )
+    job, _ = await enqueue_extract(store, owner_id, FAKE_URL, [source], settings)
+    await worker.process(await store.claim_next_job())
+
+    async with sessionmaker() as session:
+        recipe = (await session.execute(select(Recipe))).scalars().one()
+        recipe_id = recipe.id
+        # Baseline: the model's derived estimate (FakeExtractor emits 1/1).
+        assert recipe.estimated == {
+            "spiciness_level": 1,
+            "difficulty_level": 1,
+            "source": "derived",
+        }
+
+    # A stranger cannot touch the row (get_recipe is owner-scoped):
+    async with sessionmaker() as session:
+        assert (
+            await recipes_service.patch_recipe(
+                session, uuid.uuid4(), recipe_id, estimated_spiciness_level=3
+            )
+            is None
+        )
+
+    # Correct only spiciness; difficulty is untouched but the object flips user:
+    async with sessionmaker() as session:
+        patched = await recipes_service.patch_recipe(
+            session, owner_id, recipe_id, estimated_spiciness_level=3
+        )
+        assert patched is not None
+
+    async with sessionmaker() as session:
+        recipe = await session.get(Recipe, recipe_id)
+        assert recipe.estimated == {
+            "spiciness_level": 3,
+            "difficulty_level": 1,
+            "source": "user",
+        }
+
+
 async def test_kill_mid_extract_no_double_spend_and_reconcile(
     sessionmaker, owner_id, tmp_path: Path
 ) -> None:

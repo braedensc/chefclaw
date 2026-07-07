@@ -1,10 +1,17 @@
 // Difficulty as a 0–3 level meter — a mark VISUALLY DISTINCT from the chili
 // spiciness scale: three short rounded bars of increasing height, filled up to
 // `level` in electric cyan (with a soft cyan glow), empty bars in dim hairline.
-// The level is a DERIVED estimate (estimated_difficulty_level), so the label is
-// flagged "(estimated)"; a null/undefined level renders nothing (Hard Rule 7).
+// The level is an estimate (estimated_difficulty_level); while it is still the
+// model's guess the label is flagged "(estimated)", dropped once the owner has
+// corrected it (`estimated={false}`). A null/undefined level renders nothing
+// (Hard Rule 7).
 
-const DIFFICULTY_WORDS = ['very easy', 'easy', 'medium', 'hard'] as const;
+export const DIFFICULTY_WORDS = [
+  'very easy',
+  'easy',
+  'medium',
+  'hard',
+] as const;
 
 // Three bars of increasing height, baseline-aligned in a 16-tall viewBox.
 const BARS = [
@@ -46,13 +53,20 @@ function LevelMeter({ level }: { level: number }) {
 /**
  * A 3-segment level meter filled up to `level` (0–3), plus the difficulty word
  * as visible text (screen-reader and sighted parity — the glyphs are
- * decorative). The value is an ESTIMATE, so the label says so. A null/undefined
- * level renders nothing.
+ * decorative). While `estimated` (the default), the label is flagged
+ * "(estimated)"; pass `estimated={false}` once the owner has corrected the
+ * value. `decorative` drops the accessible label entirely (aria-hidden) — for a
+ * live preview beside a labelled input that is the real control. A
+ * null/undefined level renders nothing.
  */
 export function DifficultyScale({
   level,
+  estimated = true,
+  decorative = false,
 }: {
   level: number | null | undefined;
+  estimated?: boolean;
+  decorative?: boolean;
 }) {
   if (level == null) return null;
   const word = DIFFICULTY_WORDS[level] ?? DIFFICULTY_WORDS[0];
@@ -60,7 +74,11 @@ export function DifficultyScale({
   return (
     <span
       className="inline-flex items-center gap-1"
-      aria-label={`Difficulty: ${word} (estimated)`}
+      {...(decorative
+        ? { 'aria-hidden': true }
+        : {
+            'aria-label': `Difficulty: ${word}${estimated ? ' (estimated)' : ''}`,
+          })}
     >
       <LevelMeter level={level} />
       <span

@@ -358,6 +358,7 @@ async def test_list_recipes_projects_card_fields_from_document(
     # Derived estimates projected from the separate `estimated` column:
     assert item["estimated_spiciness_level"] == 2
     assert item["estimated_difficulty_level"] == 1
+    assert item["estimated_source"] == "derived"  # the model's own assessment
     assert "image_url" not in item  # the filesystem path never leaves the API
 
 
@@ -376,8 +377,9 @@ async def test_list_recipes_projections_none_safe_on_partial_documents(
     first, second = response.json()["items"]
     assert (first["has_image"], first["difficulty"]) == (False, None)
     assert (first["total_time_minutes"], first["ingredient_count"]) == (None, None)
-    # Null `estimated` column ⇒ both derived levels None (None-safe):
+    # Null `estimated` column ⇒ both levels + the source None (None-safe):
     assert (first["estimated_spiciness_level"], first["estimated_difficulty_level"]) == (None, None)
+    assert first["estimated_source"] is None
     assert second["total_time_minutes"] == 40
     assert second["difficulty"] is None
     assert second["ingredient_count"] is None
@@ -427,6 +429,7 @@ async def test_get_recipe_detail_preserves_has_image_through_revalidation(
     assert body["ingredient_count"] == 3
     assert body["estimated_spiciness_level"] == 3
     assert body["estimated_difficulty_level"] == 2
+    assert body["estimated_source"] == "derived"  # survives response revalidation
     assert "image_url" not in body  # the filesystem path never leaves the API
 
 
@@ -505,6 +508,60 @@ async def test_patch_updates_only_provided_fields(monkeypatch: pytest.MonkeyPatc
     assert response.json()["tags"] == ["dinner"]
 
 
+async def test_patch_forwards_estimate_levels(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The two derived estimate levels ride the PATCH whitelist: a provided
+    value (including an explicit null) is forwarded; an absent one is not."""
+    row = make_recipe_row()
+    captured: dict = {}
+
+    async def fake_patch(session, owner_id, recipe_id, **kwargs):
+        captured.update(kwargs)
+        return row
+
+    monkeypatch.setattr(recipes_service, "patch_recipe", fake_patch)
+    async with client_for(build_app()) as client:
+        response = await client.patch(
+            f"/api/recipes/{row.id}",
+            json={"estimated_spiciness_level": 3, "estimated_difficulty_level": None},
+            headers=bearer(TEST_TOKEN),
+        )
+    assert response.status_code == 200
+    # Both present (one a real value, one an explicit null clear); tags/notes absent.
+    assert captured == {
+        "estimated_spiciness_level": 3,
+        "estimated_difficulty_level": None,
+    }
+
+
+@pytest.mark.parametrize(
+    "body",
+    [
+        {"estimated_spiciness_level": 4},  # > 3
+        {"estimated_difficulty_level": -1},  # < 0
+        {"estimated_spiciness_level": True},  # bool is not an int (strict)
+        {"estimated_difficulty_level": 1.5},  # non-integer
+    ],
+)
+async def test_patch_rejects_out_of_range_or_mistyped_estimates(
+    monkeypatch: pytest.MonkeyPatch, body: dict
+) -> None:
+    """Estimate levels are 0–3 ints — anything else is a 422 and the service
+    is never called (bool/float are not silently coerced)."""
+    called = False
+
+    async def fake_patch(session, owner_id, recipe_id, **kwargs):
+        nonlocal called
+        called = True
+
+    monkeypatch.setattr(recipes_service, "patch_recipe", fake_patch)
+    async with client_for(build_app()) as client:
+        response = await client.patch(
+            f"/api/recipes/{uuid.uuid4()}", json=body, headers=bearer(TEST_TOKEN)
+        )
+    assert response.status_code == 422
+    assert called is False
+
+
 @pytest.mark.parametrize(
     "body",
     [
@@ -512,6 +569,7 @@ async def test_patch_updates_only_provided_fields(monkeypatch: pytest.MonkeyPatc
         {"title_en": "Hacked"},
         {"tags": ["ok"], "document": {}},
         {"status": "failed"},
+        {"estimated": {"spiciness_level": 1, "source": "user"}},  # not the whitelisted shape
     ],
 )
 async def test_patch_rejects_document_and_other_field_edits(
