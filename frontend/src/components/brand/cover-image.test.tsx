@@ -27,7 +27,7 @@ function renderCover(props: Partial<Parameters<typeof CoverImage>[0]> = {}) {
     <QueryClientProvider client={queryClient}>
       <CoverImage
         recipeId="r1"
-        hasCover={false}
+        hasImage={false}
         platform="bilibili"
         alt="红烧肉 cover"
         {...props}
@@ -43,22 +43,22 @@ describe('CoverImage', () => {
     revokeObjectURL.mockClear();
   });
 
-  it('renders the platform-tinted fallback without fetching when hasCover is false', () => {
-    const { container } = renderCover({ hasCover: false });
+  it('renders the platform-tinted fallback without fetching when hasImage is false', () => {
+    const { container } = renderCover({ hasImage: false });
 
     expect(container.querySelector('[data-cover-fallback]')).not.toBeNull();
     expect(
       screen.getByRole('img', { name: '红烧肉 cover' }),
     ).toBeInTheDocument();
     expect(container.querySelector('img')).toBeNull();
-    expect(genState.cover).not.toHaveBeenCalled();
+    expect(genState.image).not.toHaveBeenCalled();
   });
 
-  it('fetches the cover through the generated client and shows the blob object URL', async () => {
+  it('fetches the image through the generated client and shows the blob object URL', async () => {
     const blob = new Blob(['jpeg-bytes'], { type: 'image/jpeg' });
-    genState.cover.mockResolvedValue(blob);
+    genState.image.mockResolvedValue(blob);
 
-    const { container, unmount } = renderCover({ hasCover: true });
+    const { container, unmount } = renderCover({ hasImage: true });
 
     await waitFor(() =>
       expect(container.querySelector('img')).toHaveAttribute(
@@ -70,7 +70,7 @@ describe('CoverImage', () => {
       'alt',
       '红烧肉 cover',
     );
-    expect(genState.cover).toHaveBeenCalledWith(
+    expect(genState.image).toHaveBeenCalledWith(
       expect.objectContaining({ path: { recipe_id: 'r1' } }),
     );
     expect(createObjectURL).toHaveBeenCalledWith(blob);
@@ -80,12 +80,12 @@ describe('CoverImage', () => {
     expect(revokeObjectURL).toHaveBeenCalledWith('blob:mock-cover');
   });
 
-  it('falls back to the platform tile when the cover fetch errors', async () => {
-    genState.cover.mockRejectedValue(new Error('cover fetch failed (404)'));
+  it('falls back to the platform tile when the image fetch errors', async () => {
+    genState.image.mockRejectedValue(new Error('image fetch failed (404)'));
 
-    const { container } = renderCover({ hasCover: true, platform: 'rednote' });
+    const { container } = renderCover({ hasImage: true, platform: 'rednote' });
 
-    await waitFor(() => expect(genState.cover).toHaveBeenCalled());
+    await waitFor(() => expect(genState.image).toHaveBeenCalled());
     await waitFor(() =>
       expect(container.querySelector('[data-cover-fallback]')).not.toBeNull(),
     );

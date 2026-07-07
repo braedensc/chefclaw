@@ -26,28 +26,29 @@ import shutil
 import tempfile
 import time
 import uuid
-from collections.abc import Awaitable, Callable, Mapping, Sequence
+from collections.abc import Awaitable, Callable, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
 from chefclaw import errors, observability, spend
 from chefclaw.config import Settings
-from chefclaw.documents import SourceInfo, validate_extraction
+from chefclaw.documents import RecipeDocument, SourceInfo, validate_extraction
 from chefclaw.extractors import (
     ExtractionUsage,
     ExtractorAdapter,
     extractor_model_id,
     get_extractor,
 )
-from chefclaw.models import Job, JobStatus
-from chefclaw.services.covers import (
-    CoverGenerator,
-    archived_video_path,
-    cover_frames,
-    generate_covers,
+from chefclaw.images import (
+    STYLE_VERSION,
+    ImageGeneratorAdapter,
+    build_illustration_prompt,
+    get_image_generator,
 )
-from chefclaw.services.repo import JobStore, RecipeCoverRef
+from chefclaw.models import Job, JobStatus
+from chefclaw.services.illustrations import illustration_path, write_illustration
+from chefclaw.services.repo import JobStore
 from chefclaw.sources import CanonicalRef, FetchedMedia, SourceAdapter, resolve_source
 from chefclaw.sources.localfile import LocalFileSource
 
@@ -228,8 +229,10 @@ class Worker:
         settings: Settings,
         *,
         extractor_factory: Callable[[Settings], ExtractorAdapter] = get_extractor,
-        cover_generator: CoverGenerator = generate_covers,
-        backfill_covers_on_start: bool = False,
+        image_generator_factory: Callable[
+            [Settings], ImageGeneratorAdapter
+        ] = get_image_generator,
+        backfill_illustrations_on_start: bool = False,
         sleeper: Sleeper = asyncio.sleep,
         jitter: Callable[[], float] = random.random,
         idle_seconds: float = IDLE_SLEEP_SECONDS,
@@ -238,11 +241,11 @@ class Worker:
         self._adapters_by_platform = {adapter.platform: adapter for adapter in adapters}
         self._settings = settings
         self._extractor_factory = extractor_factory
-        # Injectable like the sleeper: CI-tier tests must never shell out to
-        # real ffmpeg. The backfill flag defaults OFF (tests); the app turns
-        # it on for the one-shot startup pass.
-        self._cover_generator = cover_generator
-        self._backfill_covers_on_start = backfill_covers_on_start
+        # Injectable like the extractor factory: CI-tier tests inject a fake
+        # image generator (no network, no spend). The backfill flag defaults
+        # OFF (tests); the app turns it on for the one-shot startup pass.
+        self._image_generator_factory = image_generator_factory
+        self._backfill_illustrations_on_start = backfill_illustrations_on_start
         # The one-shot backfill's task handle (run_forever spawns it in the
         # background) — exposed for tests and cancelled on worker shutdown.
         self.backfill_task: asyncio.Task[None] | None = None
@@ -269,14 +272,14 @@ class Worker:
                         logger.debug("startup reconcile failed (db not up yet?)", exc_info=True)
                         await self._sleeper(self._idle_seconds)
                         continue
-                    if self._backfill_covers_on_start and self.backfill_task is None:
+                    if self._backfill_illustrations_on_start and self.backfill_task is None:
                         # One-shot, best-effort, never raises — spawned in the
-                        # BACKGROUND so a slow ffmpeg pass never delays the
-                        # first claim. Job execution stays strictly serial:
-                        # the backfill only runs ffmpeg subprocesses + row
-                        # updates, which is acceptable concurrency.
+                        # BACKGROUND so a slow image pass never delays the first
+                        # claim. Job execution stays strictly serial: the
+                        # backfill only runs subprocess/HTTP + row updates,
+                        # which is acceptable concurrency.
                         self.backfill_task = asyncio.create_task(
-                            self.backfill_covers(), name="chefclaw-cover-backfill"
+                            self.backfill_illustrations(), name="chefclaw-illustration-backfill"
                         )
                 try:
                     job = await self.store.claim_next_job()
@@ -311,8 +314,9 @@ class Worker:
                     )
                     await self._sleeper(self._idle_seconds)
         finally:
-            # Worker shutdown takes the backfill with it (best-effort work —
-            # the next boot's backfill picks up whatever it left missing).
+            # Worker shutdown takes the illustration backfill with it
+            # (best-effort work — the next boot's backfill picks up whatever it
+            # left missing).
             if self.backfill_task is not None:
                 self.backfill_task.cancel()
 
@@ -540,7 +544,11 @@ class Worker:
             creator=media.creator,
             video_duration_seconds=media.duration_seconds,
         )
-        documents = validate_extraction(outcome.dishes, source)
+        # (document, estimated) pairs — the derived estimates ride in their own
+        # column, never inside the verbatim document (Hard Rule 7).
+        validated = validate_extraction(outcome.dishes, source)
+        documents = [document for document, _estimated in validated]
+        estimates = [estimated for _document, estimated in validated]
 
         extraction_meta: dict[str, Any] = {
             "model_id": outcome.usage.model_id,
@@ -560,11 +568,12 @@ class Worker:
         if retention_warnings:
             extraction_meta["warnings"].extend(retention_warnings)
 
-        # The atomic store comes FIRST — covers must never sit inside the
-        # paid-work crash-loss window (a wedged ffmpeg before the store would
-        # reconcile to interrupted and a human retry would re-pay).
+        # The atomic store comes FIRST — the illustration stage must never sit
+        # inside the paid-work crash-loss window (an image API hiccup before
+        # the store would reconcile to interrupted and a human retry would
+        # re-pay). Derived estimates ride along in the atomic store.
         recipe_ids = await self.store.store_results(
-            job, documents, extraction_meta=extraction_meta
+            job, documents, estimates, extraction_meta=extraction_meta
         )
         if recipe_ids is None:
             # UNIQUE(platform, canonical_id, dish_index) fired: a raced
@@ -581,10 +590,11 @@ class Worker:
                 err.retryable = False
                 raise err
             await self.store.adopt_recipes(job.id, recipe_ids)
-            return recipe_ids  # the racer's rows — their own cover pass owns them
-        # Covers AFTER the commit: best-effort, and a crash between the store
-        # and here is healed by the startup backfill (its documented job).
-        await self._store_covers(job, media, retained, recipe_ids)
+            return recipe_ids  # the racer's rows — their own image pass owns them
+        # Illustrations AFTER the commit: best-effort, budget-gated, and a
+        # crash between the store and here is healed by the startup backfill
+        # (its documented job).
+        await self._store_illustrations(job, documents, recipe_ids)
         return recipe_ids
 
     async def _record_attempt(self, job: Job, usage: ExtractionUsage | None) -> None:
@@ -607,124 +617,141 @@ class Worker:
             cost_usd=spend.estimate_cost(usage),
         )
 
-    # ── covers (poster keyframes — strictly best-effort, post-store) ─────────
+    # ── illustrations (generated cartoon covers — best-effort, post-store) ───
 
     def _media_root(self) -> Path:
-        # resolve() so every persisted cover_path is absolute — the /cover
-        # route serves only files that resolve under this same root.
+        # resolve() so every persisted image_url is absolute — the /image route
+        # serves only files that resolve under this same root.
         return Path(self._settings.media_dir).resolve()
 
-    async def _store_covers(
-        self, job: Job, media: FetchedMedia, retained: list[str], recipe_ids: Sequence[uuid.UUID]
+    async def _store_illustrations(
+        self, job: Job, documents: Sequence[RecipeDocument], recipe_ids: Sequence[uuid.UUID]
     ) -> None:
-        """One poster keyframe per dish, generated AFTER the atomic store and
-        persisted per row via set_recipe_cover. STRICTLY BEST-EFFORT: any
-        failure just leaves cover_path NULL (the backfill may heal it later).
-        Covers come from the RETAINED archive file ONLY — with
-        media_retention=discard nothing is ever written under media_dir
-        (has_cover simply stays false, e.g. the golden/CI stacks)."""
-        if self._settings.media_retention != "keep":
-            return
+        """One generated illustration per dish, AFTER the atomic store. STRICTLY
+        BEST-EFFORT: budget refusal, an image-API error, or a write failure
+        just leaves image_url NULL (the backfill may heal it later) — it must
+        NEVER fail or delay the recipe store. Unlike the old ffmpeg covers, this
+        does NOT depend on a retained video: the prompt is built from the
+        recipe's text fields (Hard Rule 7)."""
+        media_root = self._media_root()
+        for dish_index, (document, recipe_id) in enumerate(
+            zip(documents, recipe_ids, strict=False)
+        ):
+            prompt = build_illustration_prompt(document.model_dump(mode="json"))
+            out_path = illustration_path(
+                media_root, job.platform, job.canonical_id, dish_index
+            )
+            await self._generate_and_persist_illustration(
+                job_id=job.id,
+                owner_id=job.owner_id,
+                recipe_id=recipe_id,
+                prompt=prompt,
+                out_path=out_path,
+            )
+
+    async def _generate_and_persist_illustration(
+        self,
+        *,
+        job_id: uuid.UUID,
+        owner_id: uuid.UUID,
+        recipe_id: uuid.UUID,
+        prompt: str,
+        out_path: Path,
+    ) -> bool:
+        """The shared budget-gate → generate → persist → ledger path (live
+        post-store stage AND the startup backfill). Returns True when an
+        illustration landed. Best-effort: every failure logs and returns False,
+        leaving image_url NULL. Budget check + ledger row bracket the paid call
+        exactly like extraction (fail-closed). ``job_id`` attributes the spend
+        row to the recipe's originating job (an existing jobs row)."""
         try:
-            video_path = self._cover_source_video(media, retained)
-            if video_path is None:
-                return
-            target_dir = self._media_root() / job.platform / job.canonical_id
-            dish_count = len(recipe_ids)
-            await self._generate_and_persist_covers(
-                video_path,
-                target_dir,
-                cover_frames(dish_count),
-                dict(enumerate(recipe_ids)),
+            # Budget gate FIRST (cheap, no write), immediately before the paid
+            # image call — a full backfill's spike is bounded by the same
+            # fail-closed monthly budget / daily cap as extraction.
+            await self.store.check_budget(owner_id)
+            adapter = self._image_generator_factory(self._settings)  # ConfigError ⇒ skip
+            result = await adapter.generate(prompt)
+        except Exception:
+            logger.warning(
+                "illustration generation skipped for recipe %s (best-effort)",
+                recipe_id,
+                exc_info=True,
+            )
+            return False
+
+        # Ledger the paid image attempt: a flat per-image cost (NOT token-based
+        # estimate_cost) with the image model id and STYLE_VERSION as the
+        # "prompt version". Best-effort — a ledger hiccup must not undo the
+        # image (the daily cap still counts extraction attempts).
+        try:
+            await self.store.record_spend(
+                job_id=job_id,
+                owner_id=owner_id,
+                usage=ExtractionUsage(
+                    model_id=result.model_id,
+                    prompt_version=STYLE_VERSION,
+                    tokens_in=0,
+                    tokens_out=0,
+                    tokens_thinking=0,
+                ),
+                cost_usd=result.cost_usd,
             )
         except Exception:
             logger.warning(
-                "job %s cover generation failed; recipes stored without covers",
-                job.id,
-                exc_info=True,
+                "illustration spend-ledger write failed for recipe %s", recipe_id, exc_info=True
             )
 
-    @staticmethod
-    def _cover_source_video(media: FetchedMedia, retained: list[str]) -> Path | None:
-        # media_retention=keep MOVED the download into the archive — the
-        # retained entry with the download's filename is the video. No scratch
-        # fallback: covers are generated from the retained archive file only.
-        for entry in retained:
-            path = Path(entry)
-            if path.name == media.video_path.name and path.is_file():
-                return path
-        return None
-
-    async def _generate_and_persist_covers(
-        self,
-        video_path: Path,
-        target_dir: Path,
-        frames: Sequence[tuple[int, float]],
-        recipe_id_by_dish: Mapping[int, uuid.UUID],
-    ) -> int:
-        """The shared generate→persist path (live post-store stage AND the
-        startup backfill): run the generator once for ``frames``, then point
-        each produced cover-<dish_index>.jpg at its recipe row. Returns how
-        many covers landed."""
-        covers = await self._cover_generator(video_path, target_dir, frames)
-        persisted = 0
-        for dish_index, cover in covers.items():
-            recipe_id = recipe_id_by_dish.get(dish_index)
-            if cover is None or recipe_id is None:
-                continue
-            await self.store.set_recipe_cover(recipe_id, cover)
-            persisted += 1
-        return persisted
-
-    async def backfill_covers(self) -> None:
-        """One-shot startup backfill (best-effort): any recipe missing a cover
-        — stored before the cover stage existed, OR stored by a run that
-        crashed between the atomic store and its post-store cover pass — gets
-        a poster keyframe from its retained archive video. Never raises — a
-        failed backfill must never take the worker down."""
+        persisted = write_illustration(out_path, result.image_bytes)
+        if persisted is None:
+            return False
         try:
-            missing = await self.store.list_recipes_missing_covers()
-            if not missing:
-                return
-            # TRUE dish count per group (covered siblings included): a
-            # partially-covered group keeps the same (i+1)/(N+1) spread its
-            # existing covers were cut at.
-            dish_counts = await self.store.group_dish_counts()
+            await self.store.set_recipe_image(recipe_id, persisted, STYLE_VERSION)
         except Exception:
-            logger.warning("cover backfill: could not list recipes", exc_info=True)
+            logger.warning(
+                "illustration persist failed for recipe %s", recipe_id, exc_info=True
+            )
+            return False
+        return True
+
+    async def backfill_illustrations(self) -> None:
+        """One-shot startup backfill (best-effort): any recipe with image_url
+        NULL — stored before the illustration stage existed, OR by a run that
+        crashed between the atomic store and its post-store image pass — gets a
+        generated illustration. Budget-gated per image (a full-library backfill
+        is the only cost spike). Never raises — a failed backfill must never
+        take the worker down."""
+        try:
+            missing = await self.store.list_recipes_missing_images()
+        except Exception:
+            logger.warning("illustration backfill: could not list recipes", exc_info=True)
+            return
+        if not missing:
             return
         generated = skipped = 0
-        groups: dict[tuple[str, str], list[RecipeCoverRef]] = {}
-        for recipe in missing:
-            groups.setdefault((recipe.platform, recipe.canonical_id), []).append(recipe)
         media_root = self._media_root()
-        for (platform, canonical_id), recipes in groups.items():
+        for recipe in missing:
             try:
-                media_dir = media_root / platform / canonical_id
-                video_path = archived_video_path(media_dir)
-                if video_path is None:
-                    skipped += len(recipes)
-                    continue
-                dish_count = dish_counts.get(
-                    (platform, canonical_id),
-                    max(recipe.dish_index for recipe in recipes) + 1,
+                prompt = build_illustration_prompt(recipe.document)
+                out_path = illustration_path(
+                    media_root, recipe.platform, recipe.canonical_id, recipe.dish_index
                 )
-                # Only the MISSING dishes are generated — sibling covers that
-                # already exist are never overwritten.
-                landed = await self._generate_and_persist_covers(
-                    video_path,
-                    media_dir,
-                    cover_frames(dish_count, [recipe.dish_index for recipe in recipes]),
-                    {recipe.dish_index: recipe.id for recipe in recipes},
-                )
-                generated += landed
-                skipped += len(recipes) - landed
+                # The spend row is attributed to the recipe's originating job.
+                if await self._generate_and_persist_illustration(
+                    job_id=recipe.job_id,
+                    owner_id=recipe.owner_id,
+                    recipe_id=recipe.id,
+                    prompt=prompt,
+                    out_path=out_path,
+                ):
+                    generated += 1
+                else:
+                    skipped += 1
             except Exception:
-                skipped += len(recipes)
+                skipped += 1
                 logger.warning(
-                    "cover backfill failed for (%s, %s)", platform, canonical_id, exc_info=True
+                    "illustration backfill failed for recipe %s", recipe.id, exc_info=True
                 )
-        logger.info("cover backfill: %d generated, %d skipped", generated, skipped)
+        logger.info("illustration backfill: %d generated, %d skipped", generated, skipped)
 
     # ── media retention (§4, MEDIA_RETENTION knob) ───────────────────────────
 

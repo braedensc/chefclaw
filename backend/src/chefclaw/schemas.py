@@ -87,7 +87,16 @@ class JobOut(BaseModel):
 
 
 # The RecipeSummary fields _project_from_document computes rather than copies.
-_PROJECTED_FIELDS = frozenset({"has_cover", "difficulty", "total_time_minutes", "ingredient_count"})
+_PROJECTED_FIELDS = frozenset(
+    {
+        "has_image",
+        "difficulty",
+        "total_time_minutes",
+        "ingredient_count",
+        "estimated_spiciness_level",
+        "estimated_difficulty_level",
+    }
+)
 
 
 class RecipeSummary(BaseModel):
@@ -95,9 +104,12 @@ class RecipeSummary(BaseModel):
     ``total_time_minutes`` are lifted VERBATIM from the stored validated
     document; ``ingredient_count`` is the length of its ingredients list — a
     structural count, not a food quantity (Hard Rule 7 governs food data like
-    amounts/weights, which stay verbatim inside the document). ``has_cover``
-    derives from the server-side ``cover_path``, which itself never leaves
-    the API (the /cover endpoint streams the file)."""
+    amounts/weights, which stay verbatim inside the document). ``has_image``
+    derives from the server-side ``image_url`` (the generated illustration
+    path), which itself never leaves the API (the /image endpoint streams the
+    file). ``estimated_spiciness_level`` / ``estimated_difficulty_level`` are
+    the DERIVED estimates projected from the separate ``estimated`` column —
+    flagged 'estimated' in the UI, never inside the verbatim document."""
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -109,10 +121,14 @@ class RecipeSummary(BaseModel):
     dish_index: int
     status: str
     tags: list[str]
-    has_cover: bool = False
+    has_image: bool = False
     difficulty: str | None = None
     total_time_minutes: int | None = None
     ingredient_count: int | None = None
+    # DERIVED estimates (0–3), None when the extraction supplied none / the
+    # column is null. Read-only, projected from the `estimated` column.
+    estimated_spiciness_level: int | None = None
+    estimated_difficulty_level: int | None = None
     created_at: datetime
 
     @staticmethod
@@ -125,19 +141,33 @@ class RecipeSummary(BaseModel):
             "ingredient_count": len(ingredients) if isinstance(ingredients, list) else None,
         }
 
+    @staticmethod
+    def _estimated_projections(estimated: Any) -> dict[str, Any]:
+        # None-safe: a null `estimated` column → both levels None.
+        estimated = estimated if isinstance(estimated, dict) else {}
+        return {
+            "estimated_spiciness_level": estimated.get("spiciness_level"),
+            "estimated_difficulty_level": estimated.get("difficulty_level"),
+        }
+
     @model_validator(mode="before")
     @classmethod
     def _project_from_document(cls, data: Any) -> Any:
         """ORM ``Recipe`` → the contract fields (copied generically from
         ``cls.model_fields``, so RecipeDetail's extras ride along without a
         hand-kept list) plus the computed projections. Dicts pass through —
-        re-projected only when they carry a ``document`` key."""
+        re-projected only when they carry a ``document`` key. The
+        response-revalidation dict path (RecipeDetail.model_dump) has no
+        ``image_url``/``estimated`` keys, so those projections are only
+        (re)computed when their source key is present — never clobbered."""
         if isinstance(data, dict):
             if "document" not in data:
                 return data
             projected = {**data, **cls._document_projections(data["document"])}
-            if "cover_path" in data:
-                projected["has_cover"] = data["cover_path"] is not None
+            if "image_url" in data:
+                projected["has_image"] = data["image_url"] is not None
+            if "estimated" in data:
+                projected.update(cls._estimated_projections(data["estimated"]))
             return projected
         if not hasattr(data, "document"):
             return data
@@ -147,7 +177,8 @@ class RecipeSummary(BaseModel):
             if name not in _PROJECTED_FIELDS and hasattr(data, name)
         }
         projected.update(cls._document_projections(data.document))
-        projected["has_cover"] = data.cover_path is not None
+        projected["has_image"] = data.image_url is not None
+        projected.update(cls._estimated_projections(data.estimated))
         return projected
 
 

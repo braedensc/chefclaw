@@ -22,6 +22,7 @@ and recreated per test for isolation.
 
 import asyncio
 import uuid
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
@@ -30,6 +31,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from chefclaw.config import Settings
 from chefclaw.extractors.fake import FakeExtractor, default_dish
+from chefclaw.images import ImageResult
 from chefclaw.models import Base, Job, LlmSpend, Recipe, User
 from chefclaw.services.jobs import Worker, enqueue_extract
 from chefclaw.services.repo import PostgresJobStore
@@ -47,16 +49,25 @@ async def _noop_sleep(_seconds: float) -> None:
     return None
 
 
-async def _fake_cover_generator(video_path, target_dir, frames):
-    """Cover seam double: real files, no ffmpeg (the golden tier is about
-    real SQL, not real frame extraction)."""
-    target_dir.mkdir(parents=True, exist_ok=True)
-    covers: dict[int, str | None] = {}
-    for index, _fraction in frames:
-        out_path = target_dir / f"cover-{index}.jpg"
-        out_path.write_bytes(b"jpg")
-        covers[index] = str(out_path)
-    return covers
+class _FakeImageGenerator:
+    """Image seam double: placeholder bytes, no network (the golden tier is
+    about real SQL — the atomic store, the real set_recipe_image UPDATE — not
+    real image generation)."""
+
+    def __init__(self) -> None:
+        self.calls: list[str] = []
+
+    async def generate(self, prompt: str) -> ImageResult:
+        self.calls.append(prompt)
+        return ImageResult(
+            image_bytes=b"\xff\xd8jpg",
+            model_id="fake-image",
+            cost_usd=Decimal("0"),
+        )
+
+
+def _fake_image_factory(_settings):
+    return _FakeImageGenerator()
 
 
 @pytest.fixture
@@ -131,9 +142,11 @@ async def test_skip_locked_claim_is_exclusive(sessionmaker, owner_id, tmp_path: 
 
 async def test_atomic_store_and_ledger(sessionmaker, owner_id, tmp_path: Path) -> None:
     """Full pipeline against real SQL: N-row insert + job flip in one
-    transaction, spend ledgered, covers persisted POST-store (real
-    set_recipe_cover UPDATEs), dedupe visible to a re-enqueue."""
-    settings = golden_settings(tmp_path, media_retention="keep")
+    transaction, extraction + illustration spend ledgered, illustrations
+    persisted POST-store (real set_recipe_image UPDATEs), derived estimates
+    stored, dedupe visible to a re-enqueue. Illustrations do NOT depend on
+    media_retention (default discard here)."""
+    settings = golden_settings(tmp_path)
     store = PostgresJobStore(sessionmaker, settings)
     source = FakeSource(platform="bilibili", canonical_id="BVgolden003-p1")
     dish_two = default_dish()
@@ -144,7 +157,7 @@ async def test_atomic_store_and_ledger(sessionmaker, owner_id, tmp_path: Path) -
         adapters=[source],
         settings=settings,
         extractor_factory=lambda _s: extractor,
-        cover_generator=_fake_cover_generator,
+        image_generator_factory=_fake_image_factory,
         sleeper=_noop_sleep,
     )
 
@@ -157,21 +170,35 @@ async def test_atomic_store_and_ledger(sessionmaker, owner_id, tmp_path: Path) -
         recipes = (
             (await session.execute(select(Recipe).order_by(Recipe.dish_index))).scalars().all()
         )
-        spend_count = await session.scalar(select(func.count(LlmSpend.id)))
+        extraction_spend = await session.scalar(
+            select(func.count(LlmSpend.id)).where(LlmSpend.model == "fake-extractor")
+        )
+        image_spend = await session.scalar(
+            select(func.count(LlmSpend.id)).where(LlmSpend.model == "fake-image")
+        )
     assert stored_job.status == "stored"
     assert len(recipes) == 2
     assert [r.dish_index for r in recipes] == [0, 1]
     assert stored_job.result_recipe_ids == [r.id for r in recipes]
     assert recipes[0].document["source"]["url"] == FAKE_URL
-    assert spend_count == 1
-    # Covers persisted AFTER the atomic store (per-row set_recipe_cover
+    assert extraction_spend == 1  # one extraction attempt
+    assert image_spend == 2  # one illustration per dish
+    # Derived estimates stored SEPARATE from the verbatim document:
+    assert recipes[0].estimated == {
+        "spiciness_level": 1,
+        "difficulty_level": 1,
+        "source": "derived",
+    }
+    assert "estimated" not in recipes[0].document
+    # Illustrations persisted AFTER the atomic store (per-row set_recipe_image
     # UPDATEs from the resolved media root) — never inside the paid-work
     # crash-loss window.
     archive_dir = Path(settings.media_dir).resolve() / "bilibili" / "BVgolden003-p1"
-    assert [r.cover_path for r in recipes] == [
-        str(archive_dir / "cover-0.jpg"),
-        str(archive_dir / "cover-1.jpg"),
+    assert [r.image_url for r in recipes] == [
+        str(archive_dir / "illustration-0.jpg"),
+        str(archive_dir / "illustration-1.jpg"),
     ]
+    assert all(r.image_style_version == "cartoon-v1" for r in recipes)
 
     # Re-enqueueing the same canonical identity returns the completed job:
     again, existing = await enqueue_extract(store, owner_id, FAKE_URL, [source], settings)
@@ -193,7 +220,7 @@ async def test_store_results_unique_violation_adopts(
         adapters=[source],
         settings=settings,
         extractor_factory=lambda _s: extractor,
-        cover_generator=_fake_cover_generator,
+        image_generator_factory=_fake_image_factory,
         sleeper=_noop_sleep,
     )
 
@@ -220,11 +247,13 @@ async def test_store_results_unique_violation_adopts(
 
     from chefclaw.documents import SourceInfo, validate_extraction
 
-    documents = validate_extraction(
+    validated = validate_extraction(
         [default_dish()],
         SourceInfo(platform="bilibili", url=FAKE_URL, creator=None, video_duration_seconds=None),
     )
-    result = await store.store_results(job_b, documents, extraction_meta={})
+    documents = [doc for doc, _est in validated]
+    estimates = [est for _doc, est in validated]
+    result = await store.store_results(job_b, documents, estimates, extraction_meta={})
     assert result is None  # the real IntegrityError path
     await store.adopt_recipes(job_b.id, raced_ids)
     async with sessionmaker() as session:
@@ -249,7 +278,7 @@ async def test_hard_delete_reopens_extraction(sessionmaker, owner_id, tmp_path: 
         adapters=[source],
         settings=settings,
         extractor_factory=lambda _s: extractor,
-        cover_generator=_fake_cover_generator,
+        image_generator_factory=_fake_image_factory,
         sleeper=_noop_sleep,
     )
 
@@ -310,7 +339,7 @@ async def test_kill_mid_extract_no_double_spend_and_reconcile(
         adapters=[source],
         settings=settings,
         extractor_factory=lambda _s: blocking,
-        cover_generator=_fake_cover_generator,
+        image_generator_factory=_fake_image_factory,
         sleeper=_noop_sleep,
     )
 
@@ -335,7 +364,7 @@ async def test_kill_mid_extract_no_double_spend_and_reconcile(
         adapters=[source],
         settings=settings,
         extractor_factory=lambda _s: fresh_extractor,
-        cover_generator=_fake_cover_generator,
+        image_generator_factory=_fake_image_factory,
         sleeper=_noop_sleep,
     )
     restart_task = asyncio.create_task(restarted.run_forever())

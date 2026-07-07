@@ -200,12 +200,15 @@ def test_valid_single_dish_document() -> None:
 
 def test_valid_multi_dish_extraction() -> None:
     source = make_source()
-    docs = validate_extraction([make_hongshaorou(), make_liangban_huanggua()], source)
+    results = validate_extraction([make_hongshaorou(), make_liangban_huanggua()], source)
+    docs = [doc for doc, _est in results]
     assert len(docs) == 2
     assert docs[0].dish_name.original == "红烧肉"
     assert docs[1].dish_name.original == "凉拌黄瓜"
     for doc in docs:
         assert doc.source == source
+    # No `estimated` block on these fixtures ⇒ each estimate is None.
+    assert all(est is None for _doc, est in results)
 
 
 def test_local_platform_accepted_and_unknown_platform_rejected() -> None:
@@ -492,7 +495,7 @@ def test_validate_extraction_overrides_model_supplied_source() -> None:
         "video_duration_seconds": 1,
     }
     source = make_source()
-    docs = validate_extraction([dish], source)
+    docs = [doc for doc, _est in validate_extraction([dish], source)]
     assert docs[0].source == source
     assert docs[0].source.url == BILI_SOURCE["url"]
 
@@ -501,7 +504,7 @@ def test_validate_extraction_injects_source_when_absent() -> None:
     dish = make_hongshaorou()
     del dish["source"]
     source = make_source(platform="rednote", url="https://www.xiaohongshu.com/explore/65f0a1")
-    docs = validate_extraction([dish], source)
+    docs = [doc for doc, _est in validate_extraction([dish], source)]
     assert docs[0].source.platform == "rednote"
 
 

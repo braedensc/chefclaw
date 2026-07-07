@@ -213,15 +213,23 @@ export type RecipeDetail = {
         [key: string]: unknown;
     };
     /**
+     * Estimated Difficulty Level
+     */
+    estimated_difficulty_level?: number | null;
+    /**
+     * Estimated Spiciness Level
+     */
+    estimated_spiciness_level?: number | null;
+    /**
      * Extraction Meta
      */
     extraction_meta: {
         [key: string]: unknown;
     };
     /**
-     * Has Cover
+     * Has Image
      */
-    has_cover?: boolean;
+    has_image?: boolean;
     /**
      * Id
      */
@@ -309,9 +317,12 @@ export type RecipePatch = {
  * ``total_time_minutes`` are lifted VERBATIM from the stored validated
  * document; ``ingredient_count`` is the length of its ingredients list — a
  * structural count, not a food quantity (Hard Rule 7 governs food data like
- * amounts/weights, which stay verbatim inside the document). ``has_cover``
- * derives from the server-side ``cover_path``, which itself never leaves
- * the API (the /cover endpoint streams the file).
+ * amounts/weights, which stay verbatim inside the document). ``has_image``
+ * derives from the server-side ``image_url`` (the generated illustration
+ * path), which itself never leaves the API (the /image endpoint streams the
+ * file). ``estimated_spiciness_level`` / ``estimated_difficulty_level`` are
+ * the DERIVED estimates projected from the separate ``estimated`` column —
+ * flagged 'estimated' in the UI, never inside the verbatim document.
  */
 export type RecipeSummary = {
     /**
@@ -331,9 +342,17 @@ export type RecipeSummary = {
      */
     dish_index: number;
     /**
-     * Has Cover
+     * Estimated Difficulty Level
      */
-    has_cover?: boolean;
+    estimated_difficulty_level?: number | null;
+    /**
+     * Estimated Spiciness Level
+     */
+    estimated_spiciness_level?: number | null;
+    /**
+     * Has Image
+     */
+    has_image?: boolean;
     /**
      * Id
      */
@@ -811,7 +830,7 @@ export type PatchRecipeApiRecipesRecipeIdPatchResponses = {
 
 export type PatchRecipeApiRecipesRecipeIdPatchResponse = PatchRecipeApiRecipesRecipeIdPatchResponses[keyof PatchRecipeApiRecipesRecipeIdPatchResponses];
 
-export type GetRecipeCoverApiRecipesRecipeIdCoverGetData = {
+export type GetRecipeImageApiRecipesRecipeIdImageGetData = {
     body?: never;
     path: {
         /**
@@ -820,10 +839,10 @@ export type GetRecipeCoverApiRecipesRecipeIdCoverGetData = {
         recipe_id: string;
     };
     query?: never;
-    url: '/api/recipes/{recipe_id}/cover';
+    url: '/api/recipes/{recipe_id}/image';
 };
 
-export type GetRecipeCoverApiRecipesRecipeIdCoverGetErrors = {
+export type GetRecipeImageApiRecipesRecipeIdImageGetErrors = {
     /**
      * Not Found
      */
@@ -834,11 +853,11 @@ export type GetRecipeCoverApiRecipesRecipeIdCoverGetErrors = {
     422: HttpValidationError;
 };
 
-export type GetRecipeCoverApiRecipesRecipeIdCoverGetError = GetRecipeCoverApiRecipesRecipeIdCoverGetErrors[keyof GetRecipeCoverApiRecipesRecipeIdCoverGetErrors];
+export type GetRecipeImageApiRecipesRecipeIdImageGetError = GetRecipeImageApiRecipesRecipeIdImageGetErrors[keyof GetRecipeImageApiRecipesRecipeIdImageGetErrors];
 
-export type GetRecipeCoverApiRecipesRecipeIdCoverGetResponses = {
+export type GetRecipeImageApiRecipesRecipeIdImageGetResponses = {
     /**
-     * The recipe's poster keyframe.
+     * The recipe's generated illustration.
      */
     200: unknown;
 };

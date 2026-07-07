@@ -10,8 +10,8 @@ from importlib import resources
 
 from chefclaw.errors import ConfigError
 
-PROMPT_VERSION = "v1"
-_PROMPT_RESOURCE = "extract_v1.md"
+PROMPT_VERSION = "v2"
+_PROMPT_RESOURCE = "extract_v2.md"
 
 
 def load_prompt() -> str:

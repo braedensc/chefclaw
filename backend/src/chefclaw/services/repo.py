@@ -15,13 +15,13 @@ import uuid
 from decimal import Decimal
 from typing import Any, NamedTuple, Protocol
 
-from sqlalchemy import func, select, text, update
+from sqlalchemy import select, text, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from chefclaw import spend
 from chefclaw.config import Settings
-from chefclaw.documents import RecipeDocument
+from chefclaw.documents import EstimatedAttributes, RecipeDocument
 from chefclaw.extractors import ExtractionUsage
 from chefclaw.models import Job, JobStatus, Recipe
 
@@ -31,20 +31,25 @@ __all__ = [
     "JobStore",
     "PostgresJobStore",
     "PostgresSpendReader",
-    "RecipeCoverRef",
+    "RecipeImageRef",
     "SpendReader",
 ]
 
 
-class RecipeCoverRef(NamedTuple):
-    """The slice of a recipe the cover backfill needs — deliberately not a
-    full ORM row (the document/extraction_meta JSONB would ride along for
-    nothing)."""
+class RecipeImageRef(NamedTuple):
+    """The slice of a recipe the illustration backfill needs — deliberately
+    not the full ORM row (extraction_meta JSONB would ride along for nothing).
+    Carries the ``document`` (the prompt is built from its text fields),
+    ``owner_id`` + ``job_id`` (to budget-gate + attribute the spend row), and
+    the media-path parts."""
 
     id: uuid.UUID
+    owner_id: uuid.UUID
+    job_id: uuid.UUID
     platform: str
     canonical_id: str
     dish_index: int
+    document: dict[str, Any]
 
 # A job in any of these states already owns its (platform, canonical_id) —
 # the dedupe check returns it instead of enqueueing a twin.
@@ -119,15 +124,16 @@ class JobStore(Protocol):
         self,
         job: Job,
         documents: list[RecipeDocument],
+        estimates: list[EstimatedAttributes | None],
         *,
         extraction_meta: dict[str, Any],
     ) -> list[uuid.UUID] | None: ...
 
-    async def list_recipes_missing_covers(self) -> list[RecipeCoverRef]: ...
+    async def list_recipes_missing_images(self) -> list[RecipeImageRef]: ...
 
-    async def group_dish_counts(self) -> dict[tuple[str, str], int]: ...
-
-    async def set_recipe_cover(self, recipe_id: uuid.UUID, cover_path: str) -> None: ...
+    async def set_recipe_image(
+        self, recipe_id: uuid.UUID, image_url: str, style_version: str
+    ) -> None: ...
 
     async def reconcile_interrupted(self) -> int: ...
 
@@ -292,13 +298,16 @@ class PostgresJobStore:
         self,
         job: Job,
         documents: list[RecipeDocument],
+        estimates: list[EstimatedAttributes | None],
         *,
         extraction_meta: dict[str, Any],
     ) -> list[uuid.UUID] | None:
         """ATOMIC multi-dish store: N recipe inserts + the job's flip to
-        ``stored`` in ONE transaction (§16.4). ``cover_path`` lands NULL here —
-        covers are generated best-effort AFTER this commit (never inside the
-        paid-work crash-loss window) and persisted via set_recipe_cover.
+        ``stored`` in ONE transaction (§16.4). ``image_url`` lands NULL here —
+        illustrations are generated best-effort AFTER this commit (never inside
+        the paid-work crash-loss window) and persisted via set_recipe_image.
+        Derived ``estimated`` attributes (spiciness/difficulty — kept SEPARATE
+        from the verbatim document, Hard Rule 7) are stored atomically here.
         Returns the new recipe ids, or ``None`` when UNIQUE(platform,
         canonical_id, dish_index) fired — a raced duplicate the caller adopts
         instead of failing."""
@@ -317,9 +326,16 @@ class PostgresJobStore:
                             dish_index=index,
                             status="stored",
                             document=document.model_dump(mode="json"),
+                            estimated=(
+                                estimate.model_dump(mode="json")
+                                if estimate is not None
+                                else None
+                            ),
                             extraction_meta=extraction_meta,
                         )
-                        for index, document in enumerate(documents)
+                        for index, (document, estimate) in enumerate(
+                            zip(documents, estimates, strict=False)
+                        )
                     ]
                     session.add_all(rows)
                     await session.flush()  # RETURNING populates the uuidv7 ids
@@ -338,36 +354,40 @@ class PostgresJobStore:
         except IntegrityError:
             return None  # raced duplicate — caller adopts the existing rows
 
-    async def list_recipes_missing_covers(self) -> list[RecipeCoverRef]:
-        """Startup cover backfill input. Column-only select — never the full
-        ORM rows (document/extraction_meta JSONB stay unloaded)."""
+    async def list_recipes_missing_images(self) -> list[RecipeImageRef]:
+        """Startup illustration-backfill input: recipes WHERE image_url IS NULL,
+        joined to their originating stored job (which carries the recipe id in
+        result_recipe_ids) so the backfill can attribute its spend row to a real
+        jobs row. The document rides along (the prompt is built from its text
+        fields); extraction_meta stays unloaded. A recipe with no locatable job
+        is skipped (an inner join) — the illustration budget row needs a valid
+        FK."""
         stmt = (
-            select(Recipe.id, Recipe.platform, Recipe.canonical_id, Recipe.dish_index)
-            .where(Recipe.cover_path.is_(None))
+            select(
+                Recipe.id,
+                Recipe.owner_id,
+                Job.id.label("job_id"),
+                Recipe.platform,
+                Recipe.canonical_id,
+                Recipe.dish_index,
+                Recipe.document,
+            )
+            .join(Job, Job.result_recipe_ids.any(Recipe.id))
+            .where(Recipe.image_url.is_(None))
             .order_by(Recipe.created_at)
         )
         async with self._sessionmaker() as session:
             rows = (await session.execute(stmt)).all()
-        return [RecipeCoverRef(*row) for row in rows]
+        return [RecipeImageRef(*row) for row in rows]
 
-    async def group_dish_counts(self) -> dict[tuple[str, str], int]:
-        """max(dish_index)+1 per (platform, canonical_id), over ALL rows —
-        the TRUE dish count the backfill's fraction spread needs (a partially
-        covered group must not shrink to just its cover-less rows)."""
-        stmt = select(
-            Recipe.platform, Recipe.canonical_id, func.max(Recipe.dish_index)
-        ).group_by(Recipe.platform, Recipe.canonical_id)
-        async with self._sessionmaker() as session:
-            rows = (await session.execute(stmt)).all()
-        return {
-            (platform, canonical_id): max_index + 1
-            for platform, canonical_id, max_index in rows
-        }
-
-    async def set_recipe_cover(self, recipe_id: uuid.UUID, cover_path: str) -> None:
+    async def set_recipe_image(
+        self, recipe_id: uuid.UUID, image_url: str, style_version: str
+    ) -> None:
         async with self._sessionmaker() as session, session.begin():
             await session.execute(
-                update(Recipe).where(Recipe.id == recipe_id).values(cover_path=cover_path)
+                update(Recipe)
+                .where(Recipe.id == recipe_id)
+                .values(image_url=image_url, image_style_version=style_version)
             )
 
     async def reconcile_interrupted(self) -> int:

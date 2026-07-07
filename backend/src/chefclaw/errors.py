@@ -86,6 +86,17 @@ class ExtractionFailedError(ChefclawError):
         self.usage = usage
 
 
+class ImageGenerationFailedError(ChefclawError):
+    """The illustration image call failed (or returned no usable bytes). The
+    illustration stage is STRICTLY BEST-EFFORT — the worker logs this and
+    leaves the recipe's image NULL; it never fails or delays the recipe store.
+    Retryable in spirit (the startup backfill re-attempts), but the worker's
+    illustration stage swallows every failure rather than requeueing the job."""
+
+    error_type = "image_generation_failed"
+    retryable = True
+
+
 class ValidationFailedError(ChefclawError):
     """Model output did not validate against the recipe document schema. The
     raw output is preserved for debugging (never silently 'fixed' — Hard Rule 7)."""

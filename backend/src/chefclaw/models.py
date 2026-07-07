@@ -117,10 +117,18 @@ class Recipe(Base):
         ARRAY(Text), nullable=False, server_default=text("'{}'::text[]")
     )
     user_notes: Mapped[str | None] = mapped_column(Text)
-    # Poster keyframe in the media archive (server filesystem path). NEVER
-    # exposed by the API — RecipeSummary derives has_cover from it and the
-    # /cover endpoint streams the file. NULL = no cover (best-effort stage).
-    cover_path: Mapped[str | None] = mapped_column(Text)
+    # Generated cartoon illustration in the media archive (server filesystem
+    # path). NEVER exposed by the API — RecipeSummary derives has_image from it
+    # and the /image endpoint streams the file. NULL = no illustration yet
+    # (best-effort stage; the startup backfill heals misses).
+    image_url: Mapped[str | None] = mapped_column(Text)
+    # Which fixed style block produced the illustration (e.g. "cartoon-v1").
+    image_style_version: Mapped[str | None] = mapped_column(Text)
+    # DERIVED spiciness/difficulty estimates (Hard Rule 7): kept SEPARATE from
+    # the raw `document` so it never overwrites verbatim captures — same
+    # posture as the reserved nutrition_ref. NULL when the extraction supplied
+    # none. Read-only, like the document (never in RecipePatch).
+    estimated: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
     # Never user-editable — only tags and user_notes are PATCH-able.
     document: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
     extraction_meta: Mapped[dict[str, Any]] = mapped_column(

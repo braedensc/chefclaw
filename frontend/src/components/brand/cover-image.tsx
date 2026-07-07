@@ -1,19 +1,20 @@
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
-import { getRecipeCoverApiRecipesRecipeIdCoverGetOptions } from '../../client/@tanstack/react-query.gen';
+import { getRecipeImageApiRecipesRecipeIdImageGetOptions } from '../../client/@tanstack/react-query.gen';
 import { fallbackCoverGradient, platformAccent } from './platform-accents';
 import { SteamWisps } from './steam-wisps';
 
-// The authed recipe-cover image, fetched through the generated SDK — auth and
-// ApiError mapping live centrally in src/api.ts. <img> can't send an
-// Authorization header, so the cover bytes come down as a blob → object URL.
-// Loading and error states show the same platform-tinted fallback as
-// hasCover=false — no spinner flash; empty covers still look intentional.
+// The authed recipe image (a generated dish illustration), fetched through the
+// generated SDK — auth and ApiError mapping live centrally in src/api.ts.
+// <img> can't send an Authorization header, so the image bytes come down as a
+// blob → object URL. Loading and error states show the same platform-tinted
+// fallback as hasImage=false — no spinner flash; empty covers still look
+// intentional.
 
 export interface CoverImageProps {
   recipeId: string;
-  hasCover: boolean;
+  hasImage: boolean;
   platform: string;
   alt: string;
   /** Caller sizes the tile (e.g. `aspect-[16/10]`) — the art fills it. */
@@ -52,17 +53,17 @@ function FallbackArt({ platform, alt }: { platform: string; alt: string }) {
 
 export function CoverImage({
   recipeId,
-  hasCover,
+  hasImage,
   platform,
   alt,
   className,
 }: CoverImageProps) {
-  const coverQuery = useQuery({
-    ...getRecipeCoverApiRecipesRecipeIdCoverGetOptions({
+  const imageQuery = useQuery({
+    ...getRecipeImageApiRecipesRecipeIdImageGetOptions({
       path: { recipe_id: recipeId },
     }),
-    enabled: hasCover,
-    // The cover never changes for a stored recipe — fetch once per session
+    enabled: hasImage,
+    // The image never changes for a stored recipe — fetch once per session
     // and never evict (the default 5-min gcTime would re-download the bytes
     // on back-navigation).
     staleTime: Infinity,
@@ -75,7 +76,7 @@ export function CoverImage({
   // the image paints on the same render the blob lands — no post-paint
   // flash from a useState-in-effect double render; the effect cleanup
   // revokes the previous URL on change/unmount.
-  const blob = coverQuery.data instanceof Blob ? coverQuery.data : null;
+  const blob = imageQuery.data instanceof Blob ? imageQuery.data : null;
   const objectUrl = useMemo(
     () => (blob === null ? null : URL.createObjectURL(blob)),
     [blob],
@@ -85,7 +86,14 @@ export function CoverImage({
     return () => URL.revokeObjectURL(objectUrl);
   }, [objectUrl]);
 
-  const showImage = hasCover && objectUrl !== null && !coverQuery.isError;
+  // A blob that doesn't decode (a corrupt/partial image, or a placeholder in
+  // dev) must show the tasteful fallback, never a broken-image glyph. Reset
+  // the flag whenever the URL changes so a new image gets a fresh chance.
+  const [decodeFailed, setDecodeFailed] = useState(false);
+  useEffect(() => setDecodeFailed(false), [objectUrl]);
+
+  const showImage =
+    hasImage && objectUrl !== null && !imageQuery.isError && !decodeFailed;
 
   return (
     <div className={`relative overflow-hidden ${className ?? ''}`}>
@@ -93,6 +101,7 @@ export function CoverImage({
         <img
           src={objectUrl}
           alt={alt}
+          onError={() => setDecodeFailed(true)}
           className="absolute inset-0 h-full w-full object-cover"
         />
       ) : (

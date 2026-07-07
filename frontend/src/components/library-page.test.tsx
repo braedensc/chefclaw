@@ -136,7 +136,7 @@ describe('LibraryPage', () => {
     expect(await screen.findByRole('status')).toHaveTextContent('file-abc');
   });
 
-  it('renders card meta (chilis, time, ingredient count) from summary fields', async () => {
+  it('renders card meta (spiciness, difficulty, time, ingredient count) from summary fields', async () => {
     genState.recipesPage = recipePage([recipeSummary({ id: 'r1' })]);
 
     renderApp('/');
@@ -144,9 +144,14 @@ describe('LibraryPage', () => {
     const card = await screen.findByRole('link', {
       name: /Red-braised pork belly/,
     });
-    // Verbatim projections from the document: difficulty word beside the
-    // lit chilis, stated minutes, stated ingredient count.
-    expect(within(card).getByText('medium')).toBeInTheDocument();
+    // The two distinct ESTIMATE scales: spiciness=2 → "medium" chilis,
+    // difficulty=1 → "easy" level meter; then stated minutes + ingredients.
+    expect(
+      within(card).getByLabelText('Spiciness: medium (estimated)'),
+    ).toBeInTheDocument();
+    expect(
+      within(card).getByLabelText('Difficulty: easy (estimated)'),
+    ).toBeInTheDocument();
     expect(within(card).getByText('75 min')).toBeInTheDocument();
     expect(within(card).getByText('2 ingredients')).toBeInTheDocument();
   });
@@ -155,7 +160,8 @@ describe('LibraryPage', () => {
     genState.recipesPage = recipePage([
       recipeSummary({
         id: 'r1',
-        difficulty: null,
+        estimated_spiciness_level: null,
+        estimated_difficulty_level: null,
         total_time_minutes: null,
         ingredient_count: null,
       }),
@@ -166,7 +172,10 @@ describe('LibraryPage', () => {
     const card = await screen.findByRole('link', {
       name: /Red-braised pork belly/,
     });
-    expect(within(card).queryByText('medium')).not.toBeInTheDocument();
+    expect(within(card).queryByLabelText(/Spiciness:/)).not.toBeInTheDocument();
+    expect(
+      within(card).queryByLabelText(/Difficulty:/),
+    ).not.toBeInTheDocument();
     expect(within(card).queryByText(/\d+ min/)).not.toBeInTheDocument();
     expect(within(card).queryByText(/ingredient/)).not.toBeInTheDocument();
   });

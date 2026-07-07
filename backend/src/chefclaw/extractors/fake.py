@@ -13,7 +13,7 @@ from pathlib import Path
 
 from chefclaw.extractors import ExtractionOutcome, ExtractionUsage
 
-FAKE_PROMPT_VERSION = "v1"
+FAKE_PROMPT_VERSION = "v2"
 FAKE_MODEL_ID = "fake-extractor"
 
 # One realistic bilingual dish matching the §5 document shape MINUS the source
@@ -83,6 +83,9 @@ _DEFAULT_DISH: dict = {
         },
     ],
     "tips": ["Skim early; a clean braise keeps the sauce clear."],
+    # Derived estimates (v2): split out by validate_extraction into the
+    # separate `estimated` column, never into the verbatim document.
+    "estimated": {"spiciness_level": 1, "difficulty_level": 1},
 }
 
 _DEFAULT_USAGE = ExtractionUsage(

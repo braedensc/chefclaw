@@ -45,11 +45,11 @@ interface GenState {
   patch: MutationMock;
   deleteRecipe: MutationMock;
   /**
-   * CoverImage's blob fetch — resolve with a Blob to show a cover; the
-   * default (resolving undefined) errors the query, so covers fall back to
-   * the platform tile unless a test opts in.
+   * CoverImage's blob fetch — resolve with a Blob to show the illustration;
+   * the default (resolving undefined) errors the query, so images fall back
+   * to the platform tile unless a test opts in.
    */
-  cover: MutationMock;
+  image: MutationMock;
 }
 
 export const genState: GenState = {
@@ -65,7 +65,7 @@ export const genState: GenState = {
   upload: mutationMock(),
   patch: mutationMock(),
   deleteRecipe: mutationMock(),
-  cover: mutationMock(),
+  image: mutationMock(),
 };
 
 export function resetGenState(): void {
@@ -81,7 +81,7 @@ export function resetGenState(): void {
   genState.upload = mutationMock();
   genState.patch = mutationMock();
   genState.deleteRecipe = mutationMock();
-  genState.cover = mutationMock();
+  genState.image = mutationMock();
 }
 
 /** The `_id` discriminators match the real generated module's createQueryKey. */
@@ -113,23 +113,23 @@ export function genMockModule() {
       },
     }),
 
-    getRecipeCoverApiRecipesRecipeIdCoverGetQueryKey: (options: {
+    getRecipeImageApiRecipesRecipeIdImageGetQueryKey: (options: {
       path: { recipe_id: string };
     }) => [
-      { _id: 'getRecipeCoverApiRecipesRecipeIdCoverGet', path: options.path },
+      { _id: 'getRecipeImageApiRecipesRecipeIdImageGet', path: options.path },
     ],
-    getRecipeCoverApiRecipesRecipeIdCoverGetOptions: (options: {
+    getRecipeImageApiRecipesRecipeIdImageGetOptions: (options: {
       path: { recipe_id: string };
     }) => ({
       queryKey: [
-        { _id: 'getRecipeCoverApiRecipesRecipeIdCoverGet', path: options.path },
+        { _id: 'getRecipeImageApiRecipesRecipeIdImageGet', path: options.path },
       ],
       queryFn: async () => {
-        const cover = await genState.cover(options);
-        if (cover === undefined) {
-          throw new Error(`gen-mock: no cover for ${options.path.recipe_id}`);
+        const image = await genState.image(options);
+        if (image === undefined) {
+          throw new Error(`gen-mock: no image for ${options.path.recipe_id}`);
         }
-        return cover;
+        return image;
       },
     }),
 

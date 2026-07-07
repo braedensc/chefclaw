@@ -1,9 +1,10 @@
 import { Link } from '@tanstack/react-router';
 
 import type { RecipeSummary } from '../client/types.gen';
-import { ChiliScale } from './brand/chili-scale';
 import { CoverImage } from './brand/cover-image';
+import { DifficultyScale } from './brand/difficulty-scale';
 import { platformAccent } from './brand/platform-accents';
+import { SpicinessScale } from './brand/spiciness-scale';
 import { PlatformBadge } from './platform-badge';
 
 /** Position of a card within a multi-dish video (only passed when count>1). */
@@ -45,7 +46,8 @@ export function RecipeCard({
   const enTitle = recipe.title_en;
   const altTitle = enTitle ?? zhTitle ?? 'Untitled dish';
   const hasMeta =
-    recipe.difficulty != null ||
+    recipe.estimated_spiciness_level != null ||
+    recipe.estimated_difficulty_level != null ||
     recipe.total_time_minutes != null ||
     recipe.ingredient_count != null;
 
@@ -58,7 +60,7 @@ export function RecipeCard({
       <div className="relative">
         <CoverImage
           recipeId={recipe.id}
-          hasCover={recipe.has_cover ?? false}
+          hasImage={recipe.has_image ?? false}
           platform={recipe.platform}
           alt={altTitle}
           className="aspect-[16/10]"
@@ -103,9 +105,8 @@ export function RecipeCard({
       </div>
       {hasMeta && (
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 px-4 pt-3 pb-1 font-display text-[11px] font-semibold tracking-[0.14em] text-ink-dim uppercase">
-          {recipe.difficulty != null && (
-            <ChiliScale difficulty={recipe.difficulty} />
-          )}
+          <SpicinessScale level={recipe.estimated_spiciness_level} />
+          <DifficultyScale level={recipe.estimated_difficulty_level} />
           {recipe.total_time_minutes != null && (
             <span>{recipe.total_time_minutes} min</span>
           )}

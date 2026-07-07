@@ -30,6 +30,13 @@ Coercion contract (all models are pydantic strict mode, ``extra="forbid"``):
 Provenance is pipeline-owned: :func:`validate_extraction` overwrites each
 dish's ``source`` block from the pipeline's own knowledge — the model never
 controls where a recipe claims to come from.
+
+Derived estimates stay separate: :func:`validate_extraction` also SPLITS an
+optional per-dish ``estimated`` object (spiciness/difficulty — the only
+inferred numeric fields) OUT of each dish before document validation, so
+``RecipeDocument`` never carries a derived value and the raw captures are never
+overwritten (Hard Rule 7). Estimates land in their own column,
+``source="derived"``, the same posture as the reserved nutrition_ref.
 """
 
 from typing import Literal
@@ -40,12 +47,14 @@ from .errors import ValidationFailedError
 
 __all__ = [
     "BilingualText",
+    "EstimatedAttributes",
     "Ingredient",
     "Quantity",
     "RecipeDocument",
     "SourceInfo",
     "Step",
     "validate_document",
+    "validate_estimated",
     "validate_extraction",
 ]
 
@@ -182,6 +191,41 @@ class RecipeDocument(BaseModel):
         return self
 
 
+class EstimatedAttributes(BaseModel):
+    """DERIVED spiciness + difficulty estimates (Hard Rule 7).
+
+    These are the ONLY inferred numeric fields in the pipeline — the model's
+    ASSESSMENTS (0 = not spicy / very easy, 3 = very spicy / hard), null when
+    it is genuinely unsure. They live in a SEPARATE column from the raw
+    ``document`` and NEVER overwrite verbatim captures — ``source`` is fixed to
+    ``"derived"`` so the flag can never masquerade as a stated value, the same
+    posture as the reserved nutrition_ref.
+    """
+
+    model_config = _STRICT
+
+    spiciness_level: int | None = Field(default=None, ge=0, le=3)
+    difficulty_level: int | None = Field(default=None, ge=0, le=3)
+    source: Literal["derived"] = "derived"
+
+
+def validate_estimated(raw: dict | None) -> EstimatedAttributes | None:
+    """Validate the optional per-dish ``estimated`` object.
+
+    None or an empty dict ⇒ ``None`` (no estimate supplied). A non-empty dict
+    is validated; on ANY failure a :class:`ValidationFailedError` is raised
+    with ``raw_output`` carrying the offending object (never repaired).
+    """
+    if not raw:
+        return None
+    try:
+        return EstimatedAttributes.model_validate(raw)
+    except ValidationError as exc:
+        raise ValidationFailedError(
+            f"estimated attributes failed validation: {exc}", raw_output=raw
+        ) from exc
+
+
 def validate_document(raw: dict) -> RecipeDocument:
     """Validate one raw dish dict against the document schema.
 
@@ -197,12 +241,19 @@ def validate_document(raw: dict) -> RecipeDocument:
         ) from exc
 
 
-def validate_extraction(raw_dishes: list[dict], source: SourceInfo) -> list[RecipeDocument]:
-    """Validate a full extraction (one video ⇒ N dishes) into documents.
+def validate_extraction(
+    raw_dishes: list[dict], source: SourceInfo
+) -> list[tuple[RecipeDocument, EstimatedAttributes | None]]:
+    """Validate a full extraction (one video ⇒ N dishes) into
+    ``(document, estimated)`` pairs.
 
-    The ``source`` block of every dish is injected/overwritten from the
-    pipeline's own knowledge — the model must not control provenance, so any
-    model-emitted ``source`` is discarded. Inputs are never mutated.
+    Each raw dish may carry an optional ``estimated`` object (derived spiciness
+    + difficulty — Hard Rule 7). It is SPLIT OUT of the dish BEFORE document
+    validation so ``RecipeDocument`` stays ``extra="forbid"`` clean and the
+    derived values are stored in their own column, never inside the verbatim
+    ``document``. The document's ``source`` block is injected/overwritten from
+    the pipeline's own knowledge — the model must not control provenance, so
+    any model-emitted ``source`` is discarded. Inputs are never mutated.
 
     An empty ``raw_dishes`` is a validation failure: a stored extraction must
     contain at least one dish (mirrors the min-1 ingredients/steps rule).
@@ -217,18 +268,23 @@ def validate_extraction(raw_dishes: list[dict], source: SourceInfo) -> list[Reci
         )
 
     provenance = source.model_dump()
-    documents: list[RecipeDocument] = []
+    results: list[tuple[RecipeDocument, EstimatedAttributes | None]] = []
     for index, dish in enumerate(raw_dishes):
         if not isinstance(dish, dict):
             raise ValidationFailedError(
                 f"dish {index} is not a JSON object (got {type(dish).__name__})",
                 raw_output=dish,
             )
-        merged = {**dish, "source": provenance}
+        # Split the derived estimates out (without mutating the input) so the
+        # document validates clean under extra="forbid".
+        estimated = validate_estimated(dish.get("estimated"))
+        merged = {k: v for k, v in dish.items() if k != "estimated"}
+        merged["source"] = provenance
         try:
-            documents.append(RecipeDocument.model_validate(merged))
+            document = RecipeDocument.model_validate(merged)
         except ValidationError as exc:
             raise ValidationFailedError(
                 f"dish {index} failed validation: {exc}", raw_output=merged
             ) from exc
-    return documents
+        results.append((document, estimated))
+    return results

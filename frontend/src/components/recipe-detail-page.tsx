@@ -16,13 +16,14 @@ import type { RecipeDetail } from '../client/types.gen';
 import { apiErrorMessage } from '../lib/error-message';
 import { asRecipeDoc } from '../lib/recipe-document';
 import type { IngredientDoc, RecipeDoc, StepDoc } from '../lib/recipe-document';
-import { ChiliScale } from './brand/chili-scale';
 import { CoverImage } from './brand/cover-image';
+import { DifficultyScale } from './brand/difficulty-scale';
 import {
   fallbackCoverGradient,
   platformAccent,
 } from './brand/platform-accents';
 import { PuppyChef } from './brand/puppy-chef';
+import { SpicinessScale } from './brand/spiciness-scale';
 import { PlatformBadge } from './platform-badge';
 
 /**
@@ -179,11 +180,11 @@ function RecipeHero({ detail, doc }: { detail: RecipeDetail; doc: RecipeDoc }) {
 
   return (
     <header className="mt-4">
-      {detail.has_cover ? (
+      {detail.has_image ? (
         <div className="relative overflow-hidden rounded-card border border-line">
           <CoverImage
             recipeId={detail.id}
-            hasCover
+            hasImage
             platform={detail.platform}
             alt={`${zhTitle ?? enTitle ?? 'Untitled dish'} — cover photo`}
             className="aspect-[21/9] w-full"
@@ -206,16 +207,33 @@ function RecipeHero({ detail, doc }: { detail: RecipeDetail; doc: RecipeDoc }) {
           {titleBlock}
         </div>
       )}
-      <HeroMeta doc={doc} />
+      <HeroMeta detail={detail} doc={doc} />
     </header>
   );
 }
 
-/** Letterspaced-caps meta pills — facts verbatim from the document, dot-separated. */
-function HeroMeta({ doc }: { doc: RecipeDoc }) {
+/**
+ * Letterspaced-caps meta pills — the spiciness/difficulty scales carry
+ * recipe-level ESTIMATES (from `detail`, flagged estimated), time/serves/
+ * cuisine come verbatim from the document; dot-separated.
+ */
+function HeroMeta({ detail, doc }: { detail: RecipeDetail; doc: RecipeDoc }) {
   const items: ReactNode[] = [];
-  if (doc.difficulty != null) {
-    items.push(<ChiliScale key="difficulty" difficulty={doc.difficulty} />);
+  if (detail.estimated_spiciness_level != null) {
+    items.push(
+      <SpicinessScale
+        key="spiciness"
+        level={detail.estimated_spiciness_level}
+      />,
+    );
+  }
+  if (detail.estimated_difficulty_level != null) {
+    items.push(
+      <DifficultyScale
+        key="difficulty"
+        level={detail.estimated_difficulty_level}
+      />,
+    );
   }
   if (doc.total_time_minutes != null) {
     items.push(<span key="time">{doc.total_time_minutes} min</span>);

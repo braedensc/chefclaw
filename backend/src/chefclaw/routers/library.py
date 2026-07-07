@@ -67,32 +67,35 @@ async def get_recipe(
 
 
 @router.get(
-    "/{recipe_id}/cover",
+    "/{recipe_id}/image",
     response_model=None,  # a file stream, not a schema-modeled body
     response_class=FileResponse,
     responses={
-        200: {"content": {"image/jpeg": {}}, "description": "The recipe's poster keyframe."},
+        200: {
+            "content": {"image/jpeg": {}},
+            "description": "The recipe's generated illustration.",
+        },
         **_NOT_FOUND,
     },
 )
-async def get_recipe_cover(
+async def get_recipe_image(
     recipe_id: uuid.UUID,
     owner_id: Annotated[uuid.UUID, Depends(require_owner)],
     session: Annotated[AsyncSession, Depends(db.get_session)],
     settings: Annotated[Settings, Depends(get_settings)],
 ) -> FileResponse | JSONResponse:
-    """Stream the poster keyframe. One 404 covers every miss — no recipe, no
-    cover generated, file gone from the archive."""
+    """Stream the generated illustration. One 404 covers every miss — no
+    recipe, no illustration generated yet, file gone from the archive."""
     recipe = await recipes_service.get_recipe(session, owner_id, recipe_id)
-    if recipe is None or recipe.cover_path is None:
-        return error_response(404, "not_found", f"no cover for recipe {recipe_id}")
-    cover_path = Path(recipe.cover_path).resolve()
+    if recipe is None or recipe.image_url is None:
+        return error_response(404, "not_found", f"no image for recipe {recipe_id}")
+    image_path = Path(recipe.image_url).resolve()
     media_root = Path(settings.media_dir).resolve()
     # Belt-and-braces: only ever serve files from inside the media archive.
-    if not cover_path.is_relative_to(media_root) or not cover_path.is_file():
-        return error_response(404, "not_found", f"no cover for recipe {recipe_id}")
+    if not image_path.is_relative_to(media_root) or not image_path.is_file():
+        return error_response(404, "not_found", f"no image for recipe {recipe_id}")
     return FileResponse(
-        cover_path,
+        image_path,
         media_type="image/jpeg",
         headers={"Cache-Control": "private, max-age=86400"},
     )

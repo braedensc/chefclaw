@@ -12,10 +12,10 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from typing import Any
 
-from chefclaw.documents import RecipeDocument
+from chefclaw.documents import EstimatedAttributes, RecipeDocument
 from chefclaw.extractors import ExtractionUsage
 from chefclaw.models import Job, Recipe
-from chefclaw.services.repo import ACTIVE_STATUSES, RUNNING_STATUSES, RecipeCoverRef
+from chefclaw.services.repo import ACTIVE_STATUSES, RUNNING_STATUSES, RecipeImageRef
 
 _EPOCH = datetime(2026, 1, 1, tzinfo=UTC)
 
@@ -80,7 +80,9 @@ class FakeJobStore:
             "status": "stored",
             "tags": [],
             "user_notes": None,
-            "cover_path": None,
+            "image_url": None,
+            "image_style_version": None,
+            "estimated": None,
             "document": {},
             "extraction_meta": {},
             "created_at": self._tick(),
@@ -188,6 +190,7 @@ class FakeJobStore:
         self,
         job: Job,
         documents: list[RecipeDocument],
+        estimates: list[EstimatedAttributes | None],
         *,
         extraction_meta: dict[str, Any],
     ) -> list[uuid.UUID] | None:
@@ -207,9 +210,12 @@ class FakeJobStore:
                 )
             return None
         recipe_ids: list[uuid.UUID] = []
-        for index, document in enumerate(documents):
-            # cover_path lands NULL — covers are persisted post-store via
-            # set_recipe_cover (never inside the paid-work crash-loss window).
+        for index, (document, estimate) in enumerate(
+            zip(documents, estimates, strict=False)
+        ):
+            # image_url lands NULL — illustrations are persisted post-store via
+            # set_recipe_image (never inside the paid-work crash-loss window).
+            # Derived estimates ride in their own column (Hard Rule 7).
             recipe = self.seed_recipe(
                 owner_id=job.owner_id,
                 platform=job.platform,
@@ -219,6 +225,7 @@ class FakeJobStore:
                 title_en=document.dish_name.en,
                 title_original=document.dish_name.original,
                 document=document.model_dump(mode="json"),
+                estimated=estimate.model_dump(mode="json") if estimate is not None else None,
                 extraction_meta=extraction_meta,
             )
             recipe_ids.append(recipe.id)
@@ -228,24 +235,42 @@ class FakeJobStore:
         job.error_detail = None
         return recipe_ids
 
-    async def list_recipes_missing_covers(self) -> list[RecipeCoverRef]:
-        return [
-            RecipeCoverRef(recipe.id, recipe.platform, recipe.canonical_id, recipe.dish_index)
-            for recipe in self.recipes
-            if recipe.cover_path is None
-        ]
+    def _job_id_for_recipe(self, recipe_id: uuid.UUID) -> uuid.UUID | None:
+        """Mirror the real inner join: the stored job whose result_recipe_ids
+        lists this recipe (the illustration backfill attributes spend to it)."""
+        for job in self.jobs.values():
+            if recipe_id in (job.result_recipe_ids or []):
+                return job.id
+        return None
 
-    async def group_dish_counts(self) -> dict[tuple[str, str], int]:
-        counts: dict[tuple[str, str], int] = {}
+    async def list_recipes_missing_images(self) -> list[RecipeImageRef]:
+        refs: list[RecipeImageRef] = []
         for recipe in self.recipes:
-            key = (recipe.platform, recipe.canonical_id)
-            counts[key] = max(counts.get(key, 0), recipe.dish_index + 1)
-        return counts
+            if recipe.image_url is not None:
+                continue
+            job_id = self._job_id_for_recipe(recipe.id)
+            if job_id is None:
+                continue  # inner join drops recipes with no locatable job
+            refs.append(
+                RecipeImageRef(
+                    recipe.id,
+                    recipe.owner_id,
+                    job_id,
+                    recipe.platform,
+                    recipe.canonical_id,
+                    recipe.dish_index,
+                    recipe.document,
+                )
+            )
+        return refs
 
-    async def set_recipe_cover(self, recipe_id: uuid.UUID, cover_path: str) -> None:
+    async def set_recipe_image(
+        self, recipe_id: uuid.UUID, image_url: str, style_version: str
+    ) -> None:
         for recipe in self.recipes:
             if recipe.id == recipe_id:
-                recipe.cover_path = cover_path
+                recipe.image_url = image_url
+                recipe.image_style_version = style_version
 
     async def reconcile_interrupted(self) -> int:
         count = 0

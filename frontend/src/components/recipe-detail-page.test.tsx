@@ -51,8 +51,8 @@ describe('RecipeDetailPage', () => {
     expect(screen.getByText(/Duration: 1小时/)).toBeInTheDocument();
   });
 
-  it('renders the cover hero when the recipe has a cover', async () => {
-    genState.recipesById['r1'] = recipeDetail({ has_cover: true });
+  it('renders the illustration hero when the recipe has an image', async () => {
+    genState.recipesById['r1'] = recipeDetail({ has_image: true });
 
     renderApp('/recipes/r1');
 
@@ -67,8 +67,8 @@ describe('RecipeDetailPage', () => {
     ).toBeInTheDocument();
   });
 
-  it('shows no cover hero when has_cover is false', async () => {
-    genState.recipesById['r1'] = recipeDetail({ has_cover: false });
+  it('shows no illustration hero when has_image is false', async () => {
+    genState.recipesById['r1'] = recipeDetail({ has_image: false });
 
     renderApp('/recipes/r1');
 
@@ -76,6 +76,34 @@ describe('RecipeDetailPage', () => {
     expect(
       screen.queryByRole('img', { name: /cover photo/ }),
     ).not.toBeInTheDocument();
+  });
+
+  it('shows the estimated spiciness + difficulty scales in the hero meta', async () => {
+    genState.recipesById['r1'] = recipeDetail();
+
+    renderApp('/recipes/r1');
+
+    // Recipe-level ESTIMATES from detail: spiciness=2 → medium, difficulty=1
+    // → easy; two distinct, flagged-estimated indicators.
+    expect(
+      await screen.findByLabelText('Spiciness: medium (estimated)'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByLabelText('Difficulty: easy (estimated)'),
+    ).toBeInTheDocument();
+  });
+
+  it('omits the estimate scales when the fields are null (never invent)', async () => {
+    genState.recipesById['r1'] = recipeDetail({
+      estimated_spiciness_level: null,
+      estimated_difficulty_level: null,
+    });
+
+    renderApp('/recipes/r1');
+
+    await screen.findByRole('heading', { name: /Red-braised pork belly/ });
+    expect(screen.queryByLabelText(/Spiciness:/)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/Difficulty:/)).not.toBeInTheDocument();
   });
 
   it('shows the sleeping pup while the recipe loads', async () => {
