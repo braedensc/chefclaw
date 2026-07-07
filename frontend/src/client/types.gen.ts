@@ -131,6 +131,84 @@ export type HealthResponse = {
 };
 
 /**
+ * InviteCreate
+ *
+ * POST /api/admin/invites body. Lightweight email shape check (a friends-
+ * invite flow, not a validation fortress) — normalization happens server-side.
+ */
+export type InviteCreate = {
+    /**
+     * Email
+     */
+    email: string;
+};
+
+/**
+ * InviteList
+ */
+export type InviteList = {
+    /**
+     * Items
+     */
+    items: Array<InviteOut>;
+};
+
+/**
+ * InviteOut
+ *
+ * An invite as the admin sees it — NEVER the token_hash. ``dev_activation_
+ * link`` is present ONLY when chefclaw_email='fake' (the real link is emailed).
+ */
+export type InviteOut = {
+    /**
+     * Accepted At
+     */
+    accepted_at?: string | null;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Dev Activation Link
+     */
+    dev_activation_link?: string | null;
+    /**
+     * Email
+     */
+    email: string;
+    /**
+     * Expires At
+     */
+    expires_at: string;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Status
+     */
+    status: string;
+};
+
+/**
+ * InvitePublicOut
+ *
+ * GET /api/invites/{token} — the public invite-accept shape (M13). ``status``
+ * is 'pending' | 'invalid'; ``email`` is revealed ONLY for a live pending
+ * invite (a missing/expired/revoked token is a uniform 'invalid', no email).
+ */
+export type InvitePublicOut = {
+    /**
+     * Email
+     */
+    email?: string | null;
+    /**
+     * Status
+     */
+    status: string;
+};
+
+/**
  * JobOut
  */
 export type JobOut = {
@@ -568,6 +646,113 @@ export type ValidationError = {
     type: string;
 };
 
+export type ListInvitesApiAdminInvitesGetData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Status
+         */
+        status?: string | null;
+    };
+    url: '/api/admin/invites';
+};
+
+export type ListInvitesApiAdminInvitesGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ListInvitesApiAdminInvitesGetError = ListInvitesApiAdminInvitesGetErrors[keyof ListInvitesApiAdminInvitesGetErrors];
+
+export type ListInvitesApiAdminInvitesGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: InviteList;
+};
+
+export type ListInvitesApiAdminInvitesGetResponse = ListInvitesApiAdminInvitesGetResponses[keyof ListInvitesApiAdminInvitesGetResponses];
+
+export type CreateInviteApiAdminInvitesPostData = {
+    body: InviteCreate;
+    path?: never;
+    query?: never;
+    url: '/api/admin/invites';
+};
+
+export type CreateInviteApiAdminInvitesPostErrors = {
+    /**
+     * Conflict
+     */
+    409: ErrorBody;
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+    /**
+     * Bad Gateway
+     */
+    502: ErrorBody;
+    /**
+     * Service Unavailable
+     */
+    503: ErrorBody;
+};
+
+export type CreateInviteApiAdminInvitesPostError = CreateInviteApiAdminInvitesPostErrors[keyof CreateInviteApiAdminInvitesPostErrors];
+
+export type CreateInviteApiAdminInvitesPostResponses = {
+    /**
+     * OK
+     */
+    200: InviteOut;
+    /**
+     * Successful Response
+     */
+    201: InviteOut;
+};
+
+export type CreateInviteApiAdminInvitesPostResponse = CreateInviteApiAdminInvitesPostResponses[keyof CreateInviteApiAdminInvitesPostResponses];
+
+export type RevokeInviteApiAdminInvitesInviteIdRevokePostData = {
+    body?: never;
+    path: {
+        /**
+         * Invite Id
+         */
+        invite_id: string;
+    };
+    query?: never;
+    url: '/api/admin/invites/{invite_id}/revoke';
+};
+
+export type RevokeInviteApiAdminInvitesInviteIdRevokePostErrors = {
+    /**
+     * Not Found
+     */
+    404: ErrorBody;
+    /**
+     * Conflict
+     */
+    409: ErrorBody;
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type RevokeInviteApiAdminInvitesInviteIdRevokePostError = RevokeInviteApiAdminInvitesInviteIdRevokePostErrors[keyof RevokeInviteApiAdminInvitesInviteIdRevokePostErrors];
+
+export type RevokeInviteApiAdminInvitesInviteIdRevokePostResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
 export type GoogleCallbackApiAuthGoogleCallbackGetData = {
     body?: never;
     path?: never;
@@ -659,6 +844,36 @@ export type HealthApiHealthGetResponses = {
 };
 
 export type HealthApiHealthGetResponse = HealthApiHealthGetResponses[keyof HealthApiHealthGetResponses];
+
+export type PublicInviteApiInvitesTokenGetData = {
+    body?: never;
+    path: {
+        /**
+         * Token
+         */
+        token: string;
+    };
+    query?: never;
+    url: '/api/invites/{token}';
+};
+
+export type PublicInviteApiInvitesTokenGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type PublicInviteApiInvitesTokenGetError = PublicInviteApiInvitesTokenGetErrors[keyof PublicInviteApiInvitesTokenGetErrors];
+
+export type PublicInviteApiInvitesTokenGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: InvitePublicOut;
+};
+
+export type PublicInviteApiInvitesTokenGetResponse = PublicInviteApiInvitesTokenGetResponses[keyof PublicInviteApiInvitesTokenGetResponses];
 
 export type ListJobsApiJobsGetData = {
     body?: never;

@@ -57,14 +57,33 @@ def test_assert_prod_auth_safe_rejects_google_without_creds() -> None:
 
 def test_assert_prod_auth_safe_allows_fake_local_and_google() -> None:
     auth.assert_prod_auth_safe(Settings(chefclaw_auth_provider="fake"))  # default local
+    # A fully-configured prod deploy: google auth + ses email, both real.
     auth.assert_prod_auth_safe(
         Settings(
             chefclaw_auth_provider="google",
             google_oauth_client_id="id",
             google_oauth_client_secret="secret",
+            chefclaw_email="ses",
+            email_from="no-reply@x",
+            ses_region="us-east-1",
             sentry_environment="vps",
         )
     )
+
+
+def test_assert_prod_auth_safe_rejects_fake_email_in_vps_env() -> None:
+    """The email footgun is guarded like the auth one (M7): fake email in a
+    'vps' env fails the boot (invites would only be logged, never sent)."""
+    with pytest.raises(ConfigError):
+        auth.assert_prod_auth_safe(
+            Settings(
+                chefclaw_auth_provider="google",
+                google_oauth_client_id="id",
+                google_oauth_client_secret="secret",
+                sentry_environment="vps",
+                # chefclaw_email defaults to "fake"
+            )
+        )
 
 
 # ── require_owner (fake short-circuit + guard) ────────────────────────────────
@@ -241,9 +260,13 @@ async def test_callback_mints_session_for_returning_user(monkeypatch: pytest.Mon
 
 async def test_callback_unbound_identity_is_opaque_403(monkeypatch: pytest.MonkeyPatch) -> None:
     async def resolve(identity: VerifiedIdentity) -> None:
-        return None  # no bound account (PR 3 adds invite/bootstrap)
+        return None  # not a returning user
+
+    async def no_activation(sm: object, settings: object, identity: VerifiedIdentity) -> None:
+        return None  # no bootstrap-claim, no matching invite
 
     monkeypatch.setattr(auth_router, "resolve_owner_by_identity", resolve)
+    monkeypatch.setattr(auth_router.invites, "activate_identity", no_activation)
     async with _client(make_app()) as client:
         resp = await _drive_callback(client)
     assert resp.status_code == 403

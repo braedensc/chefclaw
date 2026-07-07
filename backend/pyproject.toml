@@ -24,6 +24,10 @@ dependencies = [
     # Authorization-Code + PKCE. Used ONLY by GoogleOAuthProvider (imported
     # lazily) for ID-token JWKS verification — the fake provider needs it never.
     "authlib>=1.3",
+    # M2 invites (PR 3): AWS SES for invite emails. Used ONLY by SesEmailAdapter
+    # (imported lazily); the fake ConsoleEmailAdapter default never needs it, so
+    # CI/dev never import it. Creds via the boto3 chain (IAM role on the VPS).
+    "boto3>=1.34",
 ]
 
 [dependency-groups]

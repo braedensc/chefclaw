@@ -26,6 +26,7 @@ from chefclaw.errors import ConfigError
 from chefclaw.models import User, UserStatus
 from chefclaw.oauth import VerifiedIdentity, get_oauth_provider, pkce_pair
 from chefclaw.schemas import MeOut
+from chefclaw.services import invites
 
 router = APIRouter(prefix="/api", tags=["auth"])
 
@@ -209,7 +210,11 @@ async def google_callback(
 
     owner_id = await resolve_owner_by_identity(identity)
     if owner_id is None:
-        # PR 3 wires invite-consume + the bootstrap_admin_email-gated claim here.
+        # First activation: bootstrap-claim (gated on bootstrap_admin_email) or
+        # consume a pending invite matching this verified email — one tx each.
+        # Still None ⇒ ONE opaque 403 (no invite vs mismatch oracle — M6).
+        owner_id = await invites.activate_identity(db.get_sessionmaker(), settings, identity)
+    if owner_id is None:
         return _opaque_denied()
 
     raw_session = await sessions.create_session(

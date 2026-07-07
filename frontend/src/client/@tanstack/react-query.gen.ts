@@ -3,8 +3,8 @@
 import { type DefaultError, type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { deleteRecipeApiRecipesRecipeIdDelete, extractRecipeApiRecipesExtractPost, getJobApiJobsJobIdGet, getRecipeApiRecipesRecipeIdGet, getRecipeImageApiRecipesRecipeIdImageGet, getSpendApiSpendGet, googleCallbackApiAuthGoogleCallbackGet, googleLoginApiAuthGoogleLoginGet, healthApiHealthGet, listJobsApiJobsGet, listRecipesApiRecipesGet, logoutApiAuthLogoutPost, meApiMeGet, type Options, patchRecipeApiRecipesRecipeIdPatch, regenerateIllustrationApiRecipesRecipeIdIllustrationPost, uploadRecipeVideoApiRecipesUploadPost } from '../sdk.gen';
-import type { DeleteRecipeApiRecipesRecipeIdDeleteData, DeleteRecipeApiRecipesRecipeIdDeleteError, DeleteRecipeApiRecipesRecipeIdDeleteResponse, ExtractRecipeApiRecipesExtractPostData, ExtractRecipeApiRecipesExtractPostError, ExtractRecipeApiRecipesExtractPostResponse, GetJobApiJobsJobIdGetData, GetJobApiJobsJobIdGetError, GetJobApiJobsJobIdGetResponse, GetRecipeApiRecipesRecipeIdGetData, GetRecipeApiRecipesRecipeIdGetError, GetRecipeApiRecipesRecipeIdGetResponse, GetRecipeImageApiRecipesRecipeIdImageGetData, GetRecipeImageApiRecipesRecipeIdImageGetError, GetSpendApiSpendGetData, GetSpendApiSpendGetError, GetSpendApiSpendGetResponse, GoogleCallbackApiAuthGoogleCallbackGetData, GoogleCallbackApiAuthGoogleCallbackGetError, GoogleLoginApiAuthGoogleLoginGetData, GoogleLoginApiAuthGoogleLoginGetError, HealthApiHealthGetData, HealthApiHealthGetResponse, ListJobsApiJobsGetData, ListJobsApiJobsGetError, ListJobsApiJobsGetResponse, ListRecipesApiRecipesGetData, ListRecipesApiRecipesGetError, ListRecipesApiRecipesGetResponse, LogoutApiAuthLogoutPostData, LogoutApiAuthLogoutPostResponse, MeApiMeGetData, MeApiMeGetResponse, PatchRecipeApiRecipesRecipeIdPatchData, PatchRecipeApiRecipesRecipeIdPatchError, PatchRecipeApiRecipesRecipeIdPatchResponse, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostData, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostError, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostResponse, UploadRecipeVideoApiRecipesUploadPostData, UploadRecipeVideoApiRecipesUploadPostError, UploadRecipeVideoApiRecipesUploadPostResponse } from '../types.gen';
+import { createInviteApiAdminInvitesPost, deleteRecipeApiRecipesRecipeIdDelete, extractRecipeApiRecipesExtractPost, getJobApiJobsJobIdGet, getRecipeApiRecipesRecipeIdGet, getRecipeImageApiRecipesRecipeIdImageGet, getSpendApiSpendGet, googleCallbackApiAuthGoogleCallbackGet, googleLoginApiAuthGoogleLoginGet, healthApiHealthGet, listInvitesApiAdminInvitesGet, listJobsApiJobsGet, listRecipesApiRecipesGet, logoutApiAuthLogoutPost, meApiMeGet, type Options, patchRecipeApiRecipesRecipeIdPatch, publicInviteApiInvitesTokenGet, regenerateIllustrationApiRecipesRecipeIdIllustrationPost, revokeInviteApiAdminInvitesInviteIdRevokePost, uploadRecipeVideoApiRecipesUploadPost } from '../sdk.gen';
+import type { CreateInviteApiAdminInvitesPostData, CreateInviteApiAdminInvitesPostError, CreateInviteApiAdminInvitesPostResponse, DeleteRecipeApiRecipesRecipeIdDeleteData, DeleteRecipeApiRecipesRecipeIdDeleteError, DeleteRecipeApiRecipesRecipeIdDeleteResponse, ExtractRecipeApiRecipesExtractPostData, ExtractRecipeApiRecipesExtractPostError, ExtractRecipeApiRecipesExtractPostResponse, GetJobApiJobsJobIdGetData, GetJobApiJobsJobIdGetError, GetJobApiJobsJobIdGetResponse, GetRecipeApiRecipesRecipeIdGetData, GetRecipeApiRecipesRecipeIdGetError, GetRecipeApiRecipesRecipeIdGetResponse, GetRecipeImageApiRecipesRecipeIdImageGetData, GetRecipeImageApiRecipesRecipeIdImageGetError, GetSpendApiSpendGetData, GetSpendApiSpendGetError, GetSpendApiSpendGetResponse, GoogleCallbackApiAuthGoogleCallbackGetData, GoogleCallbackApiAuthGoogleCallbackGetError, GoogleLoginApiAuthGoogleLoginGetData, GoogleLoginApiAuthGoogleLoginGetError, HealthApiHealthGetData, HealthApiHealthGetResponse, ListInvitesApiAdminInvitesGetData, ListInvitesApiAdminInvitesGetError, ListInvitesApiAdminInvitesGetResponse, ListJobsApiJobsGetData, ListJobsApiJobsGetError, ListJobsApiJobsGetResponse, ListRecipesApiRecipesGetData, ListRecipesApiRecipesGetError, ListRecipesApiRecipesGetResponse, LogoutApiAuthLogoutPostData, LogoutApiAuthLogoutPostResponse, MeApiMeGetData, MeApiMeGetResponse, PatchRecipeApiRecipesRecipeIdPatchData, PatchRecipeApiRecipesRecipeIdPatchError, PatchRecipeApiRecipesRecipeIdPatchResponse, PublicInviteApiInvitesTokenGetData, PublicInviteApiInvitesTokenGetError, PublicInviteApiInvitesTokenGetResponse, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostData, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostError, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostResponse, RevokeInviteApiAdminInvitesInviteIdRevokePostData, RevokeInviteApiAdminInvitesInviteIdRevokePostError, UploadRecipeVideoApiRecipesUploadPostData, UploadRecipeVideoApiRecipesUploadPostError, UploadRecipeVideoApiRecipesUploadPostResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -37,6 +37,68 @@ const createQueryKey = <TOptions extends Options>(id: string, options?: TOptions
         params.query = options.query;
     }
     return [params];
+};
+
+export const listInvitesApiAdminInvitesGetQueryKey = (options?: Options<ListInvitesApiAdminInvitesGetData>) => createQueryKey('listInvitesApiAdminInvitesGet', options);
+
+/**
+ * List Invites
+ *
+ * List invites (newest first), optionally filtered by status. NEVER returns
+ * a token_hash.
+ */
+export const listInvitesApiAdminInvitesGetOptions = (options?: Options<ListInvitesApiAdminInvitesGetData>) => queryOptions<ListInvitesApiAdminInvitesGetResponse, ListInvitesApiAdminInvitesGetError, ListInvitesApiAdminInvitesGetResponse, ReturnType<typeof listInvitesApiAdminInvitesGetQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listInvitesApiAdminInvitesGet({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listInvitesApiAdminInvitesGetQueryKey(options)
+});
+
+/**
+ * Create Invite
+ *
+ * Issue (or rotate + resend) a pending invite. Already an active member ⇒
+ * 409; a new invite ⇒ 201; a rotate/resend ⇒ 200. The activation link is
+ * emailed; it rides in the response ONLY when chefclaw_email='fake'.
+ */
+export const createInviteApiAdminInvitesPostMutation = (options?: Partial<Options<CreateInviteApiAdminInvitesPostData>>): UseMutationOptions<CreateInviteApiAdminInvitesPostResponse, CreateInviteApiAdminInvitesPostError, Options<CreateInviteApiAdminInvitesPostData>> => {
+    const mutationOptions: UseMutationOptions<CreateInviteApiAdminInvitesPostResponse, CreateInviteApiAdminInvitesPostError, Options<CreateInviteApiAdminInvitesPostData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createInviteApiAdminInvitesPost({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Revoke Invite
+ *
+ * Revoke a pending invite (idempotent). Already-accepted ⇒ 409; missing ⇒
+ * 404; otherwise 200.
+ */
+export const revokeInviteApiAdminInvitesInviteIdRevokePostMutation = (options?: Partial<Options<RevokeInviteApiAdminInvitesInviteIdRevokePostData>>): UseMutationOptions<unknown, RevokeInviteApiAdminInvitesInviteIdRevokePostError, Options<RevokeInviteApiAdminInvitesInviteIdRevokePostData>> => {
+    const mutationOptions: UseMutationOptions<unknown, RevokeInviteApiAdminInvitesInviteIdRevokePostError, Options<RevokeInviteApiAdminInvitesInviteIdRevokePostData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await revokeInviteApiAdminInvitesInviteIdRevokePost({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
 };
 
 export const googleCallbackApiAuthGoogleCallbackGetQueryKey = (options?: Options<GoogleCallbackApiAuthGoogleCallbackGetData>) => createQueryKey('googleCallbackApiAuthGoogleCallbackGet', options);
@@ -120,6 +182,28 @@ export const healthApiHealthGetOptions = (options?: Options<HealthApiHealthGetDa
         return data;
     },
     queryKey: healthApiHealthGetQueryKey(options)
+});
+
+export const publicInviteApiInvitesTokenGetQueryKey = (options: Options<PublicInviteApiInvitesTokenGetData>) => createQueryKey('publicInviteApiInvitesTokenGet', options);
+
+/**
+ * Public Invite
+ *
+ * PUBLIC invite-accept lookup (M13): a live pending invite reveals its
+ * email; a missing/expired/revoked/accepted token is a uniform 'invalid' with
+ * no email (no enumeration oracle, no address leak).
+ */
+export const publicInviteApiInvitesTokenGetOptions = (options: Options<PublicInviteApiInvitesTokenGetData>) => queryOptions<PublicInviteApiInvitesTokenGetResponse, PublicInviteApiInvitesTokenGetError, PublicInviteApiInvitesTokenGetResponse, ReturnType<typeof publicInviteApiInvitesTokenGetQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await publicInviteApiInvitesTokenGet({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: publicInviteApiInvitesTokenGetQueryKey(options)
 });
 
 export const listJobsApiJobsGetQueryKey = (options?: Options<ListJobsApiJobsGetData>) => createQueryKey('listJobsApiJobsGet', options);

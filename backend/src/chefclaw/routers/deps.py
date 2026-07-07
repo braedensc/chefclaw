@@ -31,6 +31,7 @@ _STATUS_BY_ERROR_TYPE = {
     "rate_limited": 503,
     "cookies_expired": 503,
     "upload_too_large": 413,
+    "email_send_failed": 502,
 }
 
 

@@ -46,6 +46,26 @@ class Settings(BaseSettings):
     # Absolute session lifetime for the opaque server-side sessions (720h = 30d).
     session_ttl_hours: int = 720
 
+    # ── M2 invites + transactional email (PR 3) ─────────────────────────────
+    # Email-provider selection, mirroring the auth/extractor seams. "fake"
+    # (default) is ConsoleEmailAdapter (logs the activation link, zero network);
+    # "ses" is AWS SES (empty email_from/ses_region ⇒ ConfigError). Unknown ⇒
+    # ConfigError. A 'vps' env with the fake email provider fails the boot
+    # (assert_prod_auth_safe, critique M7 — same footgun as fake auth).
+    chefclaw_email: str = "fake"
+    email_from: str = ""  # the verified SES sender ("chefclaw <no-reply@…>")
+    ses_region: str = ""  # AWS region for SES; boto3 creds via the IAM-role chain
+    # Public base URL for building the invite activation link
+    # ({public_base_url}/invite/{token}). Empty ⇒ ConfigError at create-invite
+    # (an invite email with a localhost link is useless).
+    public_base_url: str = ""
+    invite_ttl_hours: int = 168  # 7 days
+    # The seed-admin bootstrap email (critique M6b): the first-owner
+    # bootstrap-claim adopts the migration-seeded admin row ONLY if the verified
+    # OAuth email equals this. EMPTY ⇒ bootstrap-claim is disabled entirely (no
+    # "first stranger to sign in becomes admin" race). Normalized lower/trim.
+    bootstrap_admin_email: str = ""
+
     db_host: str = "127.0.0.1"
     db_port: int = 5432
     db_user: str = "chefclaw"
