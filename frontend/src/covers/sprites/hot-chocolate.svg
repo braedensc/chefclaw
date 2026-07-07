@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="hcBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="hcbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#3a1120"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <linearGradient id="hcmug" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#241a1f"/><stop offset="100%" stop-color="#120c10"/>
+    </linearGradient>
+    <radialGradient id="hccocoa" cx="46%" cy="34%" r="72%">
+      <stop offset="0%" stop-color="#8a5330"/><stop offset="55%" stop-color="#5e3320"/><stop offset="100%" stop-color="#3d1f13"/>
+    </radialGradient>
+    <radialGradient id="hccream" cx="42%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#fff6ea"/><stop offset="60%" stop-color="#fbe8d2"/><stop offset="100%" stop-color="#eccbab"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#hcbg)"/>
+  <!-- cast shadow -->
+  <ellipse cx="158" cy="186" rx="112" ry="18" fill="#000" opacity=".5"/>
+  <!-- rising steam wisps (hot drink) -->
+  <path d="M136 60 C128 42 146 34 138 14" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#hcBlur3)"/>
+  <path d="M180 58 C172 40 190 32 182 12" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#hcBlur3)"/>
+  <!-- neon steam arc (rose family) -->
+  <path d="M92 82 Q130 56 176 58" stroke="#ff4d6d" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- saucer -->
+  <ellipse cx="158" cy="168" rx="88" ry="18" fill="#161119"/>
+  <ellipse cx="158" cy="168" rx="88" ry="18" fill="none" stroke="#2c2136" stroke-width="2.5"/>
+  <ellipse cx="158" cy="166" rx="66" ry="13" fill="#0e0b12"/>
+  <!-- mug handle (right) -->
+  <path d="M204 100 C230 96 232 138 204 138" fill="none" stroke="url(#hcmug)" stroke-width="12" stroke-linecap="round"/>
+  <path d="M204 100 C230 96 232 138 204 138" fill="none" stroke="#3a2b30" stroke-width="2" stroke-linecap="round" opacity=".8"/>
+  <!-- mug body: sturdy rounded cup -->
+  <path d="M110 92 L206 92 L200 150 C196 162 120 162 116 150 Z" fill="url(#hcmug)"/>
+  <path d="M110 92 L206 92 L200 150 C196 162 120 162 116 150 Z" fill="none" stroke="#3a2b30" stroke-width="2" opacity=".8"/>
+  <!-- cocoa surface (ellipse at rim) -->
+  <ellipse cx="158" cy="92" rx="48" ry="12" fill="url(#hccocoa)"/>
+  <ellipse cx="158" cy="92" rx="48" ry="12" fill="none" stroke="#2f1a10" stroke-width="1.4" opacity=".6"/>
+  <!-- whipped cream swirl mound -->
+  <path d="M126 90 C126 78 138 70 158 70 C178 70 190 78 190 90 C182 84 172 82 158 82 C144 82 134 84 126 90 Z" fill="url(#hccream)"/>
+  <path d="M134 84 C138 74 150 68 158 66 C150 62 138 66 132 74 C129 78 130 82 134 84 Z" fill="#fff6ea"/>
+  <path d="M158 66 C166 62 178 66 184 74 C186 78 185 82 182 84 C178 74 168 68 158 66 Z" fill="#f6e4cf"/>
+  <ellipse cx="152" cy="76" rx="10" ry="4" fill="#fffaf2" opacity=".7"/>
+  <!-- cocoa dusting on cream -->
+  <circle cx="146" cy="76" r="1" fill="#5e3320" opacity=".7"/>
+  <circle cx="164" cy="74" r="1" fill="#5e3320" opacity=".7"/>
+  <circle cx="156" cy="79" r=".9" fill="#4a2814" opacity=".7"/>
+  <!-- mini marshmallows -->
+  <ellipse cx="140" cy="90" rx="6" ry="4" fill="#fff6ea" transform="rotate(-8 140 90)"/>
+  <ellipse cx="140" cy="90" rx="6" ry="4" fill="none" stroke="#e6cdb2" stroke-width=".8" transform="rotate(-8 140 90)"/>
+  <ellipse cx="176" cy="90" rx="6" ry="4" fill="#fff6ea" transform="rotate(10 176 90)"/>
+  <ellipse cx="176" cy="90" rx="6" ry="4" fill="none" stroke="#e6cdb2" stroke-width=".8" transform="rotate(10 176 90)"/>
+  <!-- chocolate drizzle over cream -->
+  <path d="M138 74 C148 80 168 80 180 74" stroke="#4a2814" stroke-width="1.6" fill="none" opacity=".8" stroke-linecap="round"/>
+  <path d="M144 70 C154 66 166 68 174 72" stroke="#3d1f13" stroke-width="1.4" fill="none" opacity=".7" stroke-linecap="round"/>
+  <!-- mug body sheen -->
+  <path d="M120 96 L118 148" stroke="#ffffff" stroke-width="3" opacity=".12" stroke-linecap="round"/>
+  <path d="M198 96 L196 146" stroke="#000" stroke-width="4" opacity=".22" stroke-linecap="round"/>
+  <!-- gloss dots -->
+  <circle cx="146" cy="72" r="1.3" fill="#fff" opacity=".65"/>
+  <circle cx="172" cy="70" r="1.2" fill="#fff" opacity=".55"/>
+  <circle cx="158" cy="90" r="1.2" fill="#fff" opacity=".4"/>
+</svg>

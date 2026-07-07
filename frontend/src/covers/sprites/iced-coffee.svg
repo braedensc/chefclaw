@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <radialGradient id="icbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <linearGradient id="icglass" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity=".05"/><stop offset="16%" stop-color="#ffffff" stop-opacity=".18"/><stop offset="50%" stop-color="#ffffff" stop-opacity=".04"/><stop offset="84%" stop-color="#ffffff" stop-opacity=".12"/><stop offset="100%" stop-color="#ffffff" stop-opacity=".02"/>
+    </linearGradient>
+    <linearGradient id="iccoffee" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6e4326"/><stop offset="55%" stop-color="#4a2a16"/><stop offset="100%" stop-color="#2c160c"/>
+    </linearGradient>
+    <linearGradient id="icmilk" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f4e3c8"/><stop offset="100%" stop-color="#d9b98c"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#icbg)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="188" rx="98" ry="16" fill="#000" opacity=".5"/>
+  <!-- sparkle (cold, no steam) -->
+  <path d="M226 44 l0 12 M220 50 l12 0" stroke="#e8cba0" stroke-width="1.6" opacity=".5" stroke-linecap="round"/>
+  <path d="M244 66 l0 8 M240 70 l8 0" stroke="#fff1d6" stroke-width="1.4" opacity=".4" stroke-linecap="round"/>
+  <!-- dark ring base under glass -->
+  <ellipse cx="160" cy="182" rx="46" ry="10" fill="#141018"/>
+  <ellipse cx="160" cy="182" rx="46" ry="10" fill="none" stroke="#2c2136" stroke-width="2.5"/>
+  <ellipse cx="160" cy="180" rx="35" ry="7" fill="#0c0c10"/>
+  <!-- tall straight-sided glass -->
+  <path d="M133 58 L187 58 L184 174 C181 179 139 179 136 174 Z" fill="#0f0d12"/>
+  <!-- coffee fill (dark) -->
+  <path d="M135 66 L185 66 L182 172 C179 176 141 176 138 172 Z" fill="url(#iccoffee)"/>
+  <!-- milk/cream swirl sinking from top -->
+  <path d="M135 84 C150 78 172 82 185 78 L185 108 C170 100 150 104 135 110 Z" fill="url(#icmilk)" opacity=".85"/>
+  <path d="M138 100 C152 94 172 100 184 94" stroke="#f4e3c8" stroke-width="2" fill="none" opacity=".5" stroke-linecap="round"/>
+  <path d="M140 116 C156 110 170 116 182 112" stroke="#c9a373" stroke-width="1.6" fill="none" opacity=".45" stroke-linecap="round"/>
+  <!-- ice cubes suspended -->
+  <g stroke="#ffffff" stroke-width="1">
+    <rect x="140" y="90" width="18" height="16" rx="3" fill="#ffffff" fill-opacity=".2" stroke-opacity=".32" transform="rotate(-14 149 98)"/>
+    <rect x="162" y="108" width="18" height="16" rx="3" fill="#ffffff" fill-opacity=".18" stroke-opacity=".3" transform="rotate(12 171 116)"/>
+    <rect x="144" y="128" width="16" height="15" rx="3" fill="#ffffff" fill-opacity=".18" stroke-opacity=".28" transform="rotate(4 152 135)"/>
+    <rect x="166" y="140" width="15" height="14" rx="3" fill="#ffffff" fill-opacity=".16" stroke-opacity=".26" transform="rotate(-8 173 147)"/>
+  </g>
+  <!-- glass overlay sheen -->
+  <path d="M133 58 L187 58 L184 174 C181 179 139 179 136 174 Z" fill="url(#icglass)"/>
+  <path d="M133 58 L187 58 L184 174 C181 179 139 179 136 174 Z" fill="none" stroke="#ffe9c9" stroke-width="1.5" opacity=".28"/>
+  <path d="M140 66 L137 168" stroke="#ffffff" stroke-width="3" opacity=".3" stroke-linecap="round"/>
+  <path d="M183 66 L185 164" stroke="#ffffff" stroke-width="2" opacity=".15" stroke-linecap="round"/>
+  <!-- glass rim -->
+  <ellipse cx="160" cy="58" rx="27" ry="6" fill="#1a1622"/>
+  <ellipse cx="160" cy="58" rx="27" ry="6" fill="none" stroke="#3a2e44" stroke-width="1.6"/>
+  <ellipse cx="160" cy="57" rx="23" ry="4.4" fill="#4a2a16"/>
+  <!-- crema/foam ring at top -->
+  <ellipse cx="160" cy="57" rx="18" ry="3.2" fill="#c69a68" opacity=".7"/>
+  <!-- coffee bean garnish on foam -->
+  <ellipse cx="154" cy="56" rx="3" ry="2" fill="#3a2010" transform="rotate(-20 154 56)"/>
+  <path d="M153 55 L155 57" stroke="#1c0d06" stroke-width=".8"/>
+  <ellipse cx="166" cy="55" rx="3" ry="2" fill="#3a2010" transform="rotate(16 166 55)"/>
+  <path d="M165 54 L167 56" stroke="#1c0d06" stroke-width=".8"/>
+  <!-- wide straw, angled -->
+  <path d="M196 30 L206 28 L184 84 L176 82 Z" fill="#35e0ff" opacity=".8"/>
+  <path d="M196 30 L206 28 L184 84 L176 82 Z" fill="none" stroke="#22aecb" stroke-width="1.3" opacity=".7"/>
+  <path d="M190 36 L182 80" stroke="#c9f6ff" stroke-width="3" opacity=".5" stroke-linecap="round"/>
+  <ellipse cx="201" cy="29" rx="5.2" ry="1.8" fill="#22aecb" transform="rotate(-8 201 29)"/>
+  <!-- gloss dots / condensation -->
+  <circle cx="142" cy="84" r="1.5" fill="#fff" opacity=".6"/>
+  <circle cx="180" cy="128" r="1.3" fill="#fff" opacity=".45"/>
+  <circle cx="148" cy="164" r="1.2" fill="#fff" opacity=".5"/>
+  <circle cx="184" cy="150" r="1" fill="#fff" opacity=".4"/>
+</svg>

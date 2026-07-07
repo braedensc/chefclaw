@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="gp1Blur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="gp1bg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#123138"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <radialGradient id="gp1sauce" cx="46%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#7a5426"/><stop offset="55%" stop-color="#573813"/><stop offset="100%" stop-color="#38220a"/>
+    </radialGradient>
+    <linearGradient id="gp1pork" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7c3a20"/><stop offset="55%" stop-color="#5e2410"/><stop offset="100%" stop-color="#3d1608"/>
+    </linearGradient>
+    <linearGradient id="gp1pep" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7ed957"/><stop offset="50%" stop-color="#4faa33"/><stop offset="100%" stop-color="#2f7d2b"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#gp1bg)"/>
+  <!-- steam -->
+  <path d="M120 52 C110 34 130 28 120 8" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#gp1Blur3)"/>
+  <path d="M198 50 C190 34 208 28 200 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#gp1Blur3)"/>
+  <ellipse cx="160" cy="188" rx="152" ry="22" fill="#000" opacity=".5"/>
+  <!-- oval plate -->
+  <ellipse cx="160" cy="130" rx="140" ry="46" fill="#141018"/>
+  <ellipse cx="160" cy="130" rx="140" ry="46" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="130" rx="126" ry="38" fill="#0f0d13"/>
+  <!-- neon steam arc (cyan) -->
+  <path d="M48 114 Q102 82 166 80" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- light garlicky glaze pool -->
+  <path d="M60 128 C66 110 108 98 160 98 C212 98 254 110 260 128 C234 150 200 156 160 156 C120 156 86 150 60 128 Z" fill="url(#gp1sauce)"/>
+  <path d="M66 122 C74 110 110 102 160 102 C210 102 246 110 254 122" fill="none" stroke="#a07a3a" stroke-width="1.4" opacity=".35"/>
+  <!-- green pepper slivers dominate: bright, curled -->
+  <g stroke="#255b1f" stroke-width="1.2" stroke-linejoin="round">
+    <g transform="translate(78 110) rotate(-18)"><path d="M0 4 Q22 -3 46 4 Q22 10 0 4 Z" fill="url(#gp1pep)"/></g>
+    <g transform="translate(146 104) rotate(10)"><path d="M0 4 Q26 -3 52 4 Q26 11 0 4 Z" fill="url(#gp1pep)"/></g>
+    <g transform="translate(178 118) rotate(-8)"><path d="M0 4 Q22 -3 44 4 Q22 10 0 4 Z" fill="url(#gp1pep)"/></g>
+    <g transform="translate(94 130) rotate(20)"><path d="M0 4 Q20 -2 40 4 Q20 10 0 4 Z" fill="url(#gp1pep)"/></g>
+    <g transform="translate(156 132) rotate(-14)"><path d="M0 4 Q24 -3 48 4 Q24 10 0 4 Z" fill="url(#gp1pep)"/></g>
+  </g>
+  <!-- pork slivers woven through -->
+  <g stroke-linejoin="round">
+    <g transform="translate(104 116) rotate(-6)"><rect width="48" height="7" rx="3.5" fill="url(#gp1pork)" stroke="#240a03" stroke-width="1.2"/><rect x="4" y="1.4" width="36" height="2" rx="1" fill="#c47a4a" opacity=".55"/></g>
+    <g transform="translate(126 128) rotate(12)"><rect width="50" height="7" rx="3.5" fill="url(#gp1pork)" stroke="#240a03" stroke-width="1.2"/><rect x="4" y="1.4" width="38" height="2" rx="1" fill="#c47a4a" opacity=".55"/></g>
+    <g transform="translate(166 112) rotate(-16)"><rect width="44" height="7" rx="3.5" fill="url(#gp1pork)" stroke="#240a03" stroke-width="1.2"/><rect x="4" y="1.4" width="32" height="2" rx="1" fill="#c47a4a" opacity=".5"/></g>
+    <g transform="translate(118 138) rotate(8)"><rect width="42" height="6.5" rx="3.2" fill="url(#gp1pork)" stroke="#240a03" stroke-width="1.2"/></g>
+  </g>
+  <!-- a few more green peppers on top for freshness -->
+  <g stroke="#255b1f" stroke-width="1.2" stroke-linejoin="round">
+    <g transform="translate(124 108) rotate(-4)"><path d="M0 4 Q18 -2 36 4 Q18 10 0 4 Z" fill="url(#gp1pep)"/></g>
+    <g transform="translate(188 130) rotate(16)"><path d="M0 4 Q18 -2 36 4 Q18 10 0 4 Z" fill="url(#gp1pep)"/></g>
+  </g>
+  <!-- garnish: garlic dots + tiny dried chili accent -->
+  <circle cx="112" cy="124" r="1.6" fill="#f2ddb0"/>
+  <circle cx="168" cy="128" r="1.5" fill="#f2ddb0"/>
+  <circle cx="142" cy="118" r="1.4" fill="#f2ddb0"/>
+  <rect x="150" y="140" width="6" height="3" rx="1.4" fill="#c0301a" transform="rotate(18 153 141)"/>
+  <!-- oil gloss dots -->
+  <circle cx="120" cy="112" r="1.5" fill="#fff" opacity=".6"/>
+  <circle cx="176" cy="122" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="140" cy="136" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

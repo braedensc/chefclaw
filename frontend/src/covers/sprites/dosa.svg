@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="doBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="dobg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="doplate" cx="50%" cy="32%" r="82%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <linearGradient id="docrepe" x1="0" y1="0" x2="0.15" y2="1">
+      <stop offset="0%" stop-color="#f4d488"/><stop offset="42%" stop-color="#e0a848"/><stop offset="100%" stop-color="#a86520"/>
+    </linearGradient>
+    <linearGradient id="docrepe2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#efc673"/><stop offset="100%" stop-color="#b57324"/>
+    </linearGradient>
+    <radialGradient id="dopotato" cx="42%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#ffdf7a"/><stop offset="60%" stop-color="#f2b93c"/><stop offset="100%" stop-color="#d18f1e"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#dobg)"/>
+  <!-- steam -->
+  <path d="M120 54 C110 36 130 28 120 8" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#doBlur3)"/>
+  <path d="M204 52 C196 36 214 28 206 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#doBlur3)"/>
+  <ellipse cx="160" cy="188" rx="152" ry="22" fill="#000" opacity=".5"/>
+  <!-- round plate -->
+  <ellipse cx="160" cy="130" rx="150" ry="52" fill="url(#doplate)"/>
+  <ellipse cx="160" cy="130" rx="150" ry="52" fill="none" stroke="#26262e" stroke-width="3"/>
+  <ellipse cx="160" cy="130" rx="134" ry="43" fill="#0f0d13"/>
+  <!-- neon steam arc (warm) -->
+  <path d="M52 112 Q106 80 168 78" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".45" stroke-linecap="round"/>
+  <!-- CRISPY FOLDED DOSA CONE (the hero silhouette) — a long golden rolled crepe across the plate -->
+  <g transform="translate(0 2)">
+    <!-- underside shadow -->
+    <path d="M46 138 C70 150 250 150 274 134 C258 148 232 156 160 156 C96 156 60 150 46 138 Z" fill="#7a4c14" opacity=".55"/>
+    <!-- main rolled cone body -->
+    <path d="M48 134 C64 118 90 108 160 108 C230 108 260 120 272 132 C258 146 232 152 160 152 C90 152 60 146 48 134 Z" fill="url(#docrepe)"/>
+    <!-- top ridge highlight -->
+    <path d="M60 128 C80 116 110 110 160 110 C214 110 244 118 262 130" fill="none" stroke="#fff0c4" stroke-width="1.6" opacity=".45"/>
+    <!-- rolled seam line down the length -->
+    <path d="M58 132 C90 124 130 122 168 124 C210 126 244 130 262 133" fill="none" stroke="#8a5418" stroke-width="1.6" opacity=".55"/>
+    <!-- crispy blistered texture spots -->
+    <circle cx="92" cy="128" r="3.2" fill="#c98a2c" opacity=".7"/>
+    <circle cx="120" cy="122" r="2.6" fill="#a86a1c" opacity=".6"/>
+    <circle cx="150" cy="126" r="3" fill="#c98a2c" opacity=".65"/>
+    <circle cx="188" cy="124" r="2.8" fill="#a86a1c" opacity=".6"/>
+    <circle cx="218" cy="130" r="3" fill="#c98a2c" opacity=".62"/>
+    <circle cx="108" cy="136" r="2.4" fill="#8a5418" opacity=".5"/>
+    <circle cx="176" cy="138" r="2.4" fill="#8a5418" opacity=".5"/>
+    <circle cx="238" cy="134" r="2.6" fill="#8a5418" opacity=".5"/>
+    <!-- open left end showing the crispier darker rim + potato peeking -->
+    <ellipse cx="56" cy="132" rx="12" ry="16" fill="url(#docrepe2)"/>
+    <ellipse cx="56" cy="132" rx="12" ry="16" fill="none" stroke="#8a5418" stroke-width="1.4" opacity=".6"/>
+    <!-- masala potato filling spilling from the left end -->
+    <path d="M50 124 C42 122 40 132 46 138 C52 144 62 142 64 134 C62 126 56 124 50 124 Z" fill="url(#dopotato)"/>
+    <path d="M50 124 C42 122 40 132 46 138 C52 144 62 142 64 134 C62 126 56 124 50 124 Z" fill="none" stroke="#b07a18" stroke-width="1.2" opacity=".55"/>
+    <circle cx="50" cy="130" r="2.2" fill="#fff0b0" opacity=".7"/>
+    <circle cx="56" cy="136" r="1.8" fill="#e0341f" opacity=".6"/>
+  </g>
+  <!-- outline over the whole roll to unify -->
+  <path d="M48 134 C64 118 90 108 160 108 C230 108 260 120 272 132 C258 146 232 152 160 152 C90 152 60 146 48 134 Z" fill="none" stroke="#5e3610" stroke-width="1.4" opacity=".45"/>
+  <!-- small chutney dip bowl on the right side -->
+  <ellipse cx="244" cy="112" rx="20" ry="8" fill="#141018"/>
+  <ellipse cx="244" cy="112" rx="20" ry="8" fill="none" stroke="#2c2136" stroke-width="2"/>
+  <ellipse cx="244" cy="111" rx="15" ry="5.5" fill="#e6ead0"/>
+  <ellipse cx="240" cy="110" rx="6" ry="2.4" fill="#f4f7e6" opacity=".7"/>
+  <circle cx="248" cy="112" r="1.4" fill="#3f9c37" opacity=".8"/>
+  <!-- cilantro + mustard seed garnish -->
+  <rect x="126" y="118" width="6" height="2.4" rx="1.2" fill="#3f9c37" transform="rotate(-18 129 119)"/>
+  <rect x="200" y="120" width="6" height="2.4" rx="1.2" fill="#5ecb4e" transform="rotate(16 203 121)"/>
+  <circle cx="158" cy="120" r="1.6" fill="#3f9c37"/>
+  <!-- gloss dots (oily crisp) -->
+  <circle cx="130" cy="118" r="1.5" fill="#fff" opacity=".6"/>
+  <circle cx="196" cy="120" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="86" cy="126" r="1.3" fill="#fff" opacity=".5"/>
+</svg>

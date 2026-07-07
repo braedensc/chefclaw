@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <radialGradient id="sbbg2" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#123138"/><stop offset="45%" stop-color="#0b090b"/><stop offset="100%" stop-color="#060507"/>
+    </radialGradient>
+    <linearGradient id="sbtray" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3a2c16"/><stop offset="100%" stop-color="#22190c"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#sbbg2)"/>
+  <ellipse cx="160" cy="190" rx="152" ry="20" fill="#000" opacity=".5"/>
+  <!-- SQUARE bamboo-slatted zaru tray (seiro): distinct rectangular vessel, tilted -->
+  <g transform="translate(160 122) rotate(-3)">
+    <!-- outer frame -->
+    <rect x="-120" y="-40" width="240" height="80" rx="6" fill="#1a130a"/>
+    <rect x="-114" y="-46" width="228" height="80" rx="6" fill="url(#sbtray)"/>
+    <rect x="-114" y="-46" width="228" height="80" rx="6" fill="none" stroke="#6b4f26" stroke-width="2.5"/>
+    <!-- inner sunken slat bed -->
+    <rect x="-102" y="-36" width="204" height="66" rx="3" fill="#12100a"/>
+    <!-- bamboo slats (the su) running across -->
+    <g stroke="#8a6a34" stroke-width="2.6" opacity=".85">
+      <path d="M-100 -26 H100"/><path d="M-100 -16 H100"/><path d="M-100 -6 H100"/>
+      <path d="M-100 4 H100"/><path d="M-100 14 H100"/><path d="M-100 24 H100"/>
+    </g>
+    <g stroke="#4a3618" stroke-width="1" opacity=".6">
+      <path d="M-100 -21 H100"/><path d="M-100 -11 H100"/><path d="M-100 -1 H100"/>
+      <path d="M-100 9 H100"/><path d="M-100 19 H100"/>
+    </g>
+  </g>
+  <!-- COLD SOBA NEST: greyish-brown buckwheat strands coiled into a bundle (dry, no broth) -->
+  <g stroke-linecap="round" fill="none" transform="translate(0 -6)">
+    <!-- shadow strands -->
+    <g stroke="#3a2c1a" stroke-width="7" opacity=".6">
+      <path d="M96 118 C88 100 112 92 132 96"/>
+      <path d="M120 122 C110 102 138 92 160 96"/>
+      <path d="M150 120 C142 100 172 92 194 98"/>
+      <path d="M180 122 C174 104 200 96 216 104"/>
+    </g>
+    <!-- body strands (buckwheat tan-grey) -->
+    <g stroke="#9c8560" stroke-width="6">
+      <path d="M96 116 C88 98 112 90 132 94"/>
+      <path d="M120 120 C110 100 138 90 160 94"/>
+      <path d="M150 118 C142 98 172 90 194 96"/>
+      <path d="M180 120 C174 102 200 94 216 102"/>
+    </g>
+    <!-- lighter cross strands -->
+    <g stroke="#b8a37c" stroke-width="5">
+      <path d="M108 108 C122 98 150 96 176 102"/>
+      <path d="M116 122 C138 116 166 116 190 122"/>
+      <path d="M100 122 C120 128 150 128 180 124"/>
+    </g>
+    <!-- top highlight strand -->
+    <path d="M112 106 C132 96 160 94 184 100" stroke="#d8c8a4" stroke-width="1.6" opacity=".7"/>
+    <path d="M120 120 C142 114 168 114 188 120" stroke="#d8c8a4" stroke-width="1.4" opacity=".6"/>
+  </g>
+  <!-- NORI STRIPS scattered on top (the signature zaru soba garnish) -->
+  <rect x="128" y="90" width="26" height="4" rx="1" fill="#1c2a24" transform="rotate(-12 141 92)"/>
+  <rect x="150" y="98" width="30" height="4" rx="1" fill="#20302a" transform="rotate(6 165 100)"/>
+  <rect x="118" y="104" width="22" height="3.6" rx="1" fill="#182420" transform="rotate(18 129 106)"/>
+  <rect x="176" y="92" width="24" height="3.8" rx="1" fill="#1c2a24" transform="rotate(-6 188 94)"/>
+  <!-- scallion + wasabi on the tray edge -->
+  <circle cx="132" cy="128" r="3" fill="none" stroke="#5ecb4e" stroke-width="2"/>
+  <circle cx="182" cy="126" r="2.6" fill="none" stroke="#3f9c37" stroke-width="1.8"/>
+  <!-- SMALL DIPPING CUP (tsuyu) bottom-right, off the tray -->
+  <ellipse cx="256" cy="150" rx="30" ry="13" fill="#141018"/>
+  <ellipse cx="256" cy="150" rx="30" ry="13" fill="none" stroke="#2c2136" stroke-width="2.5"/>
+  <ellipse cx="256" cy="149" rx="23" ry="9" fill="#2a1a0d"/>
+  <ellipse cx="250" cy="146" rx="8" ry="3" fill="#4a2e16" opacity=".7"/>
+  <!-- scallion + grated daikon floating in tsuyu -->
+  <circle cx="262" cy="150" r="2.4" fill="none" stroke="#5ecb4e" stroke-width="1.6"/>
+  <circle cx="250" cy="151" r="2.6" fill="#e8ddc6" opacity=".85"/>
+  <!-- COLD-DISH SPARKLE / condensation (no steam arc) -->
+  <g fill="#cfeaf2">
+    <path d="M84 60 l1.6 4 l4 1.6 l-4 1.6 l-1.6 4 l-1.6 -4 l-4 -1.6 l4 -1.6 Z" opacity=".7"/>
+    <path d="M232 52 l1.2 3 l3 1.2 l-3 1.2 l-1.2 3 l-1.2 -3 l-3 -1.2 l3 -1.2 Z" opacity=".55"/>
+    <path d="M198 40 l1 2.4 l2.4 1 l-2.4 1 l-1 2.4 l-1 -2.4 l-2.4 -1 l2.4 -1 Z" opacity=".5"/>
+  </g>
+  <circle cx="118" cy="46" r="1.6" fill="#cfeaf2" opacity=".6"/>
+  <circle cx="252" cy="70" r="1.4" fill="#cfeaf2" opacity=".5"/>
+  <!-- moisture gloss dots on the noodles -->
+  <circle cx="140" cy="104" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="184" cy="110" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="118" cy="118" r="1.2" fill="#fff" opacity=".45"/>
+</svg>

@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <radialGradient id="cslbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#113036"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <radialGradient id="cslbowl" cx="50%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <radialGradient id="csldress" cx="46%" cy="34%" r="78%">
+      <stop offset="0%" stop-color="#fbf3dc"/><stop offset="60%" stop-color="#f1e2bf"/><stop offset="100%" stop-color="#d8c295"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#cslbg)"/>
+  <ellipse cx="160" cy="188" rx="150" ry="20" fill="#000" opacity=".5"/>
+  <!-- cold dish: no steam arc, subtle fresh sparkle instead (handled by gloss dots) -->
+  <!-- wide shallow salad bowl -->
+  <ellipse cx="160" cy="126" rx="140" ry="52" fill="url(#cslbowl)"/>
+  <ellipse cx="160" cy="126" rx="140" ry="52" fill="none" stroke="#26262e" stroke-width="3"/>
+  <ellipse cx="160" cy="122" rx="124" ry="44" fill="#0c0c0f"/>
+  <!-- creamy dressed slaw mound sitting in the shallow bowl -->
+  <path d="M50 122 C58 96 104 84 160 84 C216 84 262 96 270 122 C240 142 202 150 160 150 C118 150 80 142 50 122 Z" fill="#c7b184" opacity=".55"/>
+  <path d="M54 118 C62 92 106 80 160 80 C214 80 258 92 266 118 C238 136 202 144 160 144 C118 144 82 136 54 118 Z" fill="url(#csldress)"/>
+  <path d="M54 118 C62 92 106 80 160 80 C214 80 258 92 266 118" fill="none" stroke="#fff8e4" stroke-width="1.4" opacity=".35"/>
+  <!-- shredded cabbage strands: pale green + white ribbons, tossed -->
+  <g stroke-linecap="round" fill="none">
+    <path d="M78 108 C96 100 118 102 132 96" stroke="#eef1dd" stroke-width="3" opacity=".9"/>
+    <path d="M88 118 C108 112 128 116 150 108" stroke="#d6e0b8" stroke-width="3" opacity=".85"/>
+    <path d="M100 128 C122 124 146 128 168 120" stroke="#f2f3e2" stroke-width="3" opacity=".85"/>
+    <path d="M150 96 C170 92 192 98 214 92" stroke="#e7edcf" stroke-width="3" opacity=".9"/>
+    <path d="M158 110 C180 106 202 112 226 104" stroke="#d1dcac" stroke-width="3" opacity=".8"/>
+    <path d="M148 124 C172 120 198 126 224 116" stroke="#f0f2e0" stroke-width="3" opacity=".8"/>
+    <path d="M120 100 C138 94 156 100 176 94" stroke="#cbd8a2" stroke-width="2.6" opacity=".8"/>
+    <path d="M96 112 C114 108 130 112 150 104" stroke="#f4f5e6" stroke-width="2.4" opacity=".85"/>
+    <path d="M172 118 C192 114 210 120 232 112" stroke="#dde6bf" stroke-width="2.6" opacity=".75"/>
+    <path d="M82 130 C104 126 126 130 148 124" stroke="#eef1dd" stroke-width="2.4" opacity=".8"/>
+  </g>
+  <!-- purple-cabbage shreds for the classic coleslaw two-tone -->
+  <g stroke-linecap="round" fill="none">
+    <path d="M92 106 C110 100 128 104 144 98" stroke="#8a4f9c" stroke-width="3" opacity=".9"/>
+    <path d="M110 122 C130 118 150 122 170 114" stroke="#7a4490" stroke-width="3" opacity=".85"/>
+    <path d="M164 104 C184 100 204 106 222 100" stroke="#96559f" stroke-width="2.8" opacity=".85"/>
+    <path d="M134 116 C152 112 170 116 190 108" stroke="#7f4a95" stroke-width="2.6" opacity=".8"/>
+    <path d="M104 132 C124 128 142 132 160 126" stroke="#8a4f9c" stroke-width="2.4" opacity=".75"/>
+  </g>
+  <!-- shredded carrot: bright orange curls -->
+  <g stroke-linecap="round" fill="none">
+    <path d="M100 114 C114 110 128 114 138 110" stroke="#f0902a" stroke-width="3" opacity=".95"/>
+    <path d="M146 118 C160 114 174 118 186 112" stroke="#ef7d1c" stroke-width="3" opacity=".9"/>
+    <path d="M186 106 C200 102 212 106 224 102" stroke="#f4993a" stroke-width="2.8" opacity=".9"/>
+    <path d="M120 128 C134 124 148 128 160 122" stroke="#ef7d1c" stroke-width="2.6" opacity=".85"/>
+    <path d="M172 128 C186 124 198 128 210 122" stroke="#f0902a" stroke-width="2.4" opacity=".8"/>
+    <path d="M84 118 C96 114 108 118 118 114" stroke="#f4993a" stroke-width="2.4" opacity=".85"/>
+  </g>
+  <!-- creamy dressing pooling/glossy laps over the top -->
+  <path d="M116 100 C140 94 180 96 206 102" stroke="#fff7e2" stroke-width="2" fill="none" opacity=".4" stroke-linecap="round"/>
+  <ellipse cx="150" cy="106" rx="20" ry="6" fill="#fdf6df" opacity=".35"/>
+  <!-- flecks: black pepper + celery-seed specks + parsley -->
+  <circle cx="128" cy="108" r="1.3" fill="#2a1a10"/>
+  <circle cx="176" cy="114" r="1.3" fill="#2a1a10"/>
+  <circle cx="150" cy="122" r="1.2" fill="#2a1a10"/>
+  <circle cx="200" cy="110" r="1.2" fill="#2a1a10"/>
+  <circle cx="108" cy="120" r="1.1" fill="#2a1a10"/>
+  <rect x="138" y="98" width="6" height="2.4" rx="1.2" fill="#4f9c37" transform="rotate(-16 141 99)"/>
+  <rect x="184" y="120" width="6" height="2.4" rx="1.2" fill="#3f8c2f" transform="rotate(18 187 121)"/>
+  <!-- fresh cold-dish sparkle / condensation gloss -->
+  <circle cx="118" cy="98" r="1.6" fill="#fff" opacity=".7"/>
+  <circle cx="196" cy="100" r="1.5" fill="#fff" opacity=".65"/>
+  <circle cx="160" cy="112" r="1.3" fill="#fff" opacity=".6"/>
+  <circle cx="134" cy="128" r="1.2" fill="#fff" opacity=".55"/>
+  <path d="M124 92 l2.4 -2.4 M126.4 92 l-2.4 -2.4" stroke="#fff" stroke-width="1" opacity=".7"/>
+  <path d="M210 106 l2.2 -2.2 M212.2 106 l-2.2 -2.2" stroke="#fff" stroke-width="1" opacity=".6"/>
+</svg>

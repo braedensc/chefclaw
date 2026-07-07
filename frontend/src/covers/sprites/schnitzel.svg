@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="scBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="scbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="scpan" cx="50%" cy="32%" r="82%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <radialGradient id="sccutlet" cx="42%" cy="30%" r="82%">
+      <stop offset="0%" stop-color="#f4c877"/><stop offset="50%" stop-color="#dca047"/><stop offset="100%" stop-color="#a86a1f"/>
+    </radialGradient>
+    <linearGradient id="sclemon" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffe97a"/><stop offset="100%" stop-color="#e8c53a"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#scbg)"/>
+  <!-- steam -->
+  <path d="M116 52 C106 34 126 26 116 6" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#scBlur3)"/>
+  <path d="M200 50 C192 34 210 26 202 6" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#scBlur3)"/>
+  <ellipse cx="160" cy="188" rx="156" ry="22" fill="#000" opacity=".5"/>
+  <!-- oval plate -->
+  <ellipse cx="160" cy="132" rx="146" ry="47" fill="url(#scpan)"/>
+  <ellipse cx="160" cy="132" rx="146" ry="47" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="132" rx="132" ry="39" fill="#0f0d13"/>
+  <!-- neon steam arc (amber/warm) -->
+  <path d="M48 116 Q104 82 168 80" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- large thin breaded cutlet: big irregular fried teardrop -->
+  <path d="M62 128 C58 108 86 92 128 90 C176 88 224 96 246 112 C256 122 250 138 226 148 C190 160 132 162 96 154 C72 148 64 140 62 128 Z" fill="url(#sccutlet)"/>
+  <!-- crumb-crust texture edge (crinkled outline) -->
+  <path d="M62 128 C58 108 86 92 128 90 C176 88 224 96 246 112 C256 122 250 138 226 148 C190 160 132 162 96 154 C72 148 64 140 62 128 Z" fill="none" stroke="#8a5416" stroke-width="1.6" opacity=".7"/>
+  <!-- wavy crumbed ripples across the surface -->
+  <g stroke-linecap="round" fill="none" opacity=".55">
+    <path d="M84 116 C104 110 130 108 156 110" stroke="#c98a3a" stroke-width="2.2"/>
+    <path d="M92 128 C120 122 156 122 190 126" stroke="#b8791f" stroke-width="2.2"/>
+    <path d="M110 140 C140 136 176 136 210 140" stroke="#c98a3a" stroke-width="2"/>
+    <path d="M170 110 C196 110 216 116 232 124" stroke="#b8791f" stroke-width="2"/>
+  </g>
+  <!-- crispy golden crumb speckle -->
+  <g opacity=".9">
+    <circle cx="100" cy="112" r="1.6" fill="#fff0c0"/>
+    <circle cx="140" cy="118" r="1.6" fill="#a86a1f"/>
+    <circle cx="180" cy="112" r="1.6" fill="#fff0c0"/>
+    <circle cx="214" cy="122" r="1.6" fill="#a86a1f"/>
+    <circle cx="126" cy="134" r="1.6" fill="#fff0c0"/>
+    <circle cx="168" cy="140" r="1.6" fill="#a86a1f"/>
+    <circle cx="204" cy="138" r="1.6" fill="#fff0c0"/>
+    <circle cx="86" cy="130" r="1.5" fill="#fff0c0"/>
+    <circle cx="232" cy="130" r="1.5" fill="#a86a1f"/>
+  </g>
+  <!-- broad golden highlight sheen -->
+  <ellipse cx="130" cy="108" rx="46" ry="10" fill="#ffe6a0" opacity=".35"/>
+  <!-- lemon wedge front-left -->
+  <path d="M92 148 C100 142 118 142 126 150 C118 158 100 158 92 152 Z" fill="url(#sclemon)"/>
+  <path d="M92 148 C100 142 118 142 126 150" fill="none" stroke="#fbf5d4" stroke-width="1.4" opacity=".8"/>
+  <path d="M100 150 l20 1 M102 154 l16 0" stroke="#d4b02e" stroke-width="1" opacity=".8"/>
+  <!-- parsley sprig on the cutlet -->
+  <circle cx="196" cy="150" r="3" fill="#3f9c37"/>
+  <circle cx="201" cy="147" r="2.6" fill="#5ecb4e"/>
+  <circle cx="192" cy="146" r="2.4" fill="#58c14a"/>
+  <rect x="196" y="150" width="2.2" height="8" rx="1.1" fill="#2f7d2b"/>
+  <!-- gloss dots -->
+  <circle cx="120" cy="104" r="1.5" fill="#fff" opacity=".6"/>
+  <circle cx="192" cy="118" r="1.4" fill="#fff" opacity=".5"/>
+  <circle cx="156" cy="132" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

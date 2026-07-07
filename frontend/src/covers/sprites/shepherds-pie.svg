@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="spBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="spbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="spdish" cx="50%" cy="30%" r="82%">
+      <stop offset="0%" stop-color="#241a2a"/><stop offset="100%" stop-color="#0d0d10"/>
+    </radialGradient>
+    <radialGradient id="spmash" cx="46%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#ffeec0"/><stop offset="55%" stop-color="#f2d488"/><stop offset="100%" stop-color="#d8ab4e"/>
+    </radialGradient>
+    <linearGradient id="spmeat" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7c3a20"/><stop offset="100%" stop-color="#4a1c0e"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#spbg)"/>
+  <!-- steam -->
+  <path d="M114 50 C104 32 124 24 114 4" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#spBlur3)"/>
+  <path d="M202 52 C194 36 212 28 204 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#spBlur3)"/>
+  <ellipse cx="160" cy="188" rx="156" ry="22" fill="#000" opacity=".5"/>
+  <!-- oval baking dish (deeper wall) -->
+  <ellipse cx="160" cy="138" rx="146" ry="48" fill="url(#spdish)"/>
+  <ellipse cx="160" cy="138" rx="146" ry="48" fill="none" stroke="#3a2b44" stroke-width="3.5"/>
+  <!-- dish handles / lugs -->
+  <ellipse cx="14" cy="132" rx="10" ry="7" fill="none" stroke="#3a2b44" stroke-width="3.5"/>
+  <ellipse cx="306" cy="132" rx="10" ry="7" fill="none" stroke="#3a2b44" stroke-width="3.5"/>
+  <!-- dark meat layer visible at the near rim edge -->
+  <path d="M28 128 C28 148 88 162 160 162 C232 162 292 148 292 128 C292 142 232 154 160 154 C88 154 28 142 28 128 Z" fill="url(#spmeat)"/>
+  <!-- neon steam arc (amber/warm) -->
+  <path d="M48 118 Q106 84 168 82" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- golden mashed-potato crust (mounded top) -->
+  <path d="M32 122 C32 100 90 88 160 88 C230 88 288 100 288 122 C288 140 230 150 160 150 C90 150 32 140 32 122 Z" fill="url(#spmash)"/>
+  <path d="M32 122 C32 100 90 88 160 88 C230 88 288 100 288 122" fill="none" stroke="#fff3cf" stroke-width="1.4" opacity=".4"/>
+  <!-- forked/piped ridges across the mash with browned peaks -->
+  <g stroke-linecap="round" fill="none">
+    <path d="M56 116 C90 108 130 106 168 108" stroke="#c99242" stroke-width="2.4" opacity=".55"/>
+    <path d="M60 126 C100 120 150 120 210 124" stroke="#b87d24" stroke-width="2.4" opacity=".5"/>
+    <path d="M92 136 C140 132 190 132 240 136" stroke="#c99242" stroke-width="2.2" opacity=".5"/>
+    <path d="M150 108 C200 108 240 114 262 122" stroke="#b87d24" stroke-width="2.2" opacity=".5"/>
+  </g>
+  <!-- browned crispy potato peaks -->
+  <g opacity=".85">
+    <path d="M84 108 C82 102 90 102 90 108 Z" fill="#a05a1e"/>
+    <path d="M128 102 C126 96 134 96 134 102 Z" fill="#8a4818"/>
+    <path d="M176 104 C174 98 182 98 182 104 Z" fill="#a05a1e"/>
+    <path d="M220 110 C218 104 226 104 226 110 Z" fill="#8a4818"/>
+    <path d="M108 128 C106 122 114 122 114 128 Z" fill="#a05a1e"/>
+    <path d="M198 126 C196 120 204 120 204 126 Z" fill="#8a4818"/>
+    <path d="M152 118 C150 112 158 112 158 118 Z" fill="#a05a1e"/>
+  </g>
+  <!-- toasty flecks + a couple peeking peas/carrot at the meat edge -->
+  <circle cx="120" cy="120" r="2" fill="#b87d24" opacity=".7"/>
+  <circle cx="200" cy="116" r="2" fill="#a05a1e" opacity=".7"/>
+  <circle cx="96" cy="156" r="2.6" fill="#5ecb4e"/>
+  <circle cx="140" cy="158" r="2.6" fill="#e0662a"/>
+  <circle cx="220" cy="156" r="2.6" fill="#3f9c37"/>
+  <!-- broad butter sheen -->
+  <ellipse cx="120" cy="104" rx="42" ry="9" fill="#fff3cf" opacity=".3"/>
+  <!-- gloss dots -->
+  <circle cx="112" cy="102" r="1.5" fill="#fff" opacity=".6"/>
+  <circle cx="188" cy="112" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="160" cy="128" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

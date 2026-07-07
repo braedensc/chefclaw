@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="satBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="satbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <linearGradient id="satboard" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7a5426"/><stop offset="100%" stop-color="#4d3115"/>
+    </linearGradient>
+    <linearGradient id="satmeat" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e0a24a"/><stop offset="50%" stop-color="#c17a2c"/><stop offset="100%" stop-color="#8f4e15"/>
+    </linearGradient>
+    <radialGradient id="satsauce" cx="42%" cy="34%" r="78%">
+      <stop offset="0%" stop-color="#c98a3e"/><stop offset="55%" stop-color="#9c5f1e"/><stop offset="100%" stop-color="#6e3e0f"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#satbg)"/>
+  <!-- rising steam wisps -->
+  <path d="M112 52 C102 36 122 28 112 8" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#satBlur3)"/>
+  <path d="M188 50 C180 34 198 26 190 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#satBlur3)"/>
+  <ellipse cx="160" cy="188" rx="154" ry="22" fill="#000" opacity=".5"/>
+  <!-- neon steam arc (warm) -->
+  <path d="M48 112 Q104 82 168 82" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- wooden serving board -->
+  <ellipse cx="160" cy="134" rx="146" ry="42" fill="url(#satboard)"/>
+  <ellipse cx="160" cy="134" rx="146" ry="42" fill="none" stroke="#3a2410" stroke-width="2.5"/>
+  <path d="M40 128 Q160 116 280 128" stroke="#5f3e1c" stroke-width="1.4" fill="none" opacity=".5"/>
+  <path d="M44 142 Q160 132 276 142" stroke="#5f3e1c" stroke-width="1.4" fill="none" opacity=".4"/>
+  <!-- peanut dipping sauce dish (bottom-right corner of board) -->
+  <ellipse cx="236" cy="150" rx="34" ry="13" fill="#241812"/>
+  <ellipse cx="236" cy="149" rx="34" ry="13" fill="none" stroke="#3a2818" stroke-width="1.6"/>
+  <ellipse cx="236" cy="148" rx="27" ry="9.5" fill="url(#satsauce)"/>
+  <circle cx="228" cy="146" r="1.6" fill="#e0341f" opacity=".8"/>
+  <circle cx="242" cy="149" r="1.4" fill="#d97a1a"/>
+  <ellipse cx="230" cy="145" rx="8" ry="2.4" fill="#e6a95a" opacity=".5"/>
+  <!-- three grilled chicken skewers, fanned, sticks pointing lower-right -->
+  <g stroke-linecap="round">
+    <!-- skewer 1 (back) -->
+    <g transform="translate(160 118) rotate(-16)">
+      <rect x="-96" y="-2" width="150" height="4" rx="2" fill="#c89a5a"/>
+      <rect x="-92" y="-1.4" width="150" height="1.4" rx="0.7" fill="#e6c58a" opacity=".7"/>
+      <g>
+        <rect x="-80" y="-12" width="22" height="24" rx="6" fill="url(#satmeat)" stroke="#6e3c10" stroke-width="1.2"/>
+        <rect x="-52" y="-13" width="22" height="26" rx="6" fill="url(#satmeat)" stroke="#6e3c10" stroke-width="1.2"/>
+        <rect x="-24" y="-12" width="22" height="24" rx="6" fill="url(#satmeat)" stroke="#6e3c10" stroke-width="1.2"/>
+        <rect x="4" y="-11" width="21" height="22" rx="6" fill="url(#satmeat)" stroke="#6e3c10" stroke-width="1.2"/>
+        <!-- char lines -->
+        <path d="M-76 -6 h14 M-48 -7 h14 M-20 -6 h14 M8 -5 h13" stroke="#4a2408" stroke-width="2" opacity=".55"/>
+        <path d="M-76 4 h14 M-48 5 h14 M-20 4 h14 M8 3 h13" stroke="#4a2408" stroke-width="2" opacity=".45"/>
+        <!-- gloss -->
+        <ellipse cx="-69" cy="-6" rx="7" ry="2.4" fill="#ffdd9a" opacity=".55"/>
+        <ellipse cx="-41" cy="-7" rx="7" ry="2.4" fill="#ffdd9a" opacity=".55"/>
+        <ellipse cx="-13" cy="-6" rx="7" ry="2.4" fill="#ffdd9a" opacity=".5"/>
+      </g>
+    </g>
+    <!-- skewer 2 (middle) -->
+    <g transform="translate(160 130) rotate(-2)">
+      <rect x="-100" y="-2" width="156" height="4" rx="2" fill="#c89a5a"/>
+      <rect x="-96" y="-1.4" width="156" height="1.4" rx="0.7" fill="#e6c58a" opacity=".7"/>
+      <g>
+        <rect x="-84" y="-13" width="23" height="26" rx="6.5" fill="url(#satmeat)" stroke="#6e3c10" stroke-width="1.2"/>
+        <rect x="-55" y="-14" width="23" height="28" rx="6.5" fill="url(#satmeat)" stroke="#6e3c10" stroke-width="1.2"/>
+        <rect x="-26" y="-13" width="23" height="26" rx="6.5" fill="url(#satmeat)" stroke="#6e3c10" stroke-width="1.2"/>
+        <rect x="3" y="-12" width="22" height="24" rx="6.5" fill="url(#satmeat)" stroke="#6e3c10" stroke-width="1.2"/>
+        <path d="M-80 -6 h15 M-51 -7 h15 M-22 -6 h15 M7 -5 h14" stroke="#4a2408" stroke-width="2" opacity=".55"/>
+        <path d="M-80 5 h15 M-51 6 h15 M-22 5 h15 M7 4 h14" stroke="#4a2408" stroke-width="2" opacity=".45"/>
+        <ellipse cx="-72" cy="-6" rx="7.5" ry="2.6" fill="#ffdd9a" opacity=".6"/>
+        <ellipse cx="-43" cy="-7" rx="7.5" ry="2.6" fill="#ffdd9a" opacity=".6"/>
+        <ellipse cx="-14" cy="-6" rx="7.5" ry="2.6" fill="#ffdd9a" opacity=".55"/>
+        <ellipse cx="14" cy="-5" rx="7" ry="2.4" fill="#ffdd9a" opacity=".5"/>
+      </g>
+    </g>
+    <!-- skewer 3 (front) -->
+    <g transform="translate(160 144) rotate(12)">
+      <rect x="-96" y="-2" width="150" height="4" rx="2" fill="#c89a5a"/>
+      <rect x="-92" y="-1.4" width="150" height="1.4" rx="0.7" fill="#e6c58a" opacity=".7"/>
+      <g>
+        <rect x="-80" y="-12" width="22" height="24" rx="6" fill="url(#satmeat)" stroke="#6e3c10" stroke-width="1.2"/>
+        <rect x="-52" y="-13" width="22" height="26" rx="6" fill="url(#satmeat)" stroke="#6e3c10" stroke-width="1.2"/>
+        <rect x="-24" y="-12" width="22" height="24" rx="6" fill="url(#satmeat)" stroke="#6e3c10" stroke-width="1.2"/>
+        <path d="M-76 -6 h14 M-48 -7 h14 M-20 -6 h14" stroke="#4a2408" stroke-width="2" opacity=".55"/>
+        <path d="M-76 4 h14 M-48 5 h14 M-20 4 h14" stroke="#4a2408" stroke-width="2" opacity=".45"/>
+        <ellipse cx="-69" cy="-6" rx="7" ry="2.4" fill="#ffdd9a" opacity=".55"/>
+        <ellipse cx="-41" cy="-7" rx="7" ry="2.4" fill="#ffdd9a" opacity=".55"/>
+        <ellipse cx="-13" cy="-6" rx="7" ry="2.4" fill="#ffdd9a" opacity=".5"/>
+      </g>
+    </g>
+  </g>
+  <!-- garnish: cilantro + chopped peanut flecks + lime -->
+  <rect x="98" y="106" width="7" height="2.6" rx="1.3" fill="#5ecb4e" transform="rotate(-18 101 107)"/>
+  <rect x="140" y="100" width="7" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(14 143 101)"/>
+  <circle cx="118" cy="110" r="1.6" fill="#e6c58a"/>
+  <circle cx="156" cy="108" r="1.4" fill="#d9a95a"/>
+  <ellipse cx="72" cy="150" rx="11" ry="8" fill="#6abf5a"/>
+  <ellipse cx="72" cy="150" rx="7" ry="5" fill="#c8e6b0"/>
+  <!-- gloss dots -->
+  <circle cx="108" cy="112" r="1.4" fill="#fff" opacity=".6"/>
+  <circle cx="176" cy="122" r="1.3" fill="#fff" opacity=".5"/>
+</svg>

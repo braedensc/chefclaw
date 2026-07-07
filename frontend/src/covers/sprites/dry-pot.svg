@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="dpBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="dpbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#102e35"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <radialGradient id="dpwok" cx="50%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <radialGradient id="dpoil" cx="50%" cy="42%" r="72%">
+      <stop offset="0%" stop-color="#ef5520"/><stop offset="55%" stop-color="#b02408"/><stop offset="100%" stop-color="#7a1305"/>
+    </radialGradient>
+    <linearGradient id="dppork" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#c05128"/><stop offset="50%" stop-color="#8a2f12"/><stop offset="100%" stop-color="#5a1c0a"/>
+    </linearGradient>
+    <linearGradient id="dplotus" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f2ddb0"/><stop offset="100%" stop-color="#d8b47f"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#dpbg)"/>
+  <!-- rising steam wisps -->
+  <path d="M116 52 C106 34 126 26 116 6" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#dpBlur3)"/>
+  <path d="M200 50 C192 34 210 26 202 6" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#dpBlur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="188" rx="150" ry="22" fill="#000" opacity=".5"/>
+  <!-- dry-pot wok (deep dark iron) -->
+  <ellipse cx="160" cy="130" rx="132" ry="54" fill="url(#dpwok)"/>
+  <ellipse cx="160" cy="130" rx="132" ry="54" fill="none" stroke="#26262e" stroke-width="3"/>
+  <ellipse cx="160" cy="130" rx="116" ry="45" fill="#0c0c0f"/>
+  <!-- wok side handles -->
+  <path d="M26 126 q-14 2 -14 10" stroke="#2a2a32" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M294 126 q14 2 14 10" stroke="#2a2a32" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <!-- neon steam arc (cyan) -->
+  <path d="M52 112 Q106 80 170 78" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- glistening chili-oil coating pooled shallow -->
+  <ellipse cx="160" cy="132" rx="106" ry="30" fill="url(#dpoil)" opacity=".85"/>
+  <ellipse cx="160" cy="128" rx="88" ry="20" fill="#c73512" opacity=".5"/>
+  <!-- HEAP of tossed dry-pot ingredients -->
+  <!-- back layer (smaller, darker) -->
+  <g opacity=".9">
+    <rect x="96" y="98" width="26" height="16" rx="4" fill="url(#dppork)" stroke="#3a1207" stroke-width="1.1" transform="rotate(-14 109 106)"/>
+    <ellipse cx="150" cy="100" rx="12" ry="11" fill="url(#dplotus)" stroke="#a9843f" stroke-width="1.1"/>
+    <circle cx="150" cy="100" r="3" fill="#0c0c0f"/><circle cx="145" cy="97" r="1.6" fill="#0c0c0f"/><circle cx="155" cy="97" r="1.6" fill="#0c0c0f"/><circle cx="147" cy="104" r="1.6" fill="#0c0c0f"/><circle cx="154" cy="104" r="1.6" fill="#0c0c0f"/>
+    <rect x="190" y="98" width="26" height="16" rx="4" fill="url(#dppork)" stroke="#3a1207" stroke-width="1.1" transform="rotate(12 203 106)"/>
+  </g>
+  <!-- front chunks (glossy pork belly cubes) -->
+  <g>
+    <rect x="86" y="116" width="30" height="20" rx="5" fill="url(#dppork)" stroke="#3a1207" stroke-width="1.3" transform="rotate(-8 101 126)"/>
+    <rect x="90" y="120" width="22" height="4" rx="2" fill="#e88a52" opacity=".55" transform="rotate(-8 101 122)"/>
+    <rect x="132" y="122" width="32" height="21" rx="5" fill="url(#dppork)" stroke="#3a1207" stroke-width="1.3" transform="rotate(6 148 132)"/>
+    <rect x="136" y="126" width="24" height="4" rx="2" fill="#e88a52" opacity=".55" transform="rotate(6 148 128)"/>
+    <rect x="184" y="118" width="30" height="20" rx="5" fill="url(#dppork)" stroke="#3a1207" stroke-width="1.3" transform="rotate(-6 199 128)"/>
+    <rect x="188" y="122" width="22" height="4" rx="2" fill="#e88a52" opacity=".55" transform="rotate(-6 199 124)"/>
+  </g>
+  <!-- lotus root front slice -->
+  <g transform="translate(118 130)">
+    <ellipse cx="0" cy="0" rx="14" ry="12" fill="url(#dplotus)" stroke="#a9843f" stroke-width="1.3"/>
+    <circle cx="0" cy="0" r="3.4" fill="#0c0c0f"/><circle cx="-6" cy="-4" r="1.8" fill="#0c0c0f"/><circle cx="6" cy="-4" r="1.8" fill="#0c0c0f"/><circle cx="-6" cy="5" r="1.8" fill="#0c0c0f"/><circle cx="6" cy="5" r="1.8" fill="#0c0c0f"/><circle cx="-8" cy="1" r="1.5" fill="#0c0c0f"/><circle cx="8" cy="1" r="1.5" fill="#0c0c0f"/>
+  </g>
+  <!-- DRIED RED CHILIES scattered across (the signature) -->
+  <g stroke-linecap="round" fill="none">
+    <path d="M100 108 C112 104 124 108 132 116" stroke="#c31f12" stroke-width="5"/>
+    <path d="M170 106 C182 102 196 106 202 114" stroke="#e0341f" stroke-width="5"/>
+    <path d="M142 140 C154 138 166 142 174 148" stroke="#c31f12" stroke-width="4.6"/>
+    <path d="M92 134 C102 132 112 136 118 142" stroke="#e0341f" stroke-width="4.2"/>
+    <path d="M206 132 C216 130 224 134 228 140" stroke="#c31f12" stroke-width="4.2"/>
+  </g>
+  <!-- Sichuan peppercorns + scallion + sesame garnish -->
+  <circle cx="118" cy="112" r="2.2" fill="#7a1305"/>
+  <circle cx="160" cy="118" r="2.2" fill="#7a1305"/>
+  <circle cx="196" cy="126" r="2" fill="#7a1305"/>
+  <circle cx="134" cy="146" r="2" fill="#7a1305"/>
+  <rect x="146" y="112" width="8" height="3" rx="1.4" fill="#5ecb4e" transform="rotate(-20 150 113)"/>
+  <rect x="176" y="134" width="8" height="3" rx="1.4" fill="#3f9c37" transform="rotate(16 180 135)"/>
+  <rect x="108" y="142" width="7" height="2.6" rx="1.3" fill="#58c14a" transform="rotate(24 111 143)"/>
+  <circle cx="150" cy="126" r="1.4" fill="#f8eed6"/>
+  <circle cx="186" cy="122" r="1.3" fill="#f8eed6"/>
+  <!-- oily gloss dots -->
+  <circle cx="104" cy="122" r="1.6" fill="#fff" opacity=".6"/>
+  <circle cx="150" cy="128" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="200" cy="124" r="1.4" fill="#fff" opacity=".5"/>
+</svg>

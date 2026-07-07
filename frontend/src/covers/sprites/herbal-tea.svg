@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="htBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="htbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <linearGradient id="htglass" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity=".05"/><stop offset="20%" stop-color="#ffffff" stop-opacity=".18"/><stop offset="50%" stop-color="#ffffff" stop-opacity=".04"/><stop offset="80%" stop-color="#ffffff" stop-opacity=".12"/><stop offset="100%" stop-color="#ffffff" stop-opacity=".03"/>
+    </linearGradient>
+    <radialGradient id="httea" cx="46%" cy="34%" r="72%">
+      <stop offset="0%" stop-color="#f6c667"/><stop offset="55%" stop-color="#e79a2e"/><stop offset="100%" stop-color="#c56f14"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#htbg)"/>
+  <!-- rising steam wisps (warm drink) -->
+  <path d="M142 52 C134 36 150 30 142 12" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#htBlur3)"/>
+  <path d="M182 50 C176 34 190 28 184 10" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#htBlur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="188" rx="106" ry="17" fill="#000" opacity=".5"/>
+  <!-- neon steam arc (warm/local, warm white) -->
+  <path d="M84 96 Q126 66 176 68" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- saucer -->
+  <ellipse cx="160" cy="170" rx="86" ry="18" fill="#141018"/>
+  <ellipse cx="160" cy="170" rx="86" ry="18" fill="none" stroke="#2c2136" stroke-width="2.5"/>
+  <ellipse cx="160" cy="169" rx="66" ry="12" fill="#0d0d11"/>
+  <!-- clear glass teacup body (rounded, wide) -->
+  <path d="M112 92 C112 84 116 82 124 82 L196 82 C204 82 208 84 208 92 L204 130 C202 150 186 162 160 162 C134 162 118 150 116 130 Z" fill="#0f0d12"/>
+  <!-- amber infusion fill -->
+  <path d="M120 98 L200 98 L196 128 C194 146 180 156 160 156 C140 156 126 146 124 128 Z" fill="url(#httea)"/>
+  <!-- tea surface ellipse -->
+  <ellipse cx="160" cy="98" rx="40" ry="7" fill="#ffd47f" opacity=".9"/>
+  <ellipse cx="160" cy="98" rx="40" ry="7" fill="none" stroke="#d98a1a" stroke-width="1" opacity=".5"/>
+  <!-- floating dried flower / petals + a leaf steeping -->
+  <g>
+    <!-- rose-red dried flower, floating on surface -->
+    <g transform="translate(150 100)">
+      <circle cx="0" cy="0" r="5.5" fill="#c9385a"/>
+      <path d="M0 -6 C4 -9 9 -6 6 -1 C10 1 8 7 2 5 C1 9 -5 8 -4 2 C-9 2 -9 -5 -3 -4 C-4 -9 3 -9 0 -6 Z" fill="#e05678" opacity=".9"/>
+      <circle cx="0" cy="0" r="2" fill="#ffd6b0"/>
+    </g>
+    <!-- small dried chamomile bud -->
+    <g transform="translate(176 108)">
+      <circle cx="0" cy="0" r="3.4" fill="#ffe08a"/>
+      <g stroke="#fff6df" stroke-width="1.4" opacity=".85"><path d="M0 -5 L0 -3 M4 -2 L2.4 -1.2 M4 2 L2.4 1.2 M0 5 L0 3 M-4 2 L-2.4 1.2 M-4 -2 L-2.4 -1.2"/></g>
+      <circle cx="0" cy="0" r="1.6" fill="#e8a02c"/>
+    </g>
+    <!-- steeping green leaf/mint suspended lower -->
+    <path d="M132 122 C138 114 150 114 154 122 C150 128 138 128 132 122 Z" fill="#4f9c3e" opacity=".85"/>
+    <path d="M136 122 L150 122" stroke="#2f7d2b" stroke-width="1" opacity=".7"/>
+    <path d="M172 130 C176 124 186 124 189 130 C186 135 176 135 172 130 Z" fill="#3f8c33" opacity=".8"/>
+    <!-- floating petal -->
+    <path d="M144 132 C148 128 156 130 156 136 C150 138 146 136 144 132 Z" fill="#e05678" opacity=".8"/>
+  </g>
+  <!-- glass sheen overlay -->
+  <path d="M112 92 C112 84 116 82 124 82 L196 82 C204 82 208 84 208 92 L204 130 C202 150 186 162 160 162 C134 162 118 150 116 130 Z" fill="url(#htglass)"/>
+  <path d="M112 92 C112 84 116 82 124 82 L196 82 C204 82 208 84 208 92 L204 130 C202 150 186 162 160 162 C134 162 118 150 116 130 Z" fill="none" stroke="#f2e2c8" stroke-width="1.5" opacity=".3"/>
+  <path d="M124 92 L128 128" stroke="#ffffff" stroke-width="3" opacity=".26" stroke-linecap="round"/>
+  <path d="M196 92 L192 126" stroke="#ffffff" stroke-width="2" opacity=".16" stroke-linecap="round"/>
+  <!-- curved glass handle on the right -->
+  <path d="M208 100 C230 100 232 134 206 136" fill="none" stroke="#1a1622" stroke-width="7" stroke-linecap="round"/>
+  <path d="M208 100 C230 100 232 134 206 136" fill="none" stroke="#33283c" stroke-width="2.4" stroke-linecap="round" opacity=".8"/>
+  <!-- gloss dots -->
+  <circle cx="140" cy="106" r="1.4" fill="#fff" opacity=".6"/>
+  <circle cx="182" cy="120" r="1.2" fill="#fff" opacity=".45"/>
+  <circle cx="156" cy="148" r="1.2" fill="#fff" opacity=".45"/>
+</svg>

@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="jcrBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="jcrbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="jcrrice" cx="42%" cy="30%" r="82%">
+      <stop offset="0%" stop-color="#fffaf0"/><stop offset="60%" stop-color="#f4ecd9"/><stop offset="100%" stop-color="#dccbab"/>
+    </radialGradient>
+    <linearGradient id="jcrcurry" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8a4a1c"/><stop offset="50%" stop-color="#5e2f10"/><stop offset="100%" stop-color="#3d1c08"/>
+    </linearGradient>
+    <radialGradient id="jcrpotato" cx="40%" cy="32%" r="80%">
+      <stop offset="0%" stop-color="#f4e2b4"/><stop offset="60%" stop-color="#e2c384"/><stop offset="100%" stop-color="#bd9a55"/>
+    </radialGradient>
+    <linearGradient id="jcrbeef" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6b3418"/><stop offset="100%" stop-color="#3d1a0a"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#jcrbg)"/>
+  <!-- steam -->
+  <path d="M110 54 C100 36 120 28 110 8" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#jcrBlur3)"/>
+  <path d="M198 52 C190 36 208 28 200 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#jcrBlur3)"/>
+  <ellipse cx="160" cy="188" rx="156" ry="22" fill="#000" opacity=".5"/>
+  <!-- oval plate -->
+  <ellipse cx="160" cy="132" rx="146" ry="47" fill="#141018"/>
+  <ellipse cx="160" cy="132" rx="146" ry="47" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="132" rx="132" ry="39" fill="#0f0d13"/>
+  <!-- neon steam arc (warm/local) -->
+  <path d="M52 116 Q104 84 168 82" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- RICE mound on the left half (fluffy dome) -->
+  <path d="M40 130 C46 106 78 96 108 96 C138 96 158 108 156 132 C138 150 96 156 74 154 C56 152 42 142 40 130 Z" fill="#b8a67e" opacity=".55"/>
+  <path d="M42 128 C48 102 78 92 108 92 C136 92 154 106 152 130 C136 148 96 152 74 150 C56 148 42 140 42 128 Z" fill="url(#jcrrice)"/>
+  <path d="M44 126 C50 102 78 90 108 90" fill="none" stroke="#fffdf6" stroke-width="1.4" opacity=".4"/>
+  <!-- rice-grain flecks -->
+  <g stroke-linecap="round" opacity=".85">
+    <path d="M62 116 l6 -2" stroke="#fffdf4" stroke-width="2.2"/>
+    <path d="M80 108 l6 2" stroke="#ded0b0" stroke-width="2.2"/>
+    <path d="M100 104 l6 -2" stroke="#fffdf4" stroke-width="2.2"/>
+    <path d="M120 110 l-6 2" stroke="#ded0b0" stroke-width="2.2"/>
+    <path d="M72 128 l6 -2" stroke="#fffdf4" stroke-width="2.2"/>
+    <path d="M96 124 l6 2" stroke="#ded0b0" stroke-width="2.2"/>
+    <path d="M120 128 l-6 2" stroke="#fffdf4" stroke-width="2.2"/>
+    <path d="M84 140 l6 -2" stroke="#ded0b0" stroke-width="2.2"/>
+    <path d="M108 138 l6 2" stroke="#fffdf4" stroke-width="2.2"/>
+    <path d="M56 130 l6 2" stroke="#ded0b0" stroke-width="2"/>
+  </g>
+  <!-- CURRY pool on the right half (thick glossy brown, irregular edge) -->
+  <path d="M150 108 C176 98 220 98 250 108 C270 116 272 138 252 150 C224 162 178 162 152 150 C138 142 138 118 150 108 Z" fill="#2c1406" opacity=".7"/>
+  <path d="M152 106 C178 96 220 96 248 106 C268 114 270 136 250 148 C222 160 178 160 154 148 C140 140 140 116 152 106 Z" fill="url(#jcrcurry)"/>
+  <!-- curry sheen highlight -->
+  <path d="M168 112 C196 106 226 108 244 116" stroke="#b06a2a" stroke-width="2.2" fill="none" opacity=".5" stroke-linecap="round"/>
+  <ellipse cx="204" cy="118" rx="30" ry="6" fill="#a8642a" opacity=".35"/>
+  <!-- curry laps onto the rice edge -->
+  <path d="M150 122 C158 118 162 128 155 134 C148 132 146 126 150 122 Z" fill="url(#jcrcurry)"/>
+  <!-- potato chunks -->
+  <g>
+    <path d="M176 122 C172 116 182 112 190 116 C196 114 200 122 194 128 C196 134 186 138 180 134 C174 134 172 126 176 122 Z" fill="url(#jcrpotato)" stroke="#9a7638" stroke-width="1.2"/>
+    <ellipse cx="183" cy="119" rx="6" ry="2.6" fill="#fbeecb" opacity=".8"/>
+  </g>
+  <g>
+    <path d="M222 128 C218 122 228 118 236 122 C242 120 246 128 240 134 C242 140 232 144 226 140 C220 140 218 132 222 128 Z" fill="url(#jcrpotato)" stroke="#9a7638" stroke-width="1.2"/>
+    <ellipse cx="229" cy="125" rx="6" ry="2.6" fill="#fbeecb" opacity=".8"/>
+  </g>
+  <!-- carrot chunk (orange) -->
+  <g>
+    <path d="M204 136 C201 131 210 129 216 132 C221 131 224 138 219 142 C221 147 212 150 207 146 C202 147 200 139 204 136 Z" fill="#e07520" stroke="#a84c10" stroke-width="1.2"/>
+    <ellipse cx="210" cy="134" rx="5" ry="2.2" fill="#ff9d52" opacity=".7"/>
+  </g>
+  <!-- beef chunks -->
+  <g>
+    <path d="M240 140 C236 135 246 132 252 135 C257 133 261 140 256 145 C258 150 249 153 244 149 C239 150 237 143 240 140 Z" fill="url(#jcrbeef)" stroke="#2a1206" stroke-width="1.2"/>
+    <ellipse cx="247" cy="138" rx="5" ry="2" fill="#8a4a24" opacity=".6"/>
+  </g>
+  <!-- gloss + garnish -->
+  <circle cx="200" cy="112" r="1.5" fill="#fff" opacity=".55"/>
+  <circle cx="234" cy="118" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="180" cy="140" r="1.2" fill="#fff" opacity=".45"/>
+  <rect x="212" y="150" width="6" height="2.4" rx="1.2" fill="#5ecb4e" transform="rotate(-16 215 151)"/>
+  <rect x="90" y="98" width="6" height="2.4" rx="1.2" fill="#3f9c37" transform="rotate(18 93 99)"/>
+</svg>

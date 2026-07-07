@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="cbBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="cbbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#102e35"/><stop offset="45%" stop-color="#0b090b"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <radialGradient id="cbbun" cx="40%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#ffffff"/><stop offset="58%" stop-color="#f4efe6"/><stop offset="100%" stop-color="#dcd2c2"/>
+    </radialGradient>
+    <radialGradient id="cblava" cx="42%" cy="34%" r="78%">
+      <stop offset="0%" stop-color="#ffe27a"/><stop offset="55%" stop-color="#ffb32e"/><stop offset="100%" stop-color="#e0821a"/>
+    </radialGradient>
+    <linearGradient id="cbsteamer" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#c79a52"/><stop offset="100%" stop-color="#8a622e"/>
+    </linearGradient>
+    <linearGradient id="cbslat" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d9ab5e"/><stop offset="100%" stop-color="#a2743a"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#cbbg)"/>
+  <!-- steam (hot steamed buns) -->
+  <path d="M116 48 C108 32 124 24 116 6" stroke="#fff" stroke-width="7" fill="none" opacity=".11" filter="url(#cbBlur3)"/>
+  <path d="M160 44 C152 28 168 20 160 4" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#cbBlur3)"/>
+  <path d="M204 48 C196 32 212 24 204 6" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#cbBlur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="188" rx="150" ry="21" fill="#000" opacity=".5"/>
+  <!-- neon steam arc (cyan) -->
+  <path d="M50 116 Q104 84 168 82" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- BAMBOO STEAMER basket -->
+  <!-- basket body -->
+  <ellipse cx="160" cy="150" rx="140" ry="42" fill="url(#cbsteamer)"/>
+  <ellipse cx="160" cy="150" rx="140" ry="42" fill="none" stroke="#6e4e22" stroke-width="2.5"/>
+  <!-- woven basket band -->
+  <path d="M20 150 Q20 172 40 178 Q160 194 280 178 Q300 172 300 150" fill="#7a5628"/>
+  <g stroke="#5f4420" stroke-width="1.4" opacity=".6">
+    <path d="M40 160 L40 176 M64 164 L64 182 M92 166 L92 186 M120 167 L120 188 M160 168 L160 190 M200 167 L200 188 M228 166 L228 186 M256 164 L256 182 M280 160 L280 176"/>
+  </g>
+  <path d="M22 158 Q160 178 298 158" stroke="#c79a52" stroke-width="2" fill="none" opacity=".5"/>
+  <!-- inner rim of steamer (bamboo slats visible inside) -->
+  <ellipse cx="160" cy="146" rx="124" ry="34" fill="#3a2a14"/>
+  <ellipse cx="160" cy="146" rx="124" ry="34" fill="none" stroke="#8a622e" stroke-width="2"/>
+  <g stroke="#5a3f1c" stroke-width="1.4" opacity=".55">
+    <path d="M70 128 Q160 150 250 128 M60 138 Q160 162 260 138"/>
+  </g>
+  <!-- parchment liner under buns -->
+  <ellipse cx="160" cy="144" rx="104" ry="26" fill="#efe6d4" opacity=".5"/>
+  <!-- THREE steamed custard buns nestled in the basket -->
+  <!-- back-left bun -->
+  <g transform="translate(118 128)">
+    <ellipse cx="0" cy="8" rx="34" ry="30" fill="url(#cbbun)"/>
+    <ellipse cx="0" cy="8" rx="34" ry="30" fill="none" stroke="#cdc1ad" stroke-width="1.2" opacity=".55"/>
+    <path d="M0 -20 C-4 -6 -6 6 -2 22 M0 -20 C4 -6 6 6 2 22" stroke="#d8cdb9" stroke-width="1.2" fill="none" opacity=".45"/>
+    <ellipse cx="-11" cy="-4" rx="10" ry="6" fill="#ffffff" opacity=".7"/>
+    <circle cx="0" cy="-18" r="2.4" fill="#e7dcc8"/>
+  </g>
+  <!-- back-right bun -->
+  <g transform="translate(206 130)">
+    <ellipse cx="0" cy="8" rx="33" ry="29" fill="url(#cbbun)"/>
+    <ellipse cx="0" cy="8" rx="33" ry="29" fill="none" stroke="#cdc1ad" stroke-width="1.2" opacity=".55"/>
+    <path d="M0 -19 C-4 -6 -6 6 -2 22 M0 -19 C4 -6 6 6 2 22" stroke="#d8cdb9" stroke-width="1.2" fill="none" opacity=".45"/>
+    <ellipse cx="-10" cy="-4" rx="9" ry="5.5" fill="#ffffff" opacity=".7"/>
+    <circle cx="0" cy="-17" r="2.2" fill="#e7dcc8"/>
+  </g>
+  <!-- FRONT bun, broken open — golden salted-egg lava pouring out -->
+  <g transform="translate(160 138)">
+    <!-- bun body -->
+    <ellipse cx="0" cy="6" rx="40" ry="34" fill="url(#cbbun)"/>
+    <ellipse cx="0" cy="6" rx="40" ry="34" fill="none" stroke="#cdc1ad" stroke-width="1.3" opacity=".6"/>
+    <!-- top-left highlight -->
+    <ellipse cx="-14" cy="-8" rx="12" ry="7" fill="#ffffff" opacity=".75"/>
+    <!-- torn opening rim -->
+    <path d="M-24 -2 C-14 -10 14 -10 24 -2 C16 6 -16 6 -24 -2 Z" fill="#efe4d2"/>
+    <path d="M-24 -2 C-14 -10 14 -10 24 -2" fill="none" stroke="#cdbfa8" stroke-width="1.2" opacity=".6"/>
+    <!-- molten golden custard flowing out -->
+    <path d="M-22 0 C-14 8 14 8 22 0 C24 12 18 26 6 30 C-8 34 -22 24 -24 10 C-24 6 -23 2 -22 0 Z" fill="url(#cblava)"/>
+    <path d="M-18 4 C-10 10 10 10 18 4" stroke="#fff0b8" stroke-width="2" fill="none" opacity=".7" stroke-linecap="round"/>
+    <!-- lava drips over the front edge -->
+    <path d="M-6 28 C-8 40 -4 48 2 48 C8 48 10 40 8 28 C4 34 -2 34 -6 28 Z" fill="url(#cblava)"/>
+    <path d="M14 22 C16 30 20 34 22 30 C24 26 22 20 18 20 Z" fill="url(#cblava)"/>
+    <!-- glossy custard highlights -->
+    <ellipse cx="-6" cy="10" rx="7" ry="4" fill="#fff2c0" opacity=".7"/>
+    <circle cx="3" cy="38" r="2" fill="#ffe89a" opacity=".8"/>
+    <circle cx="-10" cy="18" r="1.6" fill="#fff" opacity=".6"/>
+  </g>
+  <!-- gloss dots on the intact buns -->
+  <circle cx="108" cy="120" r="1.6" fill="#fff" opacity=".65"/>
+  <circle cx="198" cy="122" r="1.5" fill="#fff" opacity=".6"/>
+  <circle cx="150" cy="130" r="1.4" fill="#fff" opacity=".55"/>
+</svg>

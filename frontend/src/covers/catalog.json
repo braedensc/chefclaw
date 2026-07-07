@@ -1,5 +1,41 @@
 [
   {
+    "id": "ants-climbing-tree",
+    "name_en": "Ants Climbing a Tree",
+    "name_zh": "蚂蚁上树",
+    "category": "stir-fry",
+    "tags": [
+      "chinese",
+      "sichuan",
+      "川菜",
+      "stir-fry",
+      "炒",
+      "glass-noodle",
+      "粉丝",
+      "pork",
+      "蚂蚁上树",
+      "spicy"
+    ]
+  },
+  {
+    "id": "apple-pie",
+    "name_en": "Apple Pie",
+    "name_zh": "苹果派",
+    "category": "global-dessert",
+    "tags": [
+      "global",
+      "dessert",
+      "甜点",
+      "苹果派",
+      "apple-pie",
+      "baked",
+      "pastry",
+      "cinnamon",
+      "american",
+      "western"
+    ]
+  },
+  {
     "id": "aromatics-trio",
     "name_en": "Garlic-Chili Aromatics",
     "name_zh": "蒜蓉辣椒",
@@ -15,6 +51,59 @@
       "condiment",
       "stir-fry",
       "generic"
+    ]
+  },
+  {
+    "id": "avocado-toast",
+    "name_en": "Avocado Toast",
+    "name_zh": "牛油果吐司",
+    "category": "global-breakfast",
+    "tags": [
+      "global",
+      "breakfast",
+      "早餐",
+      "牛油果吐司",
+      "avocado-toast",
+      "avocado",
+      "bread",
+      "healthy",
+      "brunch"
+    ]
+  },
+  {
+    "id": "bagel-lox",
+    "name_en": "Bagel with Lox",
+    "name_zh": "三文鱼贝果",
+    "category": "global-breakfast",
+    "tags": [
+      "global",
+      "breakfast",
+      "早餐",
+      "三文鱼贝果",
+      "bagel",
+      "lox",
+      "salmon",
+      "cream-cheese",
+      "brunch"
+    ]
+  },
+  {
+    "id": "banh-mi",
+    "name_en": "Banh Mi Sandwich",
+    "name_zh": "越南三明治",
+    "category": "global-sea",
+    "tags": [
+      "global",
+      "vietnamese",
+      "越南",
+      "sea",
+      "东南亚",
+      "越南三明治",
+      "banh-mi",
+      "baguette",
+      "pork",
+      "pickle",
+      "street-food"
     ]
   },
   {
@@ -88,6 +177,23 @@
     ]
   },
   {
+    "id": "beer-duck",
+    "name_en": "Beer Braised Duck",
+    "name_zh": "啤酒鸭",
+    "category": "braise",
+    "tags": [
+      "chinese",
+      "braise",
+      "焖",
+      "duck",
+      "鸭",
+      "beer",
+      "啤酒",
+      "homestyle",
+      "家常"
+    ]
+  },
+  {
     "id": "biangbiang-noodles",
     "name_en": "Biangbiang Noodles",
     "name_zh": "biangbiang面",
@@ -140,6 +246,42 @@
     ]
   },
   {
+    "id": "boiled-fish-chili",
+    "name_en": "Sichuan Boiled Fish in Chili Oil",
+    "name_zh": "水煮鱼",
+    "category": "seafood",
+    "tags": [
+      "chinese",
+      "sichuan",
+      "川菜",
+      "水煮鱼",
+      "fish",
+      "seafood",
+      "海鲜",
+      "spicy",
+      "麻辣",
+      "chili-oil"
+    ]
+  },
+  {
+    "id": "boiled-shrimp",
+    "name_en": "Poached Shrimp",
+    "name_zh": "白灼虾",
+    "category": "seafood",
+    "tags": [
+      "chinese",
+      "seafood",
+      "海鲜",
+      "白灼虾",
+      "shrimp",
+      "虾",
+      "poached",
+      "cantonese",
+      "粤菜",
+      "light"
+    ]
+  },
+  {
     "id": "braised-beef-brisket",
     "name_en": "Braised Beef Brisket",
     "name_zh": "红烧牛腩",
@@ -170,6 +312,39 @@
     ]
   },
   {
+    "id": "braised-egg",
+    "name_en": "Soy-Braised Egg",
+    "name_zh": "卤蛋",
+    "category": "egg",
+    "tags": [
+      "chinese",
+      "egg",
+      "蛋",
+      "卤蛋",
+      "braised",
+      "soy",
+      "marinated",
+      "side-dish",
+      "homestyle"
+    ]
+  },
+  {
+    "id": "braised-eggplant",
+    "name_en": "Red-Braised Eggplant",
+    "name_zh": "红烧茄子",
+    "category": "braise",
+    "tags": [
+      "chinese",
+      "braise",
+      "红烧",
+      "eggplant",
+      "茄子",
+      "vegetable",
+      "homestyle",
+      "家常"
+    ]
+  },
+  {
     "id": "braised-fish",
     "name_en": "Braised Fish in Brown Sauce",
     "name_zh": "红烧鱼",
@@ -182,6 +357,56 @@
       "seafood",
       "海鲜",
       "homestyle"
+    ]
+  },
+  {
+    "id": "braised-pork-knuckle",
+    "name_en": "Braised Pork Knuckle",
+    "name_zh": "红烧猪蹄",
+    "category": "braise",
+    "tags": [
+      "chinese",
+      "braise",
+      "红烧",
+      "pork-knuckle",
+      "猪蹄",
+      "collagen",
+      "homestyle",
+      "家常"
+    ]
+  },
+  {
+    "id": "braised-pork-rice",
+    "name_en": "Braised Pork Rice",
+    "name_zh": "卤肉饭",
+    "category": "rice-bowls",
+    "tags": [
+      "chinese",
+      "rice-bowl",
+      "盖饭",
+      "卤肉饭",
+      "pork",
+      "braised",
+      "taiwan",
+      "台湾",
+      "米饭"
+    ]
+  },
+  {
+    "id": "brownie",
+    "name_en": "Fudge Brownie",
+    "name_zh": "布朗尼",
+    "category": "global-dessert",
+    "tags": [
+      "global",
+      "dessert",
+      "甜点",
+      "布朗尼",
+      "brownie",
+      "chocolate",
+      "baked",
+      "fudge",
+      "sweet"
     ]
   },
   {
@@ -199,6 +424,59 @@
       "milk-tea",
       "beverage",
       "taiwan"
+    ]
+  },
+  {
+    "id": "buddha-bowl",
+    "name_en": "Buddha Bowl",
+    "name_zh": "佛陀碗",
+    "category": "global-salad",
+    "tags": [
+      "global",
+      "healthy",
+      "salad",
+      "沙拉",
+      "佛陀碗",
+      "buddha-bowl",
+      "grain",
+      "vegetable",
+      "vegetarian",
+      "bowl"
+    ]
+  },
+  {
+    "id": "buffalo-wings",
+    "name_en": "Buffalo Wings",
+    "name_zh": "水牛城辣鸡翅",
+    "category": "global-american",
+    "tags": [
+      "global",
+      "american",
+      "美式",
+      "辣鸡翅",
+      "buffalo-wings",
+      "chicken",
+      "spicy",
+      "fried",
+      "game-day",
+      "western"
+    ]
+  },
+  {
+    "id": "bulgogi",
+    "name_en": "Beef Bulgogi",
+    "name_zh": "韩式烤牛肉",
+    "category": "global-korean",
+    "tags": [
+      "global",
+      "korean",
+      "韩式",
+      "烤牛肉",
+      "bulgogi",
+      "beef",
+      "marinated",
+      "grilled",
+      "sweet"
     ]
   },
   {
@@ -253,6 +531,42 @@
     ]
   },
   {
+    "id": "calzone",
+    "name_en": "Calzone",
+    "name_zh": "意式折叠披萨",
+    "category": "global-italian",
+    "tags": [
+      "global",
+      "italian",
+      "意大利",
+      "折叠披萨",
+      "calzone",
+      "stuffed-pizza",
+      "cheese",
+      "baked",
+      "western"
+    ]
+  },
+  {
+    "id": "caprese-salad",
+    "name_en": "Caprese Salad",
+    "name_zh": "卡普雷塞沙拉",
+    "category": "global-salad",
+    "tags": [
+      "global",
+      "italian",
+      "意大利",
+      "卡普雷塞",
+      "caprese",
+      "salad",
+      "沙拉",
+      "mozzarella",
+      "tomato",
+      "basil",
+      "light"
+    ]
+  },
+  {
     "id": "carbonara",
     "name_en": "Spaghetti Carbonara",
     "name_zh": "培根蛋面",
@@ -268,6 +582,24 @@
       "bacon",
       "western",
       "西餐"
+    ]
+  },
+  {
+    "id": "century-egg-tofu",
+    "name_en": "Century Egg with Tofu",
+    "name_zh": "皮蛋豆腐",
+    "category": "cold-dishes",
+    "tags": [
+      "chinese",
+      "cold-dish",
+      "凉菜",
+      "皮蛋",
+      "century-egg",
+      "tofu",
+      "豆腐",
+      "summer",
+      "quick",
+      "appetizer"
     ]
   },
   {
@@ -322,6 +654,57 @@
     ]
   },
   {
+    "id": "cheesecake",
+    "name_en": "New York Cheesecake",
+    "name_zh": "芝士蛋糕",
+    "category": "global-dessert",
+    "tags": [
+      "global",
+      "dessert",
+      "甜点",
+      "芝士蛋糕",
+      "cheesecake",
+      "cream-cheese",
+      "baked",
+      "sweet",
+      "western"
+    ]
+  },
+  {
+    "id": "chestnut-chicken",
+    "name_en": "Braised Chicken with Chestnuts",
+    "name_zh": "板栗烧鸡",
+    "category": "braise",
+    "tags": [
+      "chinese",
+      "braise",
+      "烧",
+      "chicken",
+      "chestnut",
+      "板栗",
+      "autumn",
+      "homestyle"
+    ]
+  },
+  {
+    "id": "chicken-feet",
+    "name_en": "Braised Chicken Feet",
+    "name_zh": "凤爪",
+    "category": "dim-sum",
+    "tags": [
+      "chinese",
+      "dim-sum",
+      "点心",
+      "凤爪",
+      "chicken-feet",
+      "black-bean",
+      "cantonese",
+      "粤菜",
+      "steamed",
+      "spicy"
+    ]
+  },
+  {
     "id": "chicken-katsu-don",
     "name_en": "Katsu Don (Cutlet Rice Bowl)",
     "name_zh": "猪排饭",
@@ -340,6 +723,76 @@
     ]
   },
   {
+    "id": "chicken-noodle-soup",
+    "name_en": "Chicken Noodle Soup",
+    "name_zh": "鸡肉面条汤",
+    "category": "global-soup",
+    "tags": [
+      "global",
+      "soup",
+      "汤",
+      "鸡肉面条汤",
+      "chicken-noodle",
+      "chicken",
+      "noodles",
+      "comfort",
+      "western"
+    ]
+  },
+  {
+    "id": "chicken-satay",
+    "name_en": "Chicken Satay",
+    "name_zh": "沙嗲鸡肉串",
+    "category": "global-sea",
+    "tags": [
+      "global",
+      "southeast-asia",
+      "东南亚",
+      "沙嗲",
+      "satay",
+      "chicken",
+      "skewers",
+      "peanut",
+      "grilled",
+      "thai"
+    ]
+  },
+  {
+    "id": "chicken-tikka-masala",
+    "name_en": "Chicken Tikka Masala",
+    "name_zh": "玛莎拉鸡",
+    "category": "global-indian",
+    "tags": [
+      "global",
+      "indian",
+      "印度",
+      "玛莎拉鸡",
+      "tikka-masala",
+      "chicken",
+      "curry",
+      "咖喱",
+      "tomato",
+      "creamy"
+    ]
+  },
+  {
+    "id": "chilaquiles",
+    "name_en": "Chilaquiles",
+    "name_zh": "墨西哥玉米片早餐",
+    "category": "global-mexican",
+    "tags": [
+      "global",
+      "mexican",
+      "墨西哥",
+      "chilaquiles",
+      "tortilla-chips",
+      "salsa",
+      "egg",
+      "breakfast",
+      "早餐"
+    ]
+  },
+  {
     "id": "chocolate-cake",
     "name_en": "Chocolate Layer Cake",
     "name_zh": "巧克力蛋糕",
@@ -354,6 +807,112 @@
       "蛋糕",
       "chocolate",
       "sweet"
+    ]
+  },
+  {
+    "id": "chocolate-chip-cookies",
+    "name_en": "Chocolate Chip Cookies",
+    "name_zh": "巧克力曲奇",
+    "category": "global-dessert",
+    "tags": [
+      "global",
+      "dessert",
+      "甜点",
+      "曲奇",
+      "cookies",
+      "chocolate-chip",
+      "baked",
+      "sweet",
+      "snack"
+    ]
+  },
+  {
+    "id": "chongqing-chicken",
+    "name_en": "Chongqing Chili Chicken",
+    "name_zh": "辣子鸡",
+    "category": "stir-fry",
+    "tags": [
+      "chinese",
+      "sichuan",
+      "川菜",
+      "stir-fry",
+      "炒",
+      "chicken",
+      "辣子鸡",
+      "spicy",
+      "麻辣",
+      "chongqing"
+    ]
+  },
+  {
+    "id": "chongqing-xiaomian",
+    "name_en": "Chongqing Spicy Noodles",
+    "name_zh": "重庆小面",
+    "category": "noodles",
+    "tags": [
+      "chinese",
+      "noodles",
+      "面",
+      "小面",
+      "chongqing",
+      "重庆",
+      "spicy",
+      "麻辣",
+      "sichuan"
+    ]
+  },
+  {
+    "id": "chopped-chili-fish-head",
+    "name_en": "Steamed Fish Head with Chopped Chili",
+    "name_zh": "剁椒鱼头",
+    "category": "seafood",
+    "tags": [
+      "chinese",
+      "seafood",
+      "海鲜",
+      "剁椒鱼头",
+      "fish-head",
+      "chopped-chili",
+      "hunan",
+      "湘菜",
+      "steamed",
+      "spicy"
+    ]
+  },
+  {
+    "id": "churros",
+    "name_en": "Churros",
+    "name_zh": "吉事果",
+    "category": "global-dessert",
+    "tags": [
+      "global",
+      "mexican",
+      "墨西哥",
+      "dessert",
+      "甜点",
+      "吉事果",
+      "churros",
+      "fried",
+      "cinnamon-sugar",
+      "chocolate"
+    ]
+  },
+  {
+    "id": "clam-chowder",
+    "name_en": "New England Clam Chowder",
+    "name_zh": "蛤蜊浓汤",
+    "category": "global-soup",
+    "tags": [
+      "global",
+      "soup",
+      "汤",
+      "蛤蜊浓汤",
+      "clam-chowder",
+      "clam",
+      "cream",
+      "potato",
+      "american",
+      "western"
     ]
   },
   {
@@ -478,6 +1037,42 @@
     ]
   },
   {
+    "id": "coleslaw",
+    "name_en": "Coleslaw",
+    "name_zh": "凉拌卷心菜",
+    "category": "global-salad",
+    "tags": [
+      "global",
+      "salad",
+      "沙拉",
+      "凉拌卷心菜",
+      "coleslaw",
+      "cabbage",
+      "mayo",
+      "side-dish",
+      "american"
+    ]
+  },
+  {
+    "id": "com-tam",
+    "name_en": "Broken Rice with Grilled Pork",
+    "name_zh": "越南碎米饭",
+    "category": "global-sea",
+    "tags": [
+      "global",
+      "vietnamese",
+      "越南",
+      "sea",
+      "东南亚",
+      "碎米饭",
+      "com-tam",
+      "broken-rice",
+      "pork",
+      "grilled",
+      "rice"
+    ]
+  },
+  {
     "id": "congee-preserved-egg",
     "name_en": "Century Egg & Pork Congee",
     "name_zh": "皮蛋瘦肉粥",
@@ -493,6 +1088,58 @@
       "粤菜",
       "breakfast",
       "早餐"
+    ]
+  },
+  {
+    "id": "corn-rib-soup",
+    "name_en": "Corn & Pork Rib Soup",
+    "name_zh": "玉米排骨汤",
+    "category": "soup",
+    "tags": [
+      "chinese",
+      "soup",
+      "汤",
+      "煲汤",
+      "corn",
+      "玉米",
+      "pork-rib",
+      "排骨",
+      "cantonese",
+      "粤菜"
+    ]
+  },
+  {
+    "id": "cornbread",
+    "name_en": "Cornbread",
+    "name_zh": "玉米面包",
+    "category": "global-american",
+    "tags": [
+      "global",
+      "american",
+      "美式",
+      "玉米面包",
+      "cornbread",
+      "corn",
+      "baked",
+      "side-dish",
+      "southern"
+    ]
+  },
+  {
+    "id": "creme-brulee",
+    "name_en": "Creme Brulee",
+    "name_zh": "焦糖布丁",
+    "category": "global-dessert",
+    "tags": [
+      "global",
+      "dessert",
+      "甜点",
+      "焦糖布丁",
+      "creme-brulee",
+      "custard",
+      "caramelized",
+      "french",
+      "sweet"
     ]
   },
   {
@@ -514,6 +1161,112 @@
     ]
   },
   {
+    "id": "croque-monsieur",
+    "name_en": "Croque Monsieur",
+    "name_zh": "法式火腿芝士三明治",
+    "category": "global-european",
+    "tags": [
+      "global",
+      "european",
+      "西餐",
+      "火腿芝士三明治",
+      "croque-monsieur",
+      "ham",
+      "cheese",
+      "sandwich",
+      "french",
+      "baked"
+    ]
+  },
+  {
+    "id": "cupcake",
+    "name_en": "Frosted Cupcake",
+    "name_zh": "纸杯蛋糕",
+    "category": "global-dessert",
+    "tags": [
+      "global",
+      "dessert",
+      "甜点",
+      "纸杯蛋糕",
+      "cupcake",
+      "frosting",
+      "baked",
+      "sweet",
+      "colorful"
+    ]
+  },
+  {
+    "id": "cured-meat-claypot-rice",
+    "name_en": "Cured Meat Clay Pot Rice",
+    "name_zh": "腊味煲仔饭",
+    "category": "clay-pot",
+    "tags": [
+      "chinese",
+      "clay-pot",
+      "煲仔饭",
+      "腊味",
+      "cured-meat",
+      "sausage",
+      "cantonese",
+      "粤菜",
+      "rice",
+      "砂锅"
+    ]
+  },
+  {
+    "id": "curry-rice-chinese",
+    "name_en": "Curry Rice",
+    "name_zh": "咖喱饭",
+    "category": "rice-bowls",
+    "tags": [
+      "chinese",
+      "rice-bowl",
+      "盖饭",
+      "咖喱饭",
+      "curry",
+      "咖喱",
+      "potato",
+      "米饭",
+      "homestyle"
+    ]
+  },
+  {
+    "id": "custard-bun",
+    "name_en": "Salted Egg Custard Bun",
+    "name_zh": "流沙包",
+    "category": "buns",
+    "tags": [
+      "chinese",
+      "buns",
+      "点心",
+      "流沙包",
+      "custard",
+      "salted-egg",
+      "steamed",
+      "蒸",
+      "cantonese",
+      "粤菜",
+      "dim-sum"
+    ]
+  },
+  {
+    "id": "dal",
+    "name_en": "Lentil Dal",
+    "name_zh": "印度扁豆糊",
+    "category": "global-indian",
+    "tags": [
+      "global",
+      "indian",
+      "印度",
+      "扁豆糊",
+      "dal",
+      "lentil",
+      "curry",
+      "vegetarian",
+      "comfort"
+    ]
+  },
+  {
     "id": "dan-dan-noodles",
     "name_en": "Dan Dan Noodles",
     "name_zh": "担担面",
@@ -528,6 +1281,23 @@
       "spicy",
       "麻辣",
       "sesame"
+    ]
+  },
+  {
+    "id": "disanxian",
+    "name_en": "Sauteed Potato, Eggplant & Pepper",
+    "name_zh": "地三鲜",
+    "category": "stir-fry",
+    "tags": [
+      "chinese",
+      "stir-fry",
+      "炒",
+      "potato",
+      "eggplant",
+      "地三鲜",
+      "vegetable",
+      "东北",
+      "homestyle"
     ]
   },
   {
@@ -546,6 +1316,42 @@
     ]
   },
   {
+    "id": "dosa",
+    "name_en": "Masala Dosa",
+    "name_zh": "印度薄饼",
+    "category": "global-indian",
+    "tags": [
+      "global",
+      "indian",
+      "印度",
+      "薄饼",
+      "dosa",
+      "crepe",
+      "potato",
+      "south-indian",
+      "crispy",
+      "breakfast"
+    ]
+  },
+  {
+    "id": "double-skin-milk",
+    "name_en": "Double Skin Milk Pudding",
+    "name_zh": "双皮奶",
+    "category": "dessert",
+    "tags": [
+      "chinese",
+      "dessert",
+      "甜点",
+      "双皮奶",
+      "milk-pudding",
+      "cantonese",
+      "粤菜",
+      "steamed",
+      "sweet",
+      "shunde"
+    ]
+  },
+  {
     "id": "dry-fried-green-beans",
     "name_en": "Dry-Fried Green Beans",
     "name_zh": "干煸豆角",
@@ -559,6 +1365,23 @@
       "green-beans",
       "豆角",
       "vegetable"
+    ]
+  },
+  {
+    "id": "dry-pot",
+    "name_en": "Spicy Dry Pot (Malaxiangguo)",
+    "name_zh": "麻辣香锅",
+    "category": "hotpot",
+    "tags": [
+      "chinese",
+      "麻辣香锅",
+      "dry-pot",
+      "spicy",
+      "麻辣",
+      "sichuan",
+      "川菜",
+      "stir-fry",
+      "street-food"
     ]
   },
   {
@@ -597,6 +1420,24 @@
     ]
   },
   {
+    "id": "egg-tart",
+    "name_en": "Hong Kong Egg Tart",
+    "name_zh": "蛋挞",
+    "category": "dessert",
+    "tags": [
+      "chinese",
+      "dessert",
+      "甜点",
+      "蛋挞",
+      "egg-tart",
+      "custard",
+      "cantonese",
+      "粤菜",
+      "baking",
+      "dim-sum"
+    ]
+  },
+  {
     "id": "eggplant",
     "name_en": "Fish-Fragrant Eggplant",
     "name_zh": "鱼香茄子",
@@ -611,6 +1452,76 @@
       "茄子",
       "鱼香",
       "vegetable"
+    ]
+  },
+  {
+    "id": "eggs-benedict",
+    "name_en": "Eggs Benedict",
+    "name_zh": "班尼迪克蛋",
+    "category": "global-breakfast",
+    "tags": [
+      "global",
+      "breakfast",
+      "早餐",
+      "班尼迪克蛋",
+      "eggs-benedict",
+      "poached-egg",
+      "hollandaise",
+      "brunch",
+      "muffin"
+    ]
+  },
+  {
+    "id": "elote",
+    "name_en": "Mexican Street Corn (Elote)",
+    "name_zh": "墨西哥烤玉米",
+    "category": "global-mexican",
+    "tags": [
+      "global",
+      "mexican",
+      "墨西哥",
+      "烤玉米",
+      "elote",
+      "corn",
+      "street-food",
+      "cheese",
+      "chili",
+      "lime"
+    ]
+  },
+  {
+    "id": "enchiladas",
+    "name_en": "Enchiladas",
+    "name_zh": "墨西哥卷饼",
+    "category": "global-mexican",
+    "tags": [
+      "global",
+      "mexican",
+      "墨西哥",
+      "卷饼",
+      "enchiladas",
+      "tortilla",
+      "sauce",
+      "cheese",
+      "baked"
+    ]
+  },
+  {
+    "id": "fajitas",
+    "name_en": "Sizzling Fajitas",
+    "name_zh": "法士达",
+    "category": "global-mexican",
+    "tags": [
+      "global",
+      "mexican",
+      "墨西哥",
+      "法士达",
+      "fajitas",
+      "tortilla",
+      "pepper",
+      "chicken",
+      "sizzling",
+      "beef"
     ]
   },
   {
@@ -630,6 +1541,112 @@
     ]
   },
   {
+    "id": "farmhouse-pork",
+    "name_en": "Farmhouse Stir-Fried Pork",
+    "name_zh": "农家小炒肉",
+    "category": "stir-fry",
+    "tags": [
+      "chinese",
+      "stir-fry",
+      "炒",
+      "pork",
+      "小炒肉",
+      "pepper",
+      "spicy",
+      "hunan",
+      "湘菜"
+    ]
+  },
+  {
+    "id": "fettuccine-alfredo",
+    "name_en": "Fettuccine Alfredo",
+    "name_zh": "奶油意面",
+    "category": "global-italian",
+    "tags": [
+      "global",
+      "italian",
+      "意大利",
+      "奶油意面",
+      "fettuccine",
+      "alfredo",
+      "pasta",
+      "cream",
+      "cheese",
+      "western"
+    ]
+  },
+  {
+    "id": "fish-and-chips",
+    "name_en": "Fish and Chips",
+    "name_zh": "炸鱼薯条",
+    "category": "global-european",
+    "tags": [
+      "global",
+      "european",
+      "西餐",
+      "炸鱼薯条",
+      "fish-and-chips",
+      "fried",
+      "fish",
+      "fries",
+      "british",
+      "western"
+    ]
+  },
+  {
+    "id": "french-onion-soup",
+    "name_en": "French Onion Soup",
+    "name_zh": "法式洋葱汤",
+    "category": "global-soup",
+    "tags": [
+      "global",
+      "soup",
+      "汤",
+      "法式洋葱汤",
+      "french-onion",
+      "onion",
+      "cheese",
+      "broth",
+      "french",
+      "comfort"
+    ]
+  },
+  {
+    "id": "french-toast",
+    "name_en": "French Toast",
+    "name_zh": "法式吐司",
+    "category": "global-breakfast",
+    "tags": [
+      "global",
+      "breakfast",
+      "早餐",
+      "法式吐司",
+      "french-toast",
+      "bread",
+      "egg",
+      "syrup",
+      "brunch",
+      "sweet"
+    ]
+  },
+  {
+    "id": "fresh-orange-juice",
+    "name_en": "Fresh Orange Juice",
+    "name_zh": "鲜橙汁",
+    "category": "global-drink",
+    "tags": [
+      "global",
+      "drink",
+      "饮品",
+      "鲜橙汁",
+      "orange-juice",
+      "orange",
+      "fresh",
+      "breakfast",
+      "beverage"
+    ]
+  },
+  {
     "id": "fried-chicken",
     "name_en": "Crispy Fried Chicken",
     "name_zh": "炸鸡",
@@ -643,6 +1660,183 @@
       "crispy",
       "fast-food",
       "western"
+    ]
+  },
+  {
+    "id": "fried-egg-sunny",
+    "name_en": "Fried Egg",
+    "name_zh": "荷包蛋",
+    "category": "egg",
+    "tags": [
+      "chinese",
+      "egg",
+      "蛋",
+      "荷包蛋",
+      "fried-egg",
+      "sunny-side",
+      "quick",
+      "breakfast",
+      "早餐",
+      "homestyle"
+    ]
+  },
+  {
+    "id": "fruit-salad",
+    "name_en": "Fruit Salad",
+    "name_zh": "水果沙拉",
+    "category": "global-salad",
+    "tags": [
+      "global",
+      "healthy",
+      "salad",
+      "沙拉",
+      "水果沙拉",
+      "fruit",
+      "fresh",
+      "light",
+      "summer"
+    ]
+  },
+  {
+    "id": "fruit-smoothie",
+    "name_en": "Fruit Smoothie",
+    "name_zh": "水果冰沙",
+    "category": "global-drink",
+    "tags": [
+      "global",
+      "drink",
+      "饮品",
+      "水果冰沙",
+      "smoothie",
+      "fruit",
+      "blended",
+      "healthy",
+      "beverage"
+    ]
+  },
+  {
+    "id": "fuqi-feipian",
+    "name_en": "Sliced Beef in Chili Oil (Fuqi Feipian)",
+    "name_zh": "夫妻肺片",
+    "category": "cold-dishes",
+    "tags": [
+      "chinese",
+      "cold-dish",
+      "凉菜",
+      "夫妻肺片",
+      "beef",
+      "offal",
+      "sichuan",
+      "川菜",
+      "chili-oil",
+      "spicy",
+      "麻辣"
+    ]
+  },
+  {
+    "id": "garlic-broccoli",
+    "name_en": "Garlic Broccoli",
+    "name_zh": "蒜蓉西兰花",
+    "category": "stir-fry",
+    "tags": [
+      "chinese",
+      "stir-fry",
+      "炒",
+      "broccoli",
+      "西兰花",
+      "garlic",
+      "蒜蓉",
+      "vegetable",
+      "quick"
+    ]
+  },
+  {
+    "id": "garlic-eggplant-cold",
+    "name_en": "Steamed Eggplant with Garlic",
+    "name_zh": "蒜泥茄子",
+    "category": "cold-dishes",
+    "tags": [
+      "chinese",
+      "cold-dish",
+      "凉菜",
+      "eggplant",
+      "茄子",
+      "garlic",
+      "蒜泥",
+      "steamed",
+      "summer",
+      "homestyle"
+    ]
+  },
+  {
+    "id": "garlic-scallops",
+    "name_en": "Garlic Steamed Scallops",
+    "name_zh": "蒜蓉扇贝",
+    "category": "seafood",
+    "tags": [
+      "chinese",
+      "seafood",
+      "海鲜",
+      "扇贝",
+      "scallop",
+      "garlic",
+      "蒜蓉",
+      "vermicelli",
+      "steamed",
+      "cantonese"
+    ]
+  },
+  {
+    "id": "glazed-donut",
+    "name_en": "Glazed Donut",
+    "name_zh": "糖霜甜甜圈",
+    "category": "global-dessert",
+    "tags": [
+      "global",
+      "american",
+      "美式",
+      "dessert",
+      "甜点",
+      "甜甜圈",
+      "donut",
+      "glazed",
+      "fried",
+      "sweet"
+    ]
+  },
+  {
+    "id": "gnocchi",
+    "name_en": "Potato Gnocchi",
+    "name_zh": "土豆团子",
+    "category": "global-italian",
+    "tags": [
+      "global",
+      "italian",
+      "意大利",
+      "土豆团子",
+      "gnocchi",
+      "potato",
+      "pasta",
+      "dumpling",
+      "western"
+    ]
+  },
+  {
+    "id": "goulash",
+    "name_en": "Hungarian Goulash",
+    "name_zh": "匈牙利炖牛肉",
+    "category": "global-european",
+    "tags": [
+      "global",
+      "european",
+      "西餐",
+      "匈牙利炖牛肉",
+      "goulash",
+      "beef",
+      "stew",
+      "paprika",
+      "hungarian",
+      "comfort"
     ]
   },
   {
@@ -678,6 +1872,40 @@
       "coconut",
       "spicy",
       "chicken"
+    ]
+  },
+  {
+    "id": "green-pepper-pork",
+    "name_en": "Green Pepper Pork Slivers",
+    "name_zh": "青椒肉丝",
+    "category": "stir-fry",
+    "tags": [
+      "chinese",
+      "stir-fry",
+      "炒",
+      "pork",
+      "肉丝",
+      "green-pepper",
+      "青椒",
+      "homestyle",
+      "家常"
+    ]
+  },
+  {
+    "id": "grilled-cheese",
+    "name_en": "Grilled Cheese Sandwich",
+    "name_zh": "烤芝士三明治",
+    "category": "global-american",
+    "tags": [
+      "global",
+      "american",
+      "美式",
+      "烤芝士三明治",
+      "grilled-cheese",
+      "sandwich",
+      "bread",
+      "cheese",
+      "comfort"
     ]
   },
   {
@@ -732,6 +1960,57 @@
     ]
   },
   {
+    "id": "hainan-chicken-rice",
+    "name_en": "Hainan Chicken Rice",
+    "name_zh": "海南鸡饭",
+    "category": "rice-bowls",
+    "tags": [
+      "chinese",
+      "rice-bowl",
+      "盖饭",
+      "海南鸡饭",
+      "chicken",
+      "poached",
+      "hainan",
+      "米饭",
+      "southeast-asia"
+    ]
+  },
+  {
+    "id": "hand-grabbed-pancake",
+    "name_en": "Flaky Hand-Grabbed Pancake",
+    "name_zh": "手抓饼",
+    "category": "breakfast",
+    "tags": [
+      "chinese",
+      "breakfast",
+      "早餐",
+      "手抓饼",
+      "pancake",
+      "flaky",
+      "pan-fried",
+      "street-food",
+      "egg"
+    ]
+  },
+  {
+    "id": "hand-torn-cabbage",
+    "name_en": "Hand-Torn Cabbage",
+    "name_zh": "手撕包菜",
+    "category": "stir-fry",
+    "tags": [
+      "chinese",
+      "stir-fry",
+      "炒",
+      "cabbage",
+      "包菜",
+      "spicy",
+      "homestyle",
+      "家常",
+      "quick"
+    ]
+  },
+  {
     "id": "har-gow",
     "name_en": "Shrimp Dumplings (Har Gow)",
     "name_zh": "虾饺",
@@ -747,6 +2026,111 @@
       "蒸",
       "cantonese",
       "粤菜"
+    ]
+  },
+  {
+    "id": "herbal-tea",
+    "name_en": "Herbal Tea",
+    "name_zh": "花草茶",
+    "category": "global-drink",
+    "tags": [
+      "global",
+      "drink",
+      "饮品",
+      "花草茶",
+      "herbal-tea",
+      "tea",
+      "infusion",
+      "warm",
+      "beverage",
+      "healthy"
+    ]
+  },
+  {
+    "id": "homestyle-tofu",
+    "name_en": "Home-Style Braised Tofu",
+    "name_zh": "家常豆腐",
+    "category": "tofu",
+    "tags": [
+      "chinese",
+      "tofu",
+      "豆腐",
+      "家常豆腐",
+      "braised",
+      "pork",
+      "homestyle",
+      "家常",
+      "stir-fry"
+    ]
+  },
+  {
+    "id": "hot-chocolate",
+    "name_en": "Hot Chocolate",
+    "name_zh": "热巧克力",
+    "category": "global-drink",
+    "tags": [
+      "global",
+      "drink",
+      "饮品",
+      "热巧克力",
+      "hot-chocolate",
+      "cocoa",
+      "warm",
+      "winter",
+      "beverage",
+      "sweet"
+    ]
+  },
+  {
+    "id": "hot-dog",
+    "name_en": "Hot Dog",
+    "name_zh": "热狗",
+    "category": "global-american",
+    "tags": [
+      "global",
+      "american",
+      "美式",
+      "热狗",
+      "hot-dog",
+      "sausage",
+      "bun",
+      "street-food",
+      "western"
+    ]
+  },
+  {
+    "id": "hot-dry-noodles",
+    "name_en": "Hot Dry Noodles",
+    "name_zh": "热干面",
+    "category": "noodles",
+    "tags": [
+      "chinese",
+      "noodles",
+      "面",
+      "热干面",
+      "sesame",
+      "芝麻酱",
+      "wuhan",
+      "武汉",
+      "breakfast"
+    ]
+  },
+  {
+    "id": "hot-sour-potato-slivers",
+    "name_en": "Hot & Sour Potato Slivers",
+    "name_zh": "酸辣土豆丝",
+    "category": "stir-fry",
+    "tags": [
+      "chinese",
+      "stir-fry",
+      "炒",
+      "potato",
+      "土豆丝",
+      "sour",
+      "spicy",
+      "酸辣",
+      "homestyle",
+      "家常"
     ]
   },
   {
@@ -783,6 +2167,160 @@
     ]
   },
   {
+    "id": "ice-cream-sundae",
+    "name_en": "Ice Cream Sundae",
+    "name_zh": "圣代冰淇淋",
+    "category": "global-dessert",
+    "tags": [
+      "global",
+      "dessert",
+      "甜点",
+      "圣代",
+      "ice-cream",
+      "sundae",
+      "chocolate",
+      "sweet",
+      "frozen"
+    ]
+  },
+  {
+    "id": "iced-coffee",
+    "name_en": "Iced Coffee",
+    "name_zh": "冰咖啡",
+    "category": "global-drink",
+    "tags": [
+      "global",
+      "drink",
+      "饮品",
+      "冰咖啡",
+      "iced-coffee",
+      "coffee",
+      "咖啡",
+      "cold",
+      "beverage"
+    ]
+  },
+  {
+    "id": "japanese-curry-rice",
+    "name_en": "Japanese Curry Rice",
+    "name_zh": "日式咖喱饭",
+    "category": "global-japanese",
+    "tags": [
+      "global",
+      "japanese",
+      "日式",
+      "咖喱饭",
+      "curry",
+      "咖喱",
+      "rice",
+      "potato",
+      "comfort"
+    ]
+  },
+  {
+    "id": "japchae",
+    "name_en": "Japchae Glass Noodles",
+    "name_zh": "韩式杂菜",
+    "category": "global-korean",
+    "tags": [
+      "global",
+      "korean",
+      "韩式",
+      "杂菜",
+      "japchae",
+      "glass-noodle",
+      "sweet-potato-noodle",
+      "vegetable",
+      "stir-fry"
+    ]
+  },
+  {
+    "id": "jianbing",
+    "name_en": "Chinese Crepe (Jianbing)",
+    "name_zh": "煎饼果子",
+    "category": "breakfast",
+    "tags": [
+      "chinese",
+      "breakfast",
+      "早餐",
+      "煎饼果子",
+      "jianbing",
+      "crepe",
+      "egg",
+      "street-food",
+      "tianjin"
+    ]
+  },
+  {
+    "id": "jjajangmyeon",
+    "name_en": "Black Bean Noodles (Jjajangmyeon)",
+    "name_zh": "炸酱面韩式",
+    "category": "global-korean",
+    "tags": [
+      "global",
+      "korean",
+      "韩式",
+      "炸酱面",
+      "jjajangmyeon",
+      "black-bean",
+      "noodles",
+      "面",
+      "comfort"
+    ]
+  },
+  {
+    "id": "kebab-platter",
+    "name_en": "Mixed Grill Kebab Platter",
+    "name_zh": "烤肉拼盘",
+    "category": "global-middle-eastern",
+    "tags": [
+      "global",
+      "middle-eastern",
+      "中东",
+      "烤肉拼盘",
+      "kebab",
+      "grilled",
+      "meat",
+      "skewers",
+      "mediterranean"
+    ]
+  },
+  {
+    "id": "khao-pad",
+    "name_en": "Thai Fried Rice",
+    "name_zh": "泰式炒饭",
+    "category": "global-sea",
+    "tags": [
+      "global",
+      "thai",
+      "泰式",
+      "sea",
+      "东南亚",
+      "泰式炒饭",
+      "khao-pad",
+      "fried-rice",
+      "shrimp",
+      "lime"
+    ]
+  },
+  {
+    "id": "kimbap",
+    "name_en": "Kimbap Rice Rolls",
+    "name_zh": "紫菜包饭",
+    "category": "global-korean",
+    "tags": [
+      "global",
+      "korean",
+      "韩式",
+      "紫菜包饭",
+      "kimbap",
+      "rice-roll",
+      "seaweed",
+      "vegetable",
+      "snack"
+    ]
+  },
+  {
     "id": "kimchi-stew",
     "name_en": "Kimchi Stew",
     "name_zh": "泡菜汤",
@@ -798,6 +2336,56 @@
       "spicy",
       "tofu",
       "pork"
+    ]
+  },
+  {
+    "id": "knife-cut-noodles",
+    "name_en": "Knife-Cut Noodles",
+    "name_zh": "刀削面",
+    "category": "noodles",
+    "tags": [
+      "chinese",
+      "noodles",
+      "面",
+      "刀削面",
+      "knife-cut",
+      "shanxi",
+      "山西",
+      "北方"
+    ]
+  },
+  {
+    "id": "kofta",
+    "name_en": "Kofta Meatballs",
+    "name_zh": "中东肉丸",
+    "category": "global-middle-eastern",
+    "tags": [
+      "global",
+      "middle-eastern",
+      "中东",
+      "肉丸",
+      "kofta",
+      "meatball",
+      "lamb",
+      "grilled",
+      "spiced"
+    ]
+  },
+  {
+    "id": "korean-corn-dog",
+    "name_en": "Korean Corn Dog",
+    "name_zh": "韩式热狗棒",
+    "category": "global-korean",
+    "tags": [
+      "global",
+      "korean",
+      "韩式",
+      "热狗棒",
+      "corn-dog",
+      "fried",
+      "cheese",
+      "street-food",
+      "snack"
     ]
   },
   {
@@ -835,6 +2423,25 @@
     ]
   },
   {
+    "id": "laksa",
+    "name_en": "Laksa Noodle Soup",
+    "name_zh": "叻沙",
+    "category": "global-sea",
+    "tags": [
+      "global",
+      "southeast-asia",
+      "东南亚",
+      "叻沙",
+      "laksa",
+      "noodles",
+      "coconut",
+      "curry",
+      "spicy",
+      "malaysia",
+      "singapore"
+    ]
+  },
+  {
     "id": "lamb-skewers",
     "name_en": "Cumin Lamb Skewers",
     "name_zh": "孜然羊肉串",
@@ -852,6 +2459,24 @@
       "西北",
       "xinjiang",
       "street-food"
+    ]
+  },
+  {
+    "id": "lanzhou-beef-noodles",
+    "name_en": "Lanzhou Beef Noodles",
+    "name_zh": "兰州拉面",
+    "category": "noodles",
+    "tags": [
+      "chinese",
+      "noodles",
+      "面",
+      "hand-pulled",
+      "拉面",
+      "beef",
+      "兰州",
+      "西北",
+      "lanzhou",
+      "halal"
     ]
   },
   {
@@ -873,6 +2498,93 @@
     ]
   },
   {
+    "id": "latte-coffee",
+    "name_en": "Cafe Latte",
+    "name_zh": "拿铁咖啡",
+    "category": "global-drink",
+    "tags": [
+      "global",
+      "drink",
+      "饮品",
+      "拿铁",
+      "latte",
+      "coffee",
+      "咖啡",
+      "milk",
+      "espresso",
+      "beverage"
+    ]
+  },
+  {
+    "id": "lemonade",
+    "name_en": "Fresh Lemonade",
+    "name_zh": "柠檬水",
+    "category": "global-drink",
+    "tags": [
+      "global",
+      "drink",
+      "饮品",
+      "柠檬水",
+      "lemonade",
+      "lemon",
+      "refreshing",
+      "summer",
+      "beverage"
+    ]
+  },
+  {
+    "id": "lions-head-meatballs",
+    "name_en": "Lion's Head Meatballs",
+    "name_zh": "红烧狮子头",
+    "category": "braise",
+    "tags": [
+      "chinese",
+      "braise",
+      "红烧",
+      "pork",
+      "meatball",
+      "狮子头",
+      "江南",
+      "huaiyang"
+    ]
+  },
+  {
+    "id": "mac-and-cheese",
+    "name_en": "Macaroni & Cheese",
+    "name_zh": "芝士通心粉",
+    "category": "global-american",
+    "tags": [
+      "global",
+      "american",
+      "美式",
+      "芝士通心粉",
+      "mac-and-cheese",
+      "pasta",
+      "cheese",
+      "comfort",
+      "baked",
+      "western"
+    ]
+  },
+  {
+    "id": "macarons",
+    "name_en": "French Macarons",
+    "name_zh": "马卡龙",
+    "category": "global-dessert",
+    "tags": [
+      "global",
+      "dessert",
+      "甜点",
+      "马卡龙",
+      "macarons",
+      "almond",
+      "french",
+      "colorful",
+      "sweet",
+      "baking"
+    ]
+  },
+  {
     "id": "malatang",
     "name_en": "Malatang (Spicy Bowl)",
     "name_zh": "麻辣烫",
@@ -890,6 +2602,25 @@
     ]
   },
   {
+    "id": "mango-sticky-rice",
+    "name_en": "Mango Sticky Rice",
+    "name_zh": "芒果糯米饭",
+    "category": "global-sea",
+    "tags": [
+      "global",
+      "thai",
+      "泰式",
+      "sea",
+      "东南亚",
+      "芒果糯米饭",
+      "mango",
+      "sticky-rice",
+      "coconut",
+      "dessert",
+      "sweet"
+    ]
+  },
+  {
     "id": "mantou",
     "name_en": "Steamed Mantou",
     "name_zh": "馒头",
@@ -904,6 +2635,23 @@
       "plain",
       "北方",
       "staple"
+    ]
+  },
+  {
+    "id": "maocai",
+    "name_en": "Maocai (Spicy Ladle Bowl)",
+    "name_zh": "冒菜",
+    "category": "hotpot",
+    "tags": [
+      "chinese",
+      "冒菜",
+      "maocai",
+      "spicy",
+      "麻辣",
+      "sichuan",
+      "川菜",
+      "street-food",
+      "bowl"
     ]
   },
   {
@@ -942,6 +2690,43 @@
     ]
   },
   {
+    "id": "mashed-potatoes",
+    "name_en": "Mashed Potatoes",
+    "name_zh": "土豆泥",
+    "category": "global-american",
+    "tags": [
+      "global",
+      "american",
+      "美式",
+      "土豆泥",
+      "mashed-potatoes",
+      "potato",
+      "butter",
+      "side-dish",
+      "comfort",
+      "western"
+    ]
+  },
+  {
+    "id": "massaman-curry",
+    "name_en": "Massaman Curry",
+    "name_zh": "玛莎曼咖喱",
+    "category": "global-sea",
+    "tags": [
+      "global",
+      "thai",
+      "泰式",
+      "sea",
+      "东南亚",
+      "玛莎曼",
+      "massaman",
+      "curry",
+      "咖喱",
+      "beef",
+      "peanut"
+    ]
+  },
+  {
     "id": "matcha-latte",
     "name_en": "Matcha Latte",
     "name_zh": "抹茶拿铁",
@@ -956,6 +2741,126 @@
       "拿铁",
       "beverage",
       "japanese"
+    ]
+  },
+  {
+    "id": "meatloaf",
+    "name_en": "Meatloaf",
+    "name_zh": "美式肉糕",
+    "category": "global-american",
+    "tags": [
+      "global",
+      "american",
+      "美式",
+      "肉糕",
+      "meatloaf",
+      "beef",
+      "baked",
+      "comfort",
+      "dinner",
+      "western"
+    ]
+  },
+  {
+    "id": "mei-cai-kou-rou",
+    "name_en": "Braised Pork with Preserved Greens",
+    "name_zh": "梅菜扣肉",
+    "category": "braise",
+    "tags": [
+      "chinese",
+      "braise",
+      "扣肉",
+      "pork",
+      "梅菜",
+      "preserved-greens",
+      "hakka",
+      "客家"
+    ]
+  },
+  {
+    "id": "milkshake",
+    "name_en": "Milkshake",
+    "name_zh": "奶昔",
+    "category": "global-drink",
+    "tags": [
+      "global",
+      "drink",
+      "饮品",
+      "奶昔",
+      "milkshake",
+      "ice-cream",
+      "blended",
+      "sweet",
+      "beverage"
+    ]
+  },
+  {
+    "id": "minestrone",
+    "name_en": "Minestrone Soup",
+    "name_zh": "意式蔬菜汤",
+    "category": "global-soup",
+    "tags": [
+      "global",
+      "soup",
+      "汤",
+      "意式蔬菜汤",
+      "minestrone",
+      "vegetable",
+      "bean",
+      "italian",
+      "comfort"
+    ]
+  },
+  {
+    "id": "miso-soup",
+    "name_en": "Miso Soup",
+    "name_zh": "味噌汤",
+    "category": "global-japanese",
+    "tags": [
+      "global",
+      "japanese",
+      "日式",
+      "味噌汤",
+      "miso",
+      "soup",
+      "tofu",
+      "seaweed",
+      "light"
+    ]
+  },
+  {
+    "id": "moo-shu-pork",
+    "name_en": "Moo Shu Pork",
+    "name_zh": "木须肉",
+    "category": "stir-fry",
+    "tags": [
+      "chinese",
+      "stir-fry",
+      "炒",
+      "pork",
+      "木须肉",
+      "egg",
+      "wood-ear",
+      "homestyle",
+      "北方"
+    ]
+  },
+  {
+    "id": "mooncake",
+    "name_en": "Mooncake",
+    "name_zh": "月饼",
+    "category": "dessert",
+    "tags": [
+      "chinese",
+      "dessert",
+      "甜点",
+      "月饼",
+      "mooncake",
+      "lotus-paste",
+      "mid-autumn",
+      "festival",
+      "pastry",
+      "baking"
     ]
   },
   {
@@ -978,6 +2883,23 @@
     ]
   },
   {
+    "id": "mung-bean-cake",
+    "name_en": "Mung Bean Cake",
+    "name_zh": "绿豆糕",
+    "category": "dessert",
+    "tags": [
+      "chinese",
+      "dessert",
+      "甜点",
+      "绿豆糕",
+      "mung-bean",
+      "pastry",
+      "festival",
+      "sweet",
+      "summer"
+    ]
+  },
+  {
     "id": "mushroom-risotto",
     "name_en": "Mushroom Risotto",
     "name_zh": "蘑菇烩饭",
@@ -996,6 +2918,40 @@
     ]
   },
   {
+    "id": "naan",
+    "name_en": "Garlic Naan",
+    "name_zh": "印度飞饼",
+    "category": "global-indian",
+    "tags": [
+      "global",
+      "indian",
+      "印度",
+      "飞饼",
+      "naan",
+      "flatbread",
+      "garlic",
+      "tandoor",
+      "baked"
+    ]
+  },
+  {
+    "id": "nasi-goreng",
+    "name_en": "Nasi Goreng",
+    "name_zh": "印尼炒饭",
+    "category": "global-sea",
+    "tags": [
+      "global",
+      "southeast-asia",
+      "东南亚",
+      "印尼炒饭",
+      "nasi-goreng",
+      "fried-rice",
+      "indonesia",
+      "egg",
+      "sambal"
+    ]
+  },
+  {
     "id": "noodle-nest",
     "name_en": "Noodles",
     "name_zh": "面条",
@@ -1008,6 +2964,125 @@
       "plain",
       "generic",
       "面条"
+    ]
+  },
+  {
+    "id": "oatmeal-bowl",
+    "name_en": "Oatmeal Bowl",
+    "name_zh": "燕麦碗",
+    "category": "global-breakfast",
+    "tags": [
+      "global",
+      "breakfast",
+      "早餐",
+      "燕麦碗",
+      "oatmeal",
+      "oats",
+      "fruit",
+      "healthy",
+      "bowl"
+    ]
+  },
+  {
+    "id": "oil-splashed-noodles",
+    "name_en": "Oil-Splashed Noodles",
+    "name_zh": "油泼面",
+    "category": "noodles",
+    "tags": [
+      "chinese",
+      "noodles",
+      "面",
+      "油泼面",
+      "chili-oil",
+      "泼油",
+      "shaanxi",
+      "西北",
+      "spicy"
+    ]
+  },
+  {
+    "id": "okonomiyaki",
+    "name_en": "Okonomiyaki",
+    "name_zh": "大阪烧",
+    "category": "global-japanese",
+    "tags": [
+      "global",
+      "japanese",
+      "日式",
+      "大阪烧",
+      "okonomiyaki",
+      "savory-pancake",
+      "cabbage",
+      "street-food",
+      "osaka"
+    ]
+  },
+  {
+    "id": "old-duck-soup",
+    "name_en": "Old Duck Soup",
+    "name_zh": "老鸭汤",
+    "category": "soup",
+    "tags": [
+      "chinese",
+      "soup",
+      "汤",
+      "煲汤",
+      "duck",
+      "老鸭",
+      "radish",
+      "nourishing",
+      "江南"
+    ]
+  },
+  {
+    "id": "omelette",
+    "name_en": "Fluffy Omelette",
+    "name_zh": "欧姆蛋",
+    "category": "global-breakfast",
+    "tags": [
+      "global",
+      "breakfast",
+      "早餐",
+      "欧姆蛋",
+      "omelette",
+      "egg",
+      "fluffy",
+      "brunch",
+      "western"
+    ]
+  },
+  {
+    "id": "omurice",
+    "name_en": "Omurice",
+    "name_zh": "蛋包饭",
+    "category": "global-japanese",
+    "tags": [
+      "global",
+      "japanese",
+      "日式",
+      "蛋包饭",
+      "omurice",
+      "omelette",
+      "rice",
+      "ketchup",
+      "comfort"
+    ]
+  },
+  {
+    "id": "onigiri",
+    "name_en": "Onigiri Rice Balls",
+    "name_zh": "饭团",
+    "category": "global-japanese",
+    "tags": [
+      "global",
+      "japanese",
+      "日式",
+      "饭团",
+      "onigiri",
+      "rice-ball",
+      "nori",
+      "snack",
+      "bento"
     ]
   },
   {
@@ -1026,6 +3101,42 @@
       "shrimp",
       "peanut",
       "stir-fry"
+    ]
+  },
+  {
+    "id": "paella",
+    "name_en": "Spanish Seafood Paella",
+    "name_zh": "西班牙海鲜饭",
+    "category": "global-european",
+    "tags": [
+      "global",
+      "european",
+      "西餐",
+      "海鲜饭",
+      "paella",
+      "spanish",
+      "rice",
+      "seafood",
+      "saffron",
+      "western"
+    ]
+  },
+  {
+    "id": "palak-paneer",
+    "name_en": "Palak Paneer",
+    "name_zh": "菠菜芝士咖喱",
+    "category": "global-indian",
+    "tags": [
+      "global",
+      "indian",
+      "印度",
+      "菠菜芝士",
+      "palak-paneer",
+      "spinach",
+      "paneer",
+      "curry",
+      "vegetarian",
+      "creamy"
     ]
   },
   {
@@ -1079,6 +3190,24 @@
     ]
   },
   {
+    "id": "penne-arrabbiata",
+    "name_en": "Penne Arrabbiata",
+    "name_zh": "辣番茄意面",
+    "category": "global-italian",
+    "tags": [
+      "global",
+      "italian",
+      "意大利",
+      "辣番茄意面",
+      "penne",
+      "arrabbiata",
+      "pasta",
+      "tomato",
+      "spicy",
+      "western"
+    ]
+  },
+  {
     "id": "pepper-beef",
     "name_en": "Black Pepper Beef",
     "name_zh": "黑椒牛柳",
@@ -1112,6 +3241,41 @@
     ]
   },
   {
+    "id": "pesto-pasta",
+    "name_en": "Pesto Pasta",
+    "name_zh": "青酱意面",
+    "category": "global-italian",
+    "tags": [
+      "global",
+      "italian",
+      "意大利",
+      "青酱意面",
+      "pesto",
+      "pasta",
+      "basil",
+      "green",
+      "western"
+    ]
+  },
+  {
+    "id": "philly-cheesesteak",
+    "name_en": "Philly Cheesesteak",
+    "name_zh": "费城芝士牛肉堡",
+    "category": "global-american",
+    "tags": [
+      "global",
+      "american",
+      "美式",
+      "芝士牛肉堡",
+      "philly-cheesesteak",
+      "beef",
+      "cheese",
+      "hoagie",
+      "sandwich",
+      "western"
+    ]
+  },
+  {
     "id": "pho",
     "name_en": "Vietnamese Pho",
     "name_zh": "越南河粉",
@@ -1131,6 +3295,24 @@
     ]
   },
   {
+    "id": "pineapple-sweet-sour-pork",
+    "name_en": "Sweet & Sour Pork with Pineapple",
+    "name_zh": "咕噜肉",
+    "category": "stir-fry",
+    "tags": [
+      "chinese",
+      "stir-fry",
+      "炒",
+      "咕噜肉",
+      "pork",
+      "pineapple",
+      "sweet-sour",
+      "糖醋",
+      "cantonese",
+      "粤菜"
+    ]
+  },
+  {
     "id": "plain-congee",
     "name_en": "Rice Congee with Sides",
     "name_zh": "白粥",
@@ -1145,6 +3327,25 @@
       "早餐",
       "comfort",
       "light"
+    ]
+  },
+  {
+    "id": "poke-bowl",
+    "name_en": "Poke Bowl",
+    "name_zh": "波奇碗",
+    "category": "global-salad",
+    "tags": [
+      "global",
+      "healthy",
+      "salad",
+      "沙拉",
+      "波奇碗",
+      "poke",
+      "tuna",
+      "salmon",
+      "rice",
+      "bowl",
+      "hawaiian"
     ]
   },
   {
@@ -1181,6 +3382,41 @@
     ]
   },
   {
+    "id": "quesadilla",
+    "name_en": "Cheese Quesadilla",
+    "name_zh": "墨西哥芝士卷",
+    "category": "global-mexican",
+    "tags": [
+      "global",
+      "mexican",
+      "墨西哥",
+      "芝士卷",
+      "quesadilla",
+      "tortilla",
+      "cheese",
+      "grilled",
+      "snack"
+    ]
+  },
+  {
+    "id": "quiche",
+    "name_en": "Quiche Lorraine",
+    "name_zh": "法式咸派",
+    "category": "global-european",
+    "tags": [
+      "global",
+      "european",
+      "西餐",
+      "咸派",
+      "quiche",
+      "egg",
+      "tart",
+      "bacon",
+      "french",
+      "baked"
+    ]
+  },
+  {
     "id": "ramen-bowl",
     "name_en": "Tonkotsu Ramen",
     "name_zh": "豚骨拉面",
@@ -1196,6 +3432,59 @@
       "pork",
       "broth",
       "egg"
+    ]
+  },
+  {
+    "id": "ratatouille",
+    "name_en": "Ratatouille",
+    "name_zh": "普罗旺斯炖菜",
+    "category": "global-european",
+    "tags": [
+      "global",
+      "european",
+      "西餐",
+      "炖菜",
+      "ratatouille",
+      "vegetable",
+      "eggplant",
+      "zucchini",
+      "french",
+      "vegetarian"
+    ]
+  },
+  {
+    "id": "ravioli",
+    "name_en": "Cheese Ravioli",
+    "name_zh": "意式方饺",
+    "category": "global-italian",
+    "tags": [
+      "global",
+      "italian",
+      "意大利",
+      "方饺",
+      "ravioli",
+      "pasta",
+      "stuffed",
+      "cheese",
+      "western"
+    ]
+  },
+  {
+    "id": "red-bean-soup",
+    "name_en": "Sweet Red Bean Soup",
+    "name_zh": "红豆沙",
+    "category": "dessert",
+    "tags": [
+      "chinese",
+      "dessert",
+      "甜点",
+      "红豆沙",
+      "red-bean",
+      "sweet-soup",
+      "糖水",
+      "cantonese",
+      "粤菜",
+      "warm"
     ]
   },
   {
@@ -1215,6 +3504,24 @@
     ]
   },
   {
+    "id": "rice-noodle-rolls",
+    "name_en": "Rice Noodle Rolls",
+    "name_zh": "肠粉",
+    "category": "dim-sum",
+    "tags": [
+      "chinese",
+      "dim-sum",
+      "点心",
+      "肠粉",
+      "rice-noodle",
+      "cantonese",
+      "粤菜",
+      "steamed",
+      "breakfast",
+      "早餐"
+    ]
+  },
+  {
     "id": "roast-chicken",
     "name_en": "Herb Roast Chicken",
     "name_zh": "烤鸡",
@@ -1229,6 +3536,23 @@
       "herb",
       "dinner",
       "western"
+    ]
+  },
+  {
+    "id": "salt-baked-chicken",
+    "name_en": "Salt-Baked Chicken",
+    "name_zh": "盐焗鸡",
+    "category": "braise",
+    "tags": [
+      "chinese",
+      "braise",
+      "盐焗鸡",
+      "chicken",
+      "salt-baked",
+      "hakka",
+      "客家",
+      "cantonese",
+      "粤菜"
     ]
   },
   {
@@ -1250,6 +3574,77 @@
     ]
   },
   {
+    "id": "samgyeopsal",
+    "name_en": "Grilled Pork Belly (Samgyeopsal)",
+    "name_zh": "烤五花肉",
+    "category": "global-korean",
+    "tags": [
+      "global",
+      "korean",
+      "韩式",
+      "烤五花肉",
+      "samgyeopsal",
+      "pork-belly",
+      "grilled",
+      "bbq",
+      "lettuce-wrap"
+    ]
+  },
+  {
+    "id": "samosa",
+    "name_en": "Vegetable Samosa",
+    "name_zh": "咖喱角",
+    "category": "global-indian",
+    "tags": [
+      "global",
+      "indian",
+      "印度",
+      "咖喱角",
+      "samosa",
+      "fried",
+      "potato",
+      "pastry",
+      "snack",
+      "street-food"
+    ]
+  },
+  {
+    "id": "sauerkraut-fish",
+    "name_en": "Sauerkraut Fish",
+    "name_zh": "酸菜鱼",
+    "category": "seafood",
+    "tags": [
+      "chinese",
+      "sichuan",
+      "川菜",
+      "酸菜鱼",
+      "fish",
+      "sauerkraut",
+      "酸菜",
+      "sour",
+      "spicy",
+      "seafood",
+      "海鲜"
+    ]
+  },
+  {
+    "id": "scallion-oil-noodles",
+    "name_en": "Scallion Oil Noodles",
+    "name_zh": "葱油拌面",
+    "category": "noodles",
+    "tags": [
+      "chinese",
+      "noodles",
+      "面",
+      "scallion",
+      "葱油",
+      "拌面",
+      "shanghai",
+      "江南",
+      "quick"
+    ]
+  },
+  {
     "id": "scallion-pancake",
     "name_en": "Scallion Pancake",
     "name_zh": "葱油饼",
@@ -1262,6 +3657,78 @@
       "葱油饼",
       "scallion",
       "pan-fried",
+      "北方",
+      "street-food"
+    ]
+  },
+  {
+    "id": "schnitzel",
+    "name_en": "Wiener Schnitzel",
+    "name_zh": "炸肉排",
+    "category": "global-european",
+    "tags": [
+      "global",
+      "european",
+      "西餐",
+      "炸肉排",
+      "schnitzel",
+      "veal",
+      "fried",
+      "breaded",
+      "austrian",
+      "german"
+    ]
+  },
+  {
+    "id": "seaweed-egg-drop-soup",
+    "name_en": "Seaweed Egg Drop Soup",
+    "name_zh": "紫菜蛋花汤",
+    "category": "soup",
+    "tags": [
+      "chinese",
+      "soup",
+      "汤",
+      "紫菜",
+      "seaweed",
+      "egg",
+      "蛋花",
+      "light",
+      "quick",
+      "homestyle"
+    ]
+  },
+  {
+    "id": "shakshuka",
+    "name_en": "Shakshuka",
+    "name_zh": "北非蛋",
+    "category": "global-middle-eastern",
+    "tags": [
+      "global",
+      "middle-eastern",
+      "中东",
+      "北非蛋",
+      "shakshuka",
+      "egg",
+      "tomato",
+      "poached",
+      "breakfast",
+      "brunch"
+    ]
+  },
+  {
+    "id": "shaobing",
+    "name_en": "Sesame Flatbread (Shaobing)",
+    "name_zh": "烧饼",
+    "category": "breakfast",
+    "tags": [
+      "chinese",
+      "breakfast",
+      "早餐",
+      "烧饼",
+      "shaobing",
+      "sesame",
+      "flatbread",
+      "baked",
       "北方",
       "street-food"
     ]
@@ -1284,6 +3751,78 @@
     ]
   },
   {
+    "id": "sheng-jian-bao",
+    "name_en": "Pan-Fried Pork Buns",
+    "name_zh": "生煎包",
+    "category": "buns",
+    "tags": [
+      "chinese",
+      "buns",
+      "生煎包",
+      "pork",
+      "pan-fried",
+      "煎",
+      "shanghai",
+      "江南",
+      "breakfast",
+      "street-food"
+    ]
+  },
+  {
+    "id": "shepherds-pie",
+    "name_en": "Shepherd's Pie",
+    "name_zh": "牧羊人派",
+    "category": "global-european",
+    "tags": [
+      "global",
+      "european",
+      "西餐",
+      "牧羊人派",
+      "shepherds-pie",
+      "lamb",
+      "potato",
+      "baked",
+      "british",
+      "comfort"
+    ]
+  },
+  {
+    "id": "shumai",
+    "name_en": "Pork & Shrimp Shumai",
+    "name_zh": "烧卖",
+    "category": "dim-sum",
+    "tags": [
+      "chinese",
+      "dim-sum",
+      "点心",
+      "烧卖",
+      "shumai",
+      "pork",
+      "shrimp",
+      "steamed",
+      "蒸",
+      "cantonese",
+      "粤菜"
+    ]
+  },
+  {
+    "id": "soba",
+    "name_en": "Zaru Soba",
+    "name_zh": "荞麦面",
+    "category": "global-japanese",
+    "tags": [
+      "global",
+      "japanese",
+      "日式",
+      "荞麦面",
+      "soba",
+      "buckwheat",
+      "noodles",
+      "cold",
+      "dipping"
+    ]
+  },
+  {
     "id": "spaghetti-bolognese",
     "name_en": "Spaghetti Bolognese",
     "name_zh": "肉酱意面",
@@ -1302,6 +3841,42 @@
     ]
   },
   {
+    "id": "spicy-crab",
+    "name_en": "Spicy Stir-Fried Crab",
+    "name_zh": "香辣蟹",
+    "category": "seafood",
+    "tags": [
+      "chinese",
+      "seafood",
+      "海鲜",
+      "香辣蟹",
+      "crab",
+      "蟹",
+      "spicy",
+      "麻辣",
+      "sichuan",
+      "stir-fry"
+    ]
+  },
+  {
+    "id": "spicy-crayfish",
+    "name_en": "Spicy Crayfish",
+    "name_zh": "麻辣小龙虾",
+    "category": "seafood",
+    "tags": [
+      "chinese",
+      "seafood",
+      "海鲜",
+      "小龙虾",
+      "crayfish",
+      "spicy",
+      "麻辣",
+      "street-food",
+      "summer",
+      "beer-food"
+    ]
+  },
+  {
     "id": "spicy-hotpot",
     "name_en": "Sichuan Spicy Hot Pot",
     "name_zh": "麻辣火锅",
@@ -1316,6 +3891,23 @@
       "麻辣",
       "chongqing",
       "broth"
+    ]
+  },
+  {
+    "id": "spring-rolls",
+    "name_en": "Spring Rolls",
+    "name_zh": "春卷",
+    "category": "dim-sum",
+    "tags": [
+      "chinese",
+      "dim-sum",
+      "点心",
+      "春卷",
+      "spring-roll",
+      "fried",
+      "炸",
+      "crispy",
+      "festival"
     ]
   },
   {
@@ -1390,6 +3982,77 @@
     ]
   },
   {
+    "id": "stinky-tofu",
+    "name_en": "Fried Stinky Tofu",
+    "name_zh": "臭豆腐",
+    "category": "tofu",
+    "tags": [
+      "chinese",
+      "tofu",
+      "豆腐",
+      "臭豆腐",
+      "stinky-tofu",
+      "fried",
+      "street-food",
+      "changsha",
+      "spicy"
+    ]
+  },
+  {
+    "id": "stir-fried-cabbage-vinegar",
+    "name_en": "Vinegar Stir-Fried Cabbage",
+    "name_zh": "醋溜白菜",
+    "category": "stir-fry",
+    "tags": [
+      "chinese",
+      "stir-fry",
+      "炒",
+      "cabbage",
+      "白菜",
+      "vinegar",
+      "醋溜",
+      "homestyle",
+      "北方",
+      "quick"
+    ]
+  },
+  {
+    "id": "stir-fried-clams",
+    "name_en": "Stir-Fried Clams",
+    "name_zh": "炒花甲",
+    "category": "seafood",
+    "tags": [
+      "chinese",
+      "seafood",
+      "海鲜",
+      "花甲",
+      "clam",
+      "stir-fry",
+      "炒",
+      "spicy",
+      "garlic",
+      "street-food",
+      "beer-food"
+    ]
+  },
+  {
+    "id": "stir-fried-lotus-root",
+    "name_en": "Stir-Fried Lotus Root",
+    "name_zh": "炒藕片",
+    "category": "stir-fry",
+    "tags": [
+      "chinese",
+      "stir-fry",
+      "炒",
+      "lotus-root",
+      "藕",
+      "vegetable",
+      "crunchy",
+      "homestyle",
+      "家常"
+    ]
+  },
+  {
     "id": "stir-fry-greens",
     "name_en": "Garlic Stir-Fried Greens",
     "name_zh": "蒜蓉青菜",
@@ -1404,6 +4067,24 @@
       "蒜蓉",
       "quick",
       "粤菜"
+    ]
+  },
+  {
+    "id": "sundubu-jjigae",
+    "name_en": "Soft Tofu Stew",
+    "name_zh": "嫩豆腐汤",
+    "category": "global-korean",
+    "tags": [
+      "global",
+      "korean",
+      "韩式",
+      "嫩豆腐汤",
+      "sundubu",
+      "tofu",
+      "stew",
+      "spicy",
+      "gochugaru",
+      "comfort"
     ]
   },
   {
@@ -1425,6 +4106,23 @@
     ]
   },
   {
+    "id": "sweet-sour-fish",
+    "name_en": "Sweet & Sour Whole Fish",
+    "name_zh": "糖醋鱼",
+    "category": "seafood",
+    "tags": [
+      "chinese",
+      "seafood",
+      "海鲜",
+      "糖醋鱼",
+      "fish",
+      "sweet-sour",
+      "糖醋",
+      "fried",
+      "festival"
+    ]
+  },
+  {
     "id": "sweet-sour-pork",
     "name_en": "Sweet & Sour Pork",
     "name_zh": "糖醋里脊",
@@ -1438,6 +4136,41 @@
       "sweet-sour",
       "fried",
       "homestyle"
+    ]
+  },
+  {
+    "id": "sweet-sour-ribs",
+    "name_en": "Sweet & Sour Pork Ribs",
+    "name_zh": "糖醋排骨",
+    "category": "braise",
+    "tags": [
+      "chinese",
+      "braise",
+      "红烧",
+      "pork-rib",
+      "排骨",
+      "糖醋",
+      "sweet-sour",
+      "江南"
+    ]
+  },
+  {
+    "id": "tabbouleh",
+    "name_en": "Tabbouleh Salad",
+    "name_zh": "塔布勒沙拉",
+    "category": "global-salad",
+    "tags": [
+      "global",
+      "middle-eastern",
+      "中东",
+      "塔布勒",
+      "tabbouleh",
+      "salad",
+      "沙拉",
+      "parsley",
+      "bulgur",
+      "light",
+      "fresh"
     ]
   },
   {
@@ -1458,6 +4191,77 @@
     ]
   },
   {
+    "id": "takoyaki",
+    "name_en": "Takoyaki",
+    "name_zh": "章鱼烧",
+    "category": "global-japanese",
+    "tags": [
+      "global",
+      "japanese",
+      "日式",
+      "章鱼烧",
+      "takoyaki",
+      "octopus",
+      "street-food",
+      "osaka",
+      "snack"
+    ]
+  },
+  {
+    "id": "tandoori-chicken",
+    "name_en": "Tandoori Chicken",
+    "name_zh": "坦都里烤鸡",
+    "category": "global-indian",
+    "tags": [
+      "global",
+      "indian",
+      "印度",
+      "坦都里",
+      "tandoori",
+      "chicken",
+      "grilled",
+      "yogurt",
+      "spiced",
+      "red"
+    ]
+  },
+  {
+    "id": "tanghulu",
+    "name_en": "Candied Hawthorn Skewers",
+    "name_zh": "糖葫芦",
+    "category": "dessert",
+    "tags": [
+      "chinese",
+      "dessert",
+      "甜点",
+      "糖葫芦",
+      "tanghulu",
+      "hawthorn",
+      "candied",
+      "street-food",
+      "北方",
+      "sweet"
+    ]
+  },
+  {
+    "id": "tangyuan",
+    "name_en": "Glutinous Rice Balls",
+    "name_zh": "汤圆",
+    "category": "dessert",
+    "tags": [
+      "chinese",
+      "dessert",
+      "甜点",
+      "汤圆",
+      "tangyuan",
+      "glutinous-rice",
+      "sesame",
+      "festival",
+      "sweet",
+      "dim-sum"
+    ]
+  },
+  {
     "id": "tea-eggs",
     "name_en": "Tea-Marinated Eggs",
     "name_zh": "茶叶蛋",
@@ -1472,6 +4276,111 @@
       "breakfast",
       "早餐",
       "street-food"
+    ]
+  },
+  {
+    "id": "tempura",
+    "name_en": "Tempura",
+    "name_zh": "天妇罗",
+    "category": "global-japanese",
+    "tags": [
+      "global",
+      "japanese",
+      "日式",
+      "天妇罗",
+      "tempura",
+      "shrimp",
+      "fried",
+      "炸",
+      "crispy"
+    ]
+  },
+  {
+    "id": "teriyaki-chicken",
+    "name_en": "Teriyaki Chicken",
+    "name_zh": "照烧鸡",
+    "category": "global-japanese",
+    "tags": [
+      "global",
+      "japanese",
+      "日式",
+      "照烧鸡",
+      "teriyaki",
+      "chicken",
+      "glazed",
+      "sweet",
+      "rice"
+    ]
+  },
+  {
+    "id": "three-cup-chicken",
+    "name_en": "Three-Cup Chicken",
+    "name_zh": "三杯鸡",
+    "category": "braise",
+    "tags": [
+      "chinese",
+      "braise",
+      "焖",
+      "chicken",
+      "三杯鸡",
+      "basil",
+      "taiwan",
+      "台湾",
+      "soy"
+    ]
+  },
+  {
+    "id": "tiramisu",
+    "name_en": "Tiramisu",
+    "name_zh": "提拉米苏",
+    "category": "global-dessert",
+    "tags": [
+      "global",
+      "italian",
+      "意大利",
+      "dessert",
+      "甜点",
+      "提拉米苏",
+      "tiramisu",
+      "coffee",
+      "mascarpone",
+      "no-bake"
+    ]
+  },
+  {
+    "id": "tom-yum",
+    "name_en": "Tom Yum Soup",
+    "name_zh": "冬阴功汤",
+    "category": "global-sea",
+    "tags": [
+      "global",
+      "thai",
+      "泰式",
+      "sea",
+      "东南亚",
+      "冬阴功",
+      "tom-yum",
+      "shrimp",
+      "soup",
+      "spicy",
+      "sour"
+    ]
+  },
+  {
+    "id": "tomato-beef-brisket-soup",
+    "name_en": "Tomato & Beef Brisket Soup",
+    "name_zh": "番茄牛腩汤",
+    "category": "soup",
+    "tags": [
+      "chinese",
+      "soup",
+      "汤",
+      "tomato",
+      "番茄",
+      "beef-brisket",
+      "牛腩",
+      "homestyle",
+      "comfort"
     ]
   },
   {
@@ -1508,6 +4417,58 @@
     ]
   },
   {
+    "id": "tonkatsu",
+    "name_en": "Tonkatsu Pork Cutlet",
+    "name_zh": "炸猪排",
+    "category": "global-japanese",
+    "tags": [
+      "global",
+      "japanese",
+      "日式",
+      "炸猪排",
+      "tonkatsu",
+      "pork-cutlet",
+      "fried",
+      "crispy",
+      "panko"
+    ]
+  },
+  {
+    "id": "tteokbokki",
+    "name_en": "Tteokbokki Rice Cakes",
+    "name_zh": "辣炒年糕",
+    "category": "global-korean",
+    "tags": [
+      "global",
+      "korean",
+      "韩式",
+      "辣炒年糕",
+      "tteokbokki",
+      "rice-cake",
+      "gochujang",
+      "spicy",
+      "street-food"
+    ]
+  },
+  {
+    "id": "turnip-cake",
+    "name_en": "Pan-Fried Turnip Cake",
+    "name_zh": "萝卜糕",
+    "category": "dim-sum",
+    "tags": [
+      "chinese",
+      "dim-sum",
+      "点心",
+      "萝卜糕",
+      "turnip-cake",
+      "radish",
+      "cantonese",
+      "粤菜",
+      "pan-fried",
+      "new-year"
+    ]
+  },
+  {
     "id": "twice-cooked-pork",
     "name_en": "Twice-Cooked Pork",
     "name_zh": "回锅肉",
@@ -1521,6 +4482,40 @@
       "pork",
       "回锅肉",
       "spicy"
+    ]
+  },
+  {
+    "id": "udon",
+    "name_en": "Udon Noodle Soup",
+    "name_zh": "乌冬面",
+    "category": "global-japanese",
+    "tags": [
+      "global",
+      "japanese",
+      "日式",
+      "乌冬面",
+      "udon",
+      "noodles",
+      "面",
+      "broth",
+      "soup"
+    ]
+  },
+  {
+    "id": "unagi-don",
+    "name_en": "Grilled Eel Rice Bowl",
+    "name_zh": "鳗鱼饭",
+    "category": "global-japanese",
+    "tags": [
+      "global",
+      "japanese",
+      "日式",
+      "鳗鱼饭",
+      "unagi",
+      "eel",
+      "rice",
+      "grilled",
+      "donburi"
     ]
   },
   {
@@ -1538,6 +4533,60 @@
     ]
   },
   {
+    "id": "vietnamese-spring-rolls",
+    "name_en": "Vietnamese Fresh Spring Rolls",
+    "name_zh": "越南春卷",
+    "category": "global-sea",
+    "tags": [
+      "global",
+      "vietnamese",
+      "越南",
+      "sea",
+      "东南亚",
+      "越南春卷",
+      "fresh-spring-roll",
+      "rice-paper",
+      "shrimp",
+      "herbs",
+      "light"
+    ]
+  },
+  {
+    "id": "waffles",
+    "name_en": "Belgian Waffles",
+    "name_zh": "华夫饼",
+    "category": "global-american",
+    "tags": [
+      "global",
+      "american",
+      "美式",
+      "华夫饼",
+      "waffles",
+      "breakfast",
+      "早餐",
+      "sweet",
+      "syrup",
+      "brunch"
+    ]
+  },
+  {
+    "id": "white-cut-chicken",
+    "name_en": "White-Cut Chicken",
+    "name_zh": "白切鸡",
+    "category": "cold-dishes",
+    "tags": [
+      "chinese",
+      "cold-dish",
+      "凉菜",
+      "白切鸡",
+      "chicken",
+      "poached",
+      "cantonese",
+      "粤菜",
+      "ginger-scallion"
+    ]
+  },
+  {
     "id": "winter-melon-rib-soup",
     "name_en": "Winter Melon & Pork Rib Soup",
     "name_zh": "冬瓜排骨汤",
@@ -1552,6 +4601,23 @@
       "winter-melon",
       "cantonese",
       "粤菜"
+    ]
+  },
+  {
+    "id": "wonton-noodle-soup",
+    "name_en": "Wonton Noodle Soup",
+    "name_zh": "云吞面",
+    "category": "noodles",
+    "tags": [
+      "chinese",
+      "noodles",
+      "面",
+      "wonton",
+      "云吞",
+      "shrimp",
+      "cantonese",
+      "粤菜",
+      "soup-noodle"
     ]
   },
   {
@@ -1605,6 +4671,23 @@
     ]
   },
   {
+    "id": "yakitori",
+    "name_en": "Yakitori Skewers",
+    "name_zh": "日式烤鸡串",
+    "category": "global-japanese",
+    "tags": [
+      "global",
+      "japanese",
+      "日式",
+      "烤鸡串",
+      "yakitori",
+      "chicken",
+      "skewers",
+      "grilled",
+      "izakaya"
+    ]
+  },
+  {
     "id": "yangzhou-fried-rice",
     "name_en": "Yangzhou Fried Rice",
     "name_zh": "扬州炒饭",
@@ -1636,6 +4719,23 @@
       "fried",
       "street-food",
       "北方"
+    ]
+  },
+  {
+    "id": "yuxiang-pork-slivers",
+    "name_en": "Fish-Fragrant Pork Slivers",
+    "name_zh": "鱼香肉丝",
+    "category": "stir-fry",
+    "tags": [
+      "chinese",
+      "sichuan",
+      "川菜",
+      "stir-fry",
+      "炒",
+      "pork",
+      "肉丝",
+      "鱼香",
+      "yuxiang"
     ]
   },
   {

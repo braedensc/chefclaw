@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="jcBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="jcbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="jcplate" cx="50%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <radialGradient id="jcnest" cx="46%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#c99a55"/><stop offset="60%" stop-color="#a67a3c"/><stop offset="100%" stop-color="#7c561f"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#jcbg)"/>
+  <!-- steam -->
+  <path d="M120 54 C110 36 130 28 120 8" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#jcBlur3)"/>
+  <path d="M198 52 C190 36 208 28 200 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#jcBlur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="188" rx="150" ry="22" fill="#000" opacity=".5"/>
+  <!-- oval plate -->
+  <ellipse cx="160" cy="132" rx="140" ry="46" fill="url(#jcplate)"/>
+  <ellipse cx="160" cy="132" rx="140" ry="46" fill="none" stroke="#26262e" stroke-width="3"/>
+  <ellipse cx="160" cy="132" rx="126" ry="38" fill="#0e0c11"/>
+  <!-- neon steam arc (warm) -->
+  <path d="M52 116 Q104 84 168 82" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- glass-noodle nest: mounded translucent amber strands -->
+  <path d="M62 132 C68 108 108 96 160 96 C212 96 252 108 258 132 C230 150 196 156 160 156 C124 156 90 150 62 132 Z" fill="#6f5225" opacity=".55"/>
+  <path d="M66 130 C72 106 108 94 160 94 C212 94 248 106 254 130 C228 146 196 152 160 152 C124 152 92 146 66 130 Z" fill="url(#jcnest)"/>
+  <!-- long glossy translucent noodle strands (sesame-oil sheen) -->
+  <g fill="none" stroke-linecap="round" opacity=".92">
+    <path d="M70 128 C104 108 150 104 196 108 C226 111 244 120 250 128" stroke="#d8ad63" stroke-width="6"/>
+    <path d="M74 136 C112 120 158 116 202 122 C230 126 244 132 248 136" stroke="#b98c48" stroke-width="6"/>
+    <path d="M78 120 C114 102 160 100 200 102 C224 104 240 112 244 118" stroke="#e6c07a" stroke-width="5.5"/>
+    <path d="M84 142 C120 130 164 128 206 132" stroke="#a67a38" stroke-width="5"/>
+    <path d="M90 112 C122 98 168 96 208 100" stroke="#cfa259" stroke-width="5"/>
+  </g>
+  <!-- highlight strand for gloss -->
+  <path d="M78 122 C114 104 160 102 202 106" stroke="#fff1c9" stroke-width="2" fill="none" opacity=".7" stroke-linecap="round"/>
+  <path d="M84 134 C120 122 164 120 204 124" stroke="#8a5a1e" stroke-width="2.2" fill="none" opacity=".55" stroke-linecap="round"/>
+  <!-- colorful julienned vegetables tossed through -->
+  <!-- carrot strips (orange) -->
+  <rect x="96" y="108" width="26" height="4" rx="2" fill="#e87a24" transform="rotate(-14 109 110)"/>
+  <rect x="150" y="102" width="24" height="4" rx="2" fill="#f0872c" transform="rotate(10 162 104)"/>
+  <rect x="188" y="118" width="22" height="4" rx="2" fill="#e87a24" transform="rotate(-8 199 120)"/>
+  <!-- spinach / green scallion strips -->
+  <rect x="112" y="124" width="30" height="4" rx="2" fill="#3f9c37" transform="rotate(12 127 126)"/>
+  <rect x="164" y="130" width="28" height="4" rx="2" fill="#2f7d2b" transform="rotate(-10 178 132)"/>
+  <rect x="124" y="138" width="24" height="3.6" rx="1.8" fill="#5ecb4e" transform="rotate(18 136 140)"/>
+  <!-- mushroom slices (dark umber caps) -->
+  <ellipse cx="140" cy="116" rx="8" ry="4" fill="#5e3a1e" transform="rotate(-12 140 116)"/>
+  <ellipse cx="140" cy="116" rx="3.4" ry="1.6" fill="#7c5230" opacity=".8" transform="rotate(-12 140 116)"/>
+  <ellipse cx="180" cy="108" rx="7.5" ry="3.6" fill="#4d2f17" transform="rotate(8 180 108)"/>
+  <!-- red bell pepper fleck -->
+  <rect x="158" y="118" width="18" height="4" rx="2" fill="#d3341c" transform="rotate(-6 167 120)"/>
+  <!-- sesame seeds -->
+  <g fill="#f8eed6">
+    <ellipse cx="118" cy="118" rx="2" ry="1.2" transform="rotate(20 118 118)"/>
+    <ellipse cx="150" cy="112" rx="2" ry="1.2" transform="rotate(-16 150 112)"/>
+    <ellipse cx="176" cy="124" rx="2" ry="1.2" transform="rotate(10 176 124)"/>
+    <ellipse cx="132" cy="130" rx="2" ry="1.2" transform="rotate(-24 132 130)"/>
+    <ellipse cx="196" cy="130" rx="2" ry="1.2" transform="rotate(14 196 130)"/>
+  </g>
+  <!-- oily gloss dots -->
+  <circle cx="112" cy="114" r="1.5" fill="#fff" opacity=".6"/>
+  <circle cx="172" cy="112" r="1.4" fill="#fff" opacity=".5"/>
+  <circle cx="150" cy="128" r="1.2" fill="#fff" opacity=".5"/>
+  <circle cx="204" cy="122" r="1.2" fill="#fff" opacity=".45"/>
+</svg>

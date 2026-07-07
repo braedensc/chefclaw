@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="cxBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="cxbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="cxbowl" cx="50%" cy="30%" r="82%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <radialGradient id="cxoil" cx="46%" cy="40%" r="78%">
+      <stop offset="0%" stop-color="#ef5520"/><stop offset="55%" stop-color="#b02408"/><stop offset="100%" stop-color="#7a1305"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#cxbg)"/>
+  <!-- rising steam wisps -->
+  <path d="M124 50 C114 32 134 26 124 6" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#cxBlur3)"/>
+  <path d="M196 52 C188 36 206 28 198 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#cxBlur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="188" rx="140" ry="22" fill="#000" opacity=".5"/>
+  <!-- deep noodle bowl -->
+  <ellipse cx="160" cy="126" rx="128" ry="54" fill="url(#cxbowl)"/>
+  <ellipse cx="160" cy="126" rx="128" ry="54" fill="none" stroke="#26262e" stroke-width="3"/>
+  <ellipse cx="160" cy="124" rx="112" ry="45" fill="#0c0c0f"/>
+  <!-- neon steam arc (cyan, savory/Sichuan) -->
+  <path d="M52 112 Q104 80 168 78" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- fiery chili-oil pool -->
+  <ellipse cx="160" cy="126" rx="104" ry="40" fill="url(#cxoil)"/>
+  <ellipse cx="160" cy="120" rx="88" ry="30" fill="#c53012" opacity=".55"/>
+  <!-- floating chili-oil slick highlights -->
+  <ellipse cx="132" cy="112" rx="18" ry="6" fill="#ff7a3c" opacity=".4"/>
+  <ellipse cx="196" cy="130" rx="14" ry="5" fill="#ff7a3c" opacity=".35"/>
+  <!-- pale noodle strand nest lifted above the oil -->
+  <g stroke-linecap="round" fill="none">
+    <path d="M74 118 C104 96 150 92 196 100 C222 104 244 112 246 118" stroke="#7a4c14" stroke-width="7" opacity=".9"/>
+    <path d="M76 112 C108 90 152 86 198 94 C222 98 242 106 244 112" stroke="#cdb078" stroke-width="7"/>
+    <path d="M78 106 C112 84 156 80 200 88 C220 92 238 100 240 106" stroke="#e6cf9d" stroke-width="7"/>
+    <path d="M82 100 C116 80 158 76 200 82 C218 86 234 94 236 100" stroke="#d9bd85" stroke-width="6.5"/>
+    <path d="M88 94 C122 76 160 72 198 78 C214 82 228 90 230 96" stroke="#e6cf9d" stroke-width="6"/>
+    <path d="M96 90 C128 74 162 70 196 74" stroke="#fff1c9" stroke-width="2" opacity=".85"/>
+    <path d="M84 108 C118 88 158 84 200 90" stroke="#fff1c9" stroke-width="2" opacity=".7"/>
+    <path d="M80 118 C112 98 152 94 196 102" stroke="#8a5a1e" stroke-width="2.4" opacity=".6"/>
+  </g>
+  <!-- chopsticks lifting a tangle of noodles up-right -->
+  <g stroke-linecap="round">
+    <path d="M214 58 L262 44" stroke="#a67a40" stroke-width="5"/>
+    <path d="M214 66 L262 54" stroke="#b98a4e" stroke-width="5"/>
+    <path d="M216 60 L214 58 M216 68 L214 66" stroke="#7a4c14" stroke-width="5"/>
+  </g>
+  <!-- strands trailing off the chopsticks -->
+  <g stroke-linecap="round" fill="none">
+    <path d="M216 62 C208 76 214 90 202 96" stroke="#e6cf9d" stroke-width="4"/>
+    <path d="M220 64 C214 78 222 88 210 94" stroke="#d9bd85" stroke-width="3.6"/>
+  </g>
+  <!-- garnish: crushed chili, scallion, minced garlic, peanut, sesame -->
+  <rect x="108" y="98" width="7" height="2.8" rx="1.3" fill="#5ecb4e" transform="rotate(-18 111 99)"/>
+  <rect x="150" y="90" width="7" height="2.8" rx="1.3" fill="#3f9c37" transform="rotate(14 153 91)"/>
+  <rect x="186" y="104" width="7" height="2.8" rx="1.3" fill="#5ecb4e" transform="rotate(-10 189 105)"/>
+  <rect x="128" y="112" width="6" height="2.6" rx="1.2" fill="#58c14a" transform="rotate(22 131 113)"/>
+  <!-- diced red chili flecks -->
+  <circle cx="118" cy="104" r="2.2" fill="#e0341f"/>
+  <circle cx="172" cy="96" r="2.2" fill="#e0341f"/>
+  <circle cx="204" cy="112" r="2" fill="#e0341f"/>
+  <circle cx="146" cy="110" r="1.8" fill="#e0341f"/>
+  <!-- minced garlic + crushed peanut dots -->
+  <circle cx="138" cy="100" r="1.6" fill="#f2ddb0"/>
+  <circle cx="192" cy="94" r="1.6" fill="#f2ddb0"/>
+  <circle cx="160" cy="104" r="1.6" fill="#d8b47f"/>
+  <!-- sesame -->
+  <circle cx="126" cy="96" r="1" fill="#f8eed6"/>
+  <circle cx="180" cy="102" r="1" fill="#f8eed6"/>
+  <!-- oil gloss dots -->
+  <circle cx="120" cy="118" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="188" cy="122" r="1.3" fill="#fff" opacity=".45"/>
+  <circle cx="152" cy="88" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <radialGradient id="cbbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="cbcaramel" cx="42%" cy="34%" r="82%">
+      <stop offset="0%" stop-color="#e6a352"/><stop offset="48%" stop-color="#c67a2a"/><stop offset="100%" stop-color="#8a4d12"/>
+    </radialGradient>
+    <linearGradient id="cbramekin" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f3f0ea"/><stop offset="55%" stop-color="#e2dcd2"/><stop offset="100%" stop-color="#c8bfb2"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#cbbg)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="182" rx="120" ry="18" fill="#000" opacity=".5"/>
+  <!-- serving plate under the ramekin -->
+  <ellipse cx="160" cy="158" rx="128" ry="26" fill="#141018"/>
+  <ellipse cx="160" cy="158" rx="128" ry="26" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="156" rx="112" ry="20" fill="#0f0d13"/>
+  <!-- white ceramic ramekin, straight fluted walls -->
+  <path d="M96 108 L224 108 L216 156 C210 162 110 162 104 156 Z" fill="url(#cbramekin)"/>
+  <!-- fluted rib shading on the ramekin wall -->
+  <g stroke="#b8ac9c" stroke-width="1.4" opacity=".6">
+    <path d="M112 120 L110 154"/><path d="M132 122 L131 156"/><path d="M152 122 L152 156"/>
+    <path d="M172 122 L173 156"/><path d="M192 122 L194 154"/><path d="M208 120 L212 150"/>
+  </g>
+  <!-- ramekin lip -->
+  <ellipse cx="160" cy="108" rx="64" ry="12" fill="#e8e2d8"/>
+  <ellipse cx="160" cy="108" rx="64" ry="12" fill="none" stroke="#c2b8a8" stroke-width="1.4"/>
+  <!-- glassy torched caramel top -->
+  <ellipse cx="160" cy="106" rx="58" ry="10" fill="url(#cbcaramel)"/>
+  <!-- crackle / shatter lines on the caramel crust -->
+  <g stroke="#7a4410" stroke-width="1.3" opacity=".7" stroke-linecap="round" fill="none">
+    <path d="M118 106 L140 104 L150 108 L172 103"/>
+    <path d="M150 108 L156 112 L178 110 L200 106"/>
+    <path d="M134 102 L138 110"/>
+    <path d="M186 104 L184 112"/>
+  </g>
+  <!-- deeper torched patches (uneven caramelization) -->
+  <ellipse cx="132" cy="104" rx="9" ry="3" fill="#6e3a0c" opacity=".55"/>
+  <ellipse cx="188" cy="108" rx="8" ry="3" fill="#6e3a0c" opacity=".5"/>
+  <!-- glossy caramel sheen highlight -->
+  <ellipse cx="146" cy="101" rx="20" ry="4" fill="#ffe6b0" opacity=".65"/>
+  <ellipse cx="176" cy="103" rx="10" ry="2.4" fill="#ffe6b0" opacity=".5"/>
+  <!-- garnish: mint sprig + a couple of raspberries on top -->
+  <path d="M148 96 l-5 -7 M148 96 l4 -7" stroke="#3f9c37" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+  <ellipse cx="141" cy="88" rx="4" ry="2.4" fill="#4faf42" transform="rotate(-30 141 88)"/>
+  <ellipse cx="152" cy="88" rx="4" ry="2.4" fill="#5ecb4e" transform="rotate(30 152 88)"/>
+  <g transform="translate(178 96)">
+    <circle cx="0" cy="0" r="6" fill="#c92845"/>
+    <circle cx="-2" cy="-2" r="1.6" fill="#e8536f"/><circle cx="2" cy="-1" r="1.6" fill="#a51e38"/>
+    <circle cx="-1" cy="2" r="1.6" fill="#a51e38"/><circle cx="2" cy="2" r="1.6" fill="#d33a55"/>
+    <circle cx="-2" cy="-2" r=".8" fill="#ff9db0" opacity=".7"/>
+  </g>
+  <!-- sparkle accents (dessert: no steam arc) -->
+  <g stroke="#ffe9c9" stroke-width="1.6" stroke-linecap="round" opacity=".7">
+    <path d="M74 70 l0 8 M70 74 l8 0"/>
+    <path d="M244 60 l0 6 M241 63 l6 0"/>
+  </g>
+  <circle cx="74" cy="74" r="1.4" fill="#fff" opacity=".9"/>
+  <circle cx="160" cy="99" r="1.2" fill="#fff" opacity=".7"/>
+</svg>

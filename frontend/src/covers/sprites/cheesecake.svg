@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <radialGradient id="csbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <linearGradient id="csface" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fbf1d6"/><stop offset="55%" stop-color="#f4e2b6"/><stop offset="100%" stop-color="#e6c98a"/>
+    </linearGradient>
+    <linearGradient id="cstop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff8e6"/><stop offset="100%" stop-color="#f2e0b4"/>
+    </linearGradient>
+    <linearGradient id="cscrust" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#b47a34"/><stop offset="100%" stop-color="#7c4a17"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#csbg)"/>
+  <ellipse cx="160" cy="186" rx="150" ry="22" fill="#000" opacity=".5"/>
+  <!-- plate -->
+  <ellipse cx="160" cy="140" rx="140" ry="42" fill="#141018"/>
+  <ellipse cx="160" cy="140" rx="140" ry="42" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="140" rx="126" ry="34" fill="#0f0d13"/>
+  <!-- cheesecake wedge: pointed slice standing on plate -->
+  <!-- front (cut) face -->
+  <path d="M118 148 L100 96 L206 96 L200 148 Z" fill="url(#csface)"/>
+  <!-- crust band along the bottom of the face -->
+  <path d="M118 148 L200 148 L204 132 L114 132 Z" fill="url(#cscrust)"/>
+  <path d="M114 132 L204 132" stroke="#5e3610" stroke-width="1.2" opacity=".6"/>
+  <!-- top surface (creamy, catches light) -->
+  <path d="M100 96 L206 96 L188 84 L118 84 Z" fill="url(#cstop)"/>
+  <path d="M100 96 L206 96" stroke="#d8bf8c" stroke-width="1.2" opacity=".5"/>
+  <!-- face outline -->
+  <path d="M118 148 L100 96 L206 96 L200 148 Z" fill="none" stroke="#c9a866" stroke-width="1.3" opacity=".5"/>
+  <!-- creamy sheen streaks on the face -->
+  <path d="M112 108 C130 104 176 104 196 108" stroke="#fff8e6" stroke-width="2" fill="none" opacity=".4" stroke-linecap="round"/>
+  <path d="M115 122 C132 119 178 119 198 122" stroke="#fff8e6" stroke-width="1.6" fill="none" opacity=".28" stroke-linecap="round"/>
+  <!-- strawberry-drizzle swoosh on top -->
+  <path d="M120 90 C140 86 178 86 192 90" stroke="#d8324a" stroke-width="3" fill="none" opacity=".85" stroke-linecap="round"/>
+  <path d="M128 88 C150 85 172 85 186 88" stroke="#ff5a72" stroke-width="1.4" fill="none" opacity=".6" stroke-linecap="round"/>
+  <!-- a glossy strawberry half garnish on the point -->
+  <path d="M148 78 C144 70 156 66 162 72 C168 66 178 72 172 80 C166 86 154 86 148 78 Z" fill="#d8324a"/>
+  <path d="M150 74 C154 71 166 71 170 76" stroke="#ff8a9a" stroke-width="1.6" fill="none" opacity=".7"/>
+  <path d="M155 66 l3 -5 M162 66 l2 -5" stroke="#3f9c37" stroke-width="1.6" stroke-linecap="round"/>
+  <ellipse cx="156" cy="74" rx="4" ry="2" fill="#fff" opacity=".5"/>
+  <!-- condensation / sugar sparkles (cold dessert, no steam arc) -->
+  <circle cx="150" cy="112" r="1.4" fill="#fff" opacity=".6"/>
+  <circle cx="178" cy="124" r="1.2" fill="#fff" opacity=".5"/>
+  <circle cx="130" cy="132" r="1.1" fill="#fff" opacity=".45"/>
+  <path d="M96 60 l0 6 M93 63 l6 0" stroke="#fff" stroke-width="1.2" opacity=".4" stroke-linecap="round"/>
+  <path d="M224 74 l0 5 M221.5 76.5 l5 0" stroke="#fff" stroke-width="1.1" opacity=".35" stroke-linecap="round"/>
+  <path d="M210 52 l0 4 M208 54 l4 0" stroke="#ffd60a" stroke-width="1" opacity=".4" stroke-linecap="round"/>
+</svg>

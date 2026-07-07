@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <radialGradient id="lembg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <linearGradient id="lemglass" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity=".05"/><stop offset="16%" stop-color="#ffffff" stop-opacity=".18"/><stop offset="50%" stop-color="#ffffff" stop-opacity=".04"/><stop offset="84%" stop-color="#ffffff" stop-opacity=".12"/><stop offset="100%" stop-color="#ffffff" stop-opacity=".02"/>
+    </linearGradient>
+    <linearGradient id="lemjuice" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff0a6"/><stop offset="50%" stop-color="#ffe14f"/><stop offset="100%" stop-color="#f2c62a"/>
+    </linearGradient>
+    <radialGradient id="lemslice" cx="50%" cy="50%" r="55%">
+      <stop offset="0%" stop-color="#fff6c2"/><stop offset="70%" stop-color="#ffe45a"/><stop offset="100%" stop-color="#f4c22a"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#lembg)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="188" rx="98" ry="16" fill="#000" opacity=".5"/>
+  <!-- sparkle (cold refreshing, no steam) -->
+  <path d="M228 46 l0 12 M222 52 l12 0" stroke="#fff1a6" stroke-width="1.6" opacity=".55" stroke-linecap="round"/>
+  <path d="M246 68 l0 8 M242 72 l8 0" stroke="#fff6d0" stroke-width="1.4" opacity=".4" stroke-linecap="round"/>
+  <!-- dark ring base under glass -->
+  <ellipse cx="160" cy="182" rx="46" ry="10" fill="#141018"/>
+  <ellipse cx="160" cy="182" rx="46" ry="10" fill="none" stroke="#2c2136" stroke-width="2.5"/>
+  <ellipse cx="160" cy="180" rx="35" ry="7" fill="#0c0c10"/>
+  <!-- tall highball tumbler, slight taper -->
+  <path d="M132 58 L188 58 L182 174 C178 179 142 179 138 174 Z" fill="#0f0d12"/>
+  <!-- lemonade fill -->
+  <path d="M134 66 L186 66 L181 172 C177 176 143 176 139 172 Z" fill="url(#lemjuice)"/>
+  <!-- lemon slice floating at surface -->
+  <ellipse cx="160" cy="70" rx="20" ry="6.5" fill="url(#lemslice)"/>
+  <ellipse cx="160" cy="70" rx="20" ry="6.5" fill="none" stroke="#e0a81e" stroke-width="1.2"/>
+  <path d="M144 70 L176 70 M160 64.5 L160 75.5 M148 66 L172 74 M148 74 L172 66" stroke="#f5d34a" stroke-width="1" opacity=".7"/>
+  <ellipse cx="160" cy="70" rx="15" ry="4.6" fill="none" stroke="#fff3c0" stroke-width="1" opacity=".6"/>
+  <!-- ice cubes suspended -->
+  <g stroke="#ffffff" stroke-width="1" opacity=".9" fill="#ffffff">
+    <rect x="140" y="92" width="18" height="16" rx="3" fill-opacity=".22" transform="rotate(-12 149 100)"/>
+    <rect x="140" y="92" width="18" height="16" rx="3" fill="none" stroke-opacity=".35" transform="rotate(-12 149 100)"/>
+    <rect x="162" y="112" width="18" height="16" rx="3" fill-opacity=".2" transform="rotate(14 171 120)"/>
+    <rect x="162" y="112" width="18" height="16" rx="3" fill="none" stroke-opacity=".32" transform="rotate(14 171 120)"/>
+    <rect x="146" y="134" width="16" height="15" rx="3" fill-opacity=".2" transform="rotate(6 154 141)"/>
+    <rect x="146" y="134" width="16" height="15" rx="3" fill="none" stroke-opacity=".3" transform="rotate(6 154 141)"/>
+  </g>
+  <!-- fizz bubbles -->
+  <circle cx="150" cy="120" r="1.6" fill="#fff6d0" opacity=".7"/>
+  <circle cx="172" cy="104" r="1.3" fill="#fff6d0" opacity=".6"/>
+  <circle cx="158" cy="150" r="1.4" fill="#fff6d0" opacity=".6"/>
+  <circle cx="144" cy="158" r="1.1" fill="#fff6d0" opacity=".5"/>
+  <circle cx="176" cy="140" r="1.2" fill="#fff6d0" opacity=".55"/>
+  <!-- glass overlay sheen -->
+  <path d="M132 58 L188 58 L182 174 C178 179 142 179 138 174 Z" fill="url(#lemglass)"/>
+  <path d="M132 58 L188 58 L182 174 C178 179 142 179 138 174 Z" fill="none" stroke="#ffe9c9" stroke-width="1.5" opacity=".28"/>
+  <path d="M139 66 L136 168" stroke="#ffffff" stroke-width="3" opacity=".3" stroke-linecap="round"/>
+  <path d="M182 66 L184 164" stroke="#ffffff" stroke-width="2" opacity=".15" stroke-linecap="round"/>
+  <!-- glass rim -->
+  <ellipse cx="160" cy="58" rx="28" ry="6" fill="#1a1622"/>
+  <ellipse cx="160" cy="58" rx="28" ry="6" fill="none" stroke="#3a2e44" stroke-width="1.6"/>
+  <ellipse cx="160" cy="57" rx="24" ry="4.4" fill="#fff0a6"/>
+  <!-- lemon wedge on rim -->
+  <path d="M182 54 A16 16 0 0 1 198 46 L192 60 Z" fill="url(#lemslice)"/>
+  <path d="M182 54 A16 16 0 0 1 198 46 L192 60 Z" fill="none" stroke="#e0a81e" stroke-width="1.2"/>
+  <path d="M186 52 L194 49 M188 56 L195 53" stroke="#f5d34a" stroke-width="1" opacity=".7"/>
+  <!-- mint sprig on rim -->
+  <path d="M138 52 C132 44 124 46 122 42 C128 48 132 48 136 54 Z" fill="#3f9c37"/>
+  <path d="M130 48 C126 42 120 42 118 38" stroke="#5ecb4e" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+  <!-- glass straw -->
+  <path d="M198 30 L206 30 L188 82 L182 82 Z" fill="#35e0ff" opacity=".55"/>
+  <path d="M198 30 L206 30 L188 82 L182 82 Z" fill="none" stroke="#5fd8f0" stroke-width="1.2" opacity=".6"/>
+  <!-- gloss dots / condensation -->
+  <circle cx="142" cy="84" r="1.5" fill="#fff" opacity=".6"/>
+  <circle cx="180" cy="126" r="1.3" fill="#fff" opacity=".45"/>
+  <circle cx="148" cy="168" r="1.2" fill="#fff" opacity=".5"/>
+  <circle cx="184" cy="150" r="1" fill="#fff" opacity=".4"/>
+</svg>

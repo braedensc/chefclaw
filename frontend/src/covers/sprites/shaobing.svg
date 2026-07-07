@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="sbBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="sbbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="sbtop" cx="42%" cy="32%" r="80%">
+      <stop offset="0%" stop-color="#e8b76a"/><stop offset="52%" stop-color="#c98a3c"/><stop offset="100%" stop-color="#9a611f"/>
+    </radialGradient>
+    <linearGradient id="sbside" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d8a656"/><stop offset="45%" stop-color="#b47c2e"/><stop offset="100%" stop-color="#f2e2c0"/>
+    </linearGradient>
+    <linearGradient id="sbcut" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f6e8c8"/><stop offset="55%" stop-color="#ecd39c"/><stop offset="100%" stop-color="#d8b676"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#sbbg)"/>
+  <!-- steam -->
+  <path d="M116 50 C106 32 126 24 116 4" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#sbBlur3)"/>
+  <path d="M196 48 C188 32 206 24 198 6" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#sbBlur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="186" rx="150" ry="22" fill="#000" opacity=".5"/>
+  <!-- wooden serving board -->
+  <ellipse cx="160" cy="140" rx="140" ry="46" fill="#3a2614"/>
+  <ellipse cx="160" cy="140" rx="140" ry="46" fill="none" stroke="#2a1b0d" stroke-width="2.5"/>
+  <ellipse cx="160" cy="138" rx="130" ry="40" fill="#4a331c"/>
+  <path d="M40 132 L280 132 M46 148 L274 148" stroke="#33230f" stroke-width="1.4" opacity=".5"/>
+  <!-- neon steam arc (warm) -->
+  <path d="M54 110 Q106 80 168 78" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".45" stroke-linecap="round"/>
+  <!-- BACK SHAOBING: a whole rectangular sesame flatbread, standing slightly behind -->
+  <g transform="rotate(-8 118 116)">
+    <!-- side wall (flaky layers) -->
+    <path d="M66 112 L156 112 L156 130 C130 138 92 138 66 130 Z" fill="url(#sbside)" stroke="#7a4f18" stroke-width="1.2"/>
+    <path d="M70 122 L152 122" stroke="#fff0d4" stroke-width="1" opacity=".4"/>
+    <path d="M70 127 L152 127" stroke="#8a5a1e" stroke-width="1" opacity=".4"/>
+    <!-- domed golden top -->
+    <path d="M66 112 C66 98 88 90 111 90 C134 90 156 98 156 112 C130 120 92 120 66 112 Z" fill="url(#sbtop)" stroke="#7a4f18" stroke-width="1.2"/>
+    <!-- toasted glaze highlight -->
+    <path d="M74 100 C92 94 130 94 148 100" stroke="#f4d89a" stroke-width="1.5" fill="none" opacity=".5"/>
+    <!-- SESAME SEEDS dense on top -->
+    <g fill="#f8eed6">
+      <ellipse cx="82" cy="104" rx="2.2" ry="1.4" transform="rotate(20 82 104)"/>
+      <ellipse cx="96" cy="100" rx="2.2" ry="1.4" transform="rotate(-14 96 100)"/>
+      <ellipse cx="110" cy="98" rx="2.2" ry="1.4" transform="rotate(10 110 98)"/>
+      <ellipse cx="124" cy="100" rx="2.2" ry="1.4" transform="rotate(-8 124 100)"/>
+      <ellipse cx="138" cy="104" rx="2.2" ry="1.4" transform="rotate(16 138 104)"/>
+      <ellipse cx="90" cy="110" rx="2" ry="1.3" transform="rotate(-20 90 110)"/>
+      <ellipse cx="106" cy="108" rx="2" ry="1.3" transform="rotate(8 106 108)"/>
+      <ellipse cx="122" cy="108" rx="2" ry="1.3" transform="rotate(-12 122 108)"/>
+      <ellipse cx="134" cy="110" rx="2" ry="1.3" transform="rotate(18 134 110)"/>
+      <ellipse cx="100" cy="114" rx="1.9" ry="1.2" transform="rotate(-6 100 114)"/>
+      <ellipse cx="116" cy="114" rx="1.9" ry="1.2" transform="rotate(12 116 114)"/>
+    </g>
+  </g>
+  <!-- FRONT SHAOBING: cut in half, cut face toward viewer to show the hollow flaky pocket -->
+  <g transform="rotate(6 200 132)">
+    <!-- side wall of the front piece -->
+    <path d="M158 118 L262 118 L262 138 C234 146 186 146 158 138 Z" fill="url(#sbside)" stroke="#7a4f18" stroke-width="1.2"/>
+    <!-- flaky-layer striations on the cut side -->
+    <path d="M164 124 L256 124" stroke="#fff0d4" stroke-width="1" opacity=".45"/>
+    <path d="M162 129 L258 129" stroke="#8a5a1e" stroke-width="1" opacity=".45"/>
+    <path d="M164 134 L256 134" stroke="#fff0d4" stroke-width="1" opacity=".35"/>
+    <!-- golden sesame top -->
+    <path d="M158 118 C158 104 182 96 210 96 C238 96 262 104 262 118 C234 126 186 126 158 118 Z" fill="url(#sbtop)" stroke="#7a4f18" stroke-width="1.2"/>
+    <!-- open cut pocket wedge revealing pale flaky interior -->
+    <path d="M186 118 C188 108 200 104 210 104 C220 104 232 108 234 118 C222 122 198 122 186 118 Z" fill="url(#sbcut)"/>
+    <path d="M192 116 C202 113 218 113 228 116" stroke="#c9a86a" stroke-width="1.2" fill="none" opacity=".6"/>
+    <path d="M196 118 C205 116 216 116 224 118" stroke="#e6d3a4" stroke-width="1" fill="none" opacity=".6"/>
+    <!-- SESAME on the front top -->
+    <g fill="#f8eed6">
+      <ellipse cx="174" cy="110" rx="2.2" ry="1.4" transform="rotate(14 174 110)"/>
+      <ellipse cx="190" cy="106" rx="2.2" ry="1.4" transform="rotate(-10 190 106)"/>
+      <ellipse cx="228" cy="106" rx="2.2" ry="1.4" transform="rotate(8 228 106)"/>
+      <ellipse cx="244" cy="110" rx="2.2" ry="1.4" transform="rotate(-16 244 110)"/>
+      <ellipse cx="166" cy="116" rx="2" ry="1.3" transform="rotate(-6 166 116)"/>
+      <ellipse cx="252" cy="116" rx="2" ry="1.3" transform="rotate(12 252 116)"/>
+      <ellipse cx="210" cy="100" rx="2" ry="1.3" transform="rotate(4 210 100)"/>
+    </g>
+    <!-- toasted highlight -->
+    <path d="M170 104 C190 98 232 98 250 104" stroke="#f4d89a" stroke-width="1.5" fill="none" opacity=".5"/>
+  </g>
+  <!-- crumbs on the board -->
+  <circle cx="130" cy="150" r="1.4" fill="#c98a3c" opacity=".8"/>
+  <circle cx="196" cy="152" r="1.3" fill="#d8a656" opacity=".8"/>
+  <circle cx="160" cy="156" r="1.2" fill="#9a611f" opacity=".7"/>
+  <!-- gloss dots -->
+  <circle cx="108" cy="98" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="214" cy="102" r="1.3" fill="#fff" opacity=".5"/>
+</svg>

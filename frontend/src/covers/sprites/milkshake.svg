@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <radialGradient id="mkbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#3a1120"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <linearGradient id="mkglass" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity=".05"/><stop offset="20%" stop-color="#ffffff" stop-opacity=".16"/><stop offset="50%" stop-color="#ffffff" stop-opacity=".03"/><stop offset="80%" stop-color="#ffffff" stop-opacity=".11"/><stop offset="100%" stop-color="#ffffff" stop-opacity=".02"/>
+    </linearGradient>
+    <linearGradient id="mkshake" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffe3ee"/><stop offset="45%" stop-color="#f9c6d6"/><stop offset="100%" stop-color="#e89bb2"/>
+    </linearGradient>
+    <radialGradient id="mkcream" cx="42%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#fffdf8"/><stop offset="60%" stop-color="#fdeef0"/><stop offset="100%" stop-color="#f4d3dc"/>
+    </radialGradient>
+    <radialGradient id="mkcherry" cx="38%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#ff6d86"/><stop offset="55%" stop-color="#e02545"/><stop offset="100%" stop-color="#9c1226"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#mkbg)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="188" rx="98" ry="16" fill="#000" opacity=".5"/>
+  <!-- condensation sparkle (cold drink, no steam arc) -->
+  <g stroke="#ff8ba0" stroke-width="2.2" stroke-linecap="round" opacity=".5">
+    <path d="M92 66 l0 12 M86 72 l12 0"/>
+  </g>
+  <path d="M224 54 l0 9 M219.5 58.5 l9 0" stroke="#ffd0da" stroke-width="1.8" stroke-linecap="round" opacity=".55"/>
+  <!-- dark ring base under glass -->
+  <ellipse cx="160" cy="178" rx="56" ry="12" fill="#141018"/>
+  <ellipse cx="160" cy="178" rx="56" ry="12" fill="none" stroke="#2c2136" stroke-width="2.5"/>
+  <ellipse cx="160" cy="176" rx="42" ry="8" fill="#0c0c10"/>
+  <!-- soda-fountain glass: narrow foot, flaring bowl -->
+  <path d="M150 168 L170 168 L172 150 L176 118 C186 116 194 112 198 104 L122 104 C126 112 134 116 144 118 L148 150 Z" fill="#0f0d12"/>
+  <!-- shake fill inside the flaring bowl -->
+  <path d="M128 108 C132 114 140 118 149 120 L172 120 C180 118 188 114 192 108 Z" fill="url(#mkshake)"/>
+  <path d="M126 104 L194 104 C190 112 178 116 160 116 C142 116 130 112 126 104 Z" fill="url(#mkshake)"/>
+  <!-- whipped-cream dome piled above the rim -->
+  <path d="M126 104 C126 92 138 82 150 82 C150 72 172 72 172 82 C186 82 196 94 194 104 C176 100 144 100 126 104 Z" fill="url(#mkcream)"/>
+  <path d="M138 90 C144 86 150 86 154 90 M162 86 C168 84 176 88 178 94" stroke="#fff" stroke-width="1.6" fill="none" opacity=".7" stroke-linecap="round"/>
+  <path d="M126 104 C144 100 176 100 194 104" fill="none" stroke="#e8bfcb" stroke-width="1.2" opacity=".6"/>
+  <!-- cherry on top -->
+  <circle cx="160" cy="74" r="10" fill="url(#mkcherry)"/>
+  <ellipse cx="156" cy="70" rx="3" ry="2" fill="#ff9fb0" opacity=".85"/>
+  <path d="M162 65 C168 54 176 50 182 48" stroke="#7c5a2a" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- glass sheen overlay on the bowl -->
+  <path d="M122 104 C126 112 134 116 144 118 L148 150 L150 168 L170 168 L172 150 L176 118 C186 116 194 112 198 104 Z" fill="url(#mkglass)"/>
+  <path d="M136 108 L146 150" stroke="#ffffff" stroke-width="2.6" opacity=".26" stroke-linecap="round"/>
+  <path d="M186 108 L178 150" stroke="#ffffff" stroke-width="1.8" opacity=".16" stroke-linecap="round"/>
+  <!-- stem highlight -->
+  <path d="M156 152 L157 166" stroke="#ffffff" stroke-width="2" opacity=".18" stroke-linecap="round"/>
+  <!-- fat striped straw, angled -->
+  <path d="M188 44 L200 42 L184 116 L173 115 Z" fill="#ff4d6d" opacity=".92"/>
+  <path d="M188 44 L200 42 L184 116 L173 115 Z" fill="none" stroke="#c92845" stroke-width="1.2" opacity=".7"/>
+  <g stroke="#fff" stroke-width="2.2" opacity=".7" stroke-linecap="round">
+    <path d="M187 56 L198 55 M184 74 L195 73 M181 92 L192 91"/>
+  </g>
+  <!-- sprinkles on the cream -->
+  <rect x="140" y="94" width="5" height="2.2" rx="1.1" fill="#35e0ff" transform="rotate(-20 142 95)"/>
+  <rect x="172" y="96" width="5" height="2.2" rx="1.1" fill="#ffd60a" transform="rotate(24 174 97)"/>
+  <rect x="156" y="98" width="5" height="2.2" rx="1.1" fill="#58c14a" transform="rotate(-8 158 99)"/>
+  <!-- gloss dots -->
+  <circle cx="140" cy="112" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="178" cy="112" r="1.2" fill="#fff" opacity=".45"/>
+  <circle cx="150" cy="88" r="1.4" fill="#fff" opacity=".6"/>
+</svg>

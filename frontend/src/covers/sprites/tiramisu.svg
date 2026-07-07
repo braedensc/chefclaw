@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <radialGradient id="tmbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#3a1120"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <linearGradient id="tmcream" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fdeecb"/><stop offset="55%" stop-color="#f3dca6"/><stop offset="100%" stop-color="#e3c583"/>
+    </linearGradient>
+    <linearGradient id="tmsoak" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#a9784a"/><stop offset="55%" stop-color="#7e5330"/><stop offset="100%" stop-color="#5c3a20"/>
+    </linearGradient>
+    <linearGradient id="tmcocoa" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5a3620"/><stop offset="100%" stop-color="#3c2213"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#tmbg)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="176" rx="120" ry="18" fill="#000" opacity=".5"/>
+  <!-- dessert plate -->
+  <ellipse cx="160" cy="158" rx="118" ry="30" fill="#141018"/>
+  <ellipse cx="160" cy="158" rx="118" ry="30" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="156" rx="98" ry="22" fill="#0f0d13"/>
+  <!-- TIRAMISU SLICE (rectangular block, front face showing layers) -->
+  <!-- back top face (cocoa-dusted lid) -->
+  <path d="M104 108 L214 96 L238 108 L128 120 Z" fill="url(#tmcocoa)"/>
+  <path d="M104 108 L214 96 L238 108 L128 120 Z" fill="none" stroke="#2a170c" stroke-width="1.2" opacity=".5"/>
+  <!-- right side face -->
+  <path d="M238 108 L228 154 L118 166 L128 120 Z" fill="#3a2415"/>
+  <!-- FRONT FACE: stacked strata -->
+  <path d="M104 108 L214 96 L204 150 L94 162 Z" fill="url(#tmcream)"/>
+  <path d="M104 108 L214 96 L204 150 L94 162 Z" fill="none" stroke="#c79a58" stroke-width="1.4" opacity=".5"/>
+  <!-- top cream band (mascarpone) -->
+  <path d="M104 108 L214 96 L212 106 L102 118 Z" fill="#fdeecb" opacity=".9"/>
+  <!-- coffee-soaked ladyfinger stratum #1 -->
+  <path d="M102 118 L212 106 L210 122 L100 134 Z" fill="url(#tmsoak)"/>
+  <path d="M112 119 l0 12 M126 117 l0 12 M140 116 l0 12 M154 114 l0 12 M168 112 l0 12 M182 111 l0 12 M196 109 l0 12" stroke="#5c3a20" stroke-width="1.2" opacity=".4"/>
+  <!-- middle cream stratum -->
+  <path d="M100 134 L210 122 L208 138 L98 150 Z" fill="#f6e2b2" opacity=".95"/>
+  <!-- coffee-soaked ladyfinger stratum #2 -->
+  <path d="M98 150 L208 138 L204 150 L94 162 Z" fill="url(#tmsoak)"/>
+  <path d="M108 151 l0 8 M122 149 l0 8 M136 147 l0 8 M150 146 l0 8 M164 144 l0 8 M178 142 l0 8 M192 141 l0 8" stroke="#5c3a20" stroke-width="1.1" opacity=".4"/>
+  <!-- cocoa dust speckle on top -->
+  <g fill="#2a170c" opacity=".55">
+    <circle cx="128" cy="106" r="1.4"/><circle cx="150" cy="103" r="1.2"/><circle cx="172" cy="101" r="1.5"/>
+    <circle cx="192" cy="100" r="1.2"/><circle cx="140" cy="110" r="1"/><circle cx="182" cy="106" r="1.1"/>
+    <circle cx="116" cy="112" r="1.2"/><circle cx="206" cy="99" r="1"/>
+  </g>
+  <!-- dusting of lighter cocoa flecks -->
+  <g fill="#7a4d2c" opacity=".5">
+    <circle cx="135" cy="105" r=".9"/><circle cx="160" cy="102" r=".9"/><circle cx="200" cy="103" r=".8"/>
+  </g>
+  <!-- chocolate-covered coffee bean garnish on cream -->
+  <ellipse cx="158" cy="103" rx="7" ry="4.4" fill="#3a2413" transform="rotate(-8 158 103)"/>
+  <path d="M155 101 C158 104 158 104 161 101" stroke="#6b4a2c" stroke-width="1" fill="none" opacity=".7"/>
+  <!-- a dusted mint sprig -->
+  <path d="M186 95 C190 88 196 88 198 94 C194 96 189 96 186 95 Z" fill="#3f9c37" opacity=".9"/>
+  <path d="M198 94 C202 88 208 90 208 96 C204 97 200 97 198 94 Z" fill="#58c14a" opacity=".9"/>
+  <!-- COLD DESSERT: no steam arc — subtle sparkle glints instead -->
+  <g stroke="#fff" stroke-linecap="round" opacity=".7">
+    <path d="M96 88 l0 -7 M92.5 84.5 l7 0" stroke-width="1.6"/>
+    <path d="M232 118 l0 -5 M229.5 115.5 l5 0" stroke-width="1.4"/>
+    <path d="M118 92 l0 -4 M116 90 l4 0" stroke-width="1.2" opacity=".5"/>
+  </g>
+  <!-- cream gloss dots -->
+  <circle cx="122" cy="114" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="178" cy="118" r="1.2" fill="#fff" opacity=".45"/>
+  <circle cx="150" cy="140" r="1.1" fill="#fff" opacity=".4"/>
+</svg>

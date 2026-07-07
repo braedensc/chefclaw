@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="begBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="begbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#123138"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <radialGradient id="begsauce" cx="46%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#9c2b10"/><stop offset="55%" stop-color="#661408"/><stop offset="100%" stop-color="#3b0b05"/>
+    </radialGradient>
+    <linearGradient id="begskin" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7a3a4e"/><stop offset="50%" stop-color="#5c2c52"/><stop offset="100%" stop-color="#3f1c3a"/>
+    </linearGradient>
+    <linearGradient id="begflesh" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#c98a4e"/><stop offset="100%" stop-color="#96502a"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#begbg)"/>
+  <!-- rising steam wisps -->
+  <path d="M120 54 C110 36 130 30 120 10" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#begBlur3)"/>
+  <path d="M200 52 C192 36 210 28 202 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#begBlur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="188" rx="152" ry="22" fill="#000" opacity=".5"/>
+  <!-- oval plate -->
+  <ellipse cx="160" cy="132" rx="144" ry="46" fill="#141018"/>
+  <ellipse cx="160" cy="132" rx="144" ry="46" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="132" rx="130" ry="38" fill="#0f0d13"/>
+  <!-- neon steam arc (cyan) -->
+  <path d="M48 116 Q100 84 164 82" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- glossy red-braise sauce pool -->
+  <ellipse cx="160" cy="130" rx="112" ry="30" fill="url(#begsauce)"/>
+  <ellipse cx="130" cy="122" rx="20" ry="6" fill="#c2451f" opacity=".5"/>
+  <ellipse cx="196" cy="126" rx="16" ry="5" fill="#c2451f" opacity=".4"/>
+  <!-- eggplant batons: purple-skinned wedges, cut flesh showing, tossed -->
+  <!-- back row (smaller, darker) -->
+  <g transform="translate(96 100) rotate(-16) scale(.84)">
+    <path d="M0 6 Q4 -4 22 -4 Q44 -4 48 6 Q44 16 22 16 Q4 16 0 6 Z" fill="url(#begskin)" stroke="#2a1226" stroke-width="1.3"/>
+    <path d="M6 6 Q10 -1 22 -1 Q38 -1 42 6 Q38 12 22 12 Q10 12 6 6 Z" fill="url(#begflesh)" opacity=".9"/>
+  </g>
+  <g transform="translate(178 100) rotate(12) scale(.84)">
+    <path d="M0 6 Q4 -4 22 -4 Q44 -4 48 6 Q44 16 22 16 Q4 16 0 6 Z" fill="url(#begskin)" stroke="#2a1226" stroke-width="1.3"/>
+    <path d="M6 6 Q10 -1 22 -1 Q38 -1 42 6 Q38 12 22 12 Q10 12 6 6 Z" fill="url(#begflesh)" opacity=".9"/>
+  </g>
+  <!-- front row (larger, glossy) -->
+  <g transform="translate(78 116) rotate(-8)">
+    <path d="M0 8 Q5 -5 28 -5 Q56 -5 62 8 Q56 21 28 21 Q5 21 0 8 Z" fill="url(#begskin)" stroke="#2a1226" stroke-width="1.4"/>
+    <path d="M8 8 Q13 -1 28 -1 Q49 -1 55 8 Q49 16 28 16 Q13 16 8 8 Z" fill="url(#begflesh)"/>
+    <ellipse cx="24" cy="4" rx="11" ry="3" fill="#e0a866" opacity=".6"/>
+    <circle cx="14" cy="9" r="1.5" fill="#fff" opacity=".55"/>
+  </g>
+  <g transform="translate(158 120) rotate(10)">
+    <path d="M0 8 Q5 -5 28 -5 Q56 -5 62 8 Q56 21 28 21 Q5 21 0 8 Z" fill="url(#begskin)" stroke="#2a1226" stroke-width="1.4"/>
+    <path d="M8 8 Q13 -1 28 -1 Q49 -1 55 8 Q49 16 28 16 Q13 16 8 8 Z" fill="url(#begflesh)"/>
+    <ellipse cx="24" cy="4" rx="11" ry="3" fill="#e0a866" opacity=".6"/>
+    <circle cx="42" cy="10" r="1.5" fill="#fff" opacity=".55"/>
+  </g>
+  <g transform="translate(122 128) rotate(-2)">
+    <path d="M0 7 Q4 -4 24 -4 Q48 -4 53 7 Q48 18 24 18 Q4 18 0 7 Z" fill="url(#begskin)" stroke="#2a1226" stroke-width="1.4"/>
+    <path d="M7 7 Q11 0 24 0 Q42 0 47 7 Q42 14 24 14 Q11 14 7 7 Z" fill="url(#begflesh)"/>
+    <ellipse cx="21" cy="3" rx="9" ry="2.6" fill="#e0a866" opacity=".55"/>
+  </g>
+  <!-- minced garlic + diced red chili + scallion garnish -->
+  <circle cx="104" cy="118" r="2" fill="#f2ddb0"/>
+  <circle cx="190" cy="118" r="2" fill="#f2ddb0"/>
+  <circle cx="146" cy="112" r="1.8" fill="#f2ddb0"/>
+  <path d="M170 116 l9 3" stroke="#e0341f" stroke-width="3" stroke-linecap="round"/>
+  <path d="M116 124 l-9 3" stroke="#e0341f" stroke-width="3" stroke-linecap="round"/>
+  <rect x="150" y="122" width="8" height="2.8" rx="1.4" fill="#5ecb4e" transform="rotate(-14 154 123)"/>
+  <rect x="132" y="134" width="7" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(20 135 135)"/>
+  <rect x="196" y="128" width="7" height="2.6" rx="1.3" fill="#58c14a" transform="rotate(-18 199 129)"/>
+  <!-- gloss dots -->
+  <circle cx="138" cy="118" r="1.4" fill="#fff" opacity=".6"/>
+  <circle cx="180" cy="126" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="108" cy="128" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

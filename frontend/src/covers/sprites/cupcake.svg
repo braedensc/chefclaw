@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <radialGradient id="cpbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#38101e"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <linearGradient id="cpfrost" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffd2e2"/><stop offset="50%" stop-color="#ff9dc2"/><stop offset="100%" stop-color="#ef6ea2"/>
+    </linearGradient>
+    <linearGradient id="cpwrap" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8a5aa8"/><stop offset="55%" stop-color="#6a3f88"/><stop offset="100%" stop-color="#472660"/>
+    </linearGradient>
+    <linearGradient id="cpcake" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e6c188"/><stop offset="100%" stop-color="#c69a58"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#cpbg)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="182" rx="96" ry="16" fill="#000" opacity=".5"/>
+  <!-- small dark serving plate -->
+  <ellipse cx="160" cy="168" rx="98" ry="18" fill="#141018"/>
+  <ellipse cx="160" cy="168" rx="98" ry="18" fill="none" stroke="#2c2136" stroke-width="2.5"/>
+  <ellipse cx="160" cy="166" rx="82" ry="13" fill="#0f0d13"/>
+  <!-- fluted paper wrapper (trapezoid) -->
+  <path d="M122 118 L198 118 L188 164 C182 168 138 168 132 164 Z" fill="url(#cpwrap)"/>
+  <!-- wrapper pleats -->
+  <g stroke="#3a2050" stroke-width="1.6" opacity=".75">
+    <path d="M134 120 L132 164"/><path d="M147 120 L146 166"/><path d="M160 120 L160 166"/>
+    <path d="M173 120 L174 166"/><path d="M186 120 L188 164"/>
+  </g>
+  <path d="M126 120 L194 120" stroke="#a878c0" stroke-width="1.6" opacity=".5"/>
+  <!-- cake muffin-top peeking above the wrapper -->
+  <path d="M120 118 C122 106 138 100 160 100 C182 100 198 106 200 118 C182 122 138 122 120 118 Z" fill="url(#cpcake)"/>
+  <path d="M126 112 C140 108 180 108 194 112" stroke="#f0d6a8" stroke-width="1.4" opacity=".5" fill="none"/>
+  <!-- SWIRLED PIPED FROSTING: three stacked scoops narrowing to a peak -->
+  <path d="M118 100 C118 82 138 72 160 72 C182 72 202 82 202 100 C182 106 138 106 118 100 Z" fill="url(#cpfrost)"/>
+  <path d="M124 84 C126 70 146 62 160 62 C176 62 194 70 196 84 C178 90 142 90 124 84 Z" fill="url(#cpfrost)"/>
+  <path d="M134 70 C136 58 150 52 160 52 C172 52 184 58 186 70 C172 76 148 76 134 70 Z" fill="url(#cpfrost)"/>
+  <path d="M146 58 C148 48 155 42 160 42 C167 42 174 48 174 58 C166 62 152 62 146 58 Z" fill="url(#cpfrost)"/>
+  <!-- peak tip -->
+  <path d="M156 48 C157 40 160 34 160 34 C161 38 164 44 164 50 C161 51 158 51 156 48 Z" fill="#ffd2e2"/>
+  <!-- swirl highlight ribbon following the pipe -->
+  <path d="M126 96 C150 92 170 92 194 96" stroke="#ffdfeb" stroke-width="2" opacity=".6" fill="none" stroke-linecap="round"/>
+  <path d="M132 80 C150 76 168 76 188 80" stroke="#ffdfeb" stroke-width="1.8" opacity=".55" fill="none" stroke-linecap="round"/>
+  <path d="M142 66 C152 63 166 63 178 66" stroke="#ffdfeb" stroke-width="1.6" opacity=".5" fill="none" stroke-linecap="round"/>
+  <!-- cherry on top -->
+  <path d="M160 36 C160 28 168 24 172 20" stroke="#7a3a1a" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+  <circle cx="160" cy="40" r="7" fill="#e0341f"/>
+  <circle cx="157" cy="37" r="2.2" fill="#ff8b76" opacity=".85"/>
+  <!-- rainbow sprinkles on the frosting -->
+  <g stroke-linecap="round" stroke-width="2.6">
+    <path d="M138 92 l4 -2" stroke="#35e0ff"/>
+    <path d="M152 88 l3 3" stroke="#ffd60a"/>
+    <path d="M170 90 l4 -1" stroke="#5ecb4e"/>
+    <path d="M182 94 l-3 3" stroke="#b478ff"/>
+    <path d="M146 76 l3 -3" stroke="#ffd60a"/>
+    <path d="M164 74 l4 2" stroke="#35e0ff"/>
+    <path d="M176 78 l-2 -3" stroke="#5ecb4e"/>
+    <path d="M154 64 l3 2" stroke="#b478ff"/>
+    <path d="M168 62 l-3 3" stroke="#ffd60a"/>
+  </g>
+  <!-- sparkle accents (dessert: no steam arc) -->
+  <g stroke="#ffd0da" stroke-width="1.6" stroke-linecap="round" opacity=".7">
+    <path d="M84 72 l0 8 M80 76 l8 0"/>
+    <path d="M240 66 l0 6 M237 69 l6 0"/>
+  </g>
+  <circle cx="84" cy="76" r="1.4" fill="#fff" opacity=".9"/>
+  <circle cx="240" cy="69" r="1.2" fill="#fff" opacity=".85"/>
+</svg>

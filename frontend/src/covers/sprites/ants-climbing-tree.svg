@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="acBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="acbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#123138"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <radialGradient id="acwok" cx="50%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <linearGradient id="acnest" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e8c58c"/><stop offset="55%" stop-color="#c99a55"/><stop offset="100%" stop-color="#9c6f30"/>
+    </linearGradient>
+    <radialGradient id="acoil" cx="46%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#ef5520"/><stop offset="55%" stop-color="#b02408"/><stop offset="100%" stop-color="#7a1305"/>
+    </radialGradient>
+    <linearGradient id="acpork" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6b3418"/><stop offset="100%" stop-color="#3d1c0d"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#acbg)"/>
+  <!-- steam wisps -->
+  <path d="M122 54 C112 36 132 28 122 8" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#acBlur3)"/>
+  <path d="M198 52 C190 36 208 28 200 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#acBlur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="188" rx="150" ry="22" fill="#000" opacity=".5"/>
+  <!-- oval plate -->
+  <ellipse cx="160" cy="130" rx="140" ry="48" fill="url(#acwok)"/>
+  <ellipse cx="160" cy="130" rx="140" ry="48" fill="none" stroke="#26262e" stroke-width="3"/>
+  <ellipse cx="160" cy="130" rx="122" ry="40" fill="#0c0c0f"/>
+  <!-- neon steam arc (cyan, sichuan) -->
+  <path d="M50 116 Q104 82 168 80" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- chili-oil pool glinting under the noodles -->
+  <ellipse cx="160" cy="134" rx="108" ry="28" fill="url(#acoil)" opacity=".55"/>
+  <!-- glass-noodle nest: translucent glossy strands coated in red chili oil -->
+  <g stroke-linecap="round" fill="none">
+    <!-- oil-tinted base strands (reddish) -->
+    <path d="M74 128 C110 108 150 148 200 118 C226 104 248 122 246 132" stroke="#c53a14" stroke-width="6" opacity=".85"/>
+    <path d="M78 136 C118 118 156 152 208 126 C230 116 246 130 244 138" stroke="#d24a1c" stroke-width="6" opacity=".8"/>
+    <path d="M72 118 C112 100 152 138 206 108 C224 100 242 112 244 122" stroke="#b83010" stroke-width="6" opacity=".8"/>
+    <!-- translucent pale glass strands weaving over -->
+    <path d="M76 124 C116 106 154 144 204 114 C224 106 244 118 244 128" stroke="#e6cf9d" stroke-width="4" opacity=".55"/>
+    <path d="M80 132 C120 114 158 150 206 122 C228 114 244 126 242 134" stroke="#d9bd85" stroke-width="4" opacity=".55"/>
+    <path d="M74 112 C114 96 156 132 208 104 C226 98 244 108 244 116" stroke="#e6cf9d" stroke-width="3.5" opacity=".5"/>
+    <!-- bright highlight strands -->
+    <path d="M78 122 C118 104 156 142 204 112" stroke="#fff1c9" stroke-width="2" opacity=".7"/>
+    <path d="M82 130 C122 112 160 148 206 120" stroke="#fff1c9" stroke-width="1.8" opacity=".55"/>
+    <!-- dark shadow strands for depth -->
+    <path d="M76 138 C116 120 154 154 206 128" stroke="#7a1305" stroke-width="2.4" opacity=".7"/>
+  </g>
+  <!-- minced-pork "ants" clinging to the strands (tiny dark specks) -->
+  <g stroke="#3d1c0d" stroke-width=".8">
+    <ellipse cx="102" cy="120" rx="4" ry="3" fill="url(#acpork)"/>
+    <ellipse cx="128" cy="132" rx="4.5" ry="3.2" fill="url(#acpork)"/>
+    <ellipse cx="150" cy="118" rx="3.8" ry="2.8" fill="url(#acpork)"/>
+    <ellipse cx="168" cy="134" rx="4.2" ry="3" fill="url(#acpork)"/>
+    <ellipse cx="190" cy="120" rx="4" ry="3" fill="url(#acpork)"/>
+    <ellipse cx="116" cy="126" rx="3.4" ry="2.6" fill="url(#acpork)"/>
+    <ellipse cx="140" cy="128" rx="3.6" ry="2.8" fill="url(#acpork)"/>
+    <ellipse cx="204" cy="126" rx="3.6" ry="2.8" fill="url(#acpork)"/>
+    <ellipse cx="88" cy="128" rx="3.4" ry="2.6" fill="url(#acpork)"/>
+    <ellipse cx="178" cy="122" rx="3.2" ry="2.4" fill="url(#acpork)"/>
+  </g>
+  <!-- diced red chili flecks (Sichuan heat) -->
+  <rect x="110" y="114" width="6" height="3.2" rx="1.5" fill="#e0341f" transform="rotate(-20 113 115)"/>
+  <rect x="158" y="126" width="6" height="3.2" rx="1.5" fill="#ff4d3a" transform="rotate(14 161 127)"/>
+  <rect x="196" y="116" width="5.5" height="3" rx="1.4" fill="#e0341f" transform="rotate(-8 198 117)"/>
+  <rect x="132" y="122" width="5.5" height="3" rx="1.4" fill="#ff4d3a" transform="rotate(26 134 123)"/>
+  <!-- scallion greens garnish -->
+  <rect x="120" y="110" width="7" height="2.6" rx="1.3" fill="#5ecb4e" transform="rotate(-14 123 111)"/>
+  <rect x="176" y="108" width="7" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(18 179 109)"/>
+  <rect x="146" y="136" width="6" height="2.4" rx="1.2" fill="#58c14a" transform="rotate(22 149 137)"/>
+  <!-- oil gloss dots (glassy, wet) -->
+  <circle cx="120" cy="116" r="1.5" fill="#fff" opacity=".65"/>
+  <circle cx="164" cy="120" r="1.4" fill="#fff" opacity=".6"/>
+  <circle cx="196" cy="122" r="1.3" fill="#fff" opacity=".55"/>
+  <circle cx="140" cy="130" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

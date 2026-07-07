@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="ppBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="ppbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#1f3318"/><stop offset="45%" stop-color="#0a0b08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="ppplate" cx="50%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <radialGradient id="ppnest" cx="46%" cy="34%" r="78%">
+      <stop offset="0%" stop-color="#f2e2b4"/><stop offset="60%" stop-color="#e2cd93"/><stop offset="100%" stop-color="#cbb277"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#ppbg)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="184" rx="150" ry="22" fill="#000" opacity=".5"/>
+  <!-- rising steam wisps -->
+  <path d="M128 52 C120 36 136 28 128 10" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#ppBlur3)"/>
+  <path d="M196 50 C188 34 204 26 196 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#ppBlur3)"/>
+  <!-- wide pasta plate -->
+  <ellipse cx="160" cy="130" rx="140" ry="52" fill="url(#ppplate)"/>
+  <ellipse cx="160" cy="130" rx="140" ry="52" fill="none" stroke="#26262e" stroke-width="3"/>
+  <ellipse cx="160" cy="130" rx="122" ry="43" fill="#0c0c0f"/>
+  <!-- neon steam arc (warm, over green) -->
+  <path d="M52 112 Q104 80 168 78" stroke="#7bffb0" stroke-width="2.5" fill="none" opacity=".35" stroke-linecap="round"/>
+  <!-- pesto sauce pool (green, glossy) coating the nest -->
+  <ellipse cx="160" cy="122" rx="98" ry="34" fill="#3f6f28" opacity=".9"/>
+  <ellipse cx="160" cy="122" rx="98" ry="34" fill="#4d8a2e" opacity=".55"/>
+  <!-- PALE STRAND NEST tossed in pesto -->
+  <g stroke-linecap="round" fill="none">
+    <!-- base pale strands -->
+    <path d="M78 128 C104 104 150 100 190 108 C222 114 244 122 236 132" stroke="#e2cd93" stroke-width="7"/>
+    <path d="M84 136 C112 116 156 112 198 118 C226 122 244 130 232 138" stroke="#d9bd85" stroke-width="6.5"/>
+    <path d="M76 120 C102 98 148 94 188 100 C214 104 236 112 230 122" stroke="#e6cf9d" stroke-width="6.5"/>
+    <path d="M90 128 C118 110 158 106 196 112 C218 116 232 124 222 132" stroke="#eddaa4" stroke-width="6"/>
+    <path d="M82 132 C110 114 152 110 194 116 C214 120 228 126 218 134" stroke="#cdb078" stroke-width="6"/>
+    <!-- pesto-coated green-tinted strands weaving through -->
+    <path d="M88 124 C116 104 156 100 194 106 C216 110 232 118 224 128" stroke="#7fae4c" stroke-width="5" opacity=".8"/>
+    <path d="M80 134 C108 116 150 112 190 118 C214 122 230 130 220 138" stroke="#6fa040" stroke-width="4.6" opacity=".75"/>
+    <!-- highlight strand -->
+    <path d="M82 122 C108 100 152 96 192 102" stroke="#fff1c9" stroke-width="2" opacity=".7"/>
+    <!-- dark shadow strand for depth -->
+    <path d="M92 138 C120 122 160 118 200 124" stroke="#7a4c14" stroke-width="2.2" opacity=".5"/>
+  </g>
+  <!-- twirling fork rising out of the nest (top-right) -->
+  <g stroke="#c9cdd4" stroke-linecap="round" fill="none">
+    <path d="M242 100 L214 132" stroke-width="4.4"/>
+    <path d="M232 96 L216 116 M238 100 L220 120 M244 104 L224 124 M250 108 L228 128" stroke-width="2.2" opacity=".95"/>
+  </g>
+  <path d="M214 132 C210 138 216 142 220 138" stroke="#c9cdd4" stroke-width="2" fill="none" opacity=".6"/>
+  <!-- fresh basil leaf garnish on top -->
+  <path d="M144 100 C138 90 148 82 156 88 C162 94 158 104 150 106 C146 106 144 104 144 100 Z" fill="#4aa53a"/>
+  <path d="M150 88 L149 105" stroke="#2f7d2b" stroke-width="1" opacity=".7"/>
+  <path d="M186 108 C182 100 190 94 196 99 C200 104 196 112 190 113 C187 113 186 111 186 108 Z" fill="#58c14a"/>
+  <path d="M193 99 L190 113" stroke="#2f7d2b" stroke-width="1" opacity=".7"/>
+  <!-- pine nuts + parmesan flecks -->
+  <ellipse cx="126" cy="116" rx="4" ry="2.4" fill="#efdca2" transform="rotate(-18 126 116)"/>
+  <ellipse cx="170" cy="126" rx="4" ry="2.4" fill="#f4e6c0" transform="rotate(12 170 126)"/>
+  <ellipse cx="146" cy="130" rx="3.6" ry="2.2" fill="#efdca2" transform="rotate(-8 146 130)"/>
+  <!-- grated parmesan dust -->
+  <g fill="#fff6e0" opacity=".85">
+    <circle cx="138" cy="118" r="1.3"/><circle cx="164" cy="114" r="1.2"/><circle cx="182" cy="124" r="1.3"/>
+    <circle cx="118" cy="126" r="1.1"/><circle cx="200" cy="120" r="1.1"/>
+  </g>
+  <!-- oil gloss dots -->
+  <circle cx="132" cy="112" r="1.4" fill="#fff" opacity=".6"/>
+  <circle cx="176" cy="118" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="154" cy="128" r="1.2" fill="#fff" opacity=".45"/>
+</svg>

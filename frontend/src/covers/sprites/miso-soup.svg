@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="msBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="msbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#102e35"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <radialGradient id="msbroth" cx="46%" cy="34%" r="78%">
+      <stop offset="0%" stop-color="#d99a4a"/><stop offset="55%" stop-color="#b87a30"/><stop offset="100%" stop-color="#8a561d"/>
+    </radialGradient>
+    <linearGradient id="msbowl" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3a2018"/><stop offset="55%" stop-color="#26120c"/><stop offset="100%" stop-color="#160a06"/>
+    </linearGradient>
+    <linearGradient id="mstofu" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f9f2df"/><stop offset="100%" stop-color="#e3cda4"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#msbg)"/>
+  <!-- rising steam (hot soup) -->
+  <path d="M124 58 C114 40 134 32 124 10" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#msBlur3)"/>
+  <path d="M198 56 C190 40 208 32 200 10" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#msBlur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="188" rx="120" ry="20" fill="#000" opacity=".5"/>
+  <!-- neon steam arc (cyan) -->
+  <path d="M60 100 Q108 66 168 66" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- deep lacquer soup bowl: outer body -->
+  <path d="M70 108 C70 146 104 176 160 176 C216 176 250 146 250 108 Z" fill="url(#msbowl)"/>
+  <path d="M70 108 C70 146 104 176 160 176 C216 176 250 146 250 108" fill="none" stroke="#4a2418" stroke-width="2.5"/>
+  <!-- bowl rim ellipse -->
+  <ellipse cx="160" cy="108" rx="90" ry="26" fill="#2a140d"/>
+  <ellipse cx="160" cy="108" rx="90" ry="26" fill="none" stroke="#5a2c1c" stroke-width="3"/>
+  <!-- broth surface -->
+  <ellipse cx="160" cy="108" rx="80" ry="22" fill="url(#msbroth)"/>
+  <ellipse cx="160" cy="106" rx="80" ry="22" fill="none" stroke="#e5b56a" stroke-width="1.2" opacity=".4"/>
+  <!-- cloudy miss swirl -->
+  <path d="M96 108 C120 100 150 100 168 106 C150 114 118 116 96 108 Z" fill="#e6b878" opacity=".45"/>
+  <path d="M188 104 C204 100 220 102 228 108 C214 112 198 110 188 104 Z" fill="#e6b878" opacity=".38"/>
+  <!-- wakame seaweed ribbons (dark green, glossy) -->
+  <path d="M108 100 C100 96 98 106 106 108 C112 112 122 108 118 102 C114 96 112 104 108 100 Z" fill="#123d1c"/>
+  <path d="M108 100 C100 96 98 106 106 108 C112 112 122 108 118 102" fill="none" stroke="#1f5c2c" stroke-width="1.2" opacity=".8"/>
+  <path d="M196 112 C188 108 186 118 196 118 C204 120 212 114 206 108 C200 104 200 112 196 112 Z" fill="#0f3418"/>
+  <path d="M196 112 C188 108 186 118 196 118 C204 120 212 114 206 108" fill="none" stroke="#1f5c2c" stroke-width="1.2" opacity=".8"/>
+  <!-- tofu cubes floating (soft, pale, front larger) -->
+  <g transform="translate(0 0)">
+    <path d="M140 96 l16 -5 l14 6 l-3 13 l-16 5 l-14 -6 Z" fill="url(#mstofu)" stroke="#c9ab78" stroke-width="1.2"/>
+    <path d="M140 96 l16 -5 l14 6 l-16 4 Z" fill="#fffaf0" opacity=".7"/>
+    <path d="M154 91 l14 6 l-3 13 l-14 -4 Z" fill="#e9d5ac" opacity=".6"/>
+  </g>
+  <g transform="translate(0 0)">
+    <path d="M170 116 l14 -4 l12 5 l-2 11 l-14 4 l-12 -5 Z" fill="url(#mstofu)" stroke="#c9ab78" stroke-width="1.2"/>
+    <path d="M170 116 l14 -4 l12 5 l-14 3 Z" fill="#fffaf0" opacity=".7"/>
+    <path d="M184 112 l12 5 l-2 11 l-12 -3 Z" fill="#e9d5ac" opacity=".6"/>
+  </g>
+  <g transform="translate(0 0)">
+    <path d="M118 118 l13 -4 l11 5 l-2 10 l-13 4 l-11 -5 Z" fill="url(#mstofu)" stroke="#c9ab78" stroke-width="1.2"/>
+    <path d="M118 118 l13 -4 l11 5 l-13 3 Z" fill="#fffaf0" opacity=".65"/>
+  </g>
+  <!-- scallion rings floating -->
+  <circle cx="132" cy="108" r="3.2" fill="none" stroke="#5ecb4e" stroke-width="2.2"/>
+  <circle cx="150" cy="120" r="2.8" fill="none" stroke="#3f9c37" stroke-width="2"/>
+  <circle cx="200" cy="102" r="3" fill="none" stroke="#5ecb4e" stroke-width="2.2"/>
+  <circle cx="176" cy="108" r="2.6" fill="none" stroke="#58c14a" stroke-width="2"/>
+  <circle cx="210" cy="118" r="2.6" fill="none" stroke="#3f9c37" stroke-width="2"/>
+  <!-- oil gloss dots on broth -->
+  <circle cx="126" cy="104" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="188" cy="108" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="160" cy="116" r="1.2" fill="#ffe9c9" opacity=".5"/>
+  <circle cx="204" cy="112" r="1.1" fill="#fff" opacity=".45"/>
+</svg>

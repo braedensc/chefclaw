@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="wfBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="wfbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <linearGradient id="wfwaffle" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f2c473"/><stop offset="55%" stop-color="#d99f42"/><stop offset="100%" stop-color="#b3782a"/>
+    </linearGradient>
+    <linearGradient id="wfsyrup" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#a5561d"/><stop offset="100%" stop-color="#6e340d"/>
+    </linearGradient>
+    <radialGradient id="wfbutter" cx="40%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#fff3c8"/><stop offset="60%" stop-color="#ffe58a"/><stop offset="100%" stop-color="#f6c94a"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#wfbg)"/>
+  <!-- warm aroma wisps -->
+  <path d="M120 50 C110 34 130 26 120 8" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#wfBlur3)"/>
+  <path d="M198 48 C190 32 206 24 198 6" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#wfBlur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="178" rx="134" ry="19" fill="#000" opacity=".5"/>
+  <!-- round plate -->
+  <ellipse cx="160" cy="146" rx="132" ry="42" fill="#141018"/>
+  <ellipse cx="160" cy="146" rx="132" ry="42" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="146" rx="116" ry="34" fill="#0f0d13"/>
+  <!-- neon steam arc (warm) -->
+  <path d="M52 106 Q104 72 168 72" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- BACK waffle (offset, slightly smaller) -->
+  <g transform="translate(160 118)">
+    <ellipse cx="0" cy="-8" rx="66" ry="30" fill="#8a5f22" opacity=".5"/>
+    <path d="M-64 -10 A64 30 0 0 1 64 -10 L58 4 A58 26 0 0 1 -58 4 Z" fill="url(#wfwaffle)" stroke="#9a6a26" stroke-width="1.4"/>
+  </g>
+  <!-- FRONT waffle: hero, round with the classic deep grid -->
+  <g transform="translate(160 122)">
+    <!-- waffle round body -->
+    <ellipse cx="0" cy="0" rx="66" ry="30" fill="url(#wfwaffle)" stroke="#9a6a26" stroke-width="1.6"/>
+    <!-- scalloped/bumpy edge -->
+    <path d="M-64 0 A64 30 0 0 1 64 0" fill="none" stroke="#c99146" stroke-width="2" opacity=".6"/>
+    <!-- grid pockets: dark wells clipped inside the round -->
+    <g opacity=".85" stroke="#7a4e18" stroke-width="2.4" stroke-linecap="round">
+      <path d="M-44 -14 L-44 16 M-22 -20 L-22 22 M0 -22 L0 24 M22 -20 L22 22 M44 -14 L44 16"/>
+      <path d="M-58 -8 L58 -8 M-62 2 L62 2 M-54 12 L54 12"/>
+    </g>
+    <!-- pocket shadows to give depth -->
+    <g fill="#8a5a1e" opacity=".35">
+      <rect x="-38" y="-4" width="14" height="9" rx="2"/>
+      <rect x="-16" y="-4" width="14" height="9" rx="2"/>
+      <rect x="6" y="-4" width="14" height="9" rx="2"/>
+      <rect x="28" y="-4" width="12" height="9" rx="2"/>
+      <rect x="-38" y="-16" width="14" height="8" rx="2"/>
+      <rect x="-16" y="-16" width="14" height="8" rx="2"/>
+      <rect x="6" y="-16" width="14" height="8" rx="2"/>
+    </g>
+    <!-- top-edge highlight -->
+    <path d="M-58 -20 A56 22 0 0 1 58 -20" fill="none" stroke="#ffe6b0" stroke-width="1.6" opacity=".5"/>
+  </g>
+  <!-- melting butter pat on top, catching light -->
+  <path d="M148 108 L172 108 L168 122 L152 122 Z" fill="url(#wfbutter)" stroke="#e6b23a" stroke-width="1"/>
+  <ellipse cx="156" cy="112" rx="6" ry="2.4" fill="#fff8dc" opacity=".8"/>
+  <!-- maple syrup pooling and drizzling down the front -->
+  <path d="M118 118 C130 128 150 132 168 130 C186 128 200 124 210 116 C204 132 186 142 160 144 C134 146 118 138 108 128 Z" fill="url(#wfsyrup)" opacity=".85"/>
+  <path d="M126 130 C130 142 128 150 132 152 M150 134 C152 146 150 154 152 156 M182 130 C184 142 182 148 184 152" stroke="url(#wfsyrup)" stroke-width="4" fill="none" opacity=".8" stroke-linecap="round"/>
+  <!-- syrup sheen -->
+  <path d="M130 122 C146 130 176 130 196 120" stroke="#c9762e" stroke-width="1.6" fill="none" opacity=".5" stroke-linecap="round"/>
+  <!-- dusting of powdered sugar + a couple berries -->
+  <circle cx="128" cy="104" r="6" fill="#c0264a"/>
+  <circle cx="126" cy="102" r="1.8" fill="#ff6f8a" opacity=".7"/>
+  <circle cx="192" cy="110" r="5.5" fill="#7a2d8c"/>
+  <circle cx="190" cy="108" r="1.6" fill="#c56fd6" opacity=".7"/>
+  <g fill="#fff" opacity=".7">
+    <circle cx="150" cy="100" r="1"/><circle cx="170" cy="104" r="1"/><circle cx="140" cy="118" r=".9"/><circle cx="184" cy="120" r=".9"/>
+  </g>
+  <!-- gloss dots -->
+  <circle cx="162" cy="114" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="178" cy="128" r="1.2" fill="#fff" opacity=".45"/>
+</svg>

@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="ppBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="ppbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#123138"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="ppbowl" cx="50%" cy="30%" r="82%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <radialGradient id="ppcurry" cx="46%" cy="34%" r="78%">
+      <stop offset="0%" stop-color="#3f7a2e"/><stop offset="52%" stop-color="#2c5c22"/><stop offset="100%" stop-color="#1c3d16"/>
+    </radialGradient>
+    <linearGradient id="pppaneer" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fbf3df"/><stop offset="100%" stop-color="#ecd9b2"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#ppbg)"/>
+  <!-- steam -->
+  <path d="M126 52 C116 34 136 26 126 6" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#ppBlur3)"/>
+  <path d="M196 54 C188 38 206 30 198 10" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#ppBlur3)"/>
+  <ellipse cx="160" cy="188" rx="140" ry="22" fill="#000" opacity=".5"/>
+  <!-- neon steam arc (cyan) -->
+  <path d="M58 100 Q108 66 168 66" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- DEEP BOWL (curry) -->
+  <path d="M56 108 C56 100 74 96 160 96 C246 96 264 100 264 108 C264 150 218 178 160 178 C102 178 56 150 56 108 Z" fill="url(#ppbowl)"/>
+  <path d="M56 108 C56 100 74 96 160 96 C246 96 264 100 264 108 C264 150 218 178 160 178 C102 178 56 150 56 108 Z" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <!-- rim ellipse -->
+  <ellipse cx="160" cy="108" rx="104" ry="20" fill="#141018"/>
+  <ellipse cx="160" cy="108" rx="104" ry="20" fill="none" stroke="#26262e" stroke-width="2.5"/>
+  <!-- green spinach curry surface -->
+  <ellipse cx="160" cy="108" rx="96" ry="17" fill="url(#ppcurry)"/>
+  <!-- curry texture: darker green blotches + oil sheen -->
+  <ellipse cx="120" cy="106" rx="18" ry="6" fill="#1f4718" opacity=".55"/>
+  <ellipse cx="196" cy="110" rx="20" ry="6" fill="#1f4718" opacity=".5"/>
+  <ellipse cx="160" cy="114" rx="16" ry="5" fill="#4f8f3a" opacity=".5"/>
+  <ellipse cx="150" cy="102" rx="22" ry="6" fill="#569a40" opacity=".4"/>
+  <!-- cream swirl -->
+  <path d="M108 108 C130 102 150 114 176 106 C196 100 210 108 214 110" stroke="#eaf3d8" stroke-width="2.6" fill="none" opacity=".6" stroke-linecap="round"/>
+  <path d="M124 116 C140 112 156 118 172 114" stroke="#f6f9e8" stroke-width="1.8" fill="none" opacity=".45" stroke-linecap="round"/>
+  <!-- PANEER CUBES nestled in the curry (the hero silhouette) -->
+  <g stroke="#c9ad7d" stroke-width="1.2">
+    <g transform="translate(112 96) rotate(-8)"><rect width="24" height="18" rx="2.5" fill="url(#pppaneer)"/><rect x="2" y="2" width="20" height="4.5" rx="1.6" fill="#fffcf0" opacity=".7"/></g>
+    <g transform="translate(150 92) rotate(6)"><rect width="26" height="19" rx="2.5" fill="url(#pppaneer)"/><rect x="2" y="2" width="22" height="4.8" rx="1.6" fill="#fffcf0" opacity=".72"/></g>
+    <g transform="translate(190 98) rotate(-5)"><rect width="24" height="18" rx="2.5" fill="url(#pppaneer)"/><rect x="2" y="2" width="20" height="4.5" rx="1.6" fill="#fffcf0" opacity=".68"/></g>
+    <g transform="translate(132 110) rotate(12)"><rect width="22" height="16" rx="2.4" fill="url(#pppaneer)"/><rect x="2" y="2" width="18" height="4.2" rx="1.5" fill="#fffcf0" opacity=".65"/></g>
+    <g transform="translate(172 112) rotate(-14)"><rect width="23" height="17" rx="2.4" fill="url(#pppaneer)"/><rect x="2" y="2" width="19" height="4.4" rx="1.5" fill="#fffcf0" opacity=".66"/></g>
+  </g>
+  <!-- light char edges on paneer -->
+  <path d="M118 100 l18 0" stroke="#d8a24a" stroke-width="1.4" opacity=".5"/>
+  <path d="M158 98 l20 0" stroke="#d8a24a" stroke-width="1.4" opacity=".5"/>
+  <!-- garnish: cream drizzle finish + green fleck -->
+  <path d="M118 92 C138 88 168 90 200 92" stroke="#f4f7e6" stroke-width="2" fill="none" opacity=".5" stroke-linecap="round"/>
+  <rect x="140" y="120" width="6" height="2.4" rx="1.2" fill="#6abf5a" transform="rotate(20 143 121)"/>
+  <rect x="180" y="122" width="6" height="2.4" rx="1.2" fill="#3f9c37" transform="rotate(-16 183 123)"/>
+  <circle cx="128" cy="122" r="1.8" fill="#e0341f"/>
+  <!-- gloss dots -->
+  <circle cx="150" cy="100" r="1.5" fill="#fff" opacity=".6"/>
+  <circle cx="196" cy="104" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="120" cy="112" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

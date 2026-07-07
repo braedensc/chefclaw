@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="tbkBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="tbkbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#3a1120"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <radialGradient id="tbkpan" cx="50%" cy="32%" r="80%">
+      <stop offset="0%" stop-color="#1a1218"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <radialGradient id="tbksauce" cx="46%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#e8461c"/><stop offset="55%" stop-color="#c02808"/><stop offset="100%" stop-color="#7a1305"/>
+    </radialGradient>
+    <linearGradient id="tbkcake" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff4ea"/><stop offset="55%" stop-color="#f6e2d0"/><stop offset="100%" stop-color="#e2c3a8"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#tbkbg)"/>
+  <!-- steam (hot dish, keep it) -->
+  <path d="M112 52 C102 34 122 26 112 6" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#tbkBlur3)"/>
+  <path d="M198 54 C190 38 208 30 200 10" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#tbkBlur3)"/>
+  <ellipse cx="160" cy="188" rx="150" ry="22" fill="#000" opacity=".5"/>
+  <!-- shallow pan / wide bowl -->
+  <ellipse cx="160" cy="132" rx="140" ry="46" fill="url(#tbkpan)"/>
+  <ellipse cx="160" cy="132" rx="140" ry="46" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="132" rx="126" ry="38" fill="#100a0d"/>
+  <!-- neon steam arc (rose family) -->
+  <path d="M52 116 Q106 84 170 82" stroke="#ff4d6d" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- glossy gochujang sauce pool -->
+  <ellipse cx="160" cy="132" rx="118" ry="33" fill="url(#tbksauce)"/>
+  <ellipse cx="160" cy="126" rx="96" ry="20" fill="#ff6a2e" opacity=".35"/>
+  <path d="M70 128 C104 118 216 118 250 128" stroke="#ff8a4a" stroke-width="2.2" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- CYLINDRICAL RICE CAKES (garae-tteok) piled, sauce-coated -->
+  <g stroke-linejoin="round">
+    <!-- back row (smaller) -->
+    <g transform="translate(88 104) rotate(-16) scale(.9)"><rect width="46" height="16" rx="8" fill="url(#tbkcake)" stroke="#b06848" stroke-width="1.2"/><ellipse cx="12" cy="5" rx="8" ry="2.6" fill="#fffaf3" opacity=".8"/><path d="M2 8 C2 3 6 3 6 8 C6 13 2 13 2 8 Z M44 8 C44 3 40 3 40 8 C40 13 44 13 44 8 Z" fill="#e8c8a8" opacity=".7"/></g>
+    <g transform="translate(158 100) rotate(10) scale(.9)"><rect width="46" height="16" rx="8" fill="url(#tbkcake)" stroke="#b06848" stroke-width="1.2"/><ellipse cx="12" cy="5" rx="8" ry="2.6" fill="#fffaf3" opacity=".8"/><path d="M2 8 C2 3 6 3 6 8 C6 13 2 13 2 8 Z M44 8 C44 3 40 3 40 8 C40 13 44 13 44 8 Z" fill="#e8c8a8" opacity=".7"/></g>
+    <!-- front row (larger, brighter) -->
+    <g transform="translate(70 122) rotate(-22)"><rect width="54" height="19" rx="9.5" fill="url(#tbkcake)" stroke="#a85e3e" stroke-width="1.4"/><ellipse cx="15" cy="6" rx="10" ry="3" fill="#fffaf3" opacity=".85"/><path d="M3 9.5 C3 4 8 4 8 9.5 C8 15 3 15 3 9.5 Z M51 9.5 C51 4 46 4 46 9.5 C46 15 51 15 51 9.5 Z" fill="#e8c8a8" opacity=".7"/></g>
+    <g transform="translate(146 126) rotate(8)"><rect width="54" height="19" rx="9.5" fill="url(#tbkcake)" stroke="#a85e3e" stroke-width="1.4"/><ellipse cx="15" cy="6" rx="10" ry="3" fill="#fffaf3" opacity=".85"/><path d="M3 9.5 C3 4 8 4 8 9.5 C8 15 3 15 3 9.5 Z M51 9.5 C51 4 46 4 46 9.5 C46 15 51 15 51 9.5 Z" fill="#e8c8a8" opacity=".7"/></g>
+    <g transform="translate(112 132) rotate(-4)"><rect width="52" height="18" rx="9" fill="url(#tbkcake)" stroke="#a85e3e" stroke-width="1.4"/><ellipse cx="14" cy="6" rx="9" ry="2.8" fill="#fffaf3" opacity=".85"/><path d="M3 9 C3 4 8 4 8 9 C8 14 3 14 3 9 Z M49 9 C49 4 44 4 44 9 C44 14 49 14 49 9 Z" fill="#e8c8a8" opacity=".7"/></g>
+  </g>
+  <!-- sauce glaze coating the cakes -->
+  <path d="M92 116 C108 110 124 112 132 118" stroke="#c02808" stroke-width="2.2" fill="none" opacity=".55" stroke-linecap="round"/>
+  <path d="M170 122 C186 116 200 118 208 124" stroke="#c02808" stroke-width="2.2" fill="none" opacity=".55" stroke-linecap="round"/>
+  <!-- fish-cake slice (odeng) triangle -->
+  <path d="M210 118 L232 112 L226 130 Z" fill="#f2e0c8" stroke="#c08858" stroke-width="1.2"/>
+  <path d="M214 118 L228 116" stroke="#d8a878" stroke-width="1.6" opacity=".6"/>
+  <!-- boiled egg half -->
+  <g transform="translate(200 138)">
+    <ellipse cx="0" cy="0" rx="14" ry="12" fill="#fbeecb" stroke="#d8b47f" stroke-width="1.2"/>
+    <ellipse cx="0" cy="0" rx="6" ry="5.5" fill="#f6ac25"/>
+    <ellipse cx="-2" cy="-2" rx="2" ry="1.6" fill="#ffe08a" opacity=".8"/>
+  </g>
+  <!-- scallion garnish scattered on top -->
+  <rect x="120" y="110" width="8" height="2.8" rx="1.4" fill="#5ecb4e" transform="rotate(-20 124 111)"/>
+  <rect x="170" y="112" width="8" height="2.8" rx="1.4" fill="#3f9c37" transform="rotate(16 174 113)"/>
+  <rect x="142" y="146" width="7" height="2.6" rx="1.3" fill="#58c14a" transform="rotate(24 145 147)"/>
+  <rect x="96" y="140" width="7" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(-14 99 141)"/>
+  <!-- toasted sesame -->
+  <g fill="#f8eed6">
+    <ellipse cx="134" cy="122" rx="2" ry="1.1" transform="rotate(18 134 122)"/>
+    <ellipse cx="164" cy="118" rx="2" ry="1.1" transform="rotate(-14 164 118)"/>
+    <ellipse cx="150" cy="138" rx="2" ry="1.1" transform="rotate(22 150 138)"/>
+  </g>
+  <!-- oily gloss dots -->
+  <circle cx="118" cy="120" r="1.5" fill="#fff" opacity=".55"/>
+  <circle cx="176" cy="130" r="1.4" fill="#fff" opacity=".5"/>
+  <circle cx="140" cy="134" r="1.2" fill="#fff" opacity=".45"/>
+</svg>

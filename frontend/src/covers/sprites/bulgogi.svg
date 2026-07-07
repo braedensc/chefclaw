@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="bgiBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="bgibg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#123138"/><stop offset="45%" stop-color="#0b090b"/><stop offset="100%" stop-color="#060507"/>
+    </radialGradient>
+    <radialGradient id="bgiplate" cx="50%" cy="32%" r="80%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <linearGradient id="bgibeef" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8a4620"/><stop offset="45%" stop-color="#5e2c12"/><stop offset="100%" stop-color="#3a1808"/>
+    </linearGradient>
+    <linearGradient id="bgiglaze" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#c07030"/><stop offset="100%" stop-color="#8a4014"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#bgibg)"/>
+  <!-- steam -->
+  <path d="M112 54 C102 36 122 28 112 8" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#bgiBlur3)"/>
+  <path d="M198 52 C190 36 208 28 200 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#bgiBlur3)"/>
+  <ellipse cx="160" cy="188" rx="156" ry="22" fill="#000" opacity=".5"/>
+  <!-- oval plate -->
+  <ellipse cx="160" cy="132" rx="146" ry="47" fill="url(#bgiplate)"/>
+  <ellipse cx="160" cy="132" rx="146" ry="47" fill="none" stroke="#26262e" stroke-width="3"/>
+  <ellipse cx="160" cy="132" rx="132" ry="39" fill="#0d0d10"/>
+  <!-- neon steam arc (cyan savory) -->
+  <path d="M50 116 Q104 82 170 80" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- marinade sheen pool on the plate -->
+  <ellipse cx="160" cy="130" rx="118" ry="32" fill="#2a1608" opacity=".5"/>
+  <!-- TOSSED MARINATED BEEF STRIPS (curled, glossy, piled) -->
+  <g stroke-linejoin="round">
+    <!-- back layer (smaller/darker) -->
+    <g transform="translate(72 100) rotate(-14) scale(.86)"><path d="M0 6 C10 -2 34 -2 48 4 C58 8 54 18 42 18 C26 20 6 16 0 12 Z" fill="url(#bgibeef)" stroke="#2a1206" stroke-width="1.2"/><path d="M6 8 C18 4 36 4 46 8" stroke="url(#bgiglaze)" stroke-width="2" opacity=".6" fill="none" stroke-linecap="round"/></g>
+    <g transform="translate(180 98) rotate(12) scale(.86)"><path d="M0 6 C10 -2 34 -2 48 4 C58 8 54 18 42 18 C26 20 6 16 0 12 Z" fill="url(#bgibeef)" stroke="#2a1206" stroke-width="1.2"/><path d="M6 8 C18 4 36 4 46 8" stroke="url(#bgiglaze)" stroke-width="2" opacity=".6" fill="none" stroke-linecap="round"/></g>
+    <g transform="translate(128 96) rotate(-6) scale(.86)"><path d="M0 6 C10 -2 34 -2 48 4 C58 8 54 18 42 18 C26 20 6 16 0 12 Z" fill="url(#bgibeef)" stroke="#2a1206" stroke-width="1.2"/><path d="M6 8 C18 4 36 4 46 8" stroke="url(#bgiglaze)" stroke-width="2" opacity=".6" fill="none" stroke-linecap="round"/></g>
+    <!-- front layer (larger/brighter, curled ribbons) -->
+    <g transform="translate(66 118) rotate(-20)"><path d="M0 8 C12 -2 40 -2 56 6 C68 12 62 24 46 24 C28 26 6 20 0 14 Z" fill="url(#bgibeef)" stroke="#2a1206" stroke-width="1.4"/><path d="M8 10 C22 5 44 5 54 10" stroke="url(#bgiglaze)" stroke-width="2.4" opacity=".7" fill="none" stroke-linecap="round"/><ellipse cx="26" cy="9" rx="14" ry="3" fill="#c78a4a" opacity=".45"/></g>
+    <g transform="translate(150 122) rotate(10)"><path d="M0 8 C12 -2 40 -2 56 6 C68 12 62 24 46 24 C28 26 6 20 0 14 Z" fill="url(#bgibeef)" stroke="#2a1206" stroke-width="1.4"/><path d="M8 10 C22 5 44 5 54 10" stroke="url(#bgiglaze)" stroke-width="2.4" opacity=".7" fill="none" stroke-linecap="round"/><ellipse cx="26" cy="9" rx="14" ry="3" fill="#c78a4a" opacity=".45"/></g>
+    <g transform="translate(108 128) rotate(-4)"><path d="M0 8 C12 -2 40 -2 56 6 C68 12 62 24 46 24 C28 26 6 20 0 14 Z" fill="url(#bgibeef)" stroke="#2a1206" stroke-width="1.4"/><path d="M8 10 C22 5 44 5 54 10" stroke="url(#bgiglaze)" stroke-width="2.4" opacity=".7" fill="none" stroke-linecap="round"/><ellipse cx="26" cy="9" rx="14" ry="3" fill="#c78a4a" opacity=".45"/></g>
+  </g>
+  <!-- sliced onion ribbons woven through -->
+  <path d="M96 116 C112 110 132 112 144 118" stroke="#efe4d0" stroke-width="2.6" fill="none" opacity=".6" stroke-linecap="round"/>
+  <path d="M176 128 C192 122 210 124 222 130" stroke="#efe4d0" stroke-width="2.6" fill="none" opacity=".55" stroke-linecap="round"/>
+  <!-- scallion greens scattered -->
+  <rect x="118" y="108" width="8" height="2.8" rx="1.4" fill="#5ecb4e" transform="rotate(-22 122 109)"/>
+  <rect x="176" y="112" width="8" height="2.8" rx="1.4" fill="#3f9c37" transform="rotate(18 180 113)"/>
+  <rect x="140" y="140" width="7" height="2.6" rx="1.3" fill="#58c14a" transform="rotate(26 143 141)"/>
+  <rect x="204" y="120" width="7" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(-14 207 121)"/>
+  <!-- sesame seeds -->
+  <g fill="#f8eed6">
+    <ellipse cx="130" cy="120" rx="2" ry="1.1" transform="rotate(20 130 120)"/>
+    <ellipse cx="160" cy="112" rx="2" ry="1.1" transform="rotate(-16 160 112)"/>
+    <ellipse cx="188" cy="126" rx="2" ry="1.1" transform="rotate(24 188 126)"/>
+    <ellipse cx="146" cy="132" rx="2" ry="1.1" transform="rotate(-20 146 132)"/>
+    <ellipse cx="110" cy="126" rx="2" ry="1.1" transform="rotate(14 110 126)"/>
+  </g>
+  <!-- gloss dots -->
+  <circle cx="100" cy="112" r="1.6" fill="#fff" opacity=".6"/>
+  <circle cx="180" cy="118" r="1.4" fill="#fff" opacity=".5"/>
+  <circle cx="140" cy="130" r="1.3" fill="#fff" opacity=".5"/>
+</svg>

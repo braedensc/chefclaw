@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="op1Blur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="op1bg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="op1bowl" cx="50%" cy="32%" r="80%">
+      <stop offset="0%" stop-color="#1c1622"/><stop offset="100%" stop-color="#0c0c10"/>
+    </radialGradient>
+    <radialGradient id="op1nest" cx="46%" cy="34%" r="78%">
+      <stop offset="0%" stop-color="#f2e0b4"/><stop offset="55%" stop-color="#e0c384"/><stop offset="100%" stop-color="#c09a54"/>
+    </radialGradient>
+    <radialGradient id="op1oil" cx="48%" cy="38%" r="70%">
+      <stop offset="0%" stop-color="#ef5520"/><stop offset="55%" stop-color="#b02408"/><stop offset="100%" stop-color="#7a1305"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#op1bg)"/>
+  <!-- rising steam (sizzling oil) -->
+  <path d="M124 50 C114 32 134 26 124 6" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#op1Blur3)"/>
+  <path d="M198 52 C190 36 208 28 200 10" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#op1Blur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="188" rx="146" ry="22" fill="#000" opacity=".5"/>
+  <!-- wide shallow bowl -->
+  <ellipse cx="160" cy="134" rx="134" ry="46" fill="url(#op1bowl)"/>
+  <ellipse cx="160" cy="134" rx="134" ry="46" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="132" rx="118" ry="38" fill="#0e0d12"/>
+  <!-- neon steam arc (rose — spicy identity) -->
+  <path d="M50 116 Q104 84 168 82" stroke="#ff4d6d" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- pale WIDE belt-noodle nest (biang-biang style flat ribbons) -->
+  <ellipse cx="160" cy="122" rx="100" ry="30" fill="url(#op1nest)"/>
+  <g fill="none" stroke-linecap="round">
+    <path d="M74 122 C108 108 152 106 200 112 C220 114 238 120 246 124" stroke="#b8934c" stroke-width="8" opacity=".9"/>
+    <path d="M80 130 C114 116 160 114 204 120 C224 123 240 128 246 132" stroke="#d3b46e" stroke-width="8"/>
+    <path d="M86 114 C120 100 164 100 208 106" stroke="#eed6a0" stroke-width="7.5"/>
+    <path d="M94 132 C126 120 170 118 212 124" stroke="#c4a25e" stroke-width="7"/>
+    <path d="M90 122 C122 108 166 106 206 112" stroke="#fff1c9" stroke-width="2" opacity=".7"/>
+  </g>
+  <!-- SIZZLING OIL SLICK poured over the crown (glossy red-orange pool) -->
+  <path d="M112 108 C126 98 168 96 200 104 C220 110 216 128 194 132 C164 138 128 136 112 128 C100 122 100 116 112 108 Z" fill="url(#op1oil)" opacity=".92"/>
+  <path d="M120 106 C140 100 178 100 200 108" stroke="#ff7a3a" stroke-width="2" fill="none" opacity=".7" stroke-linecap="round"/>
+  <ellipse cx="150" cy="112" rx="14" ry="5" fill="#ff8a4a" opacity=".5"/>
+  <!-- pile of coarse chili flakes crowning the oil -->
+  <g>
+    <rect x="130" y="106" width="7" height="4" rx="1.6" fill="#e0341f" transform="rotate(-16 133 108)"/>
+    <rect x="150" y="102" width="7" height="4" rx="1.6" fill="#ff4d2d" transform="rotate(12 153 104)"/>
+    <rect x="168" y="108" width="7" height="4" rx="1.6" fill="#c31f12" transform="rotate(-8 171 110)"/>
+    <rect x="140" y="116" width="6.5" height="3.6" rx="1.5" fill="#e0341f" transform="rotate(20 143 118)"/>
+    <rect x="184" y="112" width="6.5" height="3.6" rx="1.5" fill="#ff4d2d" transform="rotate(-14 187 114)"/>
+    <rect x="118" y="118" width="6" height="3.4" rx="1.4" fill="#c31f12" transform="rotate(26 121 120)"/>
+    <rect x="160" y="118" width="6.5" height="3.6" rx="1.5" fill="#e0341f" transform="rotate(6 163 120)"/>
+  </g>
+  <!-- minced garlic + white sesame + scallion on top -->
+  <circle cx="128" cy="112" r="2" fill="#f2ddb0"/>
+  <circle cx="176" cy="106" r="2" fill="#f2ddb0"/>
+  <circle cx="152" cy="120" r="1.8" fill="#f2ddb0"/>
+  <rect x="122" y="110" width="7" height="2.6" rx="1.3" fill="#5ecb4e" transform="rotate(-20 125 111)"/>
+  <rect x="188" y="108" width="7" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(14 191 109)"/>
+  <rect x="146" y="124" width="6" height="2.4" rx="1.2" fill="#58c14a" transform="rotate(24 149 125)"/>
+  <circle cx="140" cy="108" r="1.2" fill="#f8eed6"/>
+  <circle cx="182" cy="118" r="1.2" fill="#f8eed6"/>
+  <!-- oil gloss dots -->
+  <circle cx="146" cy="108" r="1.5" fill="#fff" opacity=".6"/>
+  <circle cx="184" cy="122" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="164" cy="126" r="1.2" fill="#fff" opacity=".45"/>
+</svg>

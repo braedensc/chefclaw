@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="kcdBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="kcdbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <linearGradient id="kcdbatter" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f6cf6a"/><stop offset="50%" stop-color="#e0a238"/><stop offset="100%" stop-color="#b4761d"/>
+    </linearGradient>
+    <linearGradient id="kcdsear" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#c98b32"/><stop offset="100%" stop-color="#8a5416"/>
+    </linearGradient>
+    <linearGradient id="kcdboard" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3a2a1a"/><stop offset="100%" stop-color="#21160c"/>
+    </linearGradient>
+    <radialGradient id="kcdcheese" cx="40%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#ffe9a0"/><stop offset="100%" stop-color="#f2b83a"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#kcdbg)"/>
+  <!-- rising steam wisps -->
+  <path d="M120 46 C112 30 128 22 120 6" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#kcdBlur3)"/>
+  <path d="M182 44 C176 28 190 20 184 4" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#kcdBlur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="186" rx="150" ry="22" fill="#000" opacity=".5"/>
+  <!-- wooden serving board -->
+  <ellipse cx="160" cy="150" rx="140" ry="34" fill="url(#kcdboard)"/>
+  <ellipse cx="160" cy="150" rx="140" ry="34" fill="none" stroke="#4a341f" stroke-width="2.5"/>
+  <path d="M40 148 Q160 138 280 148" stroke="#5a4026" stroke-width="1.4" fill="none" opacity=".6"/>
+  <path d="M46 158 Q160 150 274 158" stroke="#241609" stroke-width="1.4" fill="none" opacity=".7"/>
+  <!-- neon steam arc (warm) -->
+  <path d="M52 108 Q104 74 172 74" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- wooden stick protruding at the bottom -->
+  <g transform="rotate(-30 160 120)">
+    <rect x="152" y="150" width="8" height="52" rx="4" fill="#c9a260"/>
+    <rect x="153.5" y="150" width="2.4" height="52" rx="1.2" fill="#e6cf9d" opacity=".6"/>
+  </g>
+  <!-- the corn dog: tall craggy fried baton, tilted -->
+  <g transform="rotate(-30 160 116)">
+    <!-- body -->
+    <rect x="138" y="30" width="44" height="118" rx="22" fill="url(#kcdbatter)"/>
+    <rect x="138" y="30" width="44" height="118" rx="22" fill="none" stroke="#8a5416" stroke-width="1.4" opacity=".5"/>
+    <!-- craggy crunchy fried nubbles (the signature bumpy crust) -->
+    <g fill="url(#kcdsear)" stroke="#7a4712" stroke-width="0.8" opacity=".95">
+      <circle cx="150" cy="52" r="5.5"/>
+      <circle cx="168" cy="46" r="5"/>
+      <circle cx="160" cy="62" r="6"/>
+      <circle cx="146" cy="72" r="5"/>
+      <circle cx="172" cy="70" r="5.5"/>
+      <circle cx="158" cy="82" r="5.5"/>
+      <circle cx="148" cy="94" r="5"/>
+      <circle cx="170" cy="92" r="5.5"/>
+      <circle cx="160" cy="104" r="6"/>
+      <circle cx="150" cy="116" r="5"/>
+      <circle cx="171" cy="114" r="5"/>
+      <circle cx="160" cy="126" r="5.5"/>
+      <circle cx="167" cy="136" r="4.5"/>
+      <circle cx="152" cy="136" r="4.5"/>
+    </g>
+    <!-- gold highlight edge -->
+    <rect x="143" y="40" width="6" height="96" rx="3" fill="#ffe6a0" opacity=".45"/>
+    <!-- rounded top with a couple of crunchy flakes -->
+    <ellipse cx="160" cy="38" rx="18" ry="7" fill="#f6cf6a"/>
+    <circle cx="154" cy="36" r="3.5" fill="url(#kcdsear)"/>
+    <circle cx="167" cy="37" r="3" fill="url(#kcdsear)"/>
+  </g>
+  <!-- melty cheese pull dripping from the top -->
+  <path d="M96 66 C92 78 96 90 104 96 C100 82 102 74 108 70 Z" fill="url(#kcdcheese)"/>
+  <path d="M96 66 C92 78 96 90 104 96" stroke="#e0952a" stroke-width="1.2" fill="none" opacity=".6"/>
+  <circle cx="99" cy="98" r="3" fill="url(#kcdcheese)"/>
+  <!-- ketchup + mustard drizzle zig-zag across the dog -->
+  <path d="M108 118 L128 100 L118 92 L138 76 L128 68 L146 56" stroke="#e0341f" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".92"/>
+  <path d="M118 124 L138 106 L128 98 L148 82 L138 74 L156 62" stroke="#ffd60a" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>
+  <!-- sugar crystals / sesame sprinkle glints -->
+  <circle cx="112" cy="90" r="1.2" fill="#fff" opacity=".8"/>
+  <circle cx="134" cy="70" r="1.1" fill="#fff" opacity=".75"/>
+  <circle cx="150" cy="52" r="1.1" fill="#fff" opacity=".7"/>
+  <circle cx="126" cy="108" r="1.2" fill="#fff" opacity=".7"/>
+  <!-- gloss dots -->
+  <circle cx="120" cy="100" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="144" cy="66" r="1.3" fill="#fff" opacity=".5"/>
+</svg>

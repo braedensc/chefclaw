@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <radialGradient id="mcbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#38101e"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <linearGradient id="mcpink" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffc7dc"/><stop offset="55%" stop-color="#ff9bc0"/><stop offset="100%" stop-color="#f06ea0"/>
+    </linearGradient>
+    <linearGradient id="mcmint" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#c7f2d8"/><stop offset="55%" stop-color="#8fdcb0"/><stop offset="100%" stop-color="#5fbf8e"/>
+    </linearGradient>
+    <linearGradient id="mcgold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffe6a0"/><stop offset="55%" stop-color="#ffcf5c"/><stop offset="100%" stop-color="#f0a828"/>
+    </linearGradient>
+    <linearGradient id="mclav" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e2ceff"/><stop offset="55%" stop-color="#c4a4f2"/><stop offset="100%" stop-color="#a67ee0"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#mcbg)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="176" rx="140" ry="18" fill="#000" opacity=".5"/>
+  <!-- slate/plate under the row of macarons -->
+  <ellipse cx="160" cy="146" rx="140" ry="30" fill="#141018"/>
+  <ellipse cx="160" cy="146" rx="140" ry="30" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="144" rx="126" ry="24" fill="#0f0d13"/>
+  <!-- a macaron unit = two domed shells + ruffled "feet" + cream filling -->
+  <!-- BACK ROW (smaller, dimmer) -->
+  <g transform="translate(84 96) scale(.82)">
+    <ellipse cx="0" cy="20" rx="26" ry="8" fill="#4a1c2c" opacity=".5"/>
+    <path d="M-26 8 A26 15 0 0 1 26 8 Z" fill="url(#mclav)"/>
+    <path d="M-26 8 L-26 12 A26 8 0 0 0 26 12 L26 8 Z" fill="#efe6d0"/>
+    <rect x="-25" y="9" width="50" height="4" fill="#e6d8bc"/>
+    <path d="M-25 11 l4 3 M-15 11 l4 3 M-5 11 l4 3 M5 11 l4 3 M15 11 l4 3" stroke="#c4a4f2" stroke-width="1.6" opacity=".5"/>
+    <path d="M-26 14 A26 15 0 0 0 26 14 L26 18 A26 15 0 0 1 -26 18 Z" fill="url(#mclav)" opacity=".9"/>
+    <ellipse cx="-8" cy="1" rx="9" ry="3" fill="#fff" opacity=".4"/>
+  </g>
+  <g transform="translate(236 96) scale(.82)">
+    <ellipse cx="0" cy="20" rx="26" ry="8" fill="#4a1c2c" opacity=".5"/>
+    <path d="M-26 8 A26 15 0 0 1 26 8 Z" fill="url(#mcgold)"/>
+    <path d="M-26 8 L-26 12 A26 8 0 0 0 26 12 L26 8 Z" fill="#efe6d0"/>
+    <rect x="-25" y="9" width="50" height="4" fill="#e6d8bc"/>
+    <path d="M-25 11 l4 3 M-15 11 l4 3 M-5 11 l4 3 M5 11 l4 3 M15 11 l4 3" stroke="#f0a828" stroke-width="1.6" opacity=".5"/>
+    <path d="M-26 14 A26 15 0 0 0 26 14 L26 18 A26 15 0 0 1 -26 18 Z" fill="url(#mcgold)" opacity=".9"/>
+    <ellipse cx="-8" cy="1" rx="9" ry="3" fill="#fff" opacity=".4"/>
+  </g>
+  <!-- FRONT ROW (larger, brighter) -->
+  <g transform="translate(120 112)">
+    <ellipse cx="0" cy="24" rx="30" ry="9" fill="#4a1c2c" opacity=".5"/>
+    <path d="M-30 10 A30 17 0 0 1 30 10 Z" fill="url(#mcmint)"/>
+    <path d="M-30 10 L-30 15 A30 9 0 0 0 30 15 L30 10 Z" fill="#f3ead6"/>
+    <rect x="-29" y="11" width="58" height="5" fill="#e9dcc0"/>
+    <path d="M-29 13 l5 4 M-18 13 l5 4 M-7 13 l5 4 M4 13 l5 4 M15 13 l5 4 M25 13 l4 4" stroke="#8fdcb0" stroke-width="1.8" opacity=".55"/>
+    <path d="M-30 17 A30 17 0 0 0 30 17 L30 22 A30 17 0 0 1 -30 22 Z" fill="url(#mcmint)"/>
+    <ellipse cx="-9" cy="2" rx="11" ry="4" fill="#fff" opacity=".5"/>
+    <circle cx="12" cy="1" r="1.6" fill="#fff" opacity=".7"/>
+  </g>
+  <g transform="translate(200 112)">
+    <ellipse cx="0" cy="24" rx="30" ry="9" fill="#4a1c2c" opacity=".5"/>
+    <path d="M-30 10 A30 17 0 0 1 30 10 Z" fill="url(#mcpink)"/>
+    <path d="M-30 10 L-30 15 A30 9 0 0 0 30 15 L30 10 Z" fill="#f3ead6"/>
+    <rect x="-29" y="11" width="58" height="5" fill="#e9dcc0"/>
+    <path d="M-29 13 l5 4 M-18 13 l5 4 M-7 13 l5 4 M4 13 l5 4 M15 13 l5 4 M25 13 l4 4" stroke="#ff9bc0" stroke-width="1.8" opacity=".6"/>
+    <path d="M-30 17 A30 17 0 0 0 30 17 L30 22 A30 17 0 0 1 -30 22 Z" fill="url(#mcpink)"/>
+    <ellipse cx="-9" cy="2" rx="11" ry="4" fill="#fff" opacity=".5"/>
+    <circle cx="12" cy="1" r="1.6" fill="#fff" opacity=".7"/>
+  </g>
+  <!-- sparkle accents (dessert: no steam arc) -->
+  <g stroke="#ffd0da" stroke-width="1.6" stroke-linecap="round" opacity=".7">
+    <path d="M64 60 l0 8 M60 64 l8 0"/>
+    <path d="M262 54 l0 6 M259 57 l6 0"/>
+    <path d="M160 46 l0 7 M156.5 49.5 l7 0"/>
+  </g>
+  <circle cx="64" cy="64" r="1.4" fill="#fff" opacity=".9"/>
+  <circle cx="262" cy="57" r="1.2" fill="#fff" opacity=".85"/>
+</svg>

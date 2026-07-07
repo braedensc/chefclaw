@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="crsBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="crsbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#123138"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <radialGradient id="crsbowl" cx="50%" cy="28%" r="82%">
+      <stop offset="0%" stop-color="#1c1622"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <radialGradient id="crsbroth" cx="46%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#f4e2b0"/><stop offset="58%" stop-color="#e6c983"/><stop offset="100%" stop-color="#cba85f"/>
+    </radialGradient>
+    <radialGradient id="crscorn" cx="42%" cy="30%" r="82%">
+      <stop offset="0%" stop-color="#ffe98f"/><stop offset="55%" stop-color="#f6c93a"/><stop offset="100%" stop-color="#d99a1c"/>
+    </radialGradient>
+    <linearGradient id="crsrib" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e6c8a4"/><stop offset="45%" stop-color="#c89468"/><stop offset="100%" stop-color="#8a5a34"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#crsbg)"/>
+  <!-- rising steam wisps (hot soup) -->
+  <path d="M126 50 C116 32 136 24 126 6" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#crsBlur3)"/>
+  <path d="M196 48 C188 32 206 24 198 6" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#crsBlur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="188" rx="140" ry="20" fill="#000" opacity=".5"/>
+  <!-- neon steam arc (cyan) -->
+  <path d="M52 108 Q104 74 168 74" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- deep soup bowl silhouette -->
+  <path d="M46 96 C46 90 62 88 160 88 C258 88 274 90 274 96 C274 138 224 172 160 172 C96 172 46 138 46 96 Z" fill="url(#crsbowl)"/>
+  <path d="M46 96 C46 90 62 88 160 88 C258 88 274 90 274 96 C274 138 224 172 160 172 C96 172 46 138 46 96 Z" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <!-- broth surface pool -->
+  <ellipse cx="160" cy="98" rx="112" ry="26" fill="url(#crsbroth)"/>
+  <ellipse cx="160" cy="98" rx="112" ry="26" fill="none" stroke="#b79556" stroke-width="1.4" opacity=".5"/>
+  <!-- glossy broth sheen -->
+  <path d="M78 92 C104 84 150 84 176 90" stroke="#fff2cf" stroke-width="2" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- pork ribs (bone-in chunks) -->
+  <g transform="translate(0 2)">
+    <g transform="translate(96 92) rotate(-12)">
+      <path d="M0 0 C0 -9 14 -13 26 -11 C36 -9 38 0 32 6 C24 12 4 12 0 4 Z" fill="url(#crsrib)" stroke="#5e3418" stroke-width="1.3" opacity="1"/>
+      <ellipse cx="9" cy="-2" rx="4" ry="3.4" fill="#f3e3cf" opacity=".9"/>
+      <ellipse cx="9" cy="-2" rx="1.6" ry="1.4" fill="#caa584"/>
+      <ellipse cx="20" cy="-5" rx="6" ry="2.4" fill="#f2d3ac" opacity=".5"/>
+    </g>
+    <g transform="translate(176 96) rotate(10)">
+      <path d="M0 0 C0 -9 14 -13 26 -11 C36 -9 38 0 32 6 C24 12 4 12 0 4 Z" fill="url(#crsrib)" stroke="#5e3418" stroke-width="1.3"/>
+      <ellipse cx="9" cy="-2" rx="4" ry="3.4" fill="#f3e3cf" opacity=".9"/>
+      <ellipse cx="9" cy="-2" rx="1.6" ry="1.4" fill="#caa584"/>
+      <ellipse cx="20" cy="-5" rx="6" ry="2.4" fill="#f2d3ac" opacity=".5"/>
+    </g>
+    <g transform="translate(134 108) rotate(-4)">
+      <path d="M0 0 C0 -8 12 -12 22 -10 C31 -8 33 0 28 5 C20 11 3 11 0 4 Z" fill="url(#crsrib)" stroke="#5e3418" stroke-width="1.2"/>
+      <ellipse cx="8" cy="-2" rx="3.4" ry="3" fill="#f3e3cf" opacity=".9"/>
+      <ellipse cx="8" cy="-2" rx="1.4" ry="1.2" fill="#caa584"/>
+    </g>
+  </g>
+  <!-- corn wheels (yellow segmented rounds) -->
+  <g>
+    <g transform="translate(70 104)">
+      <circle r="15" fill="url(#crscorn)" stroke="#c88a15" stroke-width="1.4"/>
+      <circle r="6.5" fill="#f2e0b0" opacity=".55"/>
+      <g fill="#e8b52c" stroke="#c88a15" stroke-width=".5">
+        <circle cx="0" cy="-9" r="2"/><circle cx="6" cy="-7" r="2"/><circle cx="9" cy="-1" r="2"/><circle cx="7" cy="6" r="2"/><circle cx="0" cy="9" r="2"/><circle cx="-7" cy="6" r="2"/><circle cx="-9" cy="-1" r="2"/><circle cx="-6" cy="-7" r="2"/>
+      </g>
+      <circle cx="-4" cy="-5" r="1.4" fill="#fff" opacity=".6"/>
+    </g>
+    <g transform="translate(216 108)">
+      <circle r="14" fill="url(#crscorn)" stroke="#c88a15" stroke-width="1.4"/>
+      <circle r="6" fill="#f2e0b0" opacity=".55"/>
+      <g fill="#e8b52c" stroke="#c88a15" stroke-width=".5">
+        <circle cx="0" cy="-8" r="1.9"/><circle cx="6" cy="-6" r="1.9"/><circle cx="8" cy="0" r="1.9"/><circle cx="6" cy="6" r="1.9"/><circle cx="0" cy="8" r="1.9"/><circle cx="-6" cy="6" r="1.9"/><circle cx="-8" cy="0" r="1.9"/><circle cx="-6" cy="-6" r="1.9"/>
+      </g>
+      <circle cx="-4" cy="-4" r="1.3" fill="#fff" opacity=".6"/>
+    </g>
+    <g transform="translate(160 118)">
+      <circle r="11" fill="url(#crscorn)" stroke="#c88a15" stroke-width="1.3"/>
+      <circle r="4.5" fill="#f2e0b0" opacity=".55"/>
+      <g fill="#e8b52c" stroke="#c88a15" stroke-width=".4">
+        <circle cx="0" cy="-6" r="1.7"/><circle cx="5" cy="-3" r="1.7"/><circle cx="6" cy="3" r="1.7"/><circle cx="0" cy="6" r="1.7"/><circle cx="-6" cy="3" r="1.7"/><circle cx="-5" cy="-3" r="1.7"/>
+      </g>
+    </g>
+  </g>
+  <!-- goji berries + scallion float -->
+  <circle cx="112" cy="90" r="3" fill="#d63a1e"/>
+  <circle cx="200" cy="94" r="3" fill="#d63a1e"/>
+  <circle cx="150" cy="100" r="2.6" fill="#e0341f"/>
+  <circle cx="111" cy="89" r="1" fill="#ff8a70" opacity=".8"/>
+  <rect x="128" y="94" width="7" height="2.6" rx="1.3" fill="#5ecb4e" transform="rotate(-16 131 95)"/>
+  <rect x="184" y="104" width="7" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(14 187 105)"/>
+  <rect x="98" y="118" width="6" height="2.4" rx="1.2" fill="#58c14a" transform="rotate(22 101 119)"/>
+  <!-- oil gloss dots -->
+  <circle cx="128" cy="92" r="1.4" fill="#fff" opacity=".6"/>
+  <circle cx="188" cy="98" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="160" cy="104" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="sw1Blur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="sw1bg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#3a1120"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <linearGradient id="sw1fish" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f0a24a"/><stop offset="48%" stop-color="#cf5a1e"/><stop offset="100%" stop-color="#8a3410"/>
+    </linearGradient>
+    <linearGradient id="sw1glaze" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ff8a3a"/><stop offset="50%" stop-color="#e04a18"/><stop offset="100%" stop-color="#a52a0c"/>
+    </linearGradient>
+    <radialGradient id="sw1plate" cx="50%" cy="34%" r="82%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#sw1bg)"/>
+  <!-- steam -->
+  <path d="M116 50 C106 32 126 24 116 4" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#sw1Blur3)"/>
+  <path d="M202 50 C194 34 212 26 204 6" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#sw1Blur3)"/>
+  <ellipse cx="160" cy="188" rx="156" ry="22" fill="#000" opacity=".5"/>
+  <!-- oval plate -->
+  <ellipse cx="160" cy="132" rx="148" ry="47" fill="url(#sw1plate)"/>
+  <ellipse cx="160" cy="132" rx="148" ry="47" fill="none" stroke="#26262e" stroke-width="3"/>
+  <ellipse cx="160" cy="132" rx="132" ry="38" fill="#0c0c0f"/>
+  <!-- neon steam arc (rose) -->
+  <path d="M48 114 Q102 82 168 78" stroke="#ff4d6d" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- WHOLE ARCHED FRIED FISH: tail high-left, head low-right -->
+  <!-- body -->
+  <path d="M64 96 C96 70 150 74 194 96 C216 108 236 122 244 138 C230 146 210 148 196 142 C176 134 150 130 122 132 C98 134 78 128 64 118 C58 110 58 102 64 96 Z"
+        fill="url(#sw1fish)" stroke="#6e2f0d" stroke-width="1.4"/>
+  <!-- scored crosshatch (fried squirrel-fish cuts) -->
+  <g stroke="#7a1305" stroke-width="1.4" opacity=".5" fill="none" stroke-linecap="round">
+    <path d="M96 92 L108 108 M114 88 L126 104 M132 88 L144 104 M150 90 L162 106 M168 94 L180 110"/>
+    <path d="M92 104 L106 92 M110 106 L124 94 M128 104 L142 92 M146 106 L160 94 M164 110 L178 98"/>
+  </g>
+  <!-- puffed fried nub texture at cut points -->
+  <g fill="#f2b464" opacity=".7">
+    <circle cx="106" cy="100" r="3"/><circle cx="124" cy="98" r="3"/><circle cx="142" cy="98" r="3"/><circle cx="160" cy="100" r="3"/><circle cx="176" cy="104" r="2.6"/>
+    <circle cx="114" cy="112" r="2.4"/><circle cx="134" cy="112" r="2.4"/><circle cx="152" cy="114" r="2.4"/>
+  </g>
+  <!-- GLOSSY SWEET-SOUR GLAZE pooled over the body -->
+  <path d="M78 108 C110 96 158 96 200 112 C218 120 232 130 240 138 C224 144 204 144 190 138 C170 130 146 128 120 130 C100 132 84 124 78 116 Z"
+        fill="url(#sw1glaze)" opacity=".6"/>
+  <path d="M90 104 C120 96 160 98 196 112" stroke="#ffb070" stroke-width="2" fill="none" opacity=".55" stroke-linecap="round"/>
+  <!-- head (low-right) with eye + mouth -->
+  <path d="M196 96 C216 100 234 114 244 138 C238 140 232 138 228 132 C222 122 210 112 196 108 Z" fill="url(#sw1glaze)" stroke="#6e2f0d" stroke-width="1.3"/>
+  <circle cx="216" cy="112" r="6" fill="#f3ead6" stroke="#6e2f0d" stroke-width="1"/>
+  <circle cx="217" cy="112" r="2.8" fill="#2a1608"/>
+  <circle cx="215.5" cy="110.5" r="1" fill="#fff" opacity=".8"/>
+  <path d="M232 128 C238 128 242 132 244 138" stroke="#6e2f0d" stroke-width="1.4" fill="none"/>
+  <!-- tail fan (high-left) -->
+  <path d="M64 96 C48 84 40 88 34 80 C46 82 52 76 62 84 M64 118 C48 126 40 122 34 130 C46 128 52 134 62 126"
+        fill="none" stroke="#cf5a1e" stroke-width="6" stroke-linecap="round"/>
+  <path d="M60 96 C46 86 40 90 34 82 L44 96 L34 108 C42 104 50 110 60 118 Z" fill="url(#sw1fish)" stroke="#6e2f0d" stroke-width="1.2"/>
+  <!-- dorsal fin -->
+  <path d="M110 76 C118 66 130 66 138 74 C130 78 120 78 110 82 Z" fill="url(#sw1fish)" stroke="#6e2f0d" stroke-width="1.1"/>
+  <!-- pineapple / carrot garnish bits + scallion in glaze -->
+  <rect x="98" y="118" width="6" height="5" rx="1.6" fill="#ffd24a" transform="rotate(18 101 120)"/>
+  <rect x="150" y="120" width="6" height="5" rx="1.6" fill="#5ecb4e" transform="rotate(-16 153 122)"/>
+  <rect x="128" y="124" width="6" height="5" rx="1.6" fill="#ff6a3a" transform="rotate(24 131 126)"/>
+  <rect x="176" y="122" width="6" height="5" rx="1.6" fill="#ffd24a" transform="rotate(-22 179 124)"/>
+  <circle cx="140" cy="112" r="2" fill="#f2ddb0"/>
+  <circle cx="188" cy="120" r="2" fill="#e0341f"/>
+  <!-- toasted sesame + gloss dots -->
+  <circle cx="118" cy="104" r="1.4" fill="#f8eed6"/>
+  <circle cx="162" cy="108" r="1.4" fill="#f8eed6"/>
+  <circle cx="132" cy="106" r="1.6" fill="#fff" opacity=".6"/>
+  <circle cx="180" cy="116" r="1.4" fill="#fff" opacity=".5"/>
+  <circle cx="150" cy="118" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

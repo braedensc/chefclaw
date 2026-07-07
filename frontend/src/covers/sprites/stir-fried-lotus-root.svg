@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="lrBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="lrbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#123138"/><stop offset="45%" stop-color="#0b090b"/><stop offset="100%" stop-color="#060507"/>
+    </radialGradient>
+    <radialGradient id="lrslice" cx="42%" cy="34%" r="72%">
+      <stop offset="0%" stop-color="#fbf5e6"/><stop offset="60%" stop-color="#efe2c4"/><stop offset="100%" stop-color="#dcc79c"/>
+    </radialGradient>
+    <linearGradient id="lrsauce" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#c88a3a"/><stop offset="100%" stop-color="#8a561c"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#lrbg)"/>
+  <!-- steam -->
+  <path d="M118 54 C108 36 128 28 118 8" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#lrBlur3)"/>
+  <path d="M196 52 C188 36 206 28 198 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#lrBlur3)"/>
+  <ellipse cx="160" cy="188" rx="156" ry="22" fill="#000" opacity=".5"/>
+  <!-- oval stir-fry plate -->
+  <ellipse cx="160" cy="132" rx="146" ry="46" fill="#141018"/>
+  <ellipse cx="160" cy="132" rx="146" ry="46" fill="none" stroke="#26262e" stroke-width="3"/>
+  <ellipse cx="160" cy="132" rx="130" ry="38" fill="#100e12"/>
+  <!-- neon steam arc (cyan / savory) -->
+  <path d="M48 116 Q100 84 164 82" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- glossy stir-fry sauce pool -->
+  <ellipse cx="160" cy="130" rx="118" ry="30" fill="url(#lrsauce)" opacity=".32"/>
+  <!-- LOTUS ROOT SLICES: pale discs pierced with the signature ring of holes, tossed at angles -->
+  <!-- back-left slice -->
+  <g transform="translate(96 116) rotate(-16) scale(.86)">
+    <ellipse cx="0" cy="0" rx="24" ry="16" fill="url(#lrslice)" stroke="#c2a973" stroke-width="1.4"/>
+    <ellipse cx="0" cy="-6" rx="4.4" ry="3" fill="#0f0d12"/>
+    <ellipse cx="-9" cy="0" rx="4" ry="2.8" fill="#0f0d12"/>
+    <ellipse cx="9" cy="0" rx="4" ry="2.8" fill="#0f0d12"/>
+    <ellipse cx="-5" cy="7" rx="3.6" ry="2.6" fill="#0f0d12"/>
+    <ellipse cx="6" cy="7" rx="3.6" ry="2.6" fill="#0f0d12"/>
+    <ellipse cx="0" cy="1" rx="3.4" ry="2.4" fill="#0f0d12"/>
+    <ellipse cx="-6" cy="-7" rx="9" ry="4" fill="#fff" opacity=".35"/>
+  </g>
+  <!-- back-right slice -->
+  <g transform="translate(214 118) rotate(12) scale(.84)">
+    <ellipse cx="0" cy="0" rx="23" ry="15" fill="url(#lrslice)" stroke="#c2a973" stroke-width="1.4"/>
+    <ellipse cx="0" cy="-5" rx="4.2" ry="2.8" fill="#0f0d12"/>
+    <ellipse cx="-8" cy="1" rx="3.8" ry="2.6" fill="#0f0d12"/>
+    <ellipse cx="8" cy="1" rx="3.8" ry="2.6" fill="#0f0d12"/>
+    <ellipse cx="-4" cy="7" rx="3.4" ry="2.4" fill="#0f0d12"/>
+    <ellipse cx="6" cy="7" rx="3.4" ry="2.4" fill="#0f0d12"/>
+    <ellipse cx="0" cy="1" rx="3.2" ry="2.2" fill="#0f0d12"/>
+    <ellipse cx="-6" cy="-6" rx="8" ry="3.6" fill="#fff" opacity=".32"/>
+  </g>
+  <!-- front-center slice (largest, brightest) -->
+  <g transform="translate(150 124) rotate(-4)">
+    <ellipse cx="0" cy="0" rx="30" ry="20" fill="url(#lrslice)" stroke="#c2a973" stroke-width="1.6"/>
+    <ellipse cx="0" cy="-8" rx="5.4" ry="3.6" fill="#0f0d12"/>
+    <ellipse cx="-12" cy="-1" rx="5" ry="3.4" fill="#0f0d12"/>
+    <ellipse cx="12" cy="-1" rx="5" ry="3.4" fill="#0f0d12"/>
+    <ellipse cx="-7" cy="9" rx="4.4" ry="3" fill="#0f0d12"/>
+    <ellipse cx="8" cy="9" rx="4.4" ry="3" fill="#0f0d12"/>
+    <ellipse cx="0" cy="1" rx="4.2" ry="3" fill="#0f0d12"/>
+    <ellipse cx="-9" cy="-9" rx="12" ry="5" fill="#fff" opacity=".4"/>
+  </g>
+  <!-- front-right slice at a steeper tilt (edge-on wedge showing thickness) -->
+  <g transform="translate(200 138) rotate(28) scale(.9)">
+    <ellipse cx="0" cy="0" rx="22" ry="14" fill="url(#lrslice)" stroke="#c2a973" stroke-width="1.4"/>
+    <path d="M-22 0 A22 14 0 0 0 22 0 L22 5 A22 14 0 0 1 -22 5 Z" fill="#d8bf8e"/>
+    <ellipse cx="0" cy="-5" rx="4" ry="2.6" fill="#0f0d12"/>
+    <ellipse cx="-8" cy="0" rx="3.6" ry="2.4" fill="#0f0d12"/>
+    <ellipse cx="8" cy="0" rx="3.6" ry="2.4" fill="#0f0d12"/>
+    <ellipse cx="0" cy="1" rx="3" ry="2" fill="#0f0d12"/>
+    <ellipse cx="-6" cy="-6" rx="7" ry="3" fill="#fff" opacity=".3"/>
+  </g>
+  <!-- garnish: red chili slivers + scallion greens + sesame -->
+  <rect x="112" y="106" width="8" height="2.8" rx="1.4" fill="#e0341f" transform="rotate(-22 116 107)"/>
+  <rect x="176" y="112" width="8" height="2.8" rx="1.4" fill="#e0341f" transform="rotate(14 180 113)"/>
+  <rect x="132" y="146" width="7" height="2.6" rx="1.3" fill="#5ecb4e" transform="rotate(-12 135 147)"/>
+  <rect x="196" y="118" width="7" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(20 199 119)"/>
+  <rect x="128" y="100" width="6" height="2.4" rx="1.2" fill="#58c14a" transform="rotate(26 131 101)"/>
+  <circle cx="150" cy="112" r="1.5" fill="#f8eed6"/>
+  <circle cx="184" cy="130" r="1.5" fill="#f8eed6"/>
+  <circle cx="120" cy="128" r="1.5" fill="#f8eed6"/>
+  <!-- oil gloss dots -->
+  <circle cx="140" cy="116" r="1.5" fill="#fff" opacity=".6"/>
+  <circle cx="206" cy="112" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="164" cy="140" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

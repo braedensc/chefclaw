@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="hdgBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="hdgbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <linearGradient id="hdgbun" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f0c274"/><stop offset="55%" stop-color="#dca047"/><stop offset="100%" stop-color="#b57826"/>
+    </linearGradient>
+    <linearGradient id="hdgbunlow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#dca047"/><stop offset="100%" stop-color="#9c631c"/>
+    </linearGradient>
+    <linearGradient id="hdgsausage" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d5623e"/><stop offset="50%" stop-color="#b23c22"/><stop offset="100%" stop-color="#872413"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#hdgbg)"/>
+  <!-- steam -->
+  <path d="M118 56 C108 40 126 32 116 12" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#hdgBlur3)"/>
+  <path d="M202 54 C194 38 210 30 202 10" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#hdgBlur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="182" rx="140" ry="20" fill="#000" opacity=".5"/>
+  <!-- narrow serving board / paper tray -->
+  <ellipse cx="160" cy="150" rx="132" ry="30" fill="#141018"/>
+  <ellipse cx="160" cy="150" rx="132" ry="30" fill="none" stroke="#2c2136" stroke-width="2.5"/>
+  <!-- neon steam arc (warm/local) -->
+  <path d="M52 118 Q108 92 176 92" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- lower bun (long roll) -->
+  <path d="M56 138 C56 124 78 118 160 118 C242 118 264 124 264 138 C264 152 236 158 160 158 C84 158 56 152 56 138 Z" fill="url(#hdgbunlow)"/>
+  <path d="M56 138 C56 124 78 118 160 118 C242 118 264 124 264 138 C264 152 236 158 160 158 C84 158 56 152 56 138 Z" fill="none" stroke="#7c4e15" stroke-width="1.4" opacity=".55"/>
+  <!-- sausage (plump, glossy, sitting in the roll) -->
+  <path d="M62 120 C62 108 84 102 160 102 C236 102 258 108 258 120 C258 130 232 134 160 134 C88 134 62 130 62 120 Z" fill="url(#hdgsausage)"/>
+  <path d="M62 120 C62 108 84 102 160 102 C236 102 258 108 258 120 C258 130 232 134 160 134 C88 134 62 130 62 120 Z" fill="none" stroke="#5a1a0c" stroke-width="1.4" opacity=".5"/>
+  <!-- rounded sausage ends -->
+  <ellipse cx="66" cy="118" rx="8" ry="11" fill="#a5361d"/>
+  <ellipse cx="254" cy="118" rx="8" ry="11" fill="#a5361d"/>
+  <!-- glossy sausage sheen -->
+  <path d="M80 110 C120 106 200 106 240 110" stroke="#f08a5f" stroke-width="4" fill="none" opacity=".5" stroke-linecap="round"/>
+  <!-- upper bun (top roll, tucked behind sausage) -->
+  <path d="M60 116 C60 104 84 98 160 98 C236 98 260 104 260 116 C240 112 200 111 160 111 C120 111 80 112 60 116 Z" fill="url(#hdgbun)" opacity=".9"/>
+  <!-- mustard zigzag -->
+  <path d="M78 116 Q94 108 106 118 Q120 108 132 118 Q146 108 158 118 Q172 108 184 118 Q198 108 210 118 Q224 108 238 116" stroke="#ffd60a" stroke-width="4.5" fill="none" opacity=".95" stroke-linecap="round"/>
+  <path d="M78 116 Q94 108 106 118 Q120 108 132 118 Q146 108 158 118 Q172 108 184 118 Q198 108 210 118 Q224 108 238 116" stroke="#fff0a0" stroke-width="1.6" fill="none" opacity=".55" stroke-linecap="round"/>
+  <!-- ketchup ribbon offset below -->
+  <path d="M86 126 Q102 120 116 128 Q132 120 148 128 Q164 120 180 128 Q196 120 212 128 Q226 122 236 126" stroke="#e23018" stroke-width="4" fill="none" opacity=".92" stroke-linecap="round"/>
+  <!-- diced onion + relish flecks -->
+  <g>
+    <rect x="98" y="112" width="4.5" height="4" rx="1.2" fill="#f4ead6" transform="rotate(12 100 114)"/>
+    <rect x="150" y="114" width="4.5" height="4" rx="1.2" fill="#f4ead6" transform="rotate(-10 152 116)"/>
+    <rect x="204" y="112" width="4.5" height="4" rx="1.2" fill="#f4ead6" transform="rotate(18 206 114)"/>
+    <rect x="124" y="122" width="5" height="2.6" rx="1.3" fill="#5ecb4e" transform="rotate(-14 126 123)"/>
+    <rect x="176" y="122" width="5" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(16 178 123)"/>
+    <rect x="220" y="120" width="5" height="2.6" rx="1.3" fill="#58c14a" transform="rotate(-8 222 121)"/>
+  </g>
+  <!-- sesame on the bun -->
+  <g fill="#f8eed6">
+    <ellipse cx="90" cy="104" rx="2" ry="1" transform="rotate(20 90 104)"/>
+    <ellipse cx="140" cy="102" rx="2" ry="1" transform="rotate(-14 140 102)"/>
+    <ellipse cx="196" cy="103" rx="2" ry="1" transform="rotate(24 196 103)"/>
+    <ellipse cx="234" cy="105" rx="2" ry="1" transform="rotate(-8 234 105)"/>
+  </g>
+  <!-- gloss dots -->
+  <circle cx="112" cy="112" r="1.4" fill="#fff" opacity=".6"/>
+  <circle cx="168" cy="112" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="224" cy="114" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

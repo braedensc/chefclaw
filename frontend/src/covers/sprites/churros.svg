@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <radialGradient id="chbgr" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <linearGradient id="chchurro" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#a86a24"/><stop offset="45%" stop-color="#cf8a34"/><stop offset="100%" stop-color="#9c5e1c"/>
+    </linearGradient>
+    <radialGradient id="chchoc" cx="42%" cy="34%" r="78%">
+      <stop offset="0%" stop-color="#6b3a1e"/><stop offset="55%" stop-color="#42210f"/><stop offset="100%" stop-color="#241009"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#chbgr)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="184" rx="150" ry="22" fill="#000" opacity=".5"/>
+  <!-- round plate -->
+  <ellipse cx="160" cy="132" rx="140" ry="46" fill="#141018"/>
+  <ellipse cx="160" cy="132" rx="140" ry="46" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="132" rx="126" ry="38" fill="#0f0d13"/>
+  <!-- fanned churro sticks (each a ridged golden baton). helper: body + diagonal sugar ridges + shine -->
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <!-- back stick -->
+    <g transform="translate(64 96) rotate(-20)">
+      <rect width="132" height="16" rx="8" fill="url(#chchurro)" stroke="#7c4a16" stroke-width="1.4"/>
+      <g stroke="#7c4a16" stroke-width="1.4" opacity=".55"><path d="M14 1 L8 15 M30 1 L24 15 M46 1 L40 15 M62 1 L56 15 M78 1 L72 15 M94 1 L88 15 M110 1 L104 15 M124 1 L118 15"/></g>
+      <rect x="6" y="3" width="120" height="2.6" rx="1.3" fill="#f2c766" opacity=".7"/>
+    </g>
+    <!-- second stick -->
+    <g transform="translate(70 112) rotate(-8)">
+      <rect width="140" height="16" rx="8" fill="url(#chchurro)" stroke="#7c4a16" stroke-width="1.4"/>
+      <g stroke="#7c4a16" stroke-width="1.4" opacity=".55"><path d="M14 1 L8 15 M30 1 L24 15 M46 1 L40 15 M62 1 L56 15 M78 1 L72 15 M94 1 L88 15 M110 1 L104 15 M126 1 L120 15"/></g>
+      <rect x="6" y="3" width="128" height="2.6" rx="1.3" fill="#f2c766" opacity=".7"/>
+    </g>
+    <!-- third stick -->
+    <g transform="translate(66 128) rotate(4)">
+      <rect width="136" height="16" rx="8" fill="url(#chchurro)" stroke="#7c4a16" stroke-width="1.4"/>
+      <g stroke="#7c4a16" stroke-width="1.4" opacity=".55"><path d="M14 1 L8 15 M30 1 L24 15 M46 1 L40 15 M62 1 L56 15 M78 1 L72 15 M94 1 L88 15 M110 1 L104 15 M124 1 L118 15"/></g>
+      <rect x="6" y="3" width="124" height="2.6" rx="1.3" fill="#f2c766" opacity=".7"/>
+    </g>
+    <!-- front stick -->
+    <g transform="translate(74 142) rotate(15)">
+      <rect width="120" height="15" rx="7.5" fill="url(#chchurro)" stroke="#7c4a16" stroke-width="1.4"/>
+      <g stroke="#7c4a16" stroke-width="1.4" opacity=".55"><path d="M14 1 L8 14 M30 1 L24 14 M46 1 L40 14 M62 1 L56 14 M78 1 L72 14 M94 1 L88 14 M108 1 L102 14"/></g>
+      <rect x="6" y="3" width="108" height="2.4" rx="1.2" fill="#f2c766" opacity=".7"/>
+    </g>
+  </g>
+  <!-- cinnamon-sugar dusting scattered over the sticks -->
+  <g fill="#e8b968" opacity=".8">
+    <circle cx="96" cy="102" r="1.2"/><circle cx="128" cy="98" r="1.2"/><circle cx="160" cy="104" r="1.2"/><circle cx="112" cy="116" r="1.2"/>
+    <circle cx="150" cy="120" r="1.2"/><circle cx="182" cy="118" r="1.2"/><circle cx="104" cy="132" r="1.2"/><circle cx="140" cy="134" r="1.2"/>
+    <circle cx="176" cy="130" r="1.2"/><circle cx="126" cy="148" r="1.2"/><circle cx="162" cy="150" r="1.2"/>
+  </g>
+  <g fill="#8a5a2a" opacity=".65">
+    <circle cx="110" cy="106" r="1"/><circle cx="144" cy="102" r="1"/><circle cx="174" cy="108" r="1"/><circle cx="128" cy="124" r="1"/>
+    <circle cx="166" cy="124" r="1"/><circle cx="118" cy="140" r="1"/><circle cx="152" cy="140" r="1"/>
+  </g>
+  <!-- chocolate dipping cup (lower-right on the plate) -->
+  <g>
+    <ellipse cx="228" cy="150" rx="34" ry="12" fill="#1a1622"/>
+    <ellipse cx="228" cy="150" rx="34" ry="12" fill="none" stroke="#33283c" stroke-width="2"/>
+    <path d="M198 148 L258 148 L252 168 C246 172 210 172 204 168 Z" fill="#15121b"/>
+    <path d="M200 149 L256 149 L250 166 C245 170 211 170 206 166 Z" fill="url(#chchoc)"/>
+    <ellipse cx="228" cy="150" rx="26" ry="8" fill="#4a2612"/>
+    <ellipse cx="228" cy="149" rx="26" ry="8" fill="url(#chchoc)"/>
+    <!-- glossy chocolate sheen -->
+    <ellipse cx="220" cy="147" rx="10" ry="3" fill="#8a4e2a" opacity=".6"/>
+    <path d="M210 150 Q228 156 246 150" stroke="#7a4020" stroke-width="1.4" fill="none" opacity=".6"/>
+  </g>
+  <!-- one churro tip dipped into the chocolate -->
+  <g transform="translate(196 138) rotate(30)">
+    <rect width="26" height="14" rx="7" fill="url(#chchurro)" stroke="#7c4a16" stroke-width="1.2"/>
+    <rect x="4" y="10" width="20" height="6" rx="3" fill="#3a1e0e"/>
+  </g>
+  <!-- condensation/sugar sparkles instead of steam arc (dessert) -->
+  <g fill="#fff">
+    <path d="M92 76 l2 6 l6 2 l-6 2 l-2 6 l-2 -6 l-6 -2 l6 -2 Z" opacity=".55"/>
+    <path d="M214 72 l1.6 4.6 l4.6 1.6 l-4.6 1.6 l-1.6 4.6 l-1.6 -4.6 l-4.6 -1.6 l4.6 -1.6 Z" opacity=".45"/>
+    <circle cx="150" cy="70" r="1.6" opacity=".5"/>
+    <circle cx="120" cy="82" r="1.2" opacity=".4"/>
+  </g>
+  <!-- gloss dots on churros -->
+  <circle cx="108" cy="100" r="1.5" fill="#fff" opacity=".55"/>
+  <circle cx="150" cy="130" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="220" cy="146" r="1.4" fill="#fff" opacity=".55"/>
+</svg>

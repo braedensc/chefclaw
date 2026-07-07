@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="scvBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="scvbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <!-- pale cabbage leaf: creamy white core fading to pale green rim -->
+    <linearGradient id="scvleaf" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f7f4e4"/><stop offset="55%" stop-color="#e7ecca"/><stop offset="100%" stop-color="#c6d29c"/>
+    </linearGradient>
+    <linearGradient id="scvleafg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e2eeba"/><stop offset="60%" stop-color="#b7d488"/><stop offset="100%" stop-color="#8bb058"/>
+    </linearGradient>
+    <radialGradient id="scvoil" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#e2a838" stop-opacity=".32"/><stop offset="100%" stop-color="#8a5a1e" stop-opacity=".07"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#scvbg)"/>
+  <!-- steam -->
+  <path d="M116 54 C106 36 126 28 116 8" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#scvBlur3)"/>
+  <path d="M200 52 C192 36 210 28 202 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#scvBlur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="188" rx="156" ry="22" fill="#000" opacity=".5"/>
+  <!-- oval plate -->
+  <ellipse cx="160" cy="132" rx="144" ry="46" fill="#141018"/>
+  <ellipse cx="160" cy="132" rx="144" ry="46" fill="none" stroke="#26262e" stroke-width="3"/>
+  <ellipse cx="160" cy="132" rx="130" ry="38" fill="#0f0d13"/>
+  <!-- neon steam arc (warm/local) -->
+  <path d="M48 116 Q100 84 164 82" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- glossy vinegar-oil pool -->
+  <ellipse cx="160" cy="128" rx="116" ry="31" fill="url(#scvoil)"/>
+
+  <!-- BACK LAYER cabbage pieces (dimmer, smaller, ruffled) -->
+  <g opacity=".85">
+    <!-- back leaf left: irregular lobed blob with a folded edge -->
+    <path d="M74 112 C70 104 82 98 94 100 C100 96 112 98 114 106 C120 108 118 118 110 120 C106 126 92 126 86 120 C78 122 72 118 74 112 Z" fill="url(#scvleafg)" stroke="#7ba04c" stroke-width="1.2"/>
+    <path d="M84 106 C94 102 106 104 112 110" stroke="#f2f6de" stroke-width="1.6" fill="none" opacity=".45"/>
+    <!-- back leaf right -->
+    <path d="M204 106 C202 98 214 94 224 98 C232 96 242 102 240 110 C244 116 236 122 228 120 C222 124 210 122 208 116 C202 116 202 110 204 106 Z" fill="url(#scvleaf)" stroke="#9aab68" stroke-width="1.2"/>
+    <path d="M212 104 C222 100 232 102 238 108" stroke="#ffffff" stroke-width="1.4" fill="none" opacity=".4"/>
+  </g>
+
+  <!-- FRONT LAYER — ruffled torn cabbage leaves with curled folded edges -->
+  <!-- leaf 1 (big, center-left) — irregular wavy outline + curled-over near edge -->
+  <g transform="translate(88 112) rotate(-6)">
+    <path d="M2 16 C0 6 10 -2 22 -2 C30 -8 46 -6 50 2 C60 0 68 8 64 18 C70 24 62 34 52 32 C46 40 30 40 22 34 C12 38 0 32 2 24 C-4 22 -2 18 2 16 Z" fill="url(#scvleaf)" stroke="#9aab68" stroke-width="1.4"/>
+    <!-- curled-over leaf edge (fold shadow) reads as a ruffle -->
+    <path d="M8 30 C18 36 34 36 46 30 C40 34 22 36 12 32 C10 31 8 31 8 30 Z" fill="#b7c78c" opacity=".55"/>
+    <!-- pale central rib + secondary veins -->
+    <path d="M8 22 C24 16 44 12 60 14" stroke="#f8f4e2" stroke-width="4.5" fill="none" opacity=".9" stroke-linecap="round"/>
+    <path d="M18 26 C30 22 46 20 56 21 M16 16 C30 12 46 10 56 12" stroke="#c0cf94" stroke-width="1.2" fill="none" opacity=".6"/>
+    <!-- glossy sheen -->
+    <ellipse cx="30" cy="6" rx="12" ry="3.4" fill="#ffffff" opacity=".4"/>
+  </g>
+
+  <!-- leaf 2 (big, center-right, greener) — wavy ruffled -->
+  <g transform="translate(150 104) rotate(9)">
+    <path d="M2 14 C2 4 12 -4 24 -4 C32 -10 48 -8 52 0 C62 -2 70 8 64 18 C70 26 60 34 50 32 C42 40 26 40 18 32 C8 36 -2 28 0 20 C-4 18 -2 16 2 14 Z" fill="url(#scvleafg)" stroke="#6e9440" stroke-width="1.4"/>
+    <path d="M8 28 C20 34 38 34 50 28 C42 32 24 34 14 30 C11 29 8 29 8 28 Z" fill="#7ba04c" opacity=".5"/>
+    <path d="M10 20 C26 14 46 10 60 12" stroke="#eef6d4" stroke-width="4.5" fill="none" opacity=".85" stroke-linecap="round"/>
+    <path d="M18 24 C32 20 48 18 56 19 M14 12 C30 8 46 6 54 8" stroke="#c8dc96" stroke-width="1.2" fill="none" opacity=".65"/>
+    <ellipse cx="28" cy="2" rx="13" ry="4" fill="#f6fae4" opacity=".55"/>
+  </g>
+
+  <!-- leaf 3 (front, thick pale stalk chunk) — chunkier, whiter -->
+  <g transform="translate(112 130) rotate(4)">
+    <path d="M2 12 C0 4 10 -2 22 -2 C30 -6 44 -4 46 4 C54 4 56 14 48 18 C44 26 26 28 16 22 C6 24 -2 18 0 14 C-4 14 -2 12 2 12 Z" fill="url(#scvleaf)" stroke="#9aab68" stroke-width="1.4"/>
+    <path d="M6 15 C20 11 38 9 48 11" stroke="#f8f4e2" stroke-width="5.5" fill="none" opacity=".92" stroke-linecap="round"/>
+    <path d="M12 20 C26 16 40 15 46 15" stroke="#c0cf94" stroke-width="1.2" fill="none" opacity=".6"/>
+  </g>
+
+  <!-- leaf 4 (small front-right filler) -->
+  <g transform="translate(186 122) rotate(-10)">
+    <path d="M2 10 C0 2 10 -2 20 0 C26 -4 38 -2 40 6 C46 8 44 16 36 16 C30 22 16 22 10 16 C2 18 -2 12 0 12 C-2 11 0 10 2 10 Z" fill="url(#scvleaf)" stroke="#9aab68" stroke-width="1.3"/>
+    <path d="M6 12 C18 8 32 8 40 10" stroke="#f8f4e2" stroke-width="4" fill="none" opacity=".85" stroke-linecap="round"/>
+    <path d="M12 6 C22 3 32 3 38 5" stroke="#c8dc96" stroke-width="1.1" fill="none" opacity=".6"/>
+  </g>
+
+  <!-- DRIED RED CHILI SEGMENTS — short flat rings scattered, NO hooked stems (never beaks) -->
+  <g>
+    <!-- flat chili ring: short slightly-curved bar with a dark hollow center -->
+    <g transform="translate(128 116) rotate(18)"><rect x="-7" y="-2.6" width="14" height="5.2" rx="2.6" fill="#cc2214"/><rect x="-4.5" y="-1.4" width="9" height="2.8" rx="1.4" fill="#6e1108"/></g>
+    <g transform="translate(174 128) rotate(-14)"><rect x="-6.5" y="-2.4" width="13" height="4.8" rx="2.4" fill="#c31f12"/><rect x="-4" y="-1.2" width="8" height="2.4" rx="1.2" fill="#6e1108"/></g>
+    <g transform="translate(96 128) rotate(34)"><rect x="-6" y="-2.4" width="12" height="4.8" rx="2.4" fill="#cc2214"/><rect x="-3.6" y="-1.2" width="7.2" height="2.4" rx="1.2" fill="#6e1108"/></g>
+    <g transform="translate(206 118) rotate(8)"><rect x="-6" y="-2.4" width="12" height="4.8" rx="2.4" fill="#c31f12"/><rect x="-3.6" y="-1.2" width="7.2" height="2.4" rx="1.2" fill="#6e1108"/></g>
+    <g transform="translate(150 138) rotate(-26)"><rect x="-5.4" y="-2.2" width="10.8" height="4.4" rx="2.2" fill="#cc2214"/><rect x="-3.2" y="-1.1" width="6.4" height="2.2" rx="1.1" fill="#6e1108"/></g>
+  </g>
+
+  <!-- garlic bits (pale ivory slivers) -->
+  <rect x="-4" y="-2" width="8" height="4" rx="1.6" fill="#f4ecc8" stroke="#d8c890" stroke-width=".8" transform="translate(140 120) rotate(24)"/>
+  <rect x="-3.4" y="-1.8" width="6.8" height="3.6" rx="1.4" fill="#f6efce" stroke="#d8c890" stroke-width=".8" transform="translate(164 116) rotate(-18)"/>
+  <rect x="-3" y="-1.6" width="6" height="3.2" rx="1.3" fill="#f4ecc8" stroke="#d8c890" stroke-width=".8" transform="translate(118 124) rotate(40)"/>
+  <rect x="-3" y="-1.6" width="6" height="3.2" rx="1.3" fill="#f6efce" stroke="#d8c890" stroke-width=".8" transform="translate(192 130) rotate(-8)"/>
+
+  <!-- vinegar-oil gloss dots -->
+  <circle cx="118" cy="108" r="1.5" fill="#fff" opacity=".65"/>
+  <circle cx="172" cy="106" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="146" cy="126" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="200" cy="124" r="1.2" fill="#fff" opacity=".5"/>
+  <circle cx="98" cy="120" r="1.1" fill="#fff" opacity=".45"/>
+</svg>

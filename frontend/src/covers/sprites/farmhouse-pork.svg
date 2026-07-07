@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="fhpBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="fhpbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="fhpplate" cx="50%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <radialGradient id="fhpoil" cx="50%" cy="46%" r="70%">
+      <stop offset="0%" stop-color="#c17232" stop-opacity=".5"/><stop offset="60%" stop-color="#94481a" stop-opacity=".32"/><stop offset="100%" stop-color="#6e2f0d" stop-opacity=".16"/>
+    </radialGradient>
+    <linearGradient id="fhplean" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7c3a20"/><stop offset="55%" stop-color="#5e2410"/><stop offset="100%" stop-color="#3d1608"/>
+    </linearGradient>
+    <linearGradient id="fhppepper" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5ecb4e"/><stop offset="100%" stop-color="#2f7d2b"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#fhpbg)"/>
+  <!-- steam -->
+  <path d="M118 52 C108 36 128 28 118 8" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#fhpBlur3)"/>
+  <path d="M198 50 C190 34 208 26 200 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#fhpBlur3)"/>
+  <ellipse cx="160" cy="188" rx="152" ry="22" fill="#000" opacity=".5"/>
+  <!-- oval plate -->
+  <ellipse cx="160" cy="132" rx="140" ry="46" fill="url(#fhpplate)"/>
+  <ellipse cx="160" cy="132" rx="140" ry="46" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="132" rx="126" ry="38" fill="#0f0d13"/>
+  <!-- neon steam arc (warm/local, Hunan) -->
+  <path d="M48 116 Q100 82 166 82" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- glossy oil sheen pooled under the toss -->
+  <ellipse cx="160" cy="128" rx="106" ry="30" fill="url(#fhpoil)"/>
+  <!-- GREEN CHILI CHUNKS (背景 back layer, Hunan hero aromatic) -->
+  <g>
+    <path d="M84 128 C88 118 100 116 108 122 C114 128 110 138 100 140 C90 142 82 136 84 128 Z" fill="url(#fhppepper)" stroke="#256b22" stroke-width="1.2"/>
+    <path d="M214 122 C218 112 230 110 238 116 C244 122 240 132 230 134 C220 136 212 130 214 122 Z" fill="url(#fhppepper)" stroke="#256b22" stroke-width="1.2"/>
+    <path d="M138 116 C142 108 152 108 158 114 C162 120 156 128 148 128 C140 128 134 122 138 116 Z" fill="#4fb443" stroke="#256b22" stroke-width="1.1"/>
+  </g>
+  <!-- CURLED PORK SLICES (front hero: streaky pork belly, curled, browned) -->
+  <g>
+    <!-- slice 1 -->
+    <path d="M92 118 C104 108 126 108 138 116 C144 124 138 136 122 140 C106 144 90 138 86 128 C86 122 88 120 92 118 Z" fill="url(#fhplean)" stroke="#2e1004" stroke-width="1.4"/>
+    <path d="M98 116 C110 110 126 110 136 116" stroke="#d8b47f" stroke-width="3" fill="none" opacity=".8"/>
+    <path d="M96 126 C110 122 126 122 136 126" stroke="#c17232" stroke-width="1.6" fill="none" opacity=".6"/>
+    <ellipse cx="108" cy="120" rx="8" ry="3" fill="#a35228" opacity=".5"/>
+  </g>
+  <g>
+    <!-- slice 2 (center, largest) -->
+    <path d="M146 122 C158 110 184 110 198 120 C206 128 198 142 178 146 C158 150 140 144 138 132 C138 126 142 124 146 122 Z" fill="url(#fhplean)" stroke="#2e1004" stroke-width="1.4"/>
+    <path d="M152 120 C166 112 186 112 196 120" stroke="#f6ddb2" stroke-width="3.4" fill="none" opacity=".85"/>
+    <path d="M150 132 C166 128 186 128 196 132" stroke="#c17232" stroke-width="1.8" fill="none" opacity=".6"/>
+    <ellipse cx="162" cy="124" rx="9" ry="3.4" fill="#a35228" opacity=".5"/>
+  </g>
+  <g>
+    <!-- slice 3 -->
+    <path d="M182 128 C194 118 216 118 226 126 C232 134 224 146 208 148 C192 150 178 144 176 134 C176 130 178 130 182 128 Z" fill="url(#fhplean)" stroke="#2e1004" stroke-width="1.4"/>
+    <path d="M188 126 C200 120 216 120 224 126" stroke="#d8b47f" stroke-width="3" fill="none" opacity=".8"/>
+    <path d="M186 136 C200 132 216 132 224 136" stroke="#c17232" stroke-width="1.6" fill="none" opacity=".6"/>
+    <ellipse cx="198" cy="130" rx="8" ry="3" fill="#a35228" opacity=".5"/>
+  </g>
+  <!-- fermented black beans + diced chili aromatics -->
+  <circle cx="128" cy="132" r="2" fill="#260903"/>
+  <circle cx="170" cy="140" r="2" fill="#260903"/>
+  <circle cx="150" cy="118" r="1.8" fill="#e0341f"/>
+  <circle cx="204" cy="138" r="1.8" fill="#c31f12"/>
+  <!-- garlic slice + oil gloss dots -->
+  <ellipse cx="116" cy="136" rx="3.4" ry="2" fill="#f2ddb0" transform="rotate(-12 116 136)"/>
+  <circle cx="120" cy="118" r="1.5" fill="#fff" opacity=".6"/>
+  <circle cx="176" cy="122" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="210" cy="128" r="1.2" fill="#fff" opacity=".5"/>
+  <circle cx="150" cy="128" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

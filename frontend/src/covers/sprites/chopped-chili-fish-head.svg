@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="fh1Blur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="fh1bg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#123138"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <linearGradient id="fh1flesh" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e9dcc6"/><stop offset="55%" stop-color="#d3bf9c"/><stop offset="100%" stop-color="#b39a70"/>
+    </linearGradient>
+    <radialGradient id="fh1chili" cx="46%" cy="34%" r="78%">
+      <stop offset="0%" stop-color="#ff5a2d"/><stop offset="55%" stop-color="#d92c12"/><stop offset="100%" stop-color="#9c1c07"/>
+    </radialGradient>
+    <radialGradient id="fh1plate" cx="50%" cy="34%" r="82%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#fh1bg)"/>
+  <!-- steam -->
+  <path d="M118 50 C108 32 128 24 118 4" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#fh1Blur3)"/>
+  <path d="M200 50 C192 34 210 26 202 6" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#fh1Blur3)"/>
+  <ellipse cx="160" cy="188" rx="156" ry="22" fill="#000" opacity=".5"/>
+  <!-- oval plate -->
+  <ellipse cx="160" cy="130" rx="146" ry="48" fill="url(#fh1plate)"/>
+  <ellipse cx="160" cy="130" rx="146" ry="48" fill="none" stroke="#26262e" stroke-width="3"/>
+  <ellipse cx="160" cy="130" rx="130" ry="39" fill="#0c0c0f"/>
+  <!-- neon steam arc (cyan) -->
+  <path d="M48 114 Q102 82 168 78" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- whole fish head splayed open (butterflied), wide silhouette -->
+  <!-- left half -->
+  <path d="M158 96 C120 88 78 96 62 116 C74 138 118 150 158 146 C160 130 160 112 158 96 Z" fill="url(#fh1flesh)" stroke="#8a7048" stroke-width="1.3"/>
+  <!-- right half -->
+  <path d="M162 96 C200 88 242 96 258 116 C246 138 202 150 162 146 C160 130 160 112 162 96 Z" fill="url(#fh1flesh)" stroke="#8a7048" stroke-width="1.3"/>
+  <!-- center spine crease -->
+  <path d="M160 96 L160 146" stroke="#8a7048" stroke-width="1.6" opacity=".55"/>
+  <!-- gill/cheek shading -->
+  <path d="M96 108 C86 118 88 130 100 138" stroke="#a3844f" stroke-width="1.6" fill="none" opacity=".5"/>
+  <path d="M224 108 C234 118 232 130 220 138" stroke="#a3844f" stroke-width="1.6" fill="none" opacity=".5"/>
+  <!-- eyes (one per splayed half) -->
+  <circle cx="90" cy="112" r="6.5" fill="#f3ead6" stroke="#8a7048" stroke-width="1"/>
+  <circle cx="90" cy="112" r="3" fill="#2a1608"/>
+  <circle cx="88.5" cy="110.5" r="1.1" fill="#fff" opacity=".8"/>
+  <circle cx="230" cy="112" r="6.5" fill="#f3ead6" stroke="#8a7048" stroke-width="1"/>
+  <circle cx="230" cy="112" r="3" fill="#2a1608"/>
+  <circle cx="228.5" cy="110.5" r="1.1" fill="#fff" opacity=".8"/>
+  <!-- open mouths at outer edges -->
+  <path d="M62 116 C56 118 56 124 62 126 C66 122 66 120 62 116 Z" fill="#7a3a26"/>
+  <path d="M258 116 C264 118 264 124 258 126 C254 122 254 120 258 116 Z" fill="#7a3a26"/>
+  <!-- CHOPPED CHILI BLANKET heaped over the whole head -->
+  <path d="M78 100 C100 86 220 86 242 100 C250 112 246 130 234 140 C200 152 120 152 86 140 C74 130 70 112 78 100 Z" fill="url(#fh1chili)" opacity=".96"/>
+  <path d="M78 100 C100 86 220 86 242 100 C250 112 246 130 234 140 C200 152 120 152 86 140 C74 130 70 112 78 100 Z" fill="none" stroke="#7a1305" stroke-width="1.2" opacity=".5"/>
+  <!-- chopped-chili flecks: dense diced red bits (剁椒) -->
+  <g>
+    <rect x="96" y="104" width="6" height="5" rx="1.6" fill="#ff6a3a" transform="rotate(18 99 106)"/>
+    <rect x="118" y="98" width="6.5" height="5" rx="1.6" fill="#e83b18" transform="rotate(-22 121 100)"/>
+    <rect x="142" y="102" width="6" height="5" rx="1.6" fill="#ff7a4a" transform="rotate(30 145 104)"/>
+    <rect x="166" y="98" width="6.5" height="5" rx="1.6" fill="#d92c12" transform="rotate(-12 169 100)"/>
+    <rect x="190" y="102" width="6" height="5" rx="1.6" fill="#ff6a3a" transform="rotate(24 193 104)"/>
+    <rect x="214" y="106" width="6" height="5" rx="1.6" fill="#e83b18" transform="rotate(-28 217 108)"/>
+    <rect x="106" y="118" width="6.5" height="5" rx="1.6" fill="#ff7a4a" transform="rotate(-16 109 120)"/>
+    <rect x="130" y="122" width="6" height="5" rx="1.6" fill="#d92c12" transform="rotate(26 133 124)"/>
+    <rect x="154" y="118" width="6.5" height="5" rx="1.6" fill="#ff6a3a" transform="rotate(-30 157 120)"/>
+    <rect x="178" y="122" width="6" height="5" rx="1.6" fill="#e83b18" transform="rotate(14 181 124)"/>
+    <rect x="202" y="120" width="6.5" height="5" rx="1.6" fill="#ff7a4a" transform="rotate(-20 205 122)"/>
+    <rect x="120" y="134" width="6" height="5" rx="1.6" fill="#d92c12" transform="rotate(22 123 136)"/>
+    <rect x="150" y="136" width="6.5" height="5" rx="1.6" fill="#ff6a3a" transform="rotate(-18 153 138)"/>
+    <rect x="184" y="134" width="6" height="5" rx="1.6" fill="#ff7a4a" transform="rotate(28 187 136)"/>
+    <rect x="212" y="130" width="6" height="5" rx="1.6" fill="#e83b18" transform="rotate(-24 215 132)"/>
+    <!-- a few pale garlic bits + green scallion through the chili -->
+    <circle cx="112" cy="112" r="2.2" fill="#f2ddb0"/>
+    <circle cx="172" cy="110" r="2.2" fill="#f2ddb0"/>
+    <circle cx="196" cy="132" r="2.2" fill="#f2ddb0"/>
+  </g>
+  <!-- fresh scallion strands over the top -->
+  <rect x="128" y="108" width="9" height="2.6" rx="1.3" fill="#5ecb4e" transform="rotate(-14 132 109)"/>
+  <rect x="160" y="128" width="10" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(10 165 129)"/>
+  <rect x="188" y="114" width="9" height="2.6" rx="1.3" fill="#5ecb4e" transform="rotate(-20 192 115)"/>
+  <!-- oil gloss dots -->
+  <circle cx="126" cy="110" r="1.5" fill="#fff" opacity=".55"/>
+  <circle cx="176" cy="118" r="1.4" fill="#fff" opacity=".5"/>
+  <circle cx="208" cy="122" r="1.3" fill="#fff" opacity=".5"/>
+</svg>

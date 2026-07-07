@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="bmBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="bmbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <linearGradient id="bmcrust" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e8b46a"/><stop offset="50%" stop-color="#cf8f3e"/><stop offset="100%" stop-color="#a5661f"/>
+    </linearGradient>
+    <linearGradient id="bmcrumb" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fbeecb"/><stop offset="100%" stop-color="#ecd6a4"/>
+    </linearGradient>
+    <linearGradient id="bmpork" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#a9552a"/><stop offset="100%" stop-color="#6e2f13"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#bmbg)"/>
+  <ellipse cx="160" cy="184" rx="150" ry="21" fill="#000" opacity=".5"/>
+  <!-- wooden board -->
+  <ellipse cx="160" cy="140" rx="140" ry="40" fill="#171017"/>
+  <ellipse cx="160" cy="140" rx="140" ry="40" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="140" rx="126" ry="33" fill="#0f0b10"/>
+  <!-- baguette body (long torpedo roll, angled) -->
+  <g transform="rotate(-7 160 108)">
+    <path d="M50 112 C50 96 70 88 110 86 C160 84 218 88 262 96 C278 100 278 116 262 120 C218 128 160 130 110 128 C70 126 50 128 50 112 Z" fill="url(#bmcrust)"/>
+    <!-- top crust highlight -->
+    <path d="M62 98 C110 90 210 92 258 102" stroke="#f6d79a" stroke-width="2.4" fill="none" opacity=".55" stroke-linecap="round"/>
+    <!-- diagonal score marks on crust -->
+    <path d="M96 96 l10 10 M126 94 l10 10 M156 94 l10 10 M186 94 l10 10 M216 96 l10 10" stroke="#8a5416" stroke-width="2" opacity=".5" stroke-linecap="round"/>
+    <!-- split cut face showing pale crumb -->
+    <path d="M52 114 C60 108 120 106 160 106 C210 106 254 110 262 116 C252 124 200 128 160 128 C110 128 66 126 52 114 Z" fill="url(#bmcrumb)"/>
+  </g>
+  <!-- fillings spilling out of the open sandwich middle -->
+  <!-- cilantro sprigs poking up -->
+  <path d="M120 96 q-4 -12 2 -20" stroke="#3f9c37" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M126 98 q2 -12 8 -18" stroke="#58c14a" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M198 96 q4 -12 -1 -19" stroke="#3f9c37" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <circle cx="121" cy="76" r="2.4" fill="#58c14a"/><circle cx="134" cy="80" r="2.2" fill="#6abf5a"/>
+  <circle cx="199" cy="78" r="2.4" fill="#5ecb4e"/>
+  <!-- grilled pork slices layered in the split -->
+  <g>
+    <path d="M112 112 C118 106 138 106 146 110 C154 114 150 122 140 124 C126 126 108 122 112 112 Z" fill="url(#bmpork)" stroke="#4a1c0b" stroke-width="1.2" opacity=".95"/>
+    <path d="M150 114 C158 108 178 108 186 112 C194 116 190 124 178 126 C164 128 146 124 150 114 Z" fill="url(#bmpork)" stroke="#4a1c0b" stroke-width="1.2"/>
+    <path d="M186 114 C194 109 212 110 218 114 C224 118 218 124 208 126 C194 127 180 123 186 114 Z" fill="url(#bmpork)" stroke="#4a1c0b" stroke-width="1.2"/>
+    <ellipse cx="128" cy="112" rx="7" ry="2.4" fill="#d98a4a" opacity=".5"/>
+    <ellipse cx="166" cy="114" rx="7" ry="2.4" fill="#d98a4a" opacity=".5"/>
+  </g>
+  <!-- pickled carrot & daikon batons (orange + pale) sticking out -->
+  <rect x="102" y="116" width="20" height="4.2" rx="2" fill="#f4972f" transform="rotate(-12 112 118)"/>
+  <rect x="140" y="120" width="22" height="4.2" rx="2" fill="#fbeecb" transform="rotate(4 151 122)"/>
+  <rect x="182" y="118" width="20" height="4.2" rx="2" fill="#f4972f" transform="rotate(10 192 120)"/>
+  <rect x="120" y="122" width="18" height="3.8" rx="1.9" fill="#f8f0d8" transform="rotate(8 129 124)"/>
+  <!-- red chili slices -->
+  <path d="M158 124 q8 2 12 8" stroke="#e0341f" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <circle cx="176" cy="124" r="2.2" fill="#c31f12"/>
+  <!-- mayo / sauce drizzle glint -->
+  <path d="M110 110 q30 -4 60 0 q26 3 44 -1" stroke="#fff3d0" stroke-width="1.6" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- cold-food sparkle (no steam arc) -->
+  <circle cx="240" cy="70" r="1.6" fill="#ffe9c9" opacity=".8"/>
+  <path d="M238 70 h4 M240 68 v4" stroke="#ffe9c9" stroke-width=".8" opacity=".6"/>
+  <circle cx="80" cy="86" r="1.2" fill="#fff" opacity=".6"/>
+  <!-- gloss dots -->
+  <circle cx="140" cy="108" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="196" cy="112" r="1.3" fill="#fff" opacity=".5"/>
+</svg>
