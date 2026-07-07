@@ -201,6 +201,7 @@ export function healthResponse(
     spend_month_usd: 0.2,
     budget_monthly_usd: 10,
     daily_attempt_cap: 25,
+    budget_is_personal: false,
     attempts_today: 1,
     worker: 'alive',
     sentry_enabled: false,

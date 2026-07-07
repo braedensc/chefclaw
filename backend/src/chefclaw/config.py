@@ -95,7 +95,13 @@ class Settings(BaseSettings):
     # accidental spend); compose sets "gemini" for the real stack.
     chefclaw_extractor: str = "fake"
     gemini_api_key: str = ""
-    gemini_model: str = "gemini-2.5-flash"  # model id is config, never hardcoded
+    # Model id is config, never hardcoded. TIER FLIP (M3): "gemini-2.5-flash" is
+    # the free/cheap default; "gemini-2.5-pro" is the PAID tier — higher quality
+    # at ~4x in / ~3x out token cost (both priced, padded, in
+    # spend.GEMINI_PRICING, so the fail-closed budget gate bounds pro spend
+    # unchanged). This is a GLOBAL flip for every user's extractions; per-user
+    # paid tier is deferred (docs/adr/2026-07-07-per-user-budget-caps.md).
+    gemini_model: str = "gemini-2.5-flash"
     gemini_media_resolution: str = "low"  # escalate only if overlay text is missed
     # Qwen fallback via DashScope OpenAI-compatible mode (CHEFCLAW_EXTRACTOR=qwen;
     # fail-closed when keyless). Region/data-governance review is a HUMAN

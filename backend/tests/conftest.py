@@ -46,10 +46,16 @@ def stub_spend_readout(monkeypatch: pytest.MonkeyPatch) -> None:
     async def fake_attempts(owner_id: uuid.UUID) -> None:
         return None
 
+    async def fake_user_caps(owner_id: uuid.UUID) -> tuple[None, None]:
+        return None, None
+
     from chefclaw import app as app_module
 
     monkeypatch.setattr(app_module, "_spend_month_to_date", fake_spend)
     monkeypatch.setattr(app_module, "_attempts_today", fake_attempts)
+    # M3: the health endpoint's per-user cap read must never open the real
+    # (production) DB in the unit tier — default to 'no per-user override'.
+    monkeypatch.setattr(app_module, "_user_budget_caps", fake_user_caps)
 
 
 @pytest.fixture

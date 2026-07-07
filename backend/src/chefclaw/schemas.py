@@ -32,6 +32,8 @@ __all__ = [
     "SpendDay",
     "SpendModelSlice",
     "SpendSummaryOut",
+    "UserBudgetOut",
+    "UserBudgetPatch",
 ]
 
 
@@ -85,6 +87,30 @@ class InvitePublicOut(BaseModel):
 
     status: str
     email: str | None = None
+
+
+class UserBudgetPatch(BaseModel):
+    """PATCH /api/admin/users/{user_id}/budget body (M3 per-user caps). Both
+    fields optional — a PARTIAL update keyed on which fields the request sends:
+    a field PRESENT sets the per-user override, PRESENT+``null`` CLEARS it (the
+    account falls back to the global env cap), ABSENT leaves it unchanged.
+    Positive values only — 0/negative is a 422 (use ``null`` to clear). The
+    router reads ``model_fields_set`` to tell 'clear' from 'leave alone'."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    monthly_budget_usd: float | None = Field(default=None, gt=0)
+    max_attempts_per_day: int | None = Field(default=None, gt=0)
+
+
+class UserBudgetOut(BaseModel):
+    """A user's per-user caps after the write. ``null`` on a field means no
+    per-user override — the global env cap applies to that account."""
+
+    id: uuid.UUID
+    email: str
+    monthly_budget_usd: float | None = None
+    max_attempts_per_day: int | None = None
 
 
 class ErrorBody(BaseModel):

@@ -81,6 +81,10 @@ export type HealthResponse = {
      */
     backup_finished_at?: string | null;
     /**
+     * Budget Is Personal
+     */
+    budget_is_personal?: boolean;
+    /**
      * Budget Monthly Usd
      */
     budget_monthly_usd?: number | null;
@@ -619,6 +623,52 @@ export type SpendSummaryOut = {
 };
 
 /**
+ * UserBudgetOut
+ *
+ * A user's per-user caps after the write. ``null`` on a field means no
+ * per-user override — the global env cap applies to that account.
+ */
+export type UserBudgetOut = {
+    /**
+     * Email
+     */
+    email: string;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Max Attempts Per Day
+     */
+    max_attempts_per_day?: number | null;
+    /**
+     * Monthly Budget Usd
+     */
+    monthly_budget_usd?: number | null;
+};
+
+/**
+ * UserBudgetPatch
+ *
+ * PATCH /api/admin/users/{user_id}/budget body (M3 per-user caps). Both
+ * fields optional — a PARTIAL update keyed on which fields the request sends:
+ * a field PRESENT sets the per-user override, PRESENT+``null`` CLEARS it (the
+ * account falls back to the global env cap), ABSENT leaves it unchanged.
+ * Positive values only — 0/negative is a 422 (use ``null`` to clear). The
+ * router reads ``model_fields_set`` to tell 'clear' from 'leave alone'.
+ */
+export type UserBudgetPatch = {
+    /**
+     * Max Attempts Per Day
+     */
+    max_attempts_per_day?: number | null;
+    /**
+     * Monthly Budget Usd
+     */
+    monthly_budget_usd?: number | null;
+};
+
+/**
  * ValidationError
  */
 export type ValidationError = {
@@ -752,6 +802,40 @@ export type RevokeInviteApiAdminInvitesInviteIdRevokePostResponses = {
      */
     200: unknown;
 };
+
+export type UpdateUserBudgetApiAdminUsersUserIdBudgetPatchData = {
+    body: UserBudgetPatch;
+    path: {
+        /**
+         * User Id
+         */
+        user_id: string;
+    };
+    query?: never;
+    url: '/api/admin/users/{user_id}/budget';
+};
+
+export type UpdateUserBudgetApiAdminUsersUserIdBudgetPatchErrors = {
+    /**
+     * Not Found
+     */
+    404: ErrorBody;
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type UpdateUserBudgetApiAdminUsersUserIdBudgetPatchError = UpdateUserBudgetApiAdminUsersUserIdBudgetPatchErrors[keyof UpdateUserBudgetApiAdminUsersUserIdBudgetPatchErrors];
+
+export type UpdateUserBudgetApiAdminUsersUserIdBudgetPatchResponses = {
+    /**
+     * Successful Response
+     */
+    200: UserBudgetOut;
+};
+
+export type UpdateUserBudgetApiAdminUsersUserIdBudgetPatchResponse = UpdateUserBudgetApiAdminUsersUserIdBudgetPatchResponses[keyof UpdateUserBudgetApiAdminUsersUserIdBudgetPatchResponses];
 
 export type GoogleCallbackApiAuthGoogleCallbackGetData = {
     body?: never;

@@ -27,7 +27,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from chefclaw import observability
 from chefclaw.errors import BudgetExceededError, ConfigError
 from chefclaw.extractors import ExtractionUsage
-from chefclaw.models import LlmSpend
+from chefclaw.models import LlmSpend, User
 
 if TYPE_CHECKING:
     from chefclaw.config import Settings
@@ -163,31 +163,67 @@ async def attempts_today(session: AsyncSession, owner_id: uuid.UUID) -> int:
     return int(await session.scalar(stmt))
 
 
+# ─── Per-user caps (M3, ADR 2026-07-07-per-user-budget-caps) ──────────────────
+
+
+async def read_user_caps(
+    session: AsyncSession, owner_id: uuid.UUID
+) -> tuple[Decimal | None, int | None]:
+    """The owner's per-user cap columns, or (None, None) when unset/no row.
+
+    NULL on a column means 'use the global default'. This is READ INSIDE THE
+    GATE'S OWN SESSION (see :func:`check_budget`), between the fail-closed
+    config parse and the ledger reads, so the caps share the paid-call read
+    snapshot — the concurrency-1 double-spend gate is preserved
+    (docs/adr/2026-07-06-jobs-without-broker.md)."""
+    row = (
+        await session.execute(
+            select(User.monthly_budget_usd, User.max_attempts_per_day).where(User.id == owner_id)
+        )
+    ).first()
+    if row is None:
+        return None, None
+    return row.monthly_budget_usd, row.max_attempts_per_day
+
+
 # ─── The gate ────────────────────────────────────────────────────────────────
+
+_PER_USER_CAP = "per-user cap for this account"  # message label for an override
 
 
 async def check_budget(session: AsyncSession, settings: "Settings", owner_id: uuid.UUID) -> None:
     """The paid-call gate — CALL IMMEDIATELY BEFORE EVERY PAID CALL.
 
-    Order matters: config parse first (ConfigError, fail-closed, no reads),
-    then the cheap ledger reads. Raises BudgetExceededError (monthly budget
-    or daily attempt cap) or ConfigError. Performs no writes — the attempt is
-    recorded by :func:`record_spend` after the call outcome is known.
+    Order matters and is load-bearing:
+      1. Global config parse (ConfigError, fail-closed, NO reads) — a per-user
+         cap can NEVER re-enable spend the operator hasn't globally enabled.
+      2. Per-user cap read (this session) — a non-NULL column OVERRIDES the
+         global default (higher or lower); NULL falls back to it.
+      3. The cheap ledger reads, compared against the effective cap.
+    Raises BudgetExceededError (monthly budget or daily attempt cap) or
+    ConfigError. Performs no writes — the attempt is recorded by
+    :func:`record_spend` after the call outcome is known.
     """
-    monthly_budget, daily_attempts = parse_budget(settings)
+    global_monthly, global_daily = parse_budget(settings)
+
+    user_monthly, user_daily = await read_user_caps(session, owner_id)
+    monthly_budget = user_monthly if user_monthly is not None else global_monthly
+    daily_attempts = user_daily if user_daily is not None else global_daily
 
     spent = await month_to_date_usd(session, owner_id)
     if spent >= monthly_budget:
+        source = _PER_USER_CAP if user_monthly is not None else "MONTHLY_LLM_BUDGET_USD"
         raise BudgetExceededError(
             f"monthly LLM budget reached: ${spent} spent >= ${monthly_budget} "
-            "(MONTHLY_LLM_BUDGET_USD) — no more paid calls this month."
+            f"({source}) — no more paid calls this month."
         )
 
     attempts = await attempts_today(session, owner_id)
     if attempts >= daily_attempts:
+        source = _PER_USER_CAP if user_daily is not None else "MAX_EXTRACTION_ATTEMPTS_PER_DAY"
         raise BudgetExceededError(
             f"daily extraction attempt cap reached: {attempts} attempts today >= "
-            f"{daily_attempts} (MAX_EXTRACTION_ATTEMPTS_PER_DAY) — try again tomorrow."
+            f"{daily_attempts} ({source}) — try again tomorrow."
         )
 
 

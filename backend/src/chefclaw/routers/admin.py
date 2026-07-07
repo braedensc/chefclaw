@@ -19,8 +19,16 @@ from chefclaw.config import Settings, get_settings
 from chefclaw.emailer import get_email_adapter
 from chefclaw.errors import ConfigError, EmailSendError
 from chefclaw.routers.deps import error_response
-from chefclaw.schemas import ErrorBody, InviteCreate, InviteList, InviteOut, InvitePublicOut
-from chefclaw.services import invites
+from chefclaw.schemas import (
+    ErrorBody,
+    InviteCreate,
+    InviteList,
+    InviteOut,
+    InvitePublicOut,
+    UserBudgetOut,
+    UserBudgetPatch,
+)
+from chefclaw.services import invites, users
 
 router = APIRouter(prefix="/api", tags=["invites"])
 
@@ -109,6 +117,35 @@ async def revoke_invite(
     if outcome == "already_accepted":
         return error_response(409, "already_accepted", "an accepted invite cannot be revoked")
     return JSONResponse(status_code=200, content={"status": "revoked"})
+
+
+@router.patch(
+    "/admin/users/{user_id}/budget",
+    response_model=UserBudgetOut,
+    responses={404: _ERR},
+)
+async def update_user_budget(
+    user_id: uuid.UUID,
+    body: UserBudgetPatch,
+    owner_id: Annotated[uuid.UUID, Depends(require_admin)],
+) -> UserBudgetOut | JSONResponse:
+    """Set (or clear) a user's per-user budget/rate caps (M3). Partial update:
+    an omitted field is left unchanged, an explicit ``null`` clears the override
+    back to the global env cap. These only redistribute WITHIN the globally
+    enabled budget — a per-user cap never re-enables fail-closed spend
+    (chefclaw.spend.check_budget). Missing user ⇒ 404."""
+    fields = {name: getattr(body, name) for name in body.model_fields_set}
+    row = await users.set_user_budget(db.get_sessionmaker(), user_id, values=fields)
+    if row is None:
+        return error_response(404, "not_found", f"no user {user_id}")
+    return UserBudgetOut(
+        id=row.id,
+        email=row.email,
+        monthly_budget_usd=(
+            float(row.monthly_budget_usd) if row.monthly_budget_usd is not None else None
+        ),
+        max_attempts_per_day=row.max_attempts_per_day,
+    )
 
 
 @router.get("/invites/{token}", response_model=InvitePublicOut)

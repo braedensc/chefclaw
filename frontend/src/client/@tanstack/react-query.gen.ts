@@ -3,8 +3,8 @@
 import { type DefaultError, type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { createInviteApiAdminInvitesPost, deleteRecipeApiRecipesRecipeIdDelete, extractRecipeApiRecipesExtractPost, getJobApiJobsJobIdGet, getRecipeApiRecipesRecipeIdGet, getRecipeImageApiRecipesRecipeIdImageGet, getSpendApiSpendGet, googleCallbackApiAuthGoogleCallbackGet, googleLoginApiAuthGoogleLoginGet, healthApiHealthGet, listInvitesApiAdminInvitesGet, listJobsApiJobsGet, listRecipesApiRecipesGet, logoutApiAuthLogoutPost, meApiMeGet, type Options, patchRecipeApiRecipesRecipeIdPatch, publicInviteApiInvitesTokenGet, regenerateIllustrationApiRecipesRecipeIdIllustrationPost, revokeInviteApiAdminInvitesInviteIdRevokePost, uploadRecipeVideoApiRecipesUploadPost } from '../sdk.gen';
-import type { CreateInviteApiAdminInvitesPostData, CreateInviteApiAdminInvitesPostError, CreateInviteApiAdminInvitesPostResponse, DeleteRecipeApiRecipesRecipeIdDeleteData, DeleteRecipeApiRecipesRecipeIdDeleteError, DeleteRecipeApiRecipesRecipeIdDeleteResponse, ExtractRecipeApiRecipesExtractPostData, ExtractRecipeApiRecipesExtractPostError, ExtractRecipeApiRecipesExtractPostResponse, GetJobApiJobsJobIdGetData, GetJobApiJobsJobIdGetError, GetJobApiJobsJobIdGetResponse, GetRecipeApiRecipesRecipeIdGetData, GetRecipeApiRecipesRecipeIdGetError, GetRecipeApiRecipesRecipeIdGetResponse, GetRecipeImageApiRecipesRecipeIdImageGetData, GetRecipeImageApiRecipesRecipeIdImageGetError, GetSpendApiSpendGetData, GetSpendApiSpendGetError, GetSpendApiSpendGetResponse, GoogleCallbackApiAuthGoogleCallbackGetData, GoogleCallbackApiAuthGoogleCallbackGetError, GoogleLoginApiAuthGoogleLoginGetData, GoogleLoginApiAuthGoogleLoginGetError, HealthApiHealthGetData, HealthApiHealthGetResponse, ListInvitesApiAdminInvitesGetData, ListInvitesApiAdminInvitesGetError, ListInvitesApiAdminInvitesGetResponse, ListJobsApiJobsGetData, ListJobsApiJobsGetError, ListJobsApiJobsGetResponse, ListRecipesApiRecipesGetData, ListRecipesApiRecipesGetError, ListRecipesApiRecipesGetResponse, LogoutApiAuthLogoutPostData, LogoutApiAuthLogoutPostResponse, MeApiMeGetData, MeApiMeGetResponse, PatchRecipeApiRecipesRecipeIdPatchData, PatchRecipeApiRecipesRecipeIdPatchError, PatchRecipeApiRecipesRecipeIdPatchResponse, PublicInviteApiInvitesTokenGetData, PublicInviteApiInvitesTokenGetError, PublicInviteApiInvitesTokenGetResponse, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostData, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostError, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostResponse, RevokeInviteApiAdminInvitesInviteIdRevokePostData, RevokeInviteApiAdminInvitesInviteIdRevokePostError, UploadRecipeVideoApiRecipesUploadPostData, UploadRecipeVideoApiRecipesUploadPostError, UploadRecipeVideoApiRecipesUploadPostResponse } from '../types.gen';
+import { createInviteApiAdminInvitesPost, deleteRecipeApiRecipesRecipeIdDelete, extractRecipeApiRecipesExtractPost, getJobApiJobsJobIdGet, getRecipeApiRecipesRecipeIdGet, getRecipeImageApiRecipesRecipeIdImageGet, getSpendApiSpendGet, googleCallbackApiAuthGoogleCallbackGet, googleLoginApiAuthGoogleLoginGet, healthApiHealthGet, listInvitesApiAdminInvitesGet, listJobsApiJobsGet, listRecipesApiRecipesGet, logoutApiAuthLogoutPost, meApiMeGet, type Options, patchRecipeApiRecipesRecipeIdPatch, publicInviteApiInvitesTokenGet, regenerateIllustrationApiRecipesRecipeIdIllustrationPost, revokeInviteApiAdminInvitesInviteIdRevokePost, updateUserBudgetApiAdminUsersUserIdBudgetPatch, uploadRecipeVideoApiRecipesUploadPost } from '../sdk.gen';
+import type { CreateInviteApiAdminInvitesPostData, CreateInviteApiAdminInvitesPostError, CreateInviteApiAdminInvitesPostResponse, DeleteRecipeApiRecipesRecipeIdDeleteData, DeleteRecipeApiRecipesRecipeIdDeleteError, DeleteRecipeApiRecipesRecipeIdDeleteResponse, ExtractRecipeApiRecipesExtractPostData, ExtractRecipeApiRecipesExtractPostError, ExtractRecipeApiRecipesExtractPostResponse, GetJobApiJobsJobIdGetData, GetJobApiJobsJobIdGetError, GetJobApiJobsJobIdGetResponse, GetRecipeApiRecipesRecipeIdGetData, GetRecipeApiRecipesRecipeIdGetError, GetRecipeApiRecipesRecipeIdGetResponse, GetRecipeImageApiRecipesRecipeIdImageGetData, GetRecipeImageApiRecipesRecipeIdImageGetError, GetSpendApiSpendGetData, GetSpendApiSpendGetError, GetSpendApiSpendGetResponse, GoogleCallbackApiAuthGoogleCallbackGetData, GoogleCallbackApiAuthGoogleCallbackGetError, GoogleLoginApiAuthGoogleLoginGetData, GoogleLoginApiAuthGoogleLoginGetError, HealthApiHealthGetData, HealthApiHealthGetResponse, ListInvitesApiAdminInvitesGetData, ListInvitesApiAdminInvitesGetError, ListInvitesApiAdminInvitesGetResponse, ListJobsApiJobsGetData, ListJobsApiJobsGetError, ListJobsApiJobsGetResponse, ListRecipesApiRecipesGetData, ListRecipesApiRecipesGetError, ListRecipesApiRecipesGetResponse, LogoutApiAuthLogoutPostData, LogoutApiAuthLogoutPostResponse, MeApiMeGetData, MeApiMeGetResponse, PatchRecipeApiRecipesRecipeIdPatchData, PatchRecipeApiRecipesRecipeIdPatchError, PatchRecipeApiRecipesRecipeIdPatchResponse, PublicInviteApiInvitesTokenGetData, PublicInviteApiInvitesTokenGetError, PublicInviteApiInvitesTokenGetResponse, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostData, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostError, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostResponse, RevokeInviteApiAdminInvitesInviteIdRevokePostData, RevokeInviteApiAdminInvitesInviteIdRevokePostError, UpdateUserBudgetApiAdminUsersUserIdBudgetPatchData, UpdateUserBudgetApiAdminUsersUserIdBudgetPatchError, UpdateUserBudgetApiAdminUsersUserIdBudgetPatchResponse, UploadRecipeVideoApiRecipesUploadPostData, UploadRecipeVideoApiRecipesUploadPostError, UploadRecipeVideoApiRecipesUploadPostResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -91,6 +91,29 @@ export const revokeInviteApiAdminInvitesInviteIdRevokePostMutation = (options?: 
     const mutationOptions: UseMutationOptions<unknown, RevokeInviteApiAdminInvitesInviteIdRevokePostError, Options<RevokeInviteApiAdminInvitesInviteIdRevokePostData>> = {
         mutationFn: async (fnOptions) => {
             const { data } = await revokeInviteApiAdminInvitesInviteIdRevokePost({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Update User Budget
+ *
+ * Set (or clear) a user's per-user budget/rate caps (M3). Partial update:
+ * an omitted field is left unchanged, an explicit ``null`` clears the override
+ * back to the global env cap. These only redistribute WITHIN the globally
+ * enabled budget — a per-user cap never re-enables fail-closed spend
+ * (chefclaw.spend.check_budget). Missing user ⇒ 404.
+ */
+export const updateUserBudgetApiAdminUsersUserIdBudgetPatchMutation = (options?: Partial<Options<UpdateUserBudgetApiAdminUsersUserIdBudgetPatchData>>): UseMutationOptions<UpdateUserBudgetApiAdminUsersUserIdBudgetPatchResponse, UpdateUserBudgetApiAdminUsersUserIdBudgetPatchError, Options<UpdateUserBudgetApiAdminUsersUserIdBudgetPatchData>> => {
+    const mutationOptions: UseMutationOptions<UpdateUserBudgetApiAdminUsersUserIdBudgetPatchResponse, UpdateUserBudgetApiAdminUsersUserIdBudgetPatchError, Options<UpdateUserBudgetApiAdminUsersUserIdBudgetPatchData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await updateUserBudgetApiAdminUsersUserIdBudgetPatch({
                 ...options,
                 ...fnOptions,
                 throwOnError: true

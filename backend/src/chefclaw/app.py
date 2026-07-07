@@ -11,6 +11,7 @@ import json
 import uuid
 from contextlib import asynccontextmanager
 from datetime import UTC, date, datetime
+from decimal import Decimal
 from pathlib import Path
 from typing import Annotated, Any, Literal
 
@@ -74,8 +75,12 @@ class HealthResponse(BaseModel):
     # V2-A additions. Caps are null when the budget config is fail-closed
     # (unset/unparseable) — the UI says "extraction disabled", never invents
     # a number; attempts_today is null when the ledger could not be read.
+    # M3: the caps are the EFFECTIVE ones (per-user override, else global env);
+    # budget_is_personal is True when the monthly cap is a per-user override so
+    # the Settings bar can label it a personal cap.
     budget_monthly_usd: float | None = None
     daily_attempt_cap: int | None = None
+    budget_is_personal: bool = False
     attempts_today: int | None = None
     # Worker aliveness is task-not-done, NOT a heartbeat timestamp — a
     # timestamp false-alarms during any long legitimate download/extract
@@ -180,14 +185,33 @@ async def _attempts_today(owner_id: uuid.UUID) -> int | None:
         return None
 
 
-def _budget_caps(settings: Settings) -> tuple[float | None, int | None]:
-    """The configured caps, or (None, None) under fail-closed config — the
-    same parse the paid-call gate uses, so health and the gate can't drift."""
+async def _user_budget_caps(owner_id: uuid.UUID) -> tuple[Decimal | None, int | None]:
+    """The owner's per-user cap overrides for the health readout, or (None, None)
+    when unset OR unreadable — never raises (same posture as the ledger reads).
+    An unreadable per-user row degrades to the global cap, not a crash."""
+    try:
+        async with db.get_sessionmaker()() as session:
+            return await spend.read_user_caps(session, owner_id)
+    except Exception:
+        return None, None
+
+
+async def _effective_budget_caps(
+    settings: Settings, owner_id: uuid.UUID
+) -> tuple[float | None, int | None, bool]:
+    """The EFFECTIVE caps the Settings bar tracks (M3): the per-user override
+    when set, else the global env cap. Fail-closed global ⇒ (None, None, False)
+    with NO DB read — same parse the paid-call gate uses, so health and the gate
+    can't drift. The bool is True when the monthly cap shown is a per-user
+    override (the UI labels it a personal cap)."""
     try:
         monthly, daily = spend.parse_budget(settings)
     except ConfigError:
-        return None, None
-    return float(monthly), daily
+        return None, None, False
+    user_monthly, user_daily = await _user_budget_caps(owner_id)
+    eff_monthly = user_monthly if user_monthly is not None else monthly
+    eff_daily = user_daily if user_daily is not None else daily
+    return float(eff_monthly), int(eff_daily), user_monthly is not None
 
 
 def _worker_status(app: FastAPI) -> Literal["alive", "dead", "not_running"]:
@@ -212,7 +236,9 @@ async def health(
     state (plan §16 amendment 3)."""
     db_ok = await db.ping()
     backup, backup_finished_at = _backup_status(settings)
-    budget_monthly_usd, daily_attempt_cap = _budget_caps(settings)
+    budget_monthly_usd, daily_attempt_cap, budget_is_personal = await _effective_budget_caps(
+        settings, owner_id
+    )
     return HealthResponse(
         status="ok" if db_ok else "degraded",
         db="ok" if db_ok else "unreachable",
@@ -226,6 +252,7 @@ async def health(
         spend_month_usd=await _spend_month_to_date(owner_id) if db_ok else None,
         budget_monthly_usd=budget_monthly_usd,
         daily_attempt_cap=daily_attempt_cap,
+        budget_is_personal=budget_is_personal,
         attempts_today=await _attempts_today(owner_id) if db_ok else None,
         worker=_worker_status(request.app),
         sentry_enabled=observability.sentry_enabled(),

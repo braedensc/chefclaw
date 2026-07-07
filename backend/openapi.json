@@ -118,6 +118,11 @@
             ],
             "title": "Backup Finished At"
           },
+          "budget_is_personal": {
+            "default": false,
+            "title": "Budget Is Personal",
+            "type": "boolean"
+          },
           "budget_monthly_usd": {
             "anyOf": [
               {
@@ -1043,6 +1048,80 @@
         "title": "SpendSummaryOut",
         "type": "object"
       },
+      "UserBudgetOut": {
+        "description": "A user's per-user caps after the write. ``null`` on a field means no\nper-user override — the global env cap applies to that account.",
+        "properties": {
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "max_attempts_per_day": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Attempts Per Day"
+          },
+          "monthly_budget_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Monthly Budget Usd"
+          }
+        },
+        "required": [
+          "id",
+          "email"
+        ],
+        "title": "UserBudgetOut",
+        "type": "object"
+      },
+      "UserBudgetPatch": {
+        "additionalProperties": false,
+        "description": "PATCH /api/admin/users/{user_id}/budget body (M3 per-user caps). Both\nfields optional — a PARTIAL update keyed on which fields the request sends:\na field PRESENT sets the per-user override, PRESENT+``null`` CLEARS it (the\naccount falls back to the global env cap), ABSENT leaves it unchanged.\nPositive values only — 0/negative is a 422 (use ``null`` to clear). The\nrouter reads ``model_fields_set`` to tell 'clear' from 'leave alone'.",
+        "properties": {
+          "max_attempts_per_day": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Attempts Per Day"
+          },
+          "monthly_budget_usd": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Monthly Budget Usd"
+          }
+        },
+        "title": "UserBudgetPatch",
+        "type": "object"
+      },
       "ValidationError": {
         "properties": {
           "ctx": {
@@ -1278,6 +1357,70 @@
           }
         },
         "summary": "Revoke Invite",
+        "tags": [
+          "invites"
+        ]
+      }
+    },
+    "/api/admin/users/{user_id}/budget": {
+      "patch": {
+        "description": "Set (or clear) a user's per-user budget/rate caps (M3). Partial update:\nan omitted field is left unchanged, an explicit ``null`` clears the override\nback to the global env cap. These only redistribute WITHIN the globally\nenabled budget — a per-user cap never re-enables fail-closed spend\n(chefclaw.spend.check_budget). Missing user ⇒ 404.",
+        "operationId": "update_user_budget_api_admin_users__user_id__budget_patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "User Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserBudgetPatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserBudgetOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update User Budget",
         "tags": [
           "invites"
         ]

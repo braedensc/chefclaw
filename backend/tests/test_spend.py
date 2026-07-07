@@ -105,9 +105,17 @@ def test_month_and_day_start_are_utc_windows() -> None:
 
 
 def _patch_ledger(
-    monkeypatch: pytest.MonkeyPatch, *, spent: Decimal, attempts: int
+    monkeypatch: pytest.MonkeyPatch,
+    *,
+    spent: Decimal,
+    attempts: int,
+    user_monthly: Decimal | None = None,
+    user_daily: int | None = None,
 ) -> dict[str, int]:
-    calls = {"month": 0, "day": 0}
+    """Patch the gate's three DB reads (no session needed). ``user_monthly`` /
+    ``user_daily`` default to None (no per-user override — the global env cap
+    applies)."""
+    calls = {"month": 0, "day": 0, "caps": 0}
 
     async def fake_month(session, owner_id):
         calls["month"] += 1
@@ -117,8 +125,13 @@ def _patch_ledger(
         calls["day"] += 1
         return attempts
 
+    async def fake_caps(session, owner_id):
+        calls["caps"] += 1
+        return user_monthly, user_daily
+
     monkeypatch.setattr(spend, "month_to_date_usd", fake_month)
     monkeypatch.setattr(spend, "attempts_today", fake_day)
+    monkeypatch.setattr(spend, "read_user_caps", fake_caps)
     return calls
 
 
@@ -148,7 +161,89 @@ async def test_check_budget_config_error_before_any_ledger_read(
     calls = _patch_ledger(monkeypatch, spent=Decimal("0"), attempts=0)
     with pytest.raises(ConfigError):
         await spend.check_budget(None, make_settings(monthly=""), OWNER_ID)
-    assert calls == {"month": 0, "day": 0}
+    # Fail-closed config refuses before touching ANY read (caps included) — a
+    # per-user cap can never re-enable spend the operator hasn't globally set.
+    assert calls == {"month": 0, "day": 0, "caps": 0}
+
+
+# ── check_budget: per-user caps override the global (M3) ─────────────────────
+
+
+async def test_per_user_monthly_override_tighter_than_global_gates(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A per-user monthly cap BELOW the global blocks at the lower line even
+    though the global (10) would allow it."""
+    _patch_ledger(monkeypatch, spent=Decimal("2.00"), attempts=0, user_monthly=Decimal("1.00"))
+    with pytest.raises(BudgetExceededError, match="per-user cap"):
+        await spend.check_budget(None, make_settings("10", "25"), OWNER_ID)
+
+
+async def test_per_user_monthly_override_looser_than_global_allows(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A per-user monthly cap ABOVE the global lets this owner keep spending
+    past the global line — the override replaces, not min()s, the global."""
+    _patch_ledger(monkeypatch, spent=Decimal("15.00"), attempts=0, user_monthly=Decimal("50.00"))
+    await spend.check_budget(None, make_settings("10", "25"), OWNER_ID)  # no raise
+
+
+async def test_per_user_daily_override_gates(monkeypatch: pytest.MonkeyPatch) -> None:
+    _patch_ledger(monkeypatch, spent=Decimal("0"), attempts=3, user_daily=3)
+    with pytest.raises(BudgetExceededError, match="per-user cap"):
+        await spend.check_budget(None, make_settings("10", "25"), OWNER_ID)
+
+
+async def test_null_columns_fall_back_to_global(monkeypatch: pytest.MonkeyPatch) -> None:
+    """NULL per-user columns ⇒ the global env cap applies (both directions):
+    under the global passes, at the global blocks with the ENV-VAR source."""
+    _patch_ledger(monkeypatch, spent=Decimal("9.99"), attempts=24)  # both None
+    await spend.check_budget(None, make_settings("10", "25"), OWNER_ID)  # under global
+
+    _patch_ledger(monkeypatch, spent=Decimal("10.00"), attempts=0)
+    with pytest.raises(BudgetExceededError, match="MONTHLY_LLM_BUDGET_USD"):
+        await spend.check_budget(None, make_settings("10", "25"), OWNER_ID)
+
+
+async def test_per_user_cap_cannot_bypass_failclosed_global(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The global switch is the master: a generous per-user cap does NOT
+    re-enable paid calls when the global env budget is unset (fail-closed)."""
+    calls = _patch_ledger(
+        monkeypatch, spent=Decimal("0"), attempts=0, user_monthly=Decimal("999")
+    )
+    with pytest.raises(ConfigError):
+        await spend.check_budget(None, make_settings(monthly=""), OWNER_ID)
+    assert calls["caps"] == 0  # config parse refused before the caps read
+
+
+async def test_two_users_different_caps_gated_independently(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Same global env; two owners with different per-user caps and different
+    spend are each gated against their OWN effective cap."""
+    settings = make_settings("10", "25")
+    caps = {"low": (Decimal("1.00"), None), "high": (Decimal("100.00"), None)}
+    spent = {"low": Decimal("2.00"), "high": Decimal("2.00")}
+
+    async def fake_caps(session, owner_id):
+        return caps[owner_id]
+
+    async def fake_month(session, owner_id):
+        return spent[owner_id]
+
+    async def fake_day(session, owner_id):
+        return 0
+
+    monkeypatch.setattr(spend, "read_user_caps", fake_caps)
+    monkeypatch.setattr(spend, "month_to_date_usd", fake_month)
+    monkeypatch.setattr(spend, "attempts_today", fake_day)
+
+    # $2 spent: over the "low" user's $1 cap, under the "high" user's $100 cap.
+    with pytest.raises(BudgetExceededError):
+        await spend.check_budget(None, settings, "low")
+    await spend.check_budget(None, settings, "high")  # no raise
 
 
 # ── record_spend ─────────────────────────────────────────────────────────────
