@@ -2,7 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 
-import { useTokenActions } from '../token-context';
+import { useAuth } from '../auth-context';
 import { PuppyChef } from './brand/puppy-chef';
 import { JobsDrawer } from './jobs-drawer';
 
@@ -16,7 +16,7 @@ const HEADER_CONTROL =
  * token) and the slide-over jobs panel.
  */
 export function AppShell({ children }: { children: ReactNode }) {
-  const { clearToken } = useTokenActions();
+  const { me, signOut } = useAuth();
   const [jobsOpen, setJobsOpen] = useState(false);
 
   return (
@@ -76,6 +76,19 @@ export function AppShell({ children }: { children: ReactNode }) {
             </span>
           </Link>
           <nav className="flex items-center gap-0.5 sm:gap-1">
+            {/* Admin nav is COSMETIC-gated on me.is_admin (critique M9): the
+                server enforces admin access at the transport layer, so hiding
+                the link is convenience, not security. */}
+            {me.is_admin && (
+              <>
+                <Link to="/admin/invites" className={HEADER_CONTROL}>
+                  Admin
+                </Link>
+                <span aria-hidden="true" className="text-line-bright">
+                  ·
+                </span>
+              </>
+            )}
             {/* A LINK named "Settings" — the golden selector contract's
                 button "Jobs" (e2e/golden) stays the only header button
                 with that accessible name. */}
@@ -96,12 +109,16 @@ export function AppShell({ children }: { children: ReactNode }) {
             <span aria-hidden="true" className="text-line-bright">
               ·
             </span>
+            {/* The account control: the signed-in email is the button's
+                accessible title; clicking signs out (kills the session
+                server-side, returns to the login gate). */}
             <button
               type="button"
-              onClick={clearToken}
+              onClick={signOut}
+              title={me.email}
               className={HEADER_CONTROL}
             >
-              Clear token
+              Sign out
             </button>
           </nav>
         </div>

@@ -1,7 +1,5 @@
 import { expect, test } from '@playwright/test';
 
-import { seedToken } from './helpers';
-
 // The jobs drawer lists the extraction job as stored. Runs after
 // 01-paste-to-card (workers: 1, filename-ordered); pasting again is a
 // canonical dedupe hit that returns the SAME job, so this spec is also
@@ -16,7 +14,6 @@ import { seedToken } from './helpers';
 //                                status label
 
 test('the jobs drawer lists the extraction job as stored', async ({ page }) => {
-  await seedToken(page);
   await page.goto('/');
 
   // Ensure the job exists (fresh stack) or dedupe-hit the existing one.

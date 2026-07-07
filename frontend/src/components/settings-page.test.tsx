@@ -1,4 +1,4 @@
-import { fireEvent, screen, within } from '@testing-library/react';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ApiError } from '../api-error';
@@ -366,23 +366,20 @@ describe('SettingsPage', () => {
   });
 
   describe('failure states (absorbed from the Phase-1 HealthPanel)', () => {
-    it('offers clear-token-and-re-enter on a 401 and returns to the token gate', async () => {
+    it('offers sign-in-again on a 401 and signs out', async () => {
       genState.healthError = new ApiError(401, 'Unauthorized', {
-        detail: 'Invalid token',
+        detail: 'Invalid session',
       });
 
       renderApp('/settings');
 
       expect(
-        await screen.findByText(/token rejected \(401\)/i),
+        await screen.findByText(/your session ended \(401\)/i),
       ).toBeInTheDocument();
 
-      fireEvent.click(
-        screen.getByRole('button', { name: 'Clear token & re-enter' }),
-      );
-      expect(
-        await screen.findByText(/paste your CHEFCLAW_API_TOKEN/i),
-      ).toBeInTheDocument();
+      fireEvent.click(screen.getByRole('button', { name: 'Sign in again' }));
+      // Signing out kills the session server-side (the logout mutation fires).
+      await waitFor(() => expect(genState.logout).toHaveBeenCalled());
     });
 
     it('shows the status code on any other non-2xx with a retry affordance', async () => {

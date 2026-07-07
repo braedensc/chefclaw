@@ -6,7 +6,7 @@ import { listRecipesApiRecipesGetOptions } from '../client/@tanstack/react-query
 import type { JobOut, RecipeSummary } from '../client/types.gen';
 import { CHILI_BTN } from '../lib/button-styles';
 import { useDebouncedValue } from '../lib/use-debounced-value';
-import { useTokenActions } from '../token-context';
+import { useAuth } from '../auth-context';
 import { PuppyChef } from './brand/puppy-chef';
 import { JobChip } from './job-chip';
 import { PasteBar } from './paste-bar';
@@ -47,7 +47,7 @@ function computeSiblings(items: RecipeSummary[]): Map<string, SiblingInfo> {
  * night market: neon stall front, marquee tickets, tonight's menu board.
  */
 export function LibraryPage() {
-  const { clearToken } = useTokenActions();
+  const { signOut } = useAuth();
 
   // Jobs pasted/uploaded this session — each renders a polling chip until it
   // morphs into card(s) (stored) or is dismissed (failed).
@@ -170,14 +170,14 @@ export function LibraryPage() {
             {status === 401 ? (
               <>
                 <p className="text-chili-bright">
-                  Token rejected (401) — clear the token and re-enter it.
+                  Your session ended (401) — sign in again to continue.
                 </p>
                 <button
                   type="button"
-                  onClick={clearToken}
+                  onClick={signOut}
                   className={`mt-3 ${CHILI_BTN}`}
                 >
-                  Clear token & re-enter
+                  Sign in again
                 </button>
               </>
             ) : (

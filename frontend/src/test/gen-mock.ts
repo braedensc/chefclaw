@@ -17,12 +17,21 @@ import type { Mock } from 'vitest';
 
 import type {
   HealthResponse,
+  InviteOut,
+  InvitePublicOut,
   JobOut,
+  MeOut,
   RecipeDetail,
   RecipePage,
   SpendSummaryOut,
 } from '../client/types.gen';
-import { healthResponse, recipePage, spendSummary } from './fixtures';
+import {
+  healthResponse,
+  invitePublic,
+  meOut,
+  recipePage,
+  spendSummary,
+} from './fixtures';
 
 /** A mocked generated mutationFn — tests assert on the options it receives. */
 type MutationMock = Mock<(options: unknown) => unknown>;
@@ -30,6 +39,21 @@ type MutationMock = Mock<(options: unknown) => unknown>;
 const mutationMock = () => vi.fn<(options: unknown) => unknown>();
 
 interface GenState {
+  /** GET /api/me — the authenticated identity (AuthGate). */
+  me: MeOut;
+  /** When set, the me queryFn throws it (401/unauthenticated scenarios). */
+  meError: Error | null;
+  /** GET /api/admin/invites list. */
+  invitesList: InviteOut[];
+  /** When set, the invites-list queryFn throws it. */
+  invitesError: Error | null;
+  /** GET /api/invites/{token} — the public invite-accept shape. */
+  publicInviteResult: InvitePublicOut;
+  /** When set, the public-invite queryFn throws it. */
+  publicInviteError: Error | null;
+  logout: MutationMock;
+  createInvite: MutationMock;
+  revokeInvite: MutationMock;
   recipesPage: RecipePage;
   recipesById: Record<string, RecipeDetail>;
   jobsById: Record<string, JobOut>;
@@ -55,6 +79,15 @@ interface GenState {
 }
 
 export const genState: GenState = {
+  me: meOut(),
+  meError: null,
+  invitesList: [],
+  invitesError: null,
+  publicInviteResult: invitePublic(),
+  publicInviteError: null,
+  logout: mutationMock(),
+  createInvite: mutationMock(),
+  revokeInvite: mutationMock(),
   recipesPage: recipePage([]),
   recipesById: {},
   jobsById: {},
@@ -72,6 +105,15 @@ export const genState: GenState = {
 };
 
 export function resetGenState(): void {
+  genState.me = meOut();
+  genState.meError = null;
+  genState.invitesList = [];
+  genState.invitesError = null;
+  genState.publicInviteResult = invitePublic();
+  genState.publicInviteError = null;
+  genState.logout = mutationMock();
+  genState.createInvite = mutationMock();
+  genState.revokeInvite = mutationMock();
   genState.recipesPage = recipePage([]);
   genState.recipesById = {};
   genState.jobsById = {};
@@ -91,6 +133,44 @@ export function resetGenState(): void {
 /** The `_id` discriminators match the real generated module's createQueryKey. */
 export function genMockModule() {
   return {
+    // ── M2 auth + invites ──────────────────────────────────────────────────
+    meApiMeGetQueryKey: () => [{ _id: 'meApiMeGet' }],
+    meApiMeGetOptions: () => ({
+      queryKey: [{ _id: 'meApiMeGet' }],
+      queryFn: async () => {
+        if (genState.meError) throw genState.meError;
+        return genState.me;
+      },
+    }),
+    logoutApiAuthLogoutPostMutation: () => ({
+      mutationFn: (options: unknown) => genState.logout(options),
+    }),
+    listInvitesApiAdminInvitesGetQueryKey: () => [
+      { _id: 'listInvitesApiAdminInvitesGet' },
+    ],
+    listInvitesApiAdminInvitesGetOptions: () => ({
+      queryKey: [{ _id: 'listInvitesApiAdminInvitesGet' }],
+      queryFn: async () => {
+        if (genState.invitesError) throw genState.invitesError;
+        return { items: genState.invitesList };
+      },
+    }),
+    createInviteApiAdminInvitesPostMutation: () => ({
+      mutationFn: (options: unknown) => genState.createInvite(options),
+    }),
+    revokeInviteApiAdminInvitesInviteIdRevokePostMutation: () => ({
+      mutationFn: (options: unknown) => genState.revokeInvite(options),
+    }),
+    publicInviteApiInvitesTokenGetOptions: (options: {
+      path: { token: string };
+    }) => ({
+      queryKey: [{ _id: 'publicInviteApiInvitesTokenGet', path: options.path }],
+      queryFn: async () => {
+        if (genState.publicInviteError) throw genState.publicInviteError;
+        return genState.publicInviteResult;
+      },
+    }),
+
     listRecipesApiRecipesGetQueryKey: () => [
       { _id: 'listRecipesApiRecipesGet' },
     ],
