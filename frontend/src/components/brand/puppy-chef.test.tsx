@@ -25,15 +25,12 @@ describe('PuppyChef', () => {
     expect(svg).toHaveAttribute('width', '200');
   });
 
-  it('only animates the hero when asked, via reduced-motion-guarded classes', () => {
+  it('only animates the hero when asked, via the reduced-motion-guarded neon flicker', () => {
     const { container: still } = render(<PuppyChef variant="hero" />);
-    expect(still.querySelector('.pup-bob')).toBeNull();
-    expect(still.querySelector('.steam-wisp')).toBeNull();
+    expect(still.querySelector('.neon-flicker')).toBeNull();
 
     const { container: moving } = render(<PuppyChef variant="hero" animated />);
-    expect(moving.querySelector('.pup-bob')).not.toBeNull();
-    expect(moving.querySelector('.pup-wave')).not.toBeNull();
-    expect(moving.querySelector('.steam-wisp')).not.toBeNull();
+    expect(moving.querySelector('.neon-flicker')).not.toBeNull();
   });
 
   it('renders the simplified mark variant square', () => {
