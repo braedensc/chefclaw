@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="mpBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="mpbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#3a1120"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <radialGradient id="mpcrust" cx="50%" cy="42%" r="66%">
+      <stop offset="0%" stop-color="#ecbc73"/><stop offset="70%" stop-color="#d59a44"/><stop offset="100%" stop-color="#9c6220"/>
+    </radialGradient>
+    <radialGradient id="mpsauce" cx="50%" cy="44%" r="60%">
+      <stop offset="0%" stop-color="#e8502c"/><stop offset="68%" stop-color="#cb2f18"/><stop offset="100%" stop-color="#9a1f0e"/>
+    </radialGradient>
+    <radialGradient id="mpboard" cx="50%" cy="36%" r="80%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <radialGradient id="mpmozz" cx="42%" cy="34%" r="70%">
+      <stop offset="0%" stop-color="#fffaf0"/><stop offset="60%" stop-color="#f4ebd6"/><stop offset="100%" stop-color="#e6d4ad"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#mpbg)"/>
+  <!-- steam -->
+  <path d="M126 50 C118 34 134 26 126 8" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#mpBlur3)"/>
+  <path d="M196 52 C188 36 206 28 198 10" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#mpBlur3)"/>
+  <ellipse cx="160" cy="188" rx="156" ry="22" fill="#000" opacity=".5"/>
+  <!-- dark serving board / peel -->
+  <ellipse cx="160" cy="126" rx="140" ry="54" fill="url(#mpboard)"/>
+  <ellipse cx="160" cy="126" rx="140" ry="54" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="126" rx="126" ry="46" fill="#0e0d12"/>
+  <!-- neon steam arc (rose family) -->
+  <path d="M50 108 Q104 78 168 74" stroke="#ff4d6d" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+
+  <!-- ===== whole round pie (slightly top-down ellipse) ===== -->
+  <g transform="translate(146 120)">
+    <!-- puffy golden crust rim (full round pie) -->
+    <ellipse cx="0" cy="0" rx="72" ry="54" fill="url(#mpcrust)" stroke="#7c4a16" stroke-width="1.4"/>
+    <!-- crust rim inner shading to give the puffy lip depth -->
+    <ellipse cx="0" cy="0" rx="72" ry="54" fill="none" stroke="#b57c2e" stroke-width="3" opacity=".5"/>
+    <!-- charred leopard-spot blisters around the crust rim -->
+    <circle cx="-58" cy="-10" r="3" fill="#7c3f14" opacity=".7"/>
+    <circle cx="-52" cy="22" r="2.6" fill="#6e3610" opacity=".7"/>
+    <circle cx="-30" cy="42" r="3" fill="#7c3f14" opacity=".7"/>
+    <circle cx="14" cy="46" r="2.8" fill="#6e3610" opacity=".7"/>
+    <circle cx="52" cy="30" r="2.8" fill="#7c3f14" opacity=".7"/>
+    <circle cx="62" cy="-8" r="2.6" fill="#6e3610" opacity=".7"/>
+    <circle cx="-40" cy="-36" r="2.6" fill="#7c3f14" opacity=".65"/>
+    <circle cx="10" cy="-44" r="2.4" fill="#6e3610" opacity=".65"/>
+    <circle cx="46" cy="-30" r="2.4" fill="#7c3f14" opacity=".65"/>
+    <!-- tomato sauce field (inner disc) -->
+    <ellipse cx="0" cy="1" rx="56" ry="40" fill="url(#mpsauce)"/>
+    <!-- subtle sauce sheen -->
+    <ellipse cx="-14" cy="-12" rx="26" ry="14" fill="#f26a3e" opacity=".22"/>
+    <!-- mozzarella pools (melted white blobs) -->
+    <ellipse cx="-34" cy="-6" rx="14" ry="10" fill="url(#mpmozz)"/>
+    <ellipse cx="-34" cy="-9" rx="8" ry="3.6" fill="#fffaf0" opacity=".8"/>
+    <ellipse cx="-8" cy="14" rx="16" ry="11" fill="url(#mpmozz)"/>
+    <ellipse cx="-8" cy="11" rx="9" ry="4" fill="#fffaf0" opacity=".8"/>
+    <ellipse cx="24" cy="-2" rx="14" ry="10" fill="url(#mpmozz)"/>
+    <ellipse cx="24" cy="-5" rx="8" ry="3.6" fill="#fffaf0" opacity=".78"/>
+    <ellipse cx="-18" cy="-26" rx="12" ry="8" fill="url(#mpmozz)"/>
+    <ellipse cx="8" cy="26" rx="11" ry="7" fill="url(#mpmozz)"/>
+    <ellipse cx="34" cy="20" rx="10" ry="7" fill="url(#mpmozz)"/>
+    <!-- golden-brown cheese scorch flecks -->
+    <circle cx="-26" cy="-4" r="1.6" fill="#d59a44" opacity=".8"/>
+    <circle cx="-2" cy="16" r="1.6" fill="#c98a34" opacity=".8"/>
+    <circle cx="28" cy="0" r="1.4" fill="#d59a44" opacity=".8"/>
+    <circle cx="-14" cy="-24" r="1.3" fill="#c98a34" opacity=".75"/>
+    <!-- fresh basil leaves -->
+    <g transform="translate(-40 6) rotate(-18)"><path d="M0 0 C7 -7 16 -7 21 0 C16 7 7 7 0 0 Z" fill="#2f7d2b"/><path d="M2 0 L18 0" stroke="#1f5a1c" stroke-width="1" opacity=".7"/></g>
+    <g transform="translate(2 -20) rotate(22)"><path d="M0 0 C7 -7 16 -7 21 0 C16 7 7 7 0 0 Z" fill="#3f9c37"/><path d="M2 0 L18 0" stroke="#1f5a1c" stroke-width="1" opacity=".7"/></g>
+    <g transform="translate(12 24) rotate(-8)"><path d="M0 0 C6 -6 14 -6 18 0 C14 6 6 6 0 0 Z" fill="#2f7d2b"/><path d="M2 0 L16 0" stroke="#1f5a1c" stroke-width="1" opacity=".7"/></g>
+    <g transform="translate(36 -18) rotate(12)"><path d="M0 0 C5 -5 12 -5 16 0 C12 5 5 5 0 0 Z" fill="#3f9c37"/><path d="M2 0 L14 0" stroke="#1f5a1c" stroke-width="1" opacity=".7"/></g>
+    <!-- oil gloss dots -->
+    <circle cx="-30" cy="-2" r="1.4" fill="#fff" opacity=".55"/>
+    <circle cx="-4" cy="16" r="1.3" fill="#fff" opacity=".5"/>
+    <circle cx="22" cy="-4" r="1.2" fill="#fff" opacity=".5"/>
+  </g>
+
+  <!-- ===== cheese stretch strings from pie to the pulled slice ===== -->
+  <path d="M204 118 Q224 118 240 132" stroke="#f4ebd6" stroke-width="2" fill="none" opacity=".6" stroke-linecap="round"/>
+  <path d="M206 126 Q226 128 242 140" stroke="#fffaf0" stroke-width="1.5" fill="none" opacity=".5" stroke-linecap="round"/>
+
+  <!-- ===== the pulled-out slice (right side, separated) ===== -->
+  <g transform="translate(254 138) rotate(14)">
+    <!-- wedge: point toward pie (left), crust arc at wide outer end (right) -->
+    <path d="M-52 0 L28 -30 A44 40 0 0 1 28 30 Z" fill="url(#mpsauce)" stroke="#7c4a16" stroke-width="1.2"/>
+    <!-- puffy crust rim along the wide outer arc -->
+    <path d="M28 -30 A44 40 0 0 1 28 30 L40 22 A34 30 0 0 0 40 -22 Z" fill="url(#mpcrust)" stroke="#7c4a16" stroke-width="1.2"/>
+    <circle cx="34" cy="-14" r="2.2" fill="#7c3f14" opacity=".7"/>
+    <circle cx="36" cy="12" r="2" fill="#6e3610" opacity=".7"/>
+    <!-- cheese + toppings on the slice -->
+    <ellipse cx="-8" cy="-4" rx="9" ry="7" fill="url(#mpmozz)"/>
+    <ellipse cx="-8" cy="-6" rx="5" ry="2.6" fill="#fffaf0" opacity=".8"/>
+    <ellipse cx="8" cy="8" rx="8" ry="6" fill="url(#mpmozz)"/>
+    <ellipse cx="14" cy="-8" rx="6" ry="4.5" fill="url(#mpmozz)"/>
+    <g transform="translate(-4 4) rotate(-14)"><path d="M0 0 C5 -5 12 -5 15 0 C12 5 5 5 0 0 Z" fill="#3f9c37"/></g>
+    <circle cx="0" cy="-8" r="1.6" fill="#d59a44" opacity=".8"/>
+    <circle cx="-6" cy="-3" r="1.2" fill="#fff" opacity=".55"/>
+    <!-- dripping cheese string off the point back toward the pie -->
+    <path d="M-52 0 Q-58 6 -60 14" stroke="#f4ebd6" stroke-width="1.6" fill="none" opacity=".55" stroke-linecap="round"/>
+  </g>
+</svg>

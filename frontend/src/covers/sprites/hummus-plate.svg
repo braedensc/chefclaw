@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="hpBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="hpbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="hpbowl" cx="50%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <radialGradient id="hppaste" cx="46%" cy="34%" r="78%">
+      <stop offset="0%" stop-color="#f4e6c4"/><stop offset="60%" stop-color="#e6d09c"/><stop offset="100%" stop-color="#d0b578"/>
+    </radialGradient>
+    <radialGradient id="hpwell" cx="48%" cy="40%" r="72%">
+      <stop offset="0%" stop-color="#e8a02a"/><stop offset="100%" stop-color="#a9640f"/>
+    </radialGradient>
+    <linearGradient id="hppita" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f2d99a"/><stop offset="100%" stop-color="#cf9f4f"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#hpbg)"/>
+  <!-- gentle warm wisps (hummus is a cool dip) -->
+  <path d="M132 60 C122 44 140 36 132 18" stroke="#fff" stroke-width="6" fill="none" opacity=".07" filter="url(#hpBlur3)"/>
+  <path d="M196 58 C188 44 204 36 198 18" stroke="#fff" stroke-width="6" fill="none" opacity=".06" filter="url(#hpBlur3)"/>
+  <ellipse cx="160" cy="188" rx="120" ry="20" fill="#000" opacity=".5"/>
+  <!-- ROUND shallow serving dish (near-circular, dark ring) -->
+  <ellipse cx="160" cy="132" rx="92" ry="60" fill="url(#hpbowl)"/>
+  <ellipse cx="160" cy="132" rx="92" ry="60" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="132" rx="80" ry="51" fill="#0d0b10"/>
+  <!-- neon steam arc -->
+  <path d="M72 118 Q116 88 172 88" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- pita triangle wedges leaning at the TOP edge of the dish (clearly separate from the dip) -->
+  <g stroke="#b98a48" stroke-width="1.3" stroke-linejoin="round">
+    <!-- left wedge -->
+    <path d="M118 100 L146 84 L152 116 Z" fill="url(#hppita)"/>
+    <!-- center wedge (tallest, front) -->
+    <path d="M150 94 L176 78 L182 112 Z" fill="url(#hppita)"/>
+    <!-- right wedge -->
+    <path d="M180 100 L206 88 L202 118 Z" fill="url(#hppita)" opacity=".97"/>
+  </g>
+  <!-- pita toast highlights / char specks -->
+  <path d="M124 100 L148 90" stroke="#fff0c4" stroke-width="1.1" opacity=".5"/>
+  <path d="M156 96 L178 84" stroke="#fff0c4" stroke-width="1.1" opacity=".5"/>
+  <ellipse cx="136" cy="100" rx="3.4" ry="2" fill="#c99a52" opacity=".5"/>
+  <ellipse cx="166" cy="94" rx="3.6" ry="2.2" fill="#c99a52" opacity=".5"/>
+  <ellipse cx="192" cy="104" rx="3.2" ry="1.9" fill="#c99a52" opacity=".45"/>
+  <!-- round pool of pale hummus filling the dish -->
+  <ellipse cx="160" cy="134" rx="74" ry="46" fill="url(#hppaste)"/>
+  <!-- concentric spoon-swirl grooves (round, spiralling inward) -->
+  <g fill="none" stroke="#c7a86e" stroke-width="1.5" opacity=".55" stroke-linecap="round">
+    <ellipse cx="160" cy="134" rx="62" ry="37"/>
+    <ellipse cx="158" cy="135" rx="46" ry="27"/>
+    <ellipse cx="156" cy="136" rx="30" ry="17"/>
+  </g>
+  <ellipse cx="160" cy="132" rx="70" ry="42" fill="none" stroke="#f8eecb" stroke-width="1.3" opacity=".45" stroke-linecap="round"/>
+  <!-- central olive-oil pool (paprika-dusted) -->
+  <ellipse cx="158" cy="136" rx="30" ry="16" fill="url(#hpwell)"/>
+  <ellipse cx="158" cy="136" rx="30" ry="16" fill="none" stroke="#8a5210" stroke-width="1.2" opacity=".6"/>
+  <ellipse cx="150" cy="132" rx="12" ry="4.5" fill="#ffcf6a" opacity=".55"/>
+  <!-- paprika dust flecks in the oil pool -->
+  <circle cx="146" cy="134" r="1.4" fill="#b02408"/>
+  <circle cx="170" cy="132" r="1.4" fill="#b02408"/>
+  <circle cx="160" cy="142" r="1.3" fill="#b02408"/>
+  <circle cx="152" cy="140" r="1.2" fill="#c73a0d"/>
+  <circle cx="168" cy="140" r="1.2" fill="#c73a0d"/>
+  <!-- whole chickpeas in the central pool -->
+  <g stroke="#c49a55" stroke-width="1">
+    <ellipse cx="148" cy="130" rx="6" ry="5" fill="#e9d49a"/>
+    <ellipse cx="166" cy="128" rx="6.4" ry="5.2" fill="#f0dca6"/>
+    <ellipse cx="172" cy="140" rx="5.6" ry="4.6" fill="#ecd7a0"/>
+    <ellipse cx="150" cy="142" rx="5.6" ry="4.6" fill="#e9d49a"/>
+  </g>
+  <ellipse cx="146" cy="128" rx="2.2" ry="1.4" fill="#fff5d8" opacity=".8"/>
+  <ellipse cx="164" cy="126" rx="2.4" ry="1.5" fill="#fff5d8" opacity=".8"/>
+  <!-- parsley garnish flecks scattered on the dip -->
+  <rect x="122" y="120" width="6" height="2.4" rx="1.2" fill="#3f9c37" transform="rotate(-18 125 121)"/>
+  <rect x="190" y="122" width="6" height="2.4" rx="1.2" fill="#58c14a" transform="rotate(16 193 123)"/>
+  <rect x="134" y="150" width="6" height="2.4" rx="1.2" fill="#2f7d2b" transform="rotate(-8 137 151)"/>
+  <rect x="182" y="148" width="5" height="2.2" rx="1.1" fill="#3f9c37" transform="rotate(24 184 149)"/>
+  <rect x="158" y="118" width="5" height="2.2" rx="1.1" fill="#58c14a" transform="rotate(8 160 119)"/>
+  <!-- gloss dots -->
+  <circle cx="132" cy="124" r="1.4" fill="#fff" opacity=".6"/>
+  <circle cx="188" cy="130" r="1.3" fill="#fff" opacity=".55"/>
+  <circle cx="160" cy="150" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

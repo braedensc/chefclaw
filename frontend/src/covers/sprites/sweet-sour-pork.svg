@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="nnBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="ssbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#3a1120"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <radialGradient id="ssplate" cx="50%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <radialGradient id="ssglaze" cx="50%" cy="34%" r="78%">
+      <stop offset="0%" stop-color="#ff7a3a"/><stop offset="52%" stop-color="#e2451a"/><stop offset="100%" stop-color="#a5210b"/>
+    </radialGradient>
+    <linearGradient id="sspork" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f4b356"/><stop offset="48%" stop-color="#d98226"/><stop offset="100%" stop-color="#a5540f"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#ssbg)"/>
+  <!-- steam -->
+  <path d="M124 56 C114 38 134 30 124 12" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#nnBlur3)"/>
+  <path d="M198 52 C190 36 208 28 200 10" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#nnBlur3)"/>
+  <ellipse cx="160" cy="186" rx="154" ry="21" fill="#000" opacity=".5"/>
+  <!-- oval plate (shallow, glossy stir-fry) -->
+  <ellipse cx="160" cy="130" rx="138" ry="46" fill="url(#ssplate)"/>
+  <ellipse cx="160" cy="130" rx="138" ry="46" fill="none" stroke="#271b22" stroke-width="3"/>
+  <ellipse cx="160" cy="130" rx="122" ry="37" fill="#0e0c11"/>
+  <!-- neon steam arc (rose family) -->
+  <path d="M50 118 Q100 88 164 84" stroke="#ff4d6d" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- glossy sweet-sour glaze bed (shallow sheen, not a deep pool) -->
+  <ellipse cx="160" cy="132" rx="110" ry="26" fill="url(#ssglaze)"/>
+  <ellipse cx="132" cy="124" rx="34" ry="7" fill="#ff9d55" opacity=".38" transform="rotate(-8 132 124)"/>
+  <ellipse cx="188" cy="136" rx="26" ry="6" fill="#c53012" opacity=".5" transform="rotate(6 188 136)"/>
+  <!-- battered pork nuggets: craggy golden lumps in glaze (back layer smaller/darker) -->
+  <g transform="translate(112 112) rotate(-12) scale(.82)">
+    <path d="M0 0 C-6 -12 8 -18 20 -14 C32 -18 40 -6 34 4 C40 14 26 22 14 16 C2 20 -6 12 0 0 Z" fill="url(#sspork)" stroke="#7c3d0d" stroke-width="1.4" opacity=".92"/>
+    <path d="M6 -2 C2 -8 12 -12 20 -10" stroke="#ffd98a" stroke-width="1.6" fill="none" opacity=".55"/>
+  </g>
+  <g transform="translate(200 114) rotate(14) scale(.82)">
+    <path d="M0 0 C-6 -12 8 -18 20 -14 C32 -18 40 -6 34 4 C40 14 26 22 14 16 C2 20 -6 12 0 0 Z" fill="url(#sspork)" stroke="#7c3d0d" stroke-width="1.4" opacity=".92"/>
+    <path d="M6 -2 C2 -8 12 -12 20 -10" stroke="#ffd98a" stroke-width="1.6" fill="none" opacity=".5"/>
+  </g>
+  <!-- front pork nuggets: larger, brighter, glazed -->
+  <g transform="translate(128 128) rotate(8)">
+    <path d="M0 0 C-7 -14 9 -21 23 -16 C37 -21 46 -7 39 5 C46 16 30 26 16 19 C3 23 -7 14 0 0 Z" fill="url(#sspork)" stroke="#7c3d0d" stroke-width="1.5"/>
+    <path d="M-2 0 C0 8 12 12 22 8" stroke="#c53012" stroke-width="2" fill="none" opacity=".55"/>
+    <path d="M6 -4 C2 -10 14 -14 24 -11" stroke="#ffe0a0" stroke-width="1.8" fill="none" opacity=".6"/>
+    <ellipse cx="10" cy="-6" rx="6" ry="3" fill="#ffdc94" opacity=".7"/>
+  </g>
+  <g transform="translate(178 130) rotate(-10)">
+    <path d="M0 0 C-7 -14 9 -21 23 -16 C37 -21 46 -7 39 5 C46 16 30 26 16 19 C3 23 -7 14 0 0 Z" fill="url(#sspork)" stroke="#7c3d0d" stroke-width="1.5"/>
+    <path d="M-2 0 C0 8 12 12 22 8" stroke="#c53012" stroke-width="2" fill="none" opacity=".55"/>
+    <path d="M6 -4 C2 -10 14 -14 24 -11" stroke="#ffe0a0" stroke-width="1.8" fill="none" opacity=".6"/>
+    <ellipse cx="10" cy="-6" rx="6" ry="3" fill="#ffdc94" opacity=".7"/>
+  </g>
+  <g transform="translate(150 116) rotate(4) scale(.9)">
+    <path d="M0 0 C-6 -12 8 -18 20 -14 C32 -18 40 -6 34 4 C40 14 26 22 14 16 C2 20 -6 12 0 0 Z" fill="url(#sspork)" stroke="#7c3d0d" stroke-width="1.5"/>
+    <path d="M6 -2 C2 -8 12 -12 20 -10" stroke="#ffe0a0" stroke-width="1.6" fill="none" opacity=".55"/>
+    <ellipse cx="9" cy="-5" rx="5" ry="2.6" fill="#ffdc94" opacity=".7"/>
+  </g>
+  <!-- glossy glaze drizzle lapping over -->
+  <path d="M96 142 C140 152 208 152 236 138" stroke="#c53012" stroke-width="2.6" fill="none" opacity=".6" stroke-linecap="round"/>
+  <!-- bell pepper / pineapple accents (classic sweet-sour) -->
+  <rect x="106" y="118" width="9" height="6" rx="2" fill="#2f8f3a" transform="rotate(-16 110 121)"/>
+  <rect x="206" y="120" width="9" height="6" rx="2" fill="#3fa347" transform="rotate(12 210 123)"/>
+  <rect x="146" y="140" width="9" height="6" rx="2" fill="#ffcf3f" transform="rotate(-8 150 143)"/>
+  <rect x="192" y="140" width="8" height="5.5" rx="2" fill="#ffcf3f" transform="rotate(10 196 143)"/>
+  <!-- sesame seeds -->
+  <ellipse cx="140" cy="120" rx="1.7" ry="1" fill="#f8eed6" transform="rotate(20 140 120)"/>
+  <ellipse cx="168" cy="122" rx="1.7" ry="1" fill="#f8eed6" transform="rotate(-14 168 122)"/>
+  <ellipse cx="156" cy="134" rx="1.7" ry="1" fill="#f8eed6" transform="rotate(8 156 134)"/>
+  <ellipse cx="184" cy="118" rx="1.6" ry="1" fill="#f8eed6" transform="rotate(-24 184 118)"/>
+  <!-- oil gloss dots -->
+  <circle cx="124" cy="116" r="1.4" fill="#fff" opacity=".65"/>
+  <circle cx="182" cy="120" r="1.4" fill="#fff" opacity=".6"/>
+  <circle cx="150" cy="128" r="1.2" fill="#fff" opacity=".55"/>
+</svg>

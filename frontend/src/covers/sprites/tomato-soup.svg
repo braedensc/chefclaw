@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="nnBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="ts1bg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#3a1120"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <linearGradient id="ts1bowl" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="55%" stop-color="#100b0d"/><stop offset="100%" stop-color="#070506"/>
+    </linearGradient>
+    <radialGradient id="ts1soup" cx="46%" cy="32%" r="82%">
+      <stop offset="0%" stop-color="#ff7a4a"/><stop offset="52%" stop-color="#e64026"/><stop offset="100%" stop-color="#b52413"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#ts1bg)"/>
+  <!-- steam -->
+  <path d="M126 58 C116 40 136 32 126 12" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#nnBlur3)"/>
+  <path d="M198 54 C190 38 208 30 200 10" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#nnBlur3)"/>
+  <ellipse cx="160" cy="188" rx="150" ry="22" fill="#000" opacity=".5"/>
+  <!-- deep round bowl -->
+  <path d="M52 112 C52 156 102 178 160 178 C218 178 268 156 268 112 Z" fill="url(#ts1bowl)"/>
+  <ellipse cx="160" cy="112" rx="112" ry="30" fill="#0d0d10"/>
+  <ellipse cx="160" cy="112" rx="112" ry="30" fill="none" stroke="#271b22" stroke-width="3"/>
+  <ellipse cx="160" cy="112" rx="100" ry="24" fill="#160b0e"/>
+  <!-- neon steam arc -->
+  <path d="M58 104 Q104 76 164 74" stroke="#ff4d6d" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- creamy tomato surface -->
+  <ellipse cx="160" cy="112" rx="98" ry="23" fill="url(#ts1soup)"/>
+  <!-- warm lit patch near the top for depth -->
+  <ellipse cx="138" cy="104" rx="34" ry="8" fill="#ff9d6a" opacity=".35" transform="rotate(-6 138 104)"/>
+  <!-- swirled cream ribbon -->
+  <path d="M96 112 C120 100 150 124 178 108 C202 96 224 116 236 108" stroke="#fbeede" stroke-width="4" fill="none" opacity=".9" stroke-linecap="round"/>
+  <path d="M108 118 C132 110 158 122 188 114" stroke="#f6e0c8" stroke-width="2.4" fill="none" opacity=".7" stroke-linecap="round"/>
+  <!-- a dollop of cream -->
+  <ellipse cx="160" cy="110" rx="10" ry="6" fill="#fbf3e6"/>
+  <ellipse cx="157" cy="108" rx="4" ry="2.4" fill="#fff" opacity=".8"/>
+  <!-- floating croutons: golden toasted cubes -->
+  <g transform="translate(120 106) rotate(-12)">
+    <rect x="-6" y="-5" width="12" height="10" rx="1.6" fill="#d8a94e"/>
+    <rect x="-6" y="-5" width="12" height="4" rx="1.6" fill="#e9c473"/>
+    <rect x="-6" y="-5" width="12" height="10" rx="1.6" fill="none" stroke="#8a5a1e" stroke-width="1" opacity=".6"/>
+  </g>
+  <g transform="translate(196 108) rotate(16)">
+    <rect x="-6" y="-5" width="12" height="10" rx="1.6" fill="#d8a94e"/>
+    <rect x="-6" y="-5" width="12" height="4" rx="1.6" fill="#e9c473"/>
+    <rect x="-6" y="-5" width="12" height="10" rx="1.6" fill="none" stroke="#8a5a1e" stroke-width="1" opacity=".6"/>
+  </g>
+  <g transform="translate(180 120) rotate(-8)">
+    <rect x="-5" y="-4" width="10" height="8" rx="1.4" fill="#cf9f46"/>
+    <rect x="-5" y="-4" width="10" height="3" rx="1.4" fill="#e9c473"/>
+  </g>
+  <!-- basil leaves -->
+  <path d="M144 118 C150 112 160 112 164 118 C160 124 150 124 144 118 Z" fill="#3f9c37"/>
+  <path d="M154 118 L154 118" stroke="#2f7d2b" stroke-width="1" opacity=".7"/>
+  <path d="M152 116 L156 120" stroke="#2f7d2b" stroke-width="1" opacity=".6"/>
+  <path d="M204 118 C210 113 218 113 222 118 C218 123 210 123 204 118 Z" fill="#58c14a"/>
+  <!-- cracked black pepper + oil dots -->
+  <circle cx="132" cy="116" r="1.2" fill="#260903"/>
+  <circle cx="172" cy="104" r="1.1" fill="#260903"/>
+  <circle cx="210" cy="112" r="1.1" fill="#260903"/>
+  <!-- oil/cream gloss dots -->
+  <circle cx="126" cy="102" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="188" cy="104" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="150" cy="120" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

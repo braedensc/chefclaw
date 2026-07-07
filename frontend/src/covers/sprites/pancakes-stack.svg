@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="pkBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="pkbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <linearGradient id="pkcake" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f0c883"/><stop offset="45%" stop-color="#e0a95a"/><stop offset="100%" stop-color="#b87a33"/>
+    </linearGradient>
+    <linearGradient id="pksyrup" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#a8560f"/><stop offset="100%" stop-color="#6e2f0d"/>
+    </linearGradient>
+    <linearGradient id="pkbutter" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff3c0"/><stop offset="100%" stop-color="#f6d477"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#pkbg)"/>
+  <!-- steam -->
+  <path d="M118 52 C108 34 128 26 118 6" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#pkBlur3)"/>
+  <path d="M204 50 C196 34 214 26 206 6" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#pkBlur3)"/>
+  <ellipse cx="160" cy="186" rx="154" ry="22" fill="#000" opacity=".5"/>
+  <!-- round plate -->
+  <ellipse cx="160" cy="146" rx="128" ry="40" fill="#141018"/>
+  <ellipse cx="160" cy="146" rx="128" ry="40" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="146" rx="112" ry="32" fill="#0f0d13"/>
+  <!-- neon steam arc -->
+  <path d="M60 128 Q108 96 168 92" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- pooled syrup on plate -->
+  <ellipse cx="160" cy="150" rx="96" ry="20" fill="url(#pksyrup)" opacity=".8"/>
+  <ellipse cx="132" cy="146" rx="26" ry="5" fill="#c47526" opacity=".4"/>
+  <!-- stack of 4 pancakes (bottom to top), each an ellipse disc with a rim of thickness -->
+  <g stroke="#8a5216" stroke-width="1.3">
+    <!-- pancake 4 (bottom) -->
+    <path d="M78 142 a82 20 0 0 0 164 0 v-9 a82 20 0 0 1 -164 0 Z" fill="#a9722f"/>
+    <ellipse cx="160" cy="133" rx="82" ry="20" fill="url(#pkcake)"/>
+    <!-- pancake 3 -->
+    <path d="M84 122 a76 18 0 0 0 152 0 v-9 a76 18 0 0 1 -152 0 Z" fill="#ad7632"/>
+    <ellipse cx="160" cy="113" rx="76" ry="18" fill="url(#pkcake)"/>
+    <!-- pancake 2 -->
+    <path d="M90 103 a70 16.5 0 0 0 140 0 v-9 a70 16.5 0 0 1 -140 0 Z" fill="#b17a35"/>
+    <ellipse cx="160" cy="94" rx="70" ry="16.5" fill="url(#pkcake)"/>
+    <!-- pancake 1 (top) -->
+    <path d="M96 85 a64 15 0 0 0 128 0 v-8 a64 15 0 0 1 -128 0 Z" fill="#b57e38"/>
+    <ellipse cx="160" cy="77" rx="64" ry="15" fill="url(#pkcake)"/>
+  </g>
+  <!-- toasty highlight arcs on the top of each visible disc -->
+  <path d="M112 74 Q160 66 208 74" stroke="#ffe6a8" stroke-width="2" fill="none" opacity=".5" stroke-linecap="round"/>
+  <path d="M104 91 Q160 100 216 91" stroke="#9a6528" stroke-width="1.4" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- melting butter pat on top -->
+  <path d="M148 66 h24 v10 a6 6 0 0 1 -6 6 h-12 a6 6 0 0 1 -6 -6 Z" fill="url(#pkbutter)" stroke="#e0b552" stroke-width="1"/>
+  <ellipse cx="154" cy="70" rx="6" ry="2.4" fill="#fff8dc" opacity=".8"/>
+  <!-- syrup cascade down the front of the stack -->
+  <path d="M120 74 C116 92 120 112 116 138 C118 146 124 146 126 138 C124 112 128 94 130 78" fill="url(#pksyrup)" opacity=".78"/>
+  <path d="M196 76 C200 94 194 116 200 140 C202 148 208 146 208 138 C204 114 210 96 206 80" fill="url(#pksyrup)" opacity=".72"/>
+  <path d="M160 84 C158 104 162 124 160 144 C162 150 166 150 166 144 C166 124 168 106 170 88" fill="url(#pksyrup)" opacity=".7"/>
+  <!-- glossy syrup highlights -->
+  <path d="M122 82 C120 100 122 120 120 134" stroke="#e69a3c" stroke-width="1.4" fill="none" opacity=".55" stroke-linecap="round"/>
+  <path d="M201 84 C199 104 202 122 202 134" stroke="#e69a3c" stroke-width="1.3" fill="none" opacity=".5" stroke-linecap="round"/>
+  <!-- berry garnish + gloss dots -->
+  <circle cx="120" cy="68" r="4" fill="#8a1436"/>
+  <circle cx="120" cy="68" r="4" fill="none" stroke="#c23a5c" stroke-width="1" opacity=".6"/>
+  <circle cx="200" cy="70" r="3.6" fill="#6a1030"/>
+  <circle cx="200" cy="70" r="3.6" fill="none" stroke="#c23a5c" stroke-width="1" opacity=".5"/>
+  <circle cx="122" cy="66.5" r="1.2" fill="#fff" opacity=".6"/>
+  <circle cx="164" cy="72" r="1.4" fill="#fff" opacity=".6"/>
+  <circle cx="140" cy="88" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

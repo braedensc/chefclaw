@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="ytBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="ytbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <linearGradient id="ytstick" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e2a250"/><stop offset="48%" stop-color="#c17a2d"/><stop offset="100%" stop-color="#8a4d16"/>
+    </linearGradient>
+    <radialGradient id="ytmilk" cx="46%" cy="34%" r="76%">
+      <stop offset="0%" stop-color="#fbf3df"/><stop offset="60%" stop-color="#f2e6c8"/><stop offset="100%" stop-color="#dcc79a"/>
+    </radialGradient>
+    <radialGradient id="ytbowl" cx="50%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#ytbg)"/>
+  <!-- steam over soy-milk bowl -->
+  <path d="M214 62 C206 44 224 36 214 16" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#ytBlur3)"/>
+  <path d="M240 58 C234 42 250 34 242 16" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#ytBlur3)"/>
+  <ellipse cx="160" cy="188" rx="156" ry="22" fill="#000" opacity=".5"/>
+  <!-- neon steam arc (warm/local: youtiao is northern street breakfast) -->
+  <path d="M48 118 Q100 86 176 80" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+
+  <!-- ===== soy-milk bowl (right) ===== -->
+  <g transform="translate(226 0)">
+    <ellipse cx="0" cy="118" rx="66" ry="46" fill="url(#ytbowl)"/>
+    <ellipse cx="0" cy="118" rx="66" ry="46" fill="none" stroke="#2c2136" stroke-width="3"/>
+    <ellipse cx="0" cy="110" rx="56" ry="36" fill="#0c0c0f"/>
+    <!-- warm milk surface -->
+    <ellipse cx="0" cy="108" rx="50" ry="30" fill="url(#ytmilk)"/>
+    <ellipse cx="-16" cy="100" rx="20" ry="9" fill="#fffaf0" opacity=".55"/>
+    <ellipse cx="0" cy="108" rx="50" ry="30" fill="none" stroke="#c9b183" stroke-width="1.2" opacity=".5"/>
+    <!-- gentle skin ripples -->
+    <path d="M-34 116 Q0 124 34 114" stroke="#d8c298" stroke-width="1.4" fill="none" opacity=".55"/>
+    <circle cx="20" cy="102" r="1.4" fill="#fff" opacity=".6"/>
+    <circle cx="-8" cy="118" r="1.2" fill="#fff" opacity=".45"/>
+  </g>
+
+  <!-- ===== small plate with youtiao (left) ===== -->
+  <g transform="translate(96 0)">
+    <ellipse cx="0" cy="140" rx="96" ry="34" fill="#141018"/>
+    <ellipse cx="0" cy="140" rx="96" ry="34" fill="none" stroke="#26262e" stroke-width="3"/>
+    <ellipse cx="0" cy="140" rx="82" ry="26" fill="#0f0d13"/>
+  </g>
+  <!-- two golden fried dough sticks (paired twist silhouette), crossed on the plate -->
+  <!-- stick 1 -->
+  <g transform="translate(96 138) rotate(-16)">
+    <path d="M-72 -6 C-40 -12 40 -12 72 -6 C76 -4 76 6 72 8 C40 14 -40 14 -72 8 C-76 6 -76 -4 -72 -6 Z" fill="url(#ytstick)" stroke="#5e3410" stroke-width="1.4"/>
+    <!-- the two-fused-strands cleft down the middle -->
+    <path d="M-66 1 C-30 -3 30 -3 66 1" stroke="#7a4413" stroke-width="2.2" fill="none" opacity=".8"/>
+    <!-- crispy blister highlights -->
+    <path d="M-58 -5 C-28 -9 28 -9 58 -5" stroke="#f6d79a" stroke-width="1.6" fill="none" opacity=".7"/>
+    <ellipse cx="-40" cy="-2" rx="9" ry="3.4" fill="#f4cd86" opacity=".55"/>
+    <ellipse cx="14" cy="-2" rx="10" ry="3.4" fill="#f4cd86" opacity=".5"/>
+    <ellipse cx="52" cy="0" rx="7" ry="3" fill="#f4cd86" opacity=".5"/>
+  </g>
+  <!-- stick 2 (behind/above, slightly shorter, opposite tilt) -->
+  <g transform="translate(102 122) rotate(9)">
+    <path d="M-64 -6 C-34 -12 40 -12 66 -6 C70 -4 70 6 66 8 C40 14 -34 14 -64 8 C-68 6 -68 -4 -64 -6 Z" fill="url(#ytstick)" stroke="#5e3410" stroke-width="1.4"/>
+    <path d="M-58 1 C-26 -3 30 -3 60 1" stroke="#7a4413" stroke-width="2.2" fill="none" opacity=".8"/>
+    <path d="M-50 -5 C-24 -9 26 -9 52 -5" stroke="#f6d79a" stroke-width="1.6" fill="none" opacity=".7"/>
+    <ellipse cx="-30" cy="-2" rx="9" ry="3.4" fill="#f4cd86" opacity=".55"/>
+    <ellipse cx="22" cy="-2" rx="9" ry="3.4" fill="#f4cd86" opacity=".5"/>
+  </g>
+  <!-- oil-sheen gloss dots on the crullers -->
+  <circle cx="70" cy="120" r="1.5" fill="#fff" opacity=".6"/>
+  <circle cx="120" cy="120" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="96" cy="140" r="1.3" fill="#fff" opacity=".5"/>
+</svg>

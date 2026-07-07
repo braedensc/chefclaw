@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="nnBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="wmbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#102e35"/><stop offset="45%" stop-color="#0b090b"/><stop offset="100%" stop-color="#060507"/>
+    </radialGradient>
+    <linearGradient id="wmbowl" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="55%" stop-color="#100b0d"/><stop offset="100%" stop-color="#070506"/>
+    </linearGradient>
+    <radialGradient id="wmbroth" cx="50%" cy="30%" r="82%">
+      <stop offset="0%" stop-color="#d9dcc4"/><stop offset="52%" stop-color="#aeb598"/><stop offset="100%" stop-color="#7c8768"/>
+    </radialGradient>
+    <linearGradient id="wmmelon" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#eaf3e4"/><stop offset="100%" stop-color="#c2d8bd"/>
+    </linearGradient>
+    <linearGradient id="wmrib" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e8c6a2"/><stop offset="48%" stop-color="#c58a5a"/><stop offset="100%" stop-color="#8f4f2a"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#wmbg)"/>
+  <!-- steam -->
+  <path d="M118 60 C108 42 128 34 118 14" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#nnBlur3)"/>
+  <path d="M200 56 C192 40 210 32 202 12" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#nnBlur3)"/>
+  <ellipse cx="160" cy="188" rx="158" ry="22" fill="#000" opacity=".5"/>
+  <!-- deep round bowl -->
+  <path d="M46 106 C46 152 100 178 160 178 C220 178 274 152 274 106 Z" fill="url(#wmbowl)"/>
+  <ellipse cx="160" cy="106" rx="120" ry="31" fill="#0d0d10"/>
+  <ellipse cx="160" cy="106" rx="120" ry="31" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="106" rx="108" ry="26" fill="#0e1010"/>
+  <!-- neon steam arc (teal family) -->
+  <path d="M58 98 Q104 72 164 70" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- clear pale broth (the Cantonese 煲汤 look) -->
+  <ellipse cx="160" cy="108" rx="101" ry="23" fill="url(#wmbroth)" opacity=".92"/>
+  <ellipse cx="134" cy="100" rx="32" ry="7" fill="#f0f3e2" opacity=".45" transform="rotate(-8 134 100)"/>
+  <ellipse cx="186" cy="112" rx="26" ry="6" fill="#eef2e0" opacity=".35" transform="rotate(6 186 112)"/>
+  <!-- translucent winter-melon cubes (pale green-white, soft edges) -->
+  <g transform="translate(108 98) rotate(-8)">
+    <rect x="0" y="0" width="22" height="17" rx="3" fill="url(#wmmelon)" stroke="#a7c19f" stroke-width="1.1" opacity=".95"/>
+    <path d="M2 4 L20 4" stroke="#f4faf0" stroke-width="1.6" opacity=".7"/>
+    <rect x="14" y="11" width="6" height="5" rx="1.4" fill="#d4e6cd" opacity=".8"/>
+  </g>
+  <g transform="translate(178 100) rotate(10)">
+    <rect x="0" y="0" width="24" height="18" rx="3" fill="url(#wmmelon)" stroke="#a7c19f" stroke-width="1.1" opacity=".95"/>
+    <path d="M2 4 L22 4" stroke="#f4faf0" stroke-width="1.6" opacity=".7"/>
+    <rect x="16" y="12" width="6" height="5" rx="1.4" fill="#d4e6cd" opacity=".8"/>
+  </g>
+  <g transform="translate(148 116) rotate(-4)">
+    <rect x="0" y="0" width="22" height="16" rx="3" fill="url(#wmmelon)" stroke="#a7c19f" stroke-width="1.1" opacity=".95"/>
+    <path d="M2 4 L20 4" stroke="#f4faf0" stroke-width="1.6" opacity=".7"/>
+    <rect x="14" y="10" width="6" height="5" rx="1.4" fill="#d4e6cd" opacity=".8"/>
+  </g>
+  <!-- pork ribs with visible bone (hero: chunky meat on a round bone) -->
+  <g transform="translate(120 116) rotate(6)">
+    <path d="M0 6 C-4 -6 12 -12 24 -8 C36 -12 44 0 40 10 C44 20 30 26 18 22 C6 26 -2 18 0 6 Z" fill="url(#wmrib)" stroke="#7c4020" stroke-width="1.4"/>
+    <ellipse cx="20" cy="8" rx="7" ry="5.5" fill="#f4e6d0" stroke="#c9a878" stroke-width="1.1"/>
+    <ellipse cx="20" cy="8" rx="3" ry="2.4" fill="#d8bfa0"/>
+    <path d="M4 2 C2 -4 14 -8 24 -6" stroke="#f0c79a" stroke-width="1.6" fill="none" opacity=".55"/>
+  </g>
+  <g transform="translate(184 118) rotate(-8)">
+    <path d="M0 6 C-4 -6 12 -12 24 -8 C36 -12 44 0 40 10 C44 20 30 26 18 22 C6 26 -2 18 0 6 Z" fill="url(#wmrib)" stroke="#7c4020" stroke-width="1.4"/>
+    <ellipse cx="20" cy="8" rx="7" ry="5.5" fill="#f4e6d0" stroke="#c9a878" stroke-width="1.1"/>
+    <ellipse cx="20" cy="8" rx="3" ry="2.4" fill="#d8bfa0"/>
+    <path d="M4 2 C2 -4 14 -8 24 -6" stroke="#f0c79a" stroke-width="1.6" fill="none" opacity=".55"/>
+  </g>
+  <!-- goji berries + white pepper (Cantonese soup garnish) -->
+  <circle cx="140" cy="104" r="2.6" fill="#d23b1e"/>
+  <circle cx="139" cy="103" r="1" fill="#ff8a6a" opacity=".7"/>
+  <circle cx="204" cy="110" r="2.4" fill="#c2331a"/>
+  <circle cx="166" cy="122" r="2.4" fill="#d23b1e"/>
+  <!-- scallion / cilantro flecks -->
+  <rect x="126" y="100" width="7" height="2.6" rx="1.3" fill="#58c14a" transform="rotate(-16 129 101)"/>
+  <rect x="172" y="112" width="7" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(14 175 113)"/>
+  <rect x="152" y="98" width="6" height="2.4" rx="1.2" fill="#6abf5a" transform="rotate(-8 155 99)"/>
+  <!-- clear-broth gloss dots -->
+  <circle cx="120" cy="100" r="1.4" fill="#fff" opacity=".65"/>
+  <circle cx="186" cy="104" r="1.4" fill="#fff" opacity=".6"/>
+  <circle cx="156" cy="112" r="1.2" fill="#fff" opacity=".55"/>
+</svg>

@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="nnBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="fp1bg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="fp1ball" cx="40%" cy="34%" r="72%">
+      <stop offset="0%" stop-color="#b98a3e"/><stop offset="55%" stop-color="#8a5a20"/><stop offset="100%" stop-color="#5e3a12"/>
+    </radialGradient>
+    <radialGradient id="fp1core" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#8fae5a"/><stop offset="100%" stop-color="#5f7d38"/>
+    </radialGradient>
+    <linearGradient id="fp1hum" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f4ead0"/><stop offset="100%" stop-color="#dcc48c"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#fp1bg)"/>
+  <!-- steam -->
+  <path d="M120 54 C110 36 130 28 120 8" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#nnBlur3)"/>
+  <path d="M202 52 C194 36 212 28 204 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#nnBlur3)"/>
+  <ellipse cx="160" cy="188" rx="158" ry="22" fill="#000" opacity=".5"/>
+  <!-- shallow plate -->
+  <ellipse cx="160" cy="130" rx="146" ry="46" fill="#141018"/>
+  <ellipse cx="160" cy="130" rx="146" ry="46" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="130" rx="130" ry="38" fill="#100c14"/>
+  <!-- neon steam arc -->
+  <path d="M50 116 Q100 86 166 84" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- hummus swoosh at back-left -->
+  <path d="M56 122 C60 108 84 102 108 106 C120 110 118 124 104 128 C84 134 58 134 56 122 Z" fill="url(#fp1hum)"/>
+  <path d="M66 116 Q88 110 104 116" stroke="#c9a862" stroke-width="1.4" fill="none" opacity=".5"/>
+  <circle cx="88" cy="120" r="2" fill="#c31f12" opacity=".8"/>
+  <ellipse cx="100" cy="118" rx="6" ry="2.4" fill="#c17a2a" opacity=".5"/>
+  <!-- half pita wedge upper-right -->
+  <path d="M214 100 C236 96 258 102 262 114 C250 118 226 118 210 112 Z" fill="#e6cf9d"/>
+  <path d="M214 100 C236 96 258 102 262 114" stroke="#c9a862" stroke-width="1.4" fill="none" opacity=".6"/>
+  <ellipse cx="234" cy="106" rx="8" ry="3" fill="#c8a35c" opacity=".45"/>
+  <ellipse cx="250" cy="108" rx="5" ry="2" fill="#b98a4e" opacity=".4"/>
+  <!-- FALAFEL BALLS: craggy golden-fried spheres, herb-green interior on cut ones -->
+  <!-- back-left -->
+  <g transform="translate(112 120)">
+    <circle r="15" fill="url(#fp1ball)"/>
+    <path d="M-11 -6 q4 -4 9 -2 M-6 6 q6 3 11 -1 M4 -9 q5 2 6 7" stroke="#6e4416" stroke-width="1.4" fill="none" opacity=".7"/>
+    <circle cx="-5" cy="-6" r="2.4" fill="#c79a4e" opacity=".7"/>
+    <circle cx="6" cy="4" r="1.8" fill="#5e3a12" opacity=".6"/>
+    <circle cx="-6" cy="-6" r="1.6" fill="#fff" opacity=".4"/>
+  </g>
+  <!-- back-right -->
+  <g transform="translate(196 120)">
+    <circle r="14" fill="url(#fp1ball)"/>
+    <path d="M-10 -5 q4 -3 8 -1 M-5 6 q6 2 10 -2 M3 -8 q5 3 5 8" stroke="#6e4416" stroke-width="1.4" fill="none" opacity=".7"/>
+    <circle cx="4" cy="-5" r="2.2" fill="#c79a4e" opacity=".7"/>
+    <circle cx="-4" cy="4" r="1.6" fill="#5e3a12" opacity=".6"/>
+    <circle cx="-4" cy="-5" r="1.5" fill="#fff" opacity=".4"/>
+  </g>
+  <!-- front-center: CUT ball showing herby green core -->
+  <g transform="translate(150 134)">
+    <circle r="17" fill="url(#fp1ball)"/>
+    <circle cx="-1" cy="0" r="10" fill="url(#fp1core)"/>
+    <circle cx="-1" cy="0" r="10" fill="none" stroke="#4d6b2a" stroke-width="1" opacity=".6"/>
+    <!-- chickpea/herb speckle in the core -->
+    <circle cx="-4" cy="-3" r="1.4" fill="#c8d89a"/>
+    <circle cx="3" cy="-1" r="1.3" fill="#3f6b24"/>
+    <circle cx="-1" cy="4" r="1.4" fill="#c8d89a"/>
+    <circle cx="2" cy="3" r="1.1" fill="#3f6b24"/>
+    <!-- craggy fried crust ring -->
+    <path d="M-12 -8 q5 -4 10 -2 M-14 4 q7 4 12 0 M8 -10 q6 3 7 9" stroke="#6e4416" stroke-width="1.5" fill="none" opacity=".7"/>
+    <circle cx="-9" cy="-8" r="1.8" fill="#fff" opacity=".4"/>
+  </g>
+  <!-- front-left ball -->
+  <g transform="translate(122 138)">
+    <circle r="13" fill="url(#fp1ball)"/>
+    <path d="M-9 -5 q4 -3 8 -1 M-4 6 q6 2 9 -2 M3 -7 q4 3 4 7" stroke="#6e4416" stroke-width="1.4" fill="none" opacity=".7"/>
+    <circle cx="4" cy="-4" r="2" fill="#c79a4e" opacity=".7"/>
+    <circle cx="-4" cy="-4" r="1.4" fill="#fff" opacity=".4"/>
+  </g>
+  <!-- front-right ball -->
+  <g transform="translate(182 140)">
+    <circle r="12" fill="url(#fp1ball)"/>
+    <path d="M-8 -4 q4 -3 7 -1 M-3 5 q5 2 8 -2 M2 -6 q4 3 4 6" stroke="#6e4416" stroke-width="1.4" fill="none" opacity=".7"/>
+    <circle cx="-4" cy="-4" r="1.8" fill="#c79a4e" opacity=".7"/>
+    <circle cx="-3" cy="-3" r="1.3" fill="#fff" opacity=".4"/>
+  </g>
+  <!-- fresh parsley + tomato + cucumber garnish scattered on the plate -->
+  <rect x="106" y="106" width="7" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(-20 109 107)"/>
+  <rect x="168" y="110" width="7" height="2.6" rx="1.3" fill="#58c14a" transform="rotate(16 171 111)"/>
+  <rect x="140" y="112" width="6" height="2.4" rx="1.2" fill="#3f9c37" transform="rotate(28 143 113)"/>
+  <circle cx="164" cy="150" r="3" fill="#dd3320"/>
+  <circle cx="106" cy="146" r="2.6" fill="#e0341f"/>
+  <ellipse cx="204" cy="150" rx="4" ry="2.4" fill="#7fc25a"/>
+  <ellipse cx="204" cy="150" rx="4" ry="2.4" fill="none" stroke="#4d8a34" stroke-width="1" opacity=".6"/>
+  <!-- gloss dots -->
+  <circle cx="146" cy="126" r="1.4" fill="#fff" opacity=".6"/>
+  <circle cx="192" cy="130" r="1.3" fill="#fff" opacity=".55"/>
+  <circle cx="118" cy="132" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

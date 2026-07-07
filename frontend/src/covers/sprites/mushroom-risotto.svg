@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="mrBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="mrbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="mrrice" cx="48%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#f6ecd0"/><stop offset="60%" stop-color="#e6d3a4"/><stop offset="100%" stop-color="#cbb279"/>
+    </radialGradient>
+    <radialGradient id="mrbowl" cx="50%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <linearGradient id="mrcap" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#a9743f"/><stop offset="100%" stop-color="#6e421d"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#mrbg)"/>
+  <!-- steam -->
+  <path d="M124 56 C114 38 134 30 124 12" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#mrBlur3)"/>
+  <path d="M200 54 C192 38 210 30 202 12" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#mrBlur3)"/>
+  <ellipse cx="160" cy="188" rx="156" ry="22" fill="#000" opacity=".5"/>
+  <!-- wide shallow bowl -->
+  <path d="M40 112 C40 150 96 172 160 172 C224 172 280 150 280 112 Z" fill="url(#mrbowl)"/>
+  <ellipse cx="160" cy="112" rx="120" ry="34" fill="#0d0d10"/>
+  <ellipse cx="160" cy="112" rx="120" ry="34" fill="none" stroke="#26262e" stroke-width="3"/>
+  <!-- neon steam arc (warm/amber family) -->
+  <path d="M52 106 Q104 78 168 74" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+
+  <!-- ===== creamy risotto mound ===== -->
+  <path d="M56 118 C62 96 104 86 160 86 C216 86 258 96 264 118 C234 138 198 144 160 144 C122 144 86 138 56 118 Z" fill="#9a7c42" opacity=".55"/>
+  <path d="M58 114 C64 92 106 82 160 82 C214 82 256 92 262 114 C232 132 198 138 160 138 C122 138 88 132 58 114 Z" fill="url(#mrrice)"/>
+  <path d="M58 114 C64 92 106 82 160 82 C214 82 256 92 262 114" fill="none" stroke="#fbf3d8" stroke-width="1.4" opacity=".4"/>
+  <!-- creamy folds / stir marks -->
+  <path d="M78 116 C110 106 210 106 242 116" stroke="#d8c08a" stroke-width="2" fill="none" opacity=".5"/>
+  <path d="M92 124 C124 118 196 118 228 124" stroke="#c9ae76" stroke-width="1.8" fill="none" opacity=".5"/>
+  <!-- rice-grain speckle so it reads as arborio, not a plain pool -->
+  <g stroke-linecap="round" fill="none" opacity=".85">
+    <path d="M96 100 l6 -2" stroke="#fffbe8" stroke-width="2.2"/>
+    <path d="M118 108 l5 2" stroke="#d8c08a" stroke-width="2.2"/>
+    <path d="M150 96 l6 2" stroke="#fffbe8" stroke-width="2.2"/>
+    <path d="M182 104 l-5 2" stroke="#d8c08a" stroke-width="2.2"/>
+    <path d="M210 100 l6 -2" stroke="#fffbe8" stroke-width="2.2"/>
+    <path d="M104 122 l6 2" stroke="#d8c08a" stroke-width="2"/>
+    <path d="M200 122 l-6 2" stroke="#fffbe8" stroke-width="2"/>
+    <path d="M134 128 l6 -2" stroke="#d8c08a" stroke-width="2"/>
+    <path d="M172 128 l-6 2" stroke="#fffbe8" stroke-width="2"/>
+  </g>
+
+  <!-- ===== sliced sautéed mushrooms mounded on top ===== -->
+  <!-- back mushroom slices (smaller/darker) -->
+  <g transform="translate(120 98) rotate(-12) scale(.86)">
+    <path d="M-14 4 C-16 -8 -6 -14 4 -12 C14 -13 20 -6 18 3 C10 8 -6 9 -14 4 Z" fill="url(#mrcap)" stroke="#4d2c10" stroke-width="1.2"/>
+    <path d="M-6 -9 L-4 4 M2 -11 L3 4 M10 -9 L9 3" stroke="#3d2109" stroke-width="1.1" opacity=".7"/>
+    <path d="M-12 3 C-4 6 8 6 16 2" stroke="#c79a5e" stroke-width="1.4" fill="none" opacity=".6"/>
+  </g>
+  <g transform="translate(196 100) rotate(14) scale(.86)">
+    <path d="M-14 4 C-16 -8 -6 -14 4 -12 C14 -13 20 -6 18 3 C10 8 -6 9 -14 4 Z" fill="url(#mrcap)" stroke="#4d2c10" stroke-width="1.2"/>
+    <path d="M-6 -9 L-4 4 M2 -11 L3 4 M10 -9 L9 3" stroke="#3d2109" stroke-width="1.1" opacity=".7"/>
+    <path d="M-12 3 C-4 6 8 6 16 2" stroke="#c79a5e" stroke-width="1.4" fill="none" opacity=".6"/>
+  </g>
+  <!-- front mushroom slices (larger/glossier) -->
+  <g transform="translate(140 116) rotate(-6)">
+    <path d="M-17 5 C-19 -10 -7 -17 5 -15 C17 -16 24 -7 22 4 C12 10 -7 11 -17 5 Z" fill="url(#mrcap)" stroke="#4d2c10" stroke-width="1.3"/>
+    <path d="M-8 -11 L-5 5 M2 -13 L3 5 M12 -11 L10 4" stroke="#3d2109" stroke-width="1.2" opacity=".7"/>
+    <path d="M-15 4 C-5 8 10 8 20 3" stroke="#caa066" stroke-width="1.6" fill="none" opacity=".65"/>
+    <ellipse cx="-2" cy="-8" rx="6" ry="2.4" fill="#c98f52" opacity=".55"/>
+  </g>
+  <g transform="translate(180 118) rotate(10)">
+    <path d="M-17 5 C-19 -10 -7 -17 5 -15 C17 -16 24 -7 22 4 C12 10 -7 11 -17 5 Z" fill="url(#mrcap)" stroke="#4d2c10" stroke-width="1.3"/>
+    <path d="M-8 -11 L-5 5 M2 -13 L3 5 M12 -11 L10 4" stroke="#3d2109" stroke-width="1.2" opacity=".7"/>
+    <path d="M-15 4 C-5 8 10 8 20 3" stroke="#caa066" stroke-width="1.6" fill="none" opacity=".65"/>
+    <ellipse cx="-2" cy="-8" rx="6" ry="2.4" fill="#c98f52" opacity=".55"/>
+  </g>
+  <g transform="translate(158 122) rotate(2)">
+    <path d="M-15 5 C-17 -9 -6 -15 5 -13 C16 -14 22 -6 20 4 C11 9 -6 10 -15 5 Z" fill="url(#mrcap)" stroke="#4d2c10" stroke-width="1.3"/>
+    <path d="M-7 -10 L-4 5 M2 -12 L3 5 M11 -10 L9 4" stroke="#3d2109" stroke-width="1.2" opacity=".7"/>
+    <ellipse cx="-1" cy="-7" rx="5" ry="2.2" fill="#c98f52" opacity=".55"/>
+  </g>
+
+  <!-- shaved parmesan curls -->
+  <path d="M108 108 C114 104 122 104 126 108" stroke="#f4e6bc" stroke-width="3" fill="none" stroke-linecap="round" opacity=".85"/>
+  <path d="M198 112 C204 108 212 108 216 112" stroke="#f4e6bc" stroke-width="3" fill="none" stroke-linecap="round" opacity=".85"/>
+  <!-- parsley + thyme flecks -->
+  <rect x="132" y="106" width="6" height="2.4" rx="1.2" fill="#3f9c37" transform="rotate(-16 135 107)"/>
+  <rect x="170" y="104" width="6" height="2.4" rx="1.2" fill="#58c14a" transform="rotate(14 173 105)"/>
+  <rect x="150" y="132" width="6" height="2.4" rx="1.2" fill="#2f7d2b" transform="rotate(-8 153 133)"/>
+  <rect x="196" y="126" width="5" height="2.2" rx="1.1" fill="#3f9c37" transform="rotate(20 198 127)"/>
+  <!-- coarse black pepper + oil gloss -->
+  <circle cx="146" cy="112" r="1.3" fill="#241812"/>
+  <circle cx="176" cy="114" r="1.3" fill="#241812"/>
+  <circle cx="160" cy="126" r="1.2" fill="#241812"/>
+  <circle cx="130" cy="118" r="1.4" fill="#fff" opacity=".6"/>
+  <circle cx="190" cy="122" r="1.3" fill="#fff" opacity=".55"/>
+  <circle cx="158" cy="108" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

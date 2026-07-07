@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="woBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="wobg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#123138"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <linearGradient id="wobowl" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="55%" stop-color="#100b0d"/><stop offset="100%" stop-color="#070506"/>
+    </linearGradient>
+    <radialGradient id="wooil" cx="50%" cy="32%" r="82%">
+      <stop offset="0%" stop-color="#ef5520"/><stop offset="50%" stop-color="#b02408"/><stop offset="100%" stop-color="#7a1305"/>
+    </radialGradient>
+    <linearGradient id="wowrap" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fdf3df"/><stop offset="52%" stop-color="#f2dcb2"/><stop offset="100%" stop-color="#d6ad77"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#wobg)"/>
+  <!-- steam -->
+  <path d="M118 60 C108 42 128 34 118 14" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#woBlur3)"/>
+  <path d="M200 56 C192 40 210 32 202 12" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#woBlur3)"/>
+  <ellipse cx="160" cy="188" rx="150" ry="22" fill="#000" opacity=".5"/>
+  <!-- deep round bowl body -->
+  <path d="M48 106 C48 152 102 178 160 178 C218 178 272 152 272 106 Z" fill="url(#wobowl)"/>
+  <ellipse cx="160" cy="106" rx="120" ry="31" fill="#0d0d10"/>
+  <ellipse cx="160" cy="106" rx="120" ry="31" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="106" rx="108" ry="26" fill="#120a0c"/>
+  <!-- neon steam arc -->
+  <path d="M56 98 Q104 72 166 70" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- glossy red chili-oil pool -->
+  <ellipse cx="160" cy="108" rx="101" ry="23" fill="url(#wooil)"/>
+  <ellipse cx="130" cy="100" rx="30" ry="7" fill="#ff8a3a" opacity=".3" transform="rotate(-8 130 100)"/>
+  <!-- oil sheen bubbles -->
+  <circle cx="210" cy="116" r="5" fill="#d8420f" opacity=".7"/>
+  <circle cx="210" cy="116" r="5" fill="none" stroke="#ff7a3a" stroke-width="1.2" opacity=".6"/>
+  <circle cx="104" cy="114" r="4" fill="#c73a0d" opacity=".7"/>
+  <circle cx="234" cy="106" r="3.4" fill="#ff8a3a" opacity=".5"/>
+  <!-- folded wontons: smooth round belly + a single pinched top-knot fin, NO cross-belly fold marks -->
+  <g stroke="#bb8f57" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round">
+    <!-- back-left wonton -->
+    <g transform="translate(112 99) rotate(-9) scale(.82)">
+      <path d="M-4 -14 C-9 -22 -3 -30 3 -28 C7 -27 8 -22 6 -16 C14 -18 22 -12 22 -3 C22 9 12 16 0 16 C-12 16 -22 9 -22 -3 C-22 -10 -16 -15 -4 -14 Z" fill="url(#wowrap)"/>
+      <ellipse cx="-7" cy="-2" rx="7" ry="4.5" fill="#fff8ea" opacity=".55"/>
+    </g>
+    <!-- back-right wonton -->
+    <g transform="translate(202 100) rotate(11) scale(.82)">
+      <path d="M-4 -14 C-9 -22 -3 -30 3 -28 C7 -27 8 -22 6 -16 C14 -18 22 -12 22 -3 C22 9 12 16 0 16 C-12 16 -22 9 -22 -3 C-22 -10 -16 -15 -4 -14 Z" fill="url(#wowrap)"/>
+      <ellipse cx="-7" cy="-2" rx="7" ry="4.5" fill="#fff8ea" opacity=".55"/>
+    </g>
+    <!-- front-left wonton -->
+    <g transform="translate(118 121) rotate(-15) scale(.9)">
+      <path d="M-4 -14 C-9 -22 -3 -30 3 -28 C7 -27 8 -22 6 -16 C14 -18 22 -12 22 -3 C22 9 12 16 0 16 C-12 16 -22 9 -22 -3 C-22 -10 -16 -15 -4 -14 Z" fill="url(#wowrap)"/>
+      <ellipse cx="-7" cy="-2" rx="7" ry="4.5" fill="#fff8ea" opacity=".55"/>
+    </g>
+    <!-- front-right wonton -->
+    <g transform="translate(192 121) rotate(15) scale(.92)">
+      <path d="M-4 -14 C-9 -22 -3 -30 3 -28 C7 -27 8 -22 6 -16 C14 -18 22 -12 22 -3 C22 9 12 16 0 16 C-12 16 -22 9 -22 -3 C-22 -10 -16 -15 -4 -14 Z" fill="url(#wowrap)"/>
+      <ellipse cx="-7" cy="-2" rx="7" ry="4.5" fill="#fff8ea" opacity=".55"/>
+    </g>
+    <!-- front-center wonton (largest, foremost) -->
+    <g transform="translate(154 118) rotate(-3) scale(1.12)">
+      <path d="M-4 -14 C-9 -22 -3 -30 3 -28 C7 -27 8 -22 6 -16 C14 -18 22 -12 22 -3 C22 9 12 16 0 16 C-12 16 -22 9 -22 -3 C-22 -10 -16 -15 -4 -14 Z" fill="url(#wowrap)"/>
+      <ellipse cx="-7" cy="-2" rx="8" ry="5" fill="#fff8ea" opacity=".6"/>
+    </g>
+  </g>
+  <!-- chili-oil drizzle laced over the wontons -->
+  <path d="M96 112 C130 102 190 102 226 112" stroke="#b02408" stroke-width="3" fill="none" opacity=".7" stroke-linecap="round"/>
+  <!-- dried whole chili pepper resting on top -->
+  <g transform="translate(168 128) rotate(24)">
+    <path d="M0 0 C14 -3 30 -1 40 5 C32 9 14 9 0 6 Z" fill="#b0180a"/>
+    <path d="M0 0 C14 -3 30 -1 40 5" fill="none" stroke="#8a1207" stroke-width="1" opacity=".7"/>
+    <path d="M0 3 C-5 2 -8 -2 -7 -5" fill="none" stroke="#7a5a12" stroke-width="2" stroke-linecap="round"/>
+    <path d="M40 5 C42 3 44 4 44 6" fill="none" stroke="#e07a2a" stroke-width="1.4" stroke-linecap="round" opacity=".7"/>
+  </g>
+  <!-- coarse chili flakes floating -->
+  <g>
+    <rect x="128" y="102" width="7" height="3" rx="1.4" fill="#c31f12" transform="rotate(-20 131 103)"/>
+    <rect x="182" y="104" width="7" height="3" rx="1.4" fill="#e0341f" transform="rotate(12 185 105)"/>
+    <rect x="206" y="120" width="6" height="2.8" rx="1.3" fill="#c31f12" transform="rotate(22 209 121)"/>
+    <rect x="106" y="122" width="6" height="2.8" rx="1.3" fill="#e0341f" transform="rotate(-14 109 123)"/>
+  </g>
+  <!-- sesame seeds scattered -->
+  <ellipse cx="140" cy="112" rx="2" ry="1.2" fill="#f8eed6" transform="rotate(-24 140 112)"/>
+  <ellipse cx="188" cy="116" rx="2" ry="1.2" fill="#f8eed6" transform="rotate(18 188 116)"/>
+  <ellipse cx="122" cy="108" rx="1.9" ry="1.1" fill="#f8eed6" transform="rotate(-8 122 108)"/>
+  <ellipse cx="210" cy="102" rx="1.9" ry="1.1" fill="#f8eed6" transform="rotate(30 210 102)"/>
+  <ellipse cx="164" cy="98" rx="2" ry="1.2" fill="#f8eed6" transform="rotate(6 164 98)"/>
+  <!-- fresh scallion greens scattered -->
+  <rect x="132" y="94" width="7" height="2.6" rx="1.3" fill="#58c14a" transform="rotate(-18 135 95)"/>
+  <rect x="176" y="96" width="7" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(16 179 97)"/>
+  <rect x="150" y="132" width="6.5" height="2.6" rx="1.3" fill="#5ecb4e" transform="rotate(-8 153 133)"/>
+  <rect x="118" y="130" width="6" height="2.4" rx="1.2" fill="#58c14a" transform="rotate(24 121 131)"/>
+  <rect x="200" y="98" width="6" height="2.4" rx="1.2" fill="#3f9c37" transform="rotate(-22 203 99)"/>
+  <!-- oil gloss dots -->
+  <circle cx="150" cy="106" r="1.5" fill="#fff" opacity=".6"/>
+  <circle cx="196" cy="112" r="1.4" fill="#fff" opacity=".5"/>
+  <circle cx="120" cy="116" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="nnBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="ptbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="ptplate" cx="50%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <linearGradient id="ptshrimp" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ff8f5e"/><stop offset="100%" stop-color="#e0521f"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#ptbg)"/>
+  <!-- steam -->
+  <path d="M124 56 C114 38 134 30 124 10" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#nnBlur3)"/>
+  <path d="M200 52 C192 36 210 28 202 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#nnBlur3)"/>
+  <ellipse cx="160" cy="186" rx="152" ry="22" fill="#000" opacity=".5"/>
+  <!-- oval plate -->
+  <ellipse cx="160" cy="128" rx="134" ry="50" fill="url(#ptplate)"/>
+  <ellipse cx="160" cy="128" rx="134" ry="50" fill="none" stroke="#26262e" stroke-width="3"/>
+  <ellipse cx="160" cy="128" rx="118" ry="41" fill="#0c0c0f"/>
+  <!-- neon steam arc -->
+  <path d="M56 112 Q104 84 168 80" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- tamarind-tinted noodle nest: layered pale amber strands, tossed -->
+  <g fill="none" stroke-linecap="round">
+    <!-- shadow strands (back layer) -->
+    <path d="M64 130 C96 108 132 148 168 124 C200 104 236 140 258 122" stroke="#7a4c14" stroke-width="7" opacity=".8"/>
+    <path d="M66 118 C100 140 130 106 170 132 C204 152 236 116 256 134" stroke="#8a5a1e" stroke-width="6.5" opacity=".8"/>
+    <!-- body strands -->
+    <path d="M62 124 C98 102 130 144 170 118 C204 98 238 134 260 116" stroke="#d9bd85" stroke-width="6.5"/>
+    <path d="M66 134 C100 156 132 112 172 138 C206 158 236 122 258 138" stroke="#cdb078" stroke-width="6"/>
+    <path d="M70 114 C104 136 134 100 174 126 C206 146 234 110 254 128" stroke="#e6cf9d" stroke-width="6"/>
+    <path d="M60 128 C94 106 128 150 168 128 C202 110 236 146 262 128" stroke="#d9bd85" stroke-width="5.5"/>
+    <path d="M74 122 C108 100 136 142 176 116 C208 98 232 130 250 118" stroke="#e6cf9d" stroke-width="5.5"/>
+    <!-- highlight strands -->
+    <path d="M64 124 C98 104 130 144 170 120 C204 100 238 132 258 118" stroke="#fff1c9" stroke-width="2" opacity=".85"/>
+    <path d="M68 132 C102 152 132 114 172 136 C206 154 234 122 256 134" stroke="#fff1c9" stroke-width="1.8" opacity=".7"/>
+  </g>
+  <!-- two curled shrimp on top (hero pink) -->
+  <g transform="translate(126 108) rotate(-14)">
+    <path d="M-14 6 C-20 -6 -8 -16 6 -14 C18 -12 22 -2 18 6 C14 12 6 10 4 4 C2 -2 -4 -2 -6 2 C-8 6 -12 8 -14 6 Z" fill="url(#ptshrimp)" stroke="#b83c14" stroke-width="1.3"/>
+    <path d="M-10 2 C-4 -6 8 -8 15 -3 M-6 6 C0 2 8 2 13 5" stroke="#c74a1c" stroke-width="1.1" fill="none" opacity=".6"/>
+    <ellipse cx="2" cy="-6" rx="6" ry="2.6" fill="#ffcaa2" opacity=".7"/>
+    <path d="M-14 6 C-18 10 -20 8 -18 4" fill="#e0521f"/>
+  </g>
+  <g transform="translate(196 114) rotate(160)">
+    <path d="M-14 6 C-20 -6 -8 -16 6 -14 C18 -12 22 -2 18 6 C14 12 6 10 4 4 C2 -2 -4 -2 -6 2 C-8 6 -12 8 -14 6 Z" fill="url(#ptshrimp)" stroke="#b83c14" stroke-width="1.3"/>
+    <path d="M-10 2 C-4 -6 8 -8 15 -3 M-6 6 C0 2 8 2 13 5" stroke="#c74a1c" stroke-width="1.1" fill="none" opacity=".6"/>
+    <ellipse cx="2" cy="-6" rx="6" ry="2.6" fill="#ffcaa2" opacity=".7"/>
+  </g>
+  <!-- lime wedge (front-right accent) -->
+  <g transform="translate(228 138) rotate(24)">
+    <path d="M0 0 A12 12 0 0 1 -10 -18 Z" fill="#a7cf3e"/>
+    <path d="M0 0 A12 12 0 0 1 -10 -18" stroke="#7ca024" stroke-width="1.2" fill="none"/>
+    <path d="M-2 -3 L-4 -12 M-5 -3 L-7 -11" stroke="#e9f6c2" stroke-width="1" opacity=".7"/>
+  </g>
+  <!-- crushed peanuts (little tan chunks) -->
+  <g fill="#d8b46a" stroke="#a37e34" stroke-width=".8">
+    <path d="M148 106 l6 -2 l2 5 l-6 2 Z"/>
+    <path d="M172 124 l6 -1 l1 5 l-6 1 Z"/>
+    <path d="M128 126 l5 -2 l2 4 l-5 2 Z"/>
+    <path d="M204 108 l5 -1 l2 4 l-5 1 Z"/>
+    <path d="M158 132 l5 -2 l2 4 l-5 2 Z"/>
+  </g>
+  <!-- bean sprouts (thin pale hooks) -->
+  <g stroke="#efe8cf" stroke-width="2" fill="none" stroke-linecap="round">
+    <path d="M140 118 q6 -4 10 0"/>
+    <path d="M184 120 q6 -4 10 0"/>
+    <path d="M164 110 q5 -4 9 0"/>
+  </g>
+  <!-- scallion + chili flecks -->
+  <rect x="136" y="112" width="7" height="2.6" rx="1.3" fill="#5ecb4e" transform="rotate(-18 139 113)"/>
+  <rect x="186" y="106" width="7" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(16 189 107)"/>
+  <rect x="156" y="126" width="6" height="2.4" rx="1.2" fill="#58c14a" transform="rotate(24 159 127)"/>
+  <circle cx="150" cy="120" r="1.8" fill="#e0341f"/>
+  <circle cx="178" cy="116" r="1.8" fill="#e0341f"/>
+  <!-- oil gloss dots -->
+  <circle cx="132" cy="122" r="1.4" fill="#fff" opacity=".6"/>
+  <circle cx="176" cy="130" r="1.3" fill="#fff" opacity=".55"/>
+  <circle cx="204" cy="122" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

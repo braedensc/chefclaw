@@ -10,3 +10,6 @@
 **/dist/
 **/test-results/
 **/playwright-report/
+
+# Generated dish-sprite art assets (SVG covers + catalog) — not formatted.
+**/src/covers/

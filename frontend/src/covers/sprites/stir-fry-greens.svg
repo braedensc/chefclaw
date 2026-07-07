@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="nnBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="grnbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#102e35"/><stop offset="45%" stop-color="#0b090b"/><stop offset="100%" stop-color="#060507"/>
+    </radialGradient>
+    <linearGradient id="grnleaf" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7ed86a"/><stop offset="55%" stop-color="#4aa93c"/><stop offset="100%" stop-color="#2f7d2b"/>
+    </linearGradient>
+    <linearGradient id="grnstem" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#eaf6d8"/><stop offset="100%" stop-color="#bcd89a"/>
+    </linearGradient>
+    <radialGradient id="grnplate" cx="50%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#grnbg)"/>
+  <!-- steam -->
+  <path d="M124 56 C114 38 134 30 124 10" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#nnBlur3)"/>
+  <path d="M198 54 C190 38 208 30 200 10" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#nnBlur3)"/>
+  <ellipse cx="160" cy="188" rx="156" ry="21" fill="#000" opacity=".5"/>
+  <!-- oval plate -->
+  <ellipse cx="160" cy="130" rx="138" ry="43" fill="url(#grnplate)"/>
+  <ellipse cx="160" cy="130" rx="138" ry="43" fill="none" stroke="#26262e" stroke-width="3"/>
+  <ellipse cx="160" cy="130" rx="123" ry="35" fill="#0f0d13"/>
+  <!-- neon steam arc -->
+  <path d="M50 118 Q100 88 166 84" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- light garlic-oil sheen -->
+  <ellipse cx="160" cy="136" rx="106" ry="18" fill="#2a2a10" opacity=".4"/>
+  <!-- bok-choy / gai-lan bundles: pale stem base fanning into leafy green tops -->
+  <!-- back bundle -->
+  <g transform="translate(112 118) rotate(-12) scale(.88)">
+    <path d="M0 22 C-4 8 -2 -2 2 -8 M8 24 C6 8 8 -4 12 -12 M16 24 C16 8 18 -6 22 -14" stroke="url(#grnstem)" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <path d="M-4 -6 C-14 -18 -6 -30 6 -26 C2 -18 4 -12 8 -10 C14 -20 26 -18 26 -6 C20 -2 4 0 -4 -6 Z" fill="url(#grnleaf)" stroke="#256e22" stroke-width="1.3"/>
+    <path d="M4 -18 C4 -12 6 -8 10 -8" stroke="#8be878" stroke-width="1.4" fill="none" opacity=".7"/>
+  </g>
+  <!-- right bundle -->
+  <g transform="translate(174 116) rotate(10) scale(.9)">
+    <path d="M0 22 C-4 8 -2 -2 2 -8 M8 24 C6 8 8 -4 12 -12 M16 24 C16 8 18 -6 22 -14" stroke="url(#grnstem)" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <path d="M-4 -6 C-14 -18 -6 -30 6 -26 C2 -18 4 -12 8 -10 C14 -20 26 -18 26 -6 C20 -2 4 0 -4 -6 Z" fill="url(#grnleaf)" stroke="#256e22" stroke-width="1.3"/>
+    <path d="M4 -18 C4 -12 6 -8 10 -8" stroke="#8be878" stroke-width="1.4" fill="none" opacity=".7"/>
+  </g>
+  <!-- front center bundle (biggest, brightest) -->
+  <g transform="translate(140 128) rotate(-3) scale(1.08)">
+    <path d="M0 24 C-4 8 -2 -2 2 -8 M9 26 C7 8 9 -4 13 -12 M18 26 C18 8 20 -6 24 -14 M-8 24 C-10 10 -8 0 -4 -6" stroke="url(#grnstem)" stroke-width="7.5" fill="none" stroke-linecap="round"/>
+    <path d="M-6 -6 C-18 -18 -8 -32 6 -28 C2 -19 4 -12 9 -10 C16 -22 30 -20 30 -6 C22 -1 4 1 -6 -6 Z" fill="url(#grnleaf)" stroke="#256e22" stroke-width="1.4"/>
+    <path d="M-10 -4 C-20 -12 -14 -24 -4 -22 C-6 -14 -4 -8 0 -8 C-4 -2 -14 0 -10 -4 Z" fill="#4aa93c" stroke="#256e22" stroke-width="1.2"/>
+    <path d="M5 -20 C5 -13 7 -9 11 -9" stroke="#a4f090" stroke-width="1.6" fill="none" opacity=".8"/>
+  </g>
+  <!-- extra leaf tips fanning for lushness -->
+  <path d="M92 108 C84 96 92 86 104 90 C98 98 100 104 106 104 C100 110 90 108 92 108 Z" fill="#4aa93c" stroke="#256e22" stroke-width="1.2" opacity=".92"/>
+  <path d="M214 110 C222 98 214 88 202 92 C208 100 206 106 200 106 C206 112 216 110 214 110 Z" fill="#4aa93c" stroke="#256e22" stroke-width="1.2" opacity=".92"/>
+  <!-- minced garlic (蒜蓉) scattered on top -->
+  <circle cx="118" cy="116" r="2.4" fill="#f8eec6"/><circle cx="118" cy="116" r="2.4" fill="none" stroke="#d8c68a" stroke-width=".8"/>
+  <circle cx="150" cy="110" r="2.6" fill="#f2ddb0"/><circle cx="150" cy="110" r="2.6" fill="none" stroke="#d8c68a" stroke-width=".8"/>
+  <circle cx="176" cy="120" r="2.3" fill="#f8eec6"/>
+  <circle cx="134" cy="124" r="2.2" fill="#f2ddb0"/>
+  <circle cx="196" cy="118" r="2" fill="#f8eec6"/>
+  <circle cx="164" cy="128" r="2.3" fill="#f2ddb0"/>
+  <circle cx="106" cy="124" r="1.9" fill="#f8eec6"/>
+  <!-- tiny red chili accent -->
+  <rect x="158" y="118" width="8" height="2.4" rx="1.2" fill="#e0341f" transform="rotate(-18 162 119)"/>
+  <!-- oil gloss dots -->
+  <circle cx="128" cy="112" r="1.4" fill="#fff" opacity=".6"/>
+  <circle cx="184" cy="116" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="152" cy="126" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

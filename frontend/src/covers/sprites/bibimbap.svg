@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="bbBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="bbbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#3a1120"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <radialGradient id="bbstone" cx="50%" cy="36%" r="80%">
+      <stop offset="0%" stop-color="#3a3138"/><stop offset="55%" stop-color="#241d22"/><stop offset="100%" stop-color="#0f0b0d"/>
+    </radialGradient>
+    <radialGradient id="bbrice" cx="50%" cy="40%" r="72%">
+      <stop offset="0%" stop-color="#fbf5e6"/><stop offset="70%" stop-color="#efe2c8"/><stop offset="100%" stop-color="#dccaa2"/>
+    </radialGradient>
+    <radialGradient id="bbyolk" cx="42%" cy="34%" r="72%">
+      <stop offset="0%" stop-color="#ffce54"/><stop offset="58%" stop-color="#f6981c"/><stop offset="100%" stop-color="#d0680e"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#bbbg)"/>
+  <!-- steam -->
+  <path d="M120 56 C110 38 130 30 120 10" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#bbBlur3)"/>
+  <path d="M204 54 C196 38 214 30 206 10" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#bbBlur3)"/>
+  <ellipse cx="160" cy="188" rx="152" ry="22" fill="#000" opacity=".5"/>
+  <!-- heavy stone bowl (dolsot) -->
+  <path d="M40 116 C40 160 96 184 160 184 C224 184 280 160 280 116 Z" fill="url(#bbstone)"/>
+  <path d="M40 116 C40 160 96 184 160 184 C224 184 280 160 280 116" fill="none" stroke="#4a3540" stroke-width="3"/>
+  <!-- stone rim highlight -->
+  <path d="M52 130 C72 152 116 164 160 164 C204 164 248 152 268 130" stroke="#6a5560" stroke-width="2" fill="none" opacity=".5"/>
+  <ellipse cx="160" cy="116" rx="122" ry="32" fill="#1a141a"/>
+  <ellipse cx="160" cy="116" rx="122" ry="32" fill="none" stroke="#4a3540" stroke-width="3"/>
+  <!-- neon steam arc (rose for the korean/gochujang family) -->
+  <path d="M54 108 Q104 78 166 76" stroke="#ff4d6d" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- rice mound base peeking in the gaps -->
+  <ellipse cx="160" cy="116" rx="110" ry="26" fill="url(#bbrice)"/>
+  <!-- radial toppings arranged around the rim like a clock -->
+  <!-- spinach/greens (upper-left) -->
+  <path d="M62 108 C82 96 108 96 118 106 C104 116 78 118 62 116 Z" fill="#2f7d2b"/>
+  <path d="M70 104 C86 98 104 100 112 106" stroke="#5ecb4e" stroke-width="2.4" fill="none" opacity=".7" stroke-linecap="round"/>
+  <path d="M76 110 C90 106 102 108 110 112" stroke="#3f9c37" stroke-width="2" fill="none" opacity=".6"/>
+  <!-- julienned carrot (upper-right) -->
+  <g stroke-linecap="round" fill="none">
+    <path d="M202 104 C216 98 232 100 244 106" stroke="#e8792a" stroke-width="3.4"/>
+    <path d="M204 110 C218 104 234 106 246 112" stroke="#f0913a" stroke-width="3"/>
+    <path d="M206 116 C220 110 234 112 246 118" stroke="#d96a1e" stroke-width="2.8"/>
+  </g>
+  <!-- shredded gochujang-red beef / kimchi (lower-left) -->
+  <g stroke-linecap="round" fill="none">
+    <path d="M64 128 C80 122 100 122 112 128" stroke="#c22e1c" stroke-width="4"/>
+    <path d="M68 134 C84 128 104 128 116 134" stroke="#a8240f" stroke-width="3.4"/>
+    <path d="M74 124 C88 120 104 120 114 124" stroke="#e04426" stroke-width="2.6"/>
+  </g>
+  <!-- bean sprouts (lower-right) -->
+  <g stroke-linecap="round" fill="none">
+    <path d="M200 128 C216 124 232 124 246 130" stroke="#f0e6c2" stroke-width="3"/>
+    <path d="M202 134 C218 130 234 130 248 136" stroke="#e6d8a8" stroke-width="2.6"/>
+    <path d="M204 122 C218 118 232 120 244 124" stroke="#fbf4dc" stroke-width="2.2"/>
+  </g>
+  <!-- mushroom slices (top center) -->
+  <g transform="translate(158 100)">
+    <ellipse rx="14" ry="7" fill="#5a3d28"/>
+    <ellipse rx="14" ry="7" fill="none" stroke="#3a2416" stroke-width="1.2" opacity=".6"/>
+    <path d="M-10 -1 C-4 -4 4 -4 10 -1" stroke="#7a5238" stroke-width="1.6" fill="none" opacity=".7"/>
+    <path d="M-8 2 C-2 0 4 0 9 2" stroke="#8a6244" stroke-width="1.2" fill="none" opacity=".6"/>
+  </g>
+  <!-- courgette green half-moons (left center) -->
+  <g transform="translate(100 118)">
+    <path d="M-12 0 A12 12 0 0 1 12 0 Z" fill="#6abf5a"/>
+    <path d="M-12 0 A12 12 0 0 1 12 0" stroke="#3f9c37" stroke-width="1.4" fill="none" opacity=".6"/>
+    <ellipse cx="0" cy="-2" rx="6" ry="2" fill="#e8f0c8" opacity=".5"/>
+  </g>
+  <!-- central sunny-side egg on top of it all -->
+  <g transform="translate(160 116)">
+    <ellipse rx="30" ry="18" fill="#fdf7e6"/>
+    <ellipse rx="30" ry="18" fill="none" stroke="#e6d6ac" stroke-width="1.2" opacity=".6"/>
+    <ellipse cx="2" cy="0" rx="12" ry="10" fill="url(#bbyolk)"/>
+    <ellipse cx="-2" cy="-3" rx="4" ry="3" fill="#ffe6a0" opacity=".85"/>
+  </g>
+  <!-- gochujang dollop accent (bright red) top-center -->
+  <g transform="translate(160 92)">
+    <path d="M-8 2 C-8 -6 8 -6 8 2 C4 6 -4 6 -8 2 Z" fill="#d62818"/>
+    <ellipse cx="-2" cy="-1" rx="3" ry="1.4" fill="#ff5a3a" opacity=".7"/>
+  </g>
+  <!-- sesame + scallion sprinkle -->
+  <circle cx="120" cy="104" r="1.3" fill="#f8eed6"/>
+  <circle cx="200" cy="106" r="1.3" fill="#f8eed6"/>
+  <circle cx="132" cy="132" r="1.2" fill="#f8eed6"/>
+  <circle cx="196" cy="132" r="1.2" fill="#f8eed6"/>
+  <rect x="140" y="98" width="6" height="2.4" rx="1.2" fill="#58c14a" transform="rotate(-18 143 99)"/>
+  <rect x="178" y="126" width="6" height="2.4" rx="1.2" fill="#3f9c37" transform="rotate(16 181 127)"/>
+  <!-- gloss dots -->
+  <circle cx="152" cy="108" r="1.6" fill="#fff" opacity=".55"/>
+  <circle cx="96" cy="112" r="1.2" fill="#fff" opacity=".5"/>
+  <circle cx="226" cy="112" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

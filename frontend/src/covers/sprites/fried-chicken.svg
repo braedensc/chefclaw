@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="fcBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="fcbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="fccrust" cx="42%" cy="32%" r="82%">
+      <stop offset="0%" stop-color="#f0b862"/><stop offset="52%" stop-color="#cf8a34"/><stop offset="100%" stop-color="#9a5c1a"/>
+    </radialGradient>
+    <radialGradient id="fccrust2" cx="44%" cy="34%" r="82%">
+      <stop offset="0%" stop-color="#e9ac52"/><stop offset="55%" stop-color="#c27f2c"/><stop offset="100%" stop-color="#8a4f16"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#fcbg)"/>
+  <!-- steam -->
+  <path d="M116 56 C106 38 126 30 116 10" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#fcBlur3)"/>
+  <path d="M202 54 C194 38 212 30 204 10" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#fcBlur3)"/>
+  <ellipse cx="160" cy="186" rx="154" ry="22" fill="#000" opacity=".5"/>
+  <!-- oval plate -->
+  <ellipse cx="160" cy="140" rx="134" ry="42" fill="#141018"/>
+  <ellipse cx="160" cy="140" rx="134" ry="42" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="140" rx="118" ry="34" fill="#0f0d13"/>
+  <!-- neon steam arc -->
+  <path d="M52 124 Q104 92 166 88" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- craggy fried-chicken piece: reusable via inline groups. Each = lumpy craggy blob + drumstick bone on some -->
+  <!-- back piece (smaller, dimmer) -->
+  <g transform="translate(196 96) scale(.86)" opacity=".95">
+    <path d="M-30 6 C-40 -10 -20 -26 2 -22 C22 -30 42 -16 40 4 C50 14 42 34 22 34 C4 44 -20 40 -28 26 C-40 22 -40 12 -30 6 Z" fill="url(#fccrust2)" stroke="#5e360e" stroke-width="1.4"/>
+    <path d="M-18 -8 q6 4 2 10 M6 -14 q7 3 3 11 M24 -4 q5 6 -1 11 M-6 16 q6 4 1 10 M16 18 q6 3 1 10" stroke="#8a5218" stroke-width="1.4" fill="none" opacity=".55"/>
+    <circle cx="-8" cy="-6" r="1.6" fill="#ffe1a0" opacity=".7"/>
+    <circle cx="14" cy="4" r="1.6" fill="#ffe1a0" opacity=".7"/>
+  </g>
+  <!-- drumstick (left) with pale bone knob -->
+  <g transform="translate(96 108) rotate(-16)">
+    <path d="M-34 4 C-44 -12 -22 -26 0 -22 C20 -26 34 -12 32 6 C42 14 34 32 16 32 C0 40 -22 36 -30 22 C-42 20 -44 12 -34 4 Z" fill="url(#fccrust)" stroke="#5e360e" stroke-width="1.5"/>
+    <path d="M-20 -8 q6 4 2 10 M4 -14 q7 3 3 11 M22 -2 q5 6 -1 11 M-8 14 q6 4 1 10 M14 16 q6 3 1 10 M-30 8 q5 5 0 10" stroke="#8a5218" stroke-width="1.5" fill="none" opacity=".6"/>
+    <!-- protruding bone -->
+    <path d="M28 -6 C40 -14 50 -12 54 -6 C50 -2 40 -2 30 4 Z" fill="#f2e3c4" stroke="#c7ab7e" stroke-width="1.1"/>
+    <ellipse cx="50" cy="-8" rx="4" ry="3.4" fill="#faf0d8" stroke="#c7ab7e" stroke-width="1"/>
+    <circle cx="-6" cy="-6" r="1.8" fill="#ffe8b0" opacity=".75"/>
+    <circle cx="12" cy="6" r="1.6" fill="#ffe8b0" opacity=".7"/>
+  </g>
+  <!-- front centre piece (largest, brightest craggy thigh) -->
+  <g transform="translate(158 118)">
+    <path d="M-42 8 C-54 -12 -28 -32 -2 -28 C22 -38 48 -22 46 2 C58 12 50 38 26 38 C6 50 -26 46 -36 28 C-52 24 -54 14 -42 8 Z" fill="url(#fccrust)" stroke="#5e360e" stroke-width="1.6"/>
+    <!-- craggy crust bumps -->
+    <path d="M-26 -12 q7 5 2 12 M2 -20 q8 4 3 13 M28 -6 q6 7 -1 13 M-10 18 q7 5 1 12 M20 20 q7 4 1 12 M-38 10 q6 6 0 12 M40 8 q5 6 -1 11" stroke="#8a5218" stroke-width="1.6" fill="none" opacity=".6"/>
+    <path d="M-16 2 q9 6 2 14 M12 0 q9 5 2 13" stroke="#a86a24" stroke-width="1.4" fill="none" opacity=".5"/>
+    <!-- crispy highlight nubs -->
+    <circle cx="-14" cy="-10" r="2.2" fill="#ffe8b0" opacity=".8"/>
+    <circle cx="8" cy="-2" r="2.2" fill="#ffe8b0" opacity=".8"/>
+    <circle cx="26" cy="10" r="1.8" fill="#ffe8b0" opacity=".7"/>
+    <circle cx="-20" cy="16" r="1.6" fill="#ffe0a0" opacity=".65"/>
+  </g>
+  <!-- scattered crispy crumbs on plate -->
+  <circle cx="74" cy="150" r="2.4" fill="#c98a34" opacity=".8"/>
+  <circle cx="238" cy="146" r="2.2" fill="#c98a34" opacity=".75"/>
+  <circle cx="112" cy="158" r="1.8" fill="#b57a2a" opacity=".7"/>
+  <circle cx="206" cy="156" r="2" fill="#c98a34" opacity=".7"/>
+  <!-- parsley flecks + a lemon wedge accent -->
+  <rect x="86" y="140" width="7" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(-16 89 141)"/>
+  <rect x="220" y="138" width="6" height="2.4" rx="1.2" fill="#58c14a" transform="rotate(20 223 139)"/>
+  <g transform="translate(228 118) rotate(18)">
+    <path d="M0 0 A14 14 0 0 1 24 6 L12 12 Z" fill="#f4d24a" stroke="#cfa62c" stroke-width="1"/>
+    <path d="M4 3 L18 8 M8 2 L14 10" stroke="#e8e0b0" stroke-width="1" opacity=".7"/>
+  </g>
+  <!-- oil gloss dots -->
+  <circle cx="146" cy="108" r="1.6" fill="#fff" opacity=".6"/>
+  <circle cx="108" cy="100" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="196" cy="90" r="1.3" fill="#fff" opacity=".5"/>
+</svg>

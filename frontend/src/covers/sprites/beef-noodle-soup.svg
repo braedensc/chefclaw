@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="bn1Blur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="bn1bg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="bn1broth" cx="50%" cy="34%" r="82%">
+      <stop offset="0%" stop-color="#a83816"/><stop offset="55%" stop-color="#7d2109"/><stop offset="100%" stop-color="#4a1105"/>
+    </radialGradient>
+    <linearGradient id="bn1beef" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8a3316"/><stop offset="100%" stop-color="#4f1e0b"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#bn1bg)"/>
+  <path d="M118 52 C110 36 126 28 118 10" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#bn1Blur3)"/>
+  <path d="M202 50 C194 34 210 26 202 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#bn1Blur3)"/>
+  <ellipse cx="160" cy="188" rx="152" ry="22" fill="#000" opacity=".5"/>
+  <!-- bowl -->
+  <ellipse cx="160" cy="124" rx="116" ry="66" fill="#141013"/>
+  <ellipse cx="160" cy="124" rx="116" ry="66" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="120" rx="100" ry="54" fill="#0c0a0d"/>
+  <path d="M66 104 Q108 66 168 60" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".45" stroke-linecap="round"/>
+  <!-- broth pool -->
+  <ellipse cx="160" cy="120" rx="98" ry="52" fill="url(#bn1broth)"/>
+  <ellipse cx="128" cy="98" rx="34" ry="9" fill="#c65225" opacity=".3" transform="rotate(-10 128 98)"/>
+  <!-- chili-oil sheen ring -->
+  <ellipse cx="160" cy="120" rx="92" ry="47" fill="none" stroke="#e8622a" stroke-width="2" opacity=".3"/>
+  <!-- noodle nest emerging from broth -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M96 110 C126 94 194 92 224 108" stroke="#d9bd85" stroke-width="6"/>
+    <path d="M112 100 C136 90 184 90 208 100" stroke="#e6cf9d" stroke-width="6"/>
+    <path d="M84 122 C114 100 206 100 236 124" stroke="#d9bd85" stroke-width="7"/>
+    <path d="M92 134 C124 110 196 110 228 136" stroke="#e6cf9d" stroke-width="7"/>
+    <path d="M106 144 C134 124 186 124 214 144" stroke="#cdb078" stroke-width="6"/>
+    <path d="M126 116 C118 104 134 96 146 104 C154 110 148 122 134 120" stroke="#e6cf9d" stroke-width="5.5"/>
+    <path d="M100 112 C128 96 192 94 220 110" stroke="#fff1c9" stroke-width="2" opacity=".75"/>
+    <path d="M94 132 C124 108 198 108 230 134" stroke="#fff1c9" stroke-width="2" opacity=".6"/>
+    <path d="M108 140 C136 120 184 120 212 140" stroke="#7a4c14" stroke-width="2.4" opacity=".55"/>
+  </g>
+  <!-- braised beef slices floating -->
+  <g transform="translate(78 78) rotate(-8)">
+    <rect x="0" y="0" width="46" height="26" rx="6" fill="url(#bn1beef)"/>
+    <rect x="0" y="0" width="46" height="7" rx="4" fill="#a5401d" opacity=".9"/>
+    <path d="M6 13 H40 M6 19 H40" stroke="#6b2f16" stroke-width="1.6" opacity=".55"/>
+    <ellipse cx="14" cy="5" rx="9" ry="2.6" fill="#ffc491" opacity=".5"/>
+    <rect x="0" y="0" width="46" height="26" rx="6" fill="none" stroke="#240a03" stroke-width="1.4" opacity=".55"/>
+  </g>
+  <g transform="translate(178 76) rotate(6)">
+    <rect x="0" y="0" width="46" height="26" rx="6" fill="url(#bn1beef)"/>
+    <rect x="0" y="0" width="46" height="7" rx="4" fill="#a5401d" opacity=".9"/>
+    <path d="M6 13 H40 M6 19 H40" stroke="#6b2f16" stroke-width="1.6" opacity=".55"/>
+    <ellipse cx="14" cy="5" rx="9" ry="2.6" fill="#ffc491" opacity=".5"/>
+    <rect x="0" y="0" width="46" height="26" rx="6" fill="none" stroke="#240a03" stroke-width="1.4" opacity=".55"/>
+  </g>
+  <g transform="translate(130 132) rotate(-3)">
+    <rect x="0" y="0" width="44" height="24" rx="6" fill="url(#bn1beef)"/>
+    <rect x="0" y="0" width="44" height="7" rx="4" fill="#a5401d" opacity=".9"/>
+    <path d="M6 12 H38 M6 18 H38" stroke="#6b2f16" stroke-width="1.5" opacity=".55"/>
+    <ellipse cx="13" cy="5" rx="8" ry="2.4" fill="#ffc491" opacity=".5"/>
+    <rect x="0" y="0" width="44" height="24" rx="6" fill="none" stroke="#240a03" stroke-width="1.4" opacity=".55"/>
+  </g>
+  <!-- bok choy leaf -->
+  <g transform="translate(206 118) rotate(14)">
+    <path d="M0 0 C10 -12 22 -12 26 -2 C22 6 8 8 0 0 Z" fill="#3f9c37"/>
+    <path d="M2 -1 C10 -8 18 -8 22 -2" stroke="#dfe7cf" stroke-width="2" fill="none" opacity=".7"/>
+  </g>
+  <!-- scallion + chili flecks -->
+  <rect x="112" y="98" width="7" height="2.8" rx="1.4" fill="#58c14a" transform="rotate(-20 115 99)"/>
+  <rect x="158" y="94" width="7" height="2.8" rx="1.4" fill="#6abf5a" transform="rotate(16 161 95)"/>
+  <rect x="198" y="104" width="7" height="2.8" rx="1.4" fill="#2f7d2b" transform="rotate(-8 201 105)"/>
+  <rect x="140" y="120" width="6" height="2.6" rx="1.3" fill="#58c14a" transform="rotate(26 143 121)"/>
+  <rect x="176" y="128" width="6" height="2.6" rx="1.3" fill="#6abf5a" transform="rotate(-18 179 129)"/>
+  <rect x="118" y="128" width="5" height="2.6" rx="1.3" fill="#e0341f" transform="rotate(10 120 129)"/>
+  <rect x="182" y="110" width="5" height="2.6" rx="1.3" fill="#e0341f" transform="rotate(-24 184 111)"/>
+  <!-- oil glints -->
+  <circle cx="126" cy="104" r="1.3" fill="#ffe9b0" opacity=".8"/>
+  <circle cx="172" cy="112" r="1.3" fill="#ffe9b0" opacity=".75"/>
+  <circle cx="150" cy="134" r="1.1" fill="#ffe9b0" opacity=".7"/>
+</svg>

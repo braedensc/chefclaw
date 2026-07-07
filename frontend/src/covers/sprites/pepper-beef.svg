@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="nnBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="pbfbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <linearGradient id="pbfbeef" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7c3a20"/><stop offset="45%" stop-color="#5e2410"/><stop offset="100%" stop-color="#3b1608"/>
+    </linearGradient>
+    <linearGradient id="pbfpep" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e94b2a"/><stop offset="100%" stop-color="#b32d10"/>
+    </linearGradient>
+    <radialGradient id="pbfplate" cx="50%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#pbfbg)"/>
+  <!-- steam -->
+  <path d="M120 58 C110 40 130 32 120 12" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#nnBlur3)"/>
+  <path d="M204 54 C196 38 214 30 206 10" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#nnBlur3)"/>
+  <ellipse cx="160" cy="188" rx="156" ry="21" fill="#000" opacity=".5"/>
+  <!-- oval plate -->
+  <ellipse cx="160" cy="130" rx="138" ry="43" fill="url(#pbfplate)"/>
+  <ellipse cx="160" cy="130" rx="138" ry="43" fill="none" stroke="#26262e" stroke-width="3"/>
+  <ellipse cx="160" cy="130" rx="123" ry="35" fill="#0f0d13"/>
+  <!-- neon steam arc (warm/amber family) -->
+  <path d="M50 118 Q100 88 166 84" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- dark glossy black-pepper sauce sheen -->
+  <ellipse cx="160" cy="134" rx="108" ry="22" fill="#1c0d06" opacity=".72"/>
+  <ellipse cx="134" cy="128" rx="30" ry="6" fill="#5e3418" opacity=".45" transform="rotate(-6 134 128)"/>
+  <!-- onion strips (pale, back) -->
+  <path d="M96 118 C110 110 130 110 142 118" stroke="#efe0c2" stroke-width="4" fill="none" opacity=".85" stroke-linecap="round"/>
+  <path d="M176 116 C190 108 208 108 220 116" stroke="#e6d4b0" stroke-width="4" fill="none" opacity=".8" stroke-linecap="round"/>
+  <!-- green bell-pepper strips -->
+  <path d="M104 130 C118 122 138 122 150 130" stroke="#3f9c37" stroke-width="5" fill="none" opacity=".9" stroke-linecap="round"/>
+  <path d="M168 132 C182 124 202 124 214 132" stroke="#2f7d2b" stroke-width="5" fill="none" opacity=".85" stroke-linecap="round"/>
+  <!-- red bell-pepper strip accent -->
+  <path d="M132 138 C146 132 166 132 178 138" stroke="url(#pbfpep)" stroke-width="5" fill="none" opacity=".9" stroke-linecap="round"/>
+  <!-- glossy dark beef strips (hero) -->
+  <g stroke-linecap="round" fill="none">
+    <path d="M86 128 C104 116 128 116 146 122" stroke="url(#pbfbeef)" stroke-width="9"/>
+    <path d="M86 128 C104 116 128 116 146 122" stroke="#3b1608" stroke-width="9" opacity=".0"/>
+    <path d="M92 124 C108 115 126 115 140 119" stroke="#a8623a" stroke-width="2" opacity=".55"/>
+  </g>
+  <g stroke-linecap="round" fill="none">
+    <path d="M150 116 C168 106 194 106 212 114" stroke="url(#pbfbeef)" stroke-width="9.5"/>
+    <path d="M156 112 C172 104 192 104 206 110" stroke="#b06a40" stroke-width="2" opacity=".55"/>
+  </g>
+  <g stroke-linecap="round" fill="none">
+    <path d="M108 144 C128 133 156 133 176 142" stroke="url(#pbfbeef)" stroke-width="10"/>
+    <path d="M116 140 C134 132 154 132 168 137" stroke="#b06a40" stroke-width="2.2" opacity=".6"/>
+  </g>
+  <g stroke-linecap="round" fill="none">
+    <path d="M176 128 C194 118 218 118 234 126" stroke="url(#pbfbeef)" stroke-width="9"/>
+    <path d="M182 124 C198 116 216 116 228 122" stroke="#a8623a" stroke-width="2" opacity=".5"/>
+  </g>
+  <g stroke-linecap="round" fill="none">
+    <path d="M128 122 C146 112 170 112 186 120" stroke="url(#pbfbeef)" stroke-width="9"/>
+    <path d="M134 118 C150 110 168 110 180 116" stroke="#b06a40" stroke-width="2" opacity=".55"/>
+  </g>
+  <!-- coarse black-pepper flecks -->
+  <circle cx="112" cy="122" r="1.6" fill="#1a0d05"/><circle cx="140" cy="118" r="1.5" fill="#260903"/>
+  <circle cx="170" cy="112" r="1.6" fill="#1a0d05"/><circle cx="196" cy="118" r="1.5" fill="#260903"/>
+  <circle cx="126" cy="134" r="1.5" fill="#1a0d05"/><circle cx="158" cy="128" r="1.6" fill="#260903"/>
+  <circle cx="186" cy="130" r="1.4" fill="#1a0d05"/><circle cx="148" cy="140" r="1.5" fill="#260903"/>
+  <circle cx="214" cy="124" r="1.4" fill="#1a0d05"/><circle cx="100" cy="132" r="1.4" fill="#260903"/>
+  <!-- scallion fleck -->
+  <rect x="162" y="122" width="7" height="2.6" rx="1.3" fill="#58c14a" transform="rotate(-14 165 123)"/>
+  <rect x="118" y="128" width="6" height="2.4" rx="1.2" fill="#3f9c37" transform="rotate(20 121 129)"/>
+  <!-- oil gloss dots -->
+  <circle cx="120" cy="120" r="1.5" fill="#fff" opacity=".6"/>
+  <circle cx="182" cy="116" r="1.5" fill="#fff" opacity=".55"/>
+  <circle cx="152" cy="132" r="1.3" fill="#fff" opacity=".55"/>
+</svg>
