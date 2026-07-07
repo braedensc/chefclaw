@@ -94,28 +94,36 @@ class FakeJobStore:
 
     # ── JobStore surface ─────────────────────────────────────────────────────
 
-    async def find_active_job(self, platform: str, canonical_id: str) -> Job | None:
+    async def find_active_job(
+        self, owner_id: uuid.UUID, platform: str, canonical_id: str
+    ) -> Job | None:
         candidates = [
             job
             for job in self.jobs.values()
-            if job.platform == platform
+            if job.owner_id == owner_id
+            and job.platform == platform
             and job.canonical_id == canonical_id
             and job.status in ACTIVE_STATUSES
         ]
         return min(candidates, key=lambda job: job.created_at) if candidates else None
 
     async def find_completed_job_with_recipes(
-        self, platform: str, canonical_id: str
+        self, owner_id: uuid.UUID, platform: str, canonical_id: str
     ) -> Job | None:
+        # Owner-scope BOTH the recipe probe AND the stored-job filter (M2 —
+        # mirrors the real PostgresJobStore, critique M2).
         if not any(
-            recipe.platform == platform and recipe.canonical_id == canonical_id
+            recipe.owner_id == owner_id
+            and recipe.platform == platform
+            and recipe.canonical_id == canonical_id
             for recipe in self.recipes
         ):
             return None
         stored = [
             job
             for job in self.jobs.values()
-            if job.platform == platform
+            if job.owner_id == owner_id
+            and job.platform == platform
             and job.canonical_id == canonical_id
             and job.status == "stored"
         ]
@@ -199,11 +207,15 @@ class FakeJobStore:
         job.error_type = error_type
         job.error_detail = error_detail
 
-    async def find_recipe_ids(self, platform: str, canonical_id: str) -> list[uuid.UUID]:
+    async def find_recipe_ids(
+        self, owner_id: uuid.UUID, platform: str, canonical_id: str
+    ) -> list[uuid.UUID]:
         rows = [
             recipe
             for recipe in self.recipes
-            if recipe.platform == platform and recipe.canonical_id == canonical_id
+            if recipe.owner_id == owner_id
+            and recipe.platform == platform
+            and recipe.canonical_id == canonical_id
         ]
         return [recipe.id for recipe in sorted(rows, key=lambda r: r.dish_index)]
 

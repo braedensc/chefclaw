@@ -95,7 +95,7 @@ async def sessionmaker(engine):
 @pytest.fixture
 async def owner_id(sessionmaker) -> uuid.UUID:
     async with sessionmaker() as session:
-        user = User(name="owner")
+        user = User(name="owner", email="owner@localhost")
         session.add(user)
         await session.commit()
         await session.refresh(user)
@@ -234,7 +234,7 @@ async def test_atomic_store_and_ledger(sessionmaker, owner_id, tmp_path: Path) -
     assert recipes[0].tags == ["braise", "pork", "classic"]
     # Covers persisted via the real per-row set_recipe_image UPDATE from the
     # resolved media root.
-    archive_dir = Path(settings.media_dir).resolve() / "bilibili" / "BVgolden003-p1"
+    archive_dir = Path(settings.media_dir).resolve() / str(owner_id) / "bilibili" / "BVgolden003-p1"
     assert [r.image_url for r in recipes] == [
         str(archive_dir / "illustration-0.jpg"),
         str(archive_dir / "illustration-1.jpg"),
@@ -344,8 +344,9 @@ async def test_illustration_job_failure_marks_failed_real_sql(
 async def test_store_results_unique_violation_adopts(
     sessionmaker, owner_id, tmp_path: Path
 ) -> None:
-    """The real UNIQUE(platform, canonical_id, dish_index) fires → None →
-    the caller adopts the racer's rows instead of failing."""
+    """The real UNIQUE(owner_id, platform, canonical_id, dish_index) fires (a
+    SAME-owner race after the M2 swap) → None → the caller adopts the racer's
+    rows instead of failing."""
     store = make_store(sessionmaker, tmp_path)
     settings = golden_settings(tmp_path)
     source = FakeSource(platform="bilibili", canonical_id="BVgolden004-p1")
@@ -363,7 +364,7 @@ async def test_store_results_unique_violation_adopts(
     job_a, _ = await enqueue_extract(store, owner_id, FAKE_URL, [source], settings)
     claimed_a = await store.claim_next_job()
     await worker.process(claimed_a)
-    raced_ids = await store.find_recipe_ids("bilibili", "BVgolden004-p1")
+    raced_ids = await store.find_recipe_ids(owner_id, "bilibili", "BVgolden004-p1")
     assert raced_ids
 
     # Job B for the same canonical identity hits the constraint directly.
@@ -578,3 +579,84 @@ async def test_kill_mid_extract_no_double_spend_and_reconcile(
     assert reconciled.error_type == "interrupted"
     assert spend_count == 0  # NO double spend, NO auto-rerun of paid work
     assert fresh_extractor.calls == []
+
+
+async def test_cross_owner_dedupe_isolation_and_shared_canonical_store(
+    sessionmaker, tmp_path: Path
+) -> None:
+    """Two owners extracting the SAME canonical video are fully isolated after
+    the M2 owner-scope swap (critique M10/M11). Seeds EXPLICIT distinct named
+    owners (never the fakes' uuid4 default), and asserts, both directions:
+
+    - every dedupe lookup (find_active_job / find_completed_job_with_recipes /
+      find_recipe_ids) returns ONLY the caller's own rows;
+    - owner B's paste does NOT dedupe onto owner A's completed job;
+    - both stores succeed against UNIQUE(owner_id, platform, canonical_id,
+      dish_index) — the SAME (platform, canonical_id, dish_index) stored under
+      two owners, no cross-owner IntegrityError, no merged/lost rows.
+    """
+    # M11: distinct, named owners — the random-owner default would let a
+    # seed-then-lookup-by-another-owner bug pass silently.
+    async with sessionmaker() as session:
+        alice = User(name="alice", email="alice@localhost")
+        bob = User(name="bob", email="bob@localhost")
+        session.add_all([alice, bob])
+        await session.commit()
+        await session.refresh(alice)
+        await session.refresh(bob)
+        owner_a, owner_b = alice.id, bob.id
+
+    store = make_store(sessionmaker, tmp_path)
+    settings = golden_settings(tmp_path)
+    # ONE canonical identity, shared by both owners (they saved the same video).
+    source = FakeSource(platform="bilibili", canonical_id="BVshared01-p1")
+    worker = Worker(
+        store=store,
+        adapters=[source],
+        settings=settings,
+        extractor_factory=lambda _s: FakeExtractor(),
+        image_generator_factory=_fake_image_factory,
+        sleeper=_noop_sleep,
+    )
+
+    # ── Owner A: enqueue, then assert find_active_job isolation BEFORE storing ──
+    job_a, existing_a = await enqueue_extract(store, owner_a, FAKE_URL, [source], settings)
+    assert existing_a is False
+    assert await store.find_active_job(owner_a, "bilibili", "BVshared01-p1") is not None
+    # B has no active job for the same canonical id — isolation the other way:
+    assert await store.find_active_job(owner_b, "bilibili", "BVshared01-p1") is None
+
+    await worker.process(await store.claim_next_job())  # A stores its recipe
+
+    # find_completed_job_with_recipes + find_recipe_ids are A-only, B sees nothing:
+    assert (
+        await store.find_completed_job_with_recipes(owner_a, "bilibili", "BVshared01-p1")
+    ).id == job_a.id
+    assert (
+        await store.find_completed_job_with_recipes(owner_b, "bilibili", "BVshared01-p1")
+    ) is None
+    a_ids = await store.find_recipe_ids(owner_a, "bilibili", "BVshared01-p1")
+    assert a_ids
+    assert await store.find_recipe_ids(owner_b, "bilibili", "BVshared01-p1") == []
+
+    # ── Owner B: same canonical id must NOT dedupe onto A, must store cleanly ──
+    job_b, existing_b = await enqueue_extract(store, owner_b, FAKE_URL, [source], settings)
+    assert existing_b is False  # A's completed job never satisfies B (owner-scoped)
+    assert job_b.id != job_a.id
+    # Drain the queue (A's post-store illustration jobs are older and claim
+    # first) so B's extract actually runs. No cross-owner IntegrityError: B's
+    # (bilibili, BVshared01-p1, 0) coexists with A's under the owner-scoped
+    # UNIQUE constraint.
+    while (claimed := await store.claim_next_job()) is not None:
+        await worker.process(claimed)
+
+    async with sessionmaker() as session:
+        stored_b = await session.get(Job, job_b.id)
+        total_recipes = await session.scalar(select(func.count(Recipe.id)))
+    assert stored_b.status == "stored"  # both owners stored, neither errored
+    b_ids = await store.find_recipe_ids(owner_b, "bilibili", "BVshared01-p1")
+    assert b_ids
+    assert set(a_ids).isdisjoint(b_ids)  # distinct rows, no merge
+    assert total_recipes == len(a_ids) + len(b_ids)  # both persisted; none lost
+    # Isolation still holds after both stored — each lookup is owner-fenced:
+    assert await store.find_recipe_ids(owner_a, "bilibili", "BVshared01-p1") == a_ids
