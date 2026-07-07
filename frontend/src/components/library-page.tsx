@@ -90,8 +90,11 @@ export function LibraryPage() {
     [recipesData],
   );
 
+  // A faint always-on cyan hairline keeps the filter row gently lit at rest
+  // (the paste strip, headings, and cards all carry ambient neon — the search
+  // chrome shouldn't read as dead); focus still brightens it to cyan/60.
   const fieldClasses =
-    'rounded-field border border-line bg-panel px-3.5 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-cyan/60 focus:outline-none';
+    'rounded-field border border-cyan/15 bg-panel px-3.5 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-cyan/60 focus:outline-none';
 
   return (
     <div>
@@ -236,10 +239,16 @@ export function LibraryPage() {
                 >
                   今晚的菜单
                 </span>
-                <span className="ml-auto font-display text-[10.5px] font-semibold tracking-[0.24em] text-ink-faint uppercase">
+                <span className="font-display text-[10.5px] font-semibold tracking-[0.24em] text-ink-faint uppercase">
                   {recipes.data.total}{' '}
                   {recipes.data.total === 1 ? 'dish' : 'dishes'} on the board
                 </span>
+                {/* night-market signage rule — a gold hairline trailing to the
+                    right edge; hidden on narrow screens where the row wraps. */}
+                <span
+                  aria-hidden="true"
+                  className="hidden h-px min-w-8 flex-1 self-center bg-gradient-to-r from-gold/35 to-transparent sm:block"
+                />
               </div>
               <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {recipes.data.items.map((recipe) => (
