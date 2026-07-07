@@ -39,4 +39,10 @@ describe('SpicinessScale', () => {
       screen.getByLabelText('Spiciness: hot (estimated)'),
     ).toBeInTheDocument();
   });
+
+  it('drops the "(estimated)" flag once the owner has overridden', () => {
+    render(<SpicinessScale level={2} estimated={false} />);
+    expect(screen.getByLabelText('Spiciness: medium')).toBeInTheDocument();
+    expect(screen.queryByLabelText(/\(estimated\)/)).not.toBeInTheDocument();
+  });
 });

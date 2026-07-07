@@ -12,7 +12,7 @@ silent ignore.
 
 import uuid
 from datetime import date, datetime
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -95,6 +95,7 @@ _PROJECTED_FIELDS = frozenset(
         "ingredient_count",
         "estimated_spiciness_level",
         "estimated_difficulty_level",
+        "estimated_source",
     }
 )
 
@@ -108,8 +109,10 @@ class RecipeSummary(BaseModel):
     derives from the server-side ``image_url`` (the generated illustration
     path), which itself never leaves the API (the /image endpoint streams the
     file). ``estimated_spiciness_level`` / ``estimated_difficulty_level`` are
-    the DERIVED estimates projected from the separate ``estimated`` column —
-    flagged 'estimated' in the UI, never inside the verbatim document."""
+    the 0–3 estimates projected from the separate ``estimated`` column (never
+    inside the verbatim document); ``estimated_source`` says whether they are the
+    model's ``"derived"`` guess (flag 'estimated' in the UI) or an owner
+    ``"user"`` correction."""
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -125,10 +128,14 @@ class RecipeSummary(BaseModel):
     difficulty: str | None = None
     total_time_minutes: int | None = None
     ingredient_count: int | None = None
-    # DERIVED estimates (0–3), None when the extraction supplied none / the
-    # column is null. Read-only, projected from the `estimated` column.
+    # Estimates (0–3), None when the extraction supplied none / the column is
+    # null. Projected from the `estimated` column. `estimated_source` records
+    # provenance: "derived" = the model's assessment (flag it "estimated" in the
+    # UI), "user" = an owner correction (PATCH-able — drop the flag), None when
+    # there is no estimate at all.
     estimated_spiciness_level: int | None = None
     estimated_difficulty_level: int | None = None
+    estimated_source: Literal["derived", "user"] | None = None
     created_at: datetime
 
     @staticmethod
@@ -148,6 +155,7 @@ class RecipeSummary(BaseModel):
         return {
             "estimated_spiciness_level": estimated.get("spiciness_level"),
             "estimated_difficulty_level": estimated.get("difficulty_level"),
+            "estimated_source": estimated.get("source"),
         }
 
     @model_validator(mode="before")
@@ -199,12 +207,24 @@ class RecipePage(BaseModel):
 
 
 class RecipePatch(BaseModel):
-    """The ONLY user-editable fields. extra='forbid' rejects document edits."""
+    """The user-editable fields. extra='forbid' rejects document edits.
+
+    ``tags`` / ``user_notes`` are free metadata; the two ``estimated_*`` fields
+    let the owner CORRECT the derived 0–3 estimates (a provided value re-flags
+    the ``estimated`` column ``source="user"``, taking precedence over the
+    model's derivation — see ``services.recipes.patch_recipe``). All are
+    optional; only fields actually present in the body are applied
+    (``model_fields_set``), so an explicit ``null`` clears while an absent field
+    is untouched. ``strict=True`` on the estimate ints blocks bool→int coercion
+    (``True`` is not ``spiciness_level=1``) — the same guard the document schema
+    keeps."""
 
     model_config = ConfigDict(extra="forbid")
 
     tags: list[str] | None = None
     user_notes: str | None = None
+    estimated_spiciness_level: int | None = Field(default=None, ge=0, le=3, strict=True)
+    estimated_difficulty_level: int | None = Field(default=None, ge=0, le=3, strict=True)
 
 
 class SpendModelSlice(BaseModel):

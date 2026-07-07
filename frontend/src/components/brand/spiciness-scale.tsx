@@ -1,10 +1,12 @@
 // Spiciness as a 0–3 lit-chili scale — direction B's #nnChili symbol, ported
 // with its exact lit/unlit colors: lit = chili red pod + green stem behind a
-// glow drop-shadow, unlit = dim outline. The level is a DERIVED estimate
-// (estimated_spiciness_level), so the label is flagged "(estimated)"; a
-// null/undefined level renders nothing (never fabricate — Hard Rule 7).
+// glow drop-shadow, unlit = dim outline. The level is an estimate
+// (estimated_spiciness_level); while it is still the model's guess the label is
+// flagged "(estimated)", dropped once the owner has corrected it
+// (`estimated={false}`). A null/undefined level renders nothing (never
+// fabricate — Hard Rule 7).
 
-const SPICINESS_WORDS = ['not spicy', 'mild', 'medium', 'hot'] as const;
+export const SPICINESS_WORDS = ['not spicy', 'mild', 'medium', 'hot'] as const;
 
 const CHILI_SLOTS = [1, 2, 3] as const;
 
@@ -39,14 +41,21 @@ function Chili({ lit }: { lit: boolean }) {
 
 /**
  * 3 chili slots lit up to `level` (0–3), plus the spiciness word as visible
- * text (screen-reader and sighted parity — the glyphs are decorative). The
- * value is an ESTIMATE, so the label says so. A null/undefined level renders
+ * text (screen-reader and sighted parity — the glyphs are decorative). While
+ * `estimated` (the default), the label is flagged "(estimated)"; pass
+ * `estimated={false}` once the owner has corrected the value. `decorative`
+ * drops the accessible label entirely (aria-hidden) — for a live preview beside
+ * a labelled input that is the real control. A null/undefined level renders
  * nothing.
  */
 export function SpicinessScale({
   level,
+  estimated = true,
+  decorative = false,
 }: {
   level: number | null | undefined;
+  estimated?: boolean;
+  decorative?: boolean;
 }) {
   if (level == null) return null;
   const word = SPICINESS_WORDS[level] ?? SPICINESS_WORDS[0];
@@ -54,7 +63,11 @@ export function SpicinessScale({
   return (
     <span
       className="inline-flex items-center gap-1"
-      aria-label={`Spiciness: ${word} (estimated)`}
+      {...(decorative
+        ? { 'aria-hidden': true }
+        : {
+            'aria-label': `Spiciness: ${word}${estimated ? ' (estimated)' : ''}`,
+          })}
     >
       {CHILI_SLOTS.map((slot) => (
         <Chili key={slot} lit={slot <= level} />
