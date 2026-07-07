@@ -97,11 +97,11 @@ class Settings(BaseSettings):
     gemini_api_key: str = ""
     gemini_model: str = "gemini-2.5-flash"  # model id is config, never hardcoded
     gemini_media_resolution: str = "low"  # base resolution; escalate only if overlay text is missed
-    # One-shot media-resolution escalation (V2-C, ADR 2026-07-07-cross-device-
-    # and-extractor-qa). EMPTY (default) = escalation OFF: extraction uses the
-    # base resolution and the unchanged v3 prompt — the safe, no-extra-spend
+    # One-shot media-resolution escalation (V2-C, ADR 2026-07-07-extractor-
+    # robustness-qa). EMPTY (default) = escalation OFF: extraction uses the
+    # base resolution and the unchanged v4 prompt — the safe, no-extra-spend
     # default. Set to a resolution ABOVE the base (e.g. "high" when base is
-    # "low") to enable it: the Gemini adapter then uses the v4 prompt, and when
+    # "low") to enable it: the Gemini adapter then uses the v5 prompt, and when
     # the model reports on-screen text it could not read at the base resolution,
     # it retries the SAME uploaded video ONCE at this ceiling (one extra paid
     # call, bounded, summed into the attempt's ledger row). Unknown value, or a
@@ -115,12 +115,22 @@ class Settings(BaseSettings):
     dashscope_model: str = "qwen3-vl-plus"  # config, never trusted as current
     dashscope_base_url: str = "https://dashscope-intl.aliyuncs.com/compatible-mode/v1"
 
-    # ── Illustration cover generation (V2-E, 2026-07-06) ────────────────────
-    # Card covers are GENERATED cartoon illustrations built from text fields
-    # (never a video frame). "fake" is the SAFE default (tests, golden suite,
-    # zero spend/network); compose sets "gemini" for the real stack. Reuses the
-    # existing Gemini key/SDK — no new provider or secret.
-    chefclaw_image_generator: str = "fake"
+    # ── Card covers (V2-F, 2026-07-07) ──────────────────────────────────────
+    # The cover-generation mode. "sprite" (the DEFAULT) assigns a curated
+    # original dish-sprite id during extraction and renders it INLINE from the
+    # bundled catalog — zero spend, no illustration job, shippable-safe. "fake"
+    # is the canned-blob path (golden/tests exercise the /image route); "gemini"
+    # is the legacy paid text-only illustration (demoted from default, V2-E).
+    # A real private video-frame cover is a SEPARATE layer over sprite mode,
+    # gated by chefclaw_real_covers below (never a value of this knob).
+    chefclaw_image_generator: str = "sprite"
+    # V2-F private real-frame layer, the GLOBAL half of a two-gate grant (the
+    # per-user users.real_covers_enabled is the other). Default FALSE ⇒ pure
+    # sprites: no beauty-shot frame is ever captured OR served. Meaningful only
+    # in sprite mode. A frame reaches a viewer ONLY when this is true AND the
+    # requesting owner is granted — so multi-user/public stays sprite-only and a
+    # creator frame never crosses to an ungranted viewer.
+    chefclaw_real_covers: bool = False
     # !!! CONFIRM this model id at deploy — image models sunset FAST and this
     # cannot be verified from here (Gemini 2.5 Flash Image / Imagen 4 both
     # retire Aug–Oct 2026). "Nano Banana 2". !!!

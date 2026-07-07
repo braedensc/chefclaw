@@ -117,7 +117,8 @@ async def test_fake_default_dish_passes_documents_schema():
     )
     results = validate_extraction(outcome.dishes, source)
     assert len(results) == 1
-    document, estimated, tags = results[0]
+    validated = results[0]
+    document, estimated, tags = validated.document, validated.estimated, validated.tags
     assert document.dish_name.original == "红烧肉"
     # The v2 fake dish carries derived estimates, split out of the document:
     assert estimated is not None
@@ -133,7 +134,7 @@ async def test_fake_usage_is_deterministic():
     second = await FakeExtractor().extract(VIDEO, None, None)
     assert first.usage == second.usage
     assert first.usage.tokens_thinking == 0
-    assert first.usage.prompt_version == "v3"
+    assert first.usage.prompt_version == "v4"
 
 
 async def test_fake_injection_of_dishes_and_warnings():
@@ -265,7 +266,7 @@ async def test_gemini_happy_path_upload_wait_generate_parse():
     assert outcome.dishes == DISHES
     assert outcome.usage == ExtractionUsage(
         model_id="gemini-test-model",
-        prompt_version="v3",
+        prompt_version="v4",
         tokens_in=1200,
         tokens_out=340,
         tokens_thinking=0,  # thinking disabled — SDK reports None, recorded as 0
@@ -316,7 +317,7 @@ async def test_gemini_parse_failure_carries_usage_when_sdk_surfaced_it():
     carried = exc_info.value.usage
     assert carried == ExtractionUsage(
         model_id="gemini-test-model",
-        prompt_version="v3",
+        prompt_version="v4",
         tokens_in=1200,
         tokens_out=340,
         tokens_thinking=0,
@@ -462,17 +463,17 @@ async def test_gemini_cleanup_errors_never_fail_extraction():
 
 
 def prompt_text() -> str:
-    # The ACTIVE prompt (v3 adds the auto-tags field on top of v2's derived
-    # estimates). v1/v2 are kept in place historically but no backend loads
-    # them any more.
+    # The ACTIVE prompt (v4 adds the cover_sprite_id + beauty-shot fields on top
+    # of v3's auto-tags and v2's derived estimates). v1/v2/v3 are kept in place
+    # historically but no backend loads them any more.
     return (
-        resources.files("chefclaw").joinpath("prompts/extract_v3.md").read_text(encoding="utf-8")
+        resources.files("chefclaw").joinpath("prompts/extract_v4.md").read_text(encoding="utf-8")
     )
 
 
 def test_prompt_exists_and_is_not_gutted():
     text = prompt_text()
-    assert text.strip(), "extract_v3.md must not be empty"
+    assert text.strip(), "extract_v4.md must not be empty"
     # Literal markers guarding against accidental gutting of the invariant.
     assert "适量" in text
     assert "JSON" in text
@@ -482,25 +483,28 @@ def test_prompt_exists_and_is_not_gutted():
     assert "spiciness_level" in text
     # v3 markers: the auto-tags field must be present.
     assert "tags" in text
+    # v4 markers: the cover fields must be present.
+    assert "cover_sprite_id" in text
+    assert "beauty_shot_timestamp_seconds" in text
 
 
-def test_prompt_version_is_v3():
-    assert PROMPT_VERSION == "v3"
+def test_prompt_version_is_v4():
+    assert PROMPT_VERSION == "v4"
 
 
-async def test_gemini_stamps_prompt_version_v3():
+async def test_gemini_stamps_prompt_version_v4():
     files = StubFiles(upload_result=active_file())
     models = StubModels(response=gemini_response(json.dumps(DISHES)))
     extractor = make_gemini(files, models)
     outcome = await extractor.extract(VIDEO, None, None)
-    assert outcome.usage.prompt_version == "v3"
+    assert outcome.usage.prompt_version == "v4"
 
 
 # ── media-resolution escalation (V2-C) ──────────────────────────────────────
 
 
 def envelope(dishes, on_screen_text, usage=None):
-    """A v4-envelope Gemini response (dishes + the legibility self-report)."""
+    """A v5-envelope Gemini response (dishes + the legibility self-report)."""
     return gemini_response(
         json.dumps({"dishes": dishes, "capture_quality": {"on_screen_text": on_screen_text}}),
         usage,
@@ -531,7 +535,7 @@ def test_gemini_escalation_ceiling_must_be_above_base():
             )
 
 
-async def test_gemini_escalation_config_uses_v4_prompt_and_stamps_version():
+async def test_gemini_escalation_config_uses_v5_prompt_and_stamps_version():
     files = StubFiles(upload_result=active_file())
     models = StubModels(response=envelope(DISHES, "legible"))
     extractor = escalating_gemini(files, models)
@@ -539,11 +543,11 @@ async def test_gemini_escalation_config_uses_v4_prompt_and_stamps_version():
     outcome = await extractor.extract(VIDEO, None, None)
 
     assert outcome.dishes == DISHES
-    assert outcome.usage.prompt_version == "v4"
+    assert outcome.usage.prompt_version == "v5"
     # A legible read never escalates: exactly one call, at the base resolution.
     assert len(models.calls) == 1
     assert models.calls[0]["config"].media_resolution == LOW
-    # The v4 envelope prompt (with the capture-quality self-report) reached the model.
+    # The v5 envelope prompt (with the capture-quality self-report) reached the model.
     assert "capture_quality" in models.calls[0]["contents"][1]
 
 
@@ -614,7 +618,7 @@ async def test_gemini_escalation_retry_failure_keeps_base_result():
 
 async def test_gemini_escalation_tolerates_a_bare_array_response():
     """Escalation enabled but the model ignored the envelope and returned a bare
-    v3 array: parse it anyway (backward-tolerant), and never escalate (no signal)."""
+    v4 array: parse it anyway (backward-tolerant), and never escalate (no signal)."""
     files = StubFiles(upload_result=active_file())
     models = StubModels(response=gemini_response(json.dumps(DISHES)))
     extractor = escalating_gemini(files, models)

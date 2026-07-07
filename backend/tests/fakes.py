@@ -12,10 +12,17 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from typing import Any
 
+from chefclaw.covers import AssignmentMiss
 from chefclaw.documents import EstimatedAttributes, RecipeDocument
 from chefclaw.extractors import ExtractionUsage
-from chefclaw.models import Job, Recipe
-from chefclaw.services.repo import ACTIVE_STATUSES, RUNNING_STATUSES, RecipeImageRef
+from chefclaw.models import CoverMiss, Job, Recipe
+from chefclaw.services.repo import (
+    ACTIVE_STATUSES,
+    RUNNING_STATUSES,
+    RecipeFrameRef,
+    RecipeImageRef,
+    RecipeSpriteRef,
+)
 
 _EPOCH = datetime(2026, 1, 1, tzinfo=UTC)
 
@@ -34,6 +41,10 @@ class FakeJobStore:
         self.jobs: dict[uuid.UUID, Job] = {}
         self.recipes: list[Recipe] = []
         self.spend_rows: list[dict[str, Any]] = []
+        self.cover_misses: list[CoverMiss] = []
+        # Recipes whose owner is real-covers-granted (frame backfill scope) —
+        # tests add ids to opt a recipe into list_recipes_for_frame_backfill.
+        self.real_covers_owner_ids: set[uuid.UUID] = set()
         self.budget_failure: Exception | None = None
         self.fail_store_once = False
         self.budget_checks = 0
@@ -82,6 +93,7 @@ class FakeJobStore:
             "user_notes": None,
             "image_url": None,
             "image_style_version": None,
+            "cover_sprite_id": None,
             "estimated": None,
             "document": {},
             "extraction_meta": {},
@@ -232,6 +244,7 @@ class FakeJobStore:
         documents: list[RecipeDocument],
         estimates: list[EstimatedAttributes | None],
         tags: list[list[str]],
+        cover_sprite_ids: list[str],
         *,
         extraction_meta: dict[str, Any],
     ) -> list[uuid.UUID] | None:
@@ -251,11 +264,12 @@ class FakeJobStore:
                 )
             return None
         recipe_ids: list[uuid.UUID] = []
-        for index, (document, estimate, dish_tags) in enumerate(
-            zip(documents, estimates, tags, strict=False)
+        for index, (document, estimate, dish_tags, sprite_id) in enumerate(
+            zip(documents, estimates, tags, cover_sprite_ids, strict=False)
         ):
-            # image_url lands NULL — illustrations are persisted post-store via
-            # set_recipe_image (never inside the paid-work crash-loss window).
+            # image_url lands NULL — a real frame / illustration is persisted
+            # post-store via set_recipe_image (never inside the paid-work
+            # crash-loss window). The assigned cover_sprite_id IS stored here.
             # Derived estimates ride in their own column (Hard Rule 7); auto-tags
             # seed the user-editable recipes.tags column.
             recipe = self.seed_recipe(
@@ -267,6 +281,7 @@ class FakeJobStore:
                 title_en=document.dish_name.en,
                 title_original=document.dish_name.original,
                 tags=dish_tags,
+                cover_sprite_id=sprite_id,
                 document=document.model_dump(mode="json"),
                 estimated=estimate.model_dump(mode="json") if estimate is not None else None,
                 extraction_meta=extraction_meta,
@@ -277,6 +292,54 @@ class FakeJobStore:
         job.error_type = None
         job.error_detail = None
         return recipe_ids
+
+    async def record_cover_misses(
+        self,
+        owner_id: uuid.UUID,
+        entries: list[tuple[uuid.UUID | None, AssignmentMiss]],
+    ) -> None:
+        for recipe_id, miss in entries:
+            self.cover_misses.append(
+                CoverMiss(
+                    owner_id=owner_id,
+                    recipe_id=recipe_id,
+                    dish_name_en=miss.dish_name_en,
+                    dish_name_original=miss.dish_name_original,
+                    cuisine_type=miss.cuisine_type,
+                    tags=list(miss.tags),
+                    suggested_sprite_id=miss.suggested_sprite_id,
+                    resolved_sprite_id=miss.resolved_sprite_id,
+                    score=miss.score,
+                    reason=miss.reason,
+                )
+            )
+
+    async def list_recipes_missing_sprites(self) -> list[RecipeSpriteRef]:
+        return [
+            RecipeSpriteRef(r.id, r.owner_id, r.document, list(r.tags))
+            for r in self.recipes
+            if r.cover_sprite_id is None
+        ]
+
+    async def set_recipe_sprite(self, recipe_id: uuid.UUID, sprite_id: str) -> None:
+        for recipe in self.recipes:
+            if recipe.id == recipe_id:
+                recipe.cover_sprite_id = sprite_id
+
+    async def list_recipes_for_frame_backfill(self) -> list[RecipeFrameRef]:
+        return [
+            RecipeFrameRef(
+                r.id,
+                r.owner_id,
+                r.platform,
+                r.canonical_id,
+                r.dish_index,
+                r.document,
+                r.extraction_meta,
+            )
+            for r in self.recipes
+            if r.image_url is None and r.owner_id in self.real_covers_owner_ids
+        ]
 
     def _job_id_for_recipe(self, recipe_id: uuid.UUID) -> uuid.UUID | None:
         """Mirror the real inner join: the stored job whose result_recipe_ids

@@ -144,3 +144,87 @@ launchd), daily 03:30, journald logs, `Persistent=true` so a reboot across
   tailnet; the off-VPS backup destination choice.
 - Every ladder rung beyond (a) — b/c/d exist as config paths, exercised only
   by the mocked seam tests above.
+
+---
+
+## M4 amendment (2026-07-07): public TLS ingress supersedes Tailscale-private for the product
+
+**Context:** the Path-B ADR (`2026-07-07-path-b-multi-user-product.md`) turned
+chefclaw into a hosted, invite-only, **upload-only** multi-user product, and its
+M4 phase is "public deploy: real domain + TLS — auth is the boundary now,
+Tailscale-private is superseded for the product." M2 shipped that boundary
+(Google OAuth + opaque server-side sessions; `/api/health` is not auth-exempt).
+This amendment records the ingress decision the original ADR deferred. It is
+**engineering/doc prep** — no VPS, domain, or accounts exist yet; everything
+account/secret-gated is queued in [`docs/DEPLOY_CHECKLIST.md`](../DEPLOY_CHECKLIST.md).
+
+### Decision
+
+1. **Public deploy terminates TLS with a reverse proxy — Caddy — on a real
+   domain, in front of `127.0.0.1:8000`.** Caddy runs as a **host service** (not
+   a compose service), so the compose stack stays entirely loopback-bound and
+   Caddy is the only public listener. It auto-provisions and **auto-renews** a
+   Let's Encrypt cert (no cron), does HTTP→HTTPS + HTTP/2, and forwards
+   `X-Forwarded-Proto`. Mechanics: [`docs/RUNBOOK.md`](../RUNBOOK.md) §4 step 7,
+   Option A. **nginx + certbot** is documented as a viable alternative for hosts
+   already running nginx.
+
+2. **The exposure model inverts from V2-B.** V2-B / the original decision above
+   was "zero public exposure — nothing internet-facing." Under M4, **auth is the
+   security boundary**, so the app is *meant* to be internet-reachable:
+   **80/443 are public; 8000/5432 stay `127.0.0.1`-bound.** The
+   `scripts/prod-smoke.sh` port scan still asserts 8000/5432 are closed publicly;
+   the loopback invariant is unchanged, only what fronts it differs.
+   `tailscale serve` (Option B) is retained as the **interim / dev / personal
+   single-user** path — and is the *only* posture where the full link-paste +
+   Rednote sidecar pipeline belongs (Path-B keeps platform fetch self-host-only).
+
+3. **Host: provider-agnostic, ≥ 2 GB RAM, Ubuntu LTS, x86.** Hetzner CX22 stays
+   the recommended host (cheapest with real headroom); Lightsail / DigitalOcean /
+   Linode / Vultr are all viable — the Path-B ADR's "2 GB Lightsail host" was
+   illustrative, not a hard pick. The public path additionally needs a **domain +
+   DNS A/AAAA record**; the final host + domain choice is queued for provisioning
+   (`docs/SERVICES.md` §7).
+
+4. **Build stays native-on-host; cross-arch is `buildx` + QEMU.** `Dockerfile.api`
+   builds for the VPS's own architecture when built on the box (the documented
+   flow). Cross-building x86↔ARM (e.g. an Ampere/Graviton host, or building on an
+   Apple-silicon Mac for an x86 host) uses `docker buildx --platform …` with the
+   QEMU binfmt emulator; the base images are already multi-arch. Note:
+   [`docs/RUNBOOK.md`](../RUNBOOK.md) §4 step 6.
+
+### Why Caddy over nginx + certbot
+
+For a single upstream needing "HTTPS on one domain, auto-renewed," Caddy is a
+two-line Caddyfile with automatic ACME + renewal built in; nginx + certbot is a
+hand-written server block plus certbot's separate renewal timer and reload hooks
+— strictly more moving parts for no benefit at this scale. nginx wins only when
+it's already deployed. Both keep the stack loopback-bound; the choice is
+operational surface area, not capability. A container-based Caddy in compose was
+rejected to avoid adding published `ports:` and cert volumes to the compose file
+— a host service keeps compose's "all ports 127.0.0.1" invariant literally true.
+
+### Gates (do NOT go public until these hold — full list in the checklist)
+
+- **Upload-only hosted-mode carve (Path-B decision 1) — NOT shipped yet.** No
+  config gate disables `POST /api/recipes/extract` + the platform source adapters
+  in hosted mode; both `/extract` and `/upload` are live. A public instance today
+  would let invited users drive server-side platform fetches — the operator-side
+  ToS/redistribution posture Path-B exists to avoid. This carve is a prerequisite
+  for public (not for a personal Tailscale-private instance).
+- **M3 per-user budget caps** — M2 added the per-user columns but `check_budget`
+  still reads the global env pool; without M3 one guest can drain the month's
+  budget.
+- **V2-D security audit** against the deployed surface.
+- Ideally land M3 + V2-D + the carve before public exposure; this prep does not
+  block on them (checklist Gate 0).
+
+### Verified / unverified
+
+This amendment is prep: the Caddy install + Caddyfile were authored against
+Caddy's official docs (not executed on a real host); `scripts/prod-smoke.sh` was
+re-worked to the M2 session-cookie model and exercised locally (parses clean
+under `sh`/`dash`; hard-fails on an unreachable host; skips the authed leg
+without `CHEFCLAW_SESSION`). **First real exercise at deploy day:** Google OAuth
+end-to-end, SES invite delivery, the Qwen fallback, and sidecar SOCKS5 — none
+have run against their live services (checklist "first-real-exercise flags").

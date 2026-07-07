@@ -30,6 +30,7 @@ from chefclaw.extractors.prompt import (
     PROMPT_VERSION,
     load_escalation_prompt,
     load_prompt,
+    with_cover_catalog,
     with_source_context,
 )
 
@@ -47,7 +48,7 @@ _MEDIA_RESOLUTIONS: dict[str, genai_types.MediaResolution] = {
 # Low→high ordering for the escalation ceiling check (must cover every key above).
 _RESOLUTION_ORDER = ("low", "medium", "high")
 
-# The v4 envelope's ``capture_quality.on_screen_text`` value that triggers a
+# The v5 envelope's ``capture_quality.on_screen_text`` value that triggers a
 # one-shot escalation: the model saw overlay text it could not read reliably.
 _TEXT_UNREADABLE = "unreadable"
 
@@ -111,8 +112,8 @@ class GeminiExtractor:
         self._base_resolution_name = resolution_name
 
         # Optional one-shot escalation ceiling (V2-C). Empty = OFF (the default):
-        # base resolution, the shared v3 prompt, one paid call — today's behavior
-        # unchanged. Set ⇒ the v4 envelope prompt + a single higher-res retry when
+        # base resolution, the shared v4 prompt, one paid call — today's behavior
+        # unchanged. Set ⇒ the v5 envelope prompt + a single higher-res retry when
         # the model reports unreadable on-screen text.
         self._escalate_to: genai_types.MediaResolution | None = None
         self._escalate_to_name: str | None = None
@@ -134,8 +135,8 @@ class GeminiExtractor:
             self._escalate_to_name = max_name
 
         self._model_id = settings.gemini_model  # config string, never hardcoded
-        # The v4 envelope prompt carries the legibility self-report escalation
-        # needs; without escalation we keep the shared v3 prompt byte-for-byte
+        # The v5 envelope prompt carries the legibility self-report escalation
+        # needs; without escalation we keep the shared v4 prompt byte-for-byte
         # (and the same version stamp), so the default path is unchanged.
         if self._escalate_to is not None:
             self._prompt = load_escalation_prompt()
@@ -209,7 +210,9 @@ class GeminiExtractor:
         source_duration_seconds: int | None,
         media_resolution: genai_types.MediaResolution,
     ) -> genai_types.GenerateContentResponse:
-        prompt = with_source_context(self._prompt, source_title, source_duration_seconds)
+        prompt = with_cover_catalog(
+            with_source_context(self._prompt, source_title, source_duration_seconds)
+        )
 
         config = genai_types.GenerateContentConfig(
             temperature=_TEMPERATURE,
@@ -299,9 +302,9 @@ class GeminiExtractor:
         self, response: genai_types.GenerateContentResponse
     ) -> tuple[ExtractionOutcome, str | None]:
         """Parse a Gemini response into ``(outcome, on_screen_text)``. Tolerant
-        of BOTH shapes: the v4 escalation envelope
+        of BOTH shapes: the v5 escalation envelope
         (``{"dishes": [...], "capture_quality": {"on_screen_text": ...}}``) and a
-        bare v3 array. The second tuple element is the legibility self-report
+        bare v4 array. The second tuple element is the legibility self-report
         (``None`` for a bare array or a malformed ``capture_quality``) — the only
         thing the escalation decision reads."""
         usage = self._usage_from_response(response)
@@ -339,7 +342,7 @@ class GeminiExtractor:
         self, parsed: object, raw_text: str, usage: ExtractionUsage | None
     ) -> tuple[list, str | None]:
         """Extract the dish array + legibility signal from either output shape.
-        A bare array is the v3 (and non-compliant v4) case → no signal. An
+        A bare array is the v4 (and non-compliant v5) case → no signal. An
         envelope object must carry a ``dishes`` LIST; anything else is a hard
         ExtractionFailedError preserving the raw text (Hard Rule 7)."""
         if isinstance(parsed, list):

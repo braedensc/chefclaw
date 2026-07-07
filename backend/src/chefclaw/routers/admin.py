@@ -19,8 +19,17 @@ from chefclaw.config import Settings, get_settings
 from chefclaw.emailer import get_email_adapter
 from chefclaw.errors import ConfigError, EmailSendError
 from chefclaw.routers.deps import error_response
-from chefclaw.schemas import ErrorBody, InviteCreate, InviteList, InviteOut, InvitePublicOut
-from chefclaw.services import invites
+from chefclaw.schemas import (
+    ErrorBody,
+    InviteCreate,
+    InviteList,
+    InviteOut,
+    InvitePublicOut,
+    UserAdminList,
+    UserAdminPatch,
+    UserAdminRow,
+)
+from chefclaw.services import invites, users
 
 router = APIRouter(prefix="/api", tags=["invites"])
 
@@ -109,6 +118,37 @@ async def revoke_invite(
     if outcome == "already_accepted":
         return error_response(409, "already_accepted", "an accepted invite cannot be revoked")
     return JSONResponse(status_code=200, content={"status": "revoked"})
+
+
+@router.get("/admin/users", response_model=UserAdminList)
+async def list_users(
+    owner_id: Annotated[uuid.UUID, Depends(require_admin)],
+) -> UserAdminList:
+    """Every member + their private real-frame grant (V2-F). NEVER a secret —
+    no token_hash, no oauth subject."""
+    rows = await users.list_users(db.get_sessionmaker())
+    return UserAdminList(items=[UserAdminRow.model_validate(u) for u in rows])
+
+
+@router.patch(
+    "/admin/users/{user_id}",
+    response_model=UserAdminRow,
+    responses={404: _ERR},
+)
+async def set_user_real_covers(
+    user_id: uuid.UUID,
+    body: UserAdminPatch,
+    owner_id: Annotated[uuid.UUID, Depends(require_admin)],
+) -> UserAdminRow | JSONResponse:
+    """Grant/revoke one member's PRIVATE real-frame covers (V2-F). Owner-only
+    (require_admin); ``real_covers_enabled`` is the ONLY settable field (the
+    body schema is ``extra="forbid"``, so no admin/identity escalation)."""
+    user = await users.set_real_covers_enabled(
+        db.get_sessionmaker(), user_id, body.real_covers_enabled
+    )
+    if user is None:
+        return error_response(404, "not_found", f"no user {user_id}")
+    return UserAdminRow.model_validate(user)
 
 
 @router.get("/invites/{token}", response_model=InvitePublicOut)

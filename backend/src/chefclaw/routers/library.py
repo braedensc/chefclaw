@@ -32,6 +32,7 @@ _NOT_FOUND = {404: {"model": ErrorBody}}
 async def list_recipes(
     owner_id: Annotated[uuid.UUID, Depends(require_owner)],
     session: Annotated[AsyncSession, Depends(db.get_session)],
+    settings: Annotated[Settings, Depends(get_settings)],
     q: str | None = None,
     platform: str | None = None,
     tag: str | None = None,
@@ -49,12 +50,19 @@ async def list_recipes(
         limit=limit,
         offset=offset,
     )
-    return RecipePage(
-        items=[RecipeSummary.model_validate(item) for item in items],
-        total=total,
-        limit=limit,
-        offset=offset,
+    # V2-F: hide a private real-frame cover from an ungranted viewer — the card
+    # then falls back to the inline sprite. Only reads the grant when the config
+    # can actually produce real frames (else has_image keeps its old meaning).
+    hide_frames = recipes_service.frames_are_gated(settings) and not (
+        await recipes_service.owner_real_covers_enabled(session, owner_id)
     )
+    summaries: list[RecipeSummary] = []
+    for item in items:
+        summary = RecipeSummary.model_validate(item)
+        if hide_frames:
+            summary.has_image = False
+        summaries.append(summary)
+    return RecipePage(items=summaries, total=total, limit=limit, offset=offset)
 
 
 @router.get("/{recipe_id}", response_model=RecipeDetail, responses=_NOT_FOUND)
@@ -62,11 +70,19 @@ async def get_recipe(
     recipe_id: uuid.UUID,
     owner_id: Annotated[uuid.UUID, Depends(require_owner)],
     session: Annotated[AsyncSession, Depends(db.get_session)],
+    settings: Annotated[Settings, Depends(get_settings)],
 ) -> RecipeDetail | JSONResponse:
     recipe = await recipes_service.get_recipe(session, owner_id, recipe_id)
     if recipe is None:
         return error_response(404, "not_found", f"no recipe {recipe_id}")
-    return RecipeDetail.model_validate(recipe)
+    detail = RecipeDetail.model_validate(recipe)
+    # V2-F: an ungranted viewer never sees a private real frame — fall back to
+    # the inline sprite (has_image=False).
+    if recipes_service.frames_are_gated(settings) and not (
+        await recipes_service.owner_real_covers_enabled(session, owner_id)
+    ):
+        detail.has_image = False
+    return detail
 
 
 @router.get(
@@ -87,10 +103,18 @@ async def get_recipe_image(
     session: Annotated[AsyncSession, Depends(db.get_session)],
     settings: Annotated[Settings, Depends(get_settings)],
 ) -> FileResponse | JSONResponse:
-    """Stream the generated illustration. One 404 covers every miss — no
-    recipe, no illustration generated yet, file gone from the archive."""
+    """Stream the recipe's cover image (a generated illustration, or a PRIVATE
+    real video frame). One 404 covers every miss — no recipe, no image yet, file
+    gone, OR (V2-F) a private real frame requested by an ungranted viewer: a
+    frame NEVER reaches an ungranted viewer even by direct URL."""
     recipe = await recipes_service.get_recipe(session, owner_id, recipe_id)
     if recipe is None or recipe.image_url is None:
+        return error_response(404, "not_found", f"no image for recipe {recipe_id}")
+    if recipes_service.frames_are_gated(settings) and not (
+        await recipes_service.owner_real_covers_enabled(session, owner_id)
+    ):
+        # The stored image_url is a private real frame and this viewer isn't
+        # granted — indistinguishable from "no image" (no enumeration oracle).
         return error_response(404, "not_found", f"no image for recipe {recipe_id}")
     image_path = Path(recipe.image_url).resolve()
     media_root = Path(settings.media_dir).resolve()

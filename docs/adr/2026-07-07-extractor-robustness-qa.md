@@ -19,12 +19,12 @@ Two extractor changes plus a documented QA matrix (`docs/QA_MATRIX.md`):
 
 2. **One-shot media-resolution escalation, opt-in.** A new
    `GEMINI_MEDIA_RESOLUTION_MAX` (empty = OFF, the default) enables it. When set
-   above the base `GEMINI_MEDIA_RESOLUTION`, the Gemini adapter uses a **v4
+   above the base `GEMINI_MEDIA_RESOLUTION`, the Gemini adapter uses a **v5
    envelope prompt** whose `capture_quality.on_screen_text` self-report lets the
    model flag overlay text it could not read at the base resolution; the adapter
    then **retries the same already-uploaded video once at the ceiling**, logs the
    escalation, and returns the richer read with **both calls' tokens summed into
-   one spend row**. Escalation OFF ⇒ the shared v3 prompt and today's single-call
+   one spend row**. Escalation OFF ⇒ the shared v4 prompt and today's single-call
    behavior are unchanged byte-for-byte.
 
 3. **Every `error_type` → clear, actionable jobs-drawer copy** (no bare
@@ -47,15 +47,15 @@ Two extractor changes plus a documented QA matrix (`docs/QA_MATRIX.md`):
   the one honest trigger.
 - **Rejected: changing the shared/default prompt.** The faithful-capture prompt
   is load-bearing (Hard Rule 7) and can't be A/B-validated without spend, and the
-  Qwen fallback is *never exercised live*. So the v4 envelope is **Gemini-only and
-  opt-in**: v3 stays the shared default for the no-escalation path and for Qwen,
+  Qwen fallback is *never exercised live*. So the v5 envelope is **Gemini-only and
+  opt-in**: v4 stays the shared default for the no-escalation path and for Qwen,
   preserving the "same instructions for both backends" invariant in the default
   configuration. The parser is backward-tolerant (a bare array still parses), so
   even a non-compliant model can't break extraction.
 - **Rejected: escalation on by default.** It changes the prompt *and* spends a
   second call. Cost discipline is a stated Hard-Rule-grade concern and the prompt
   is crown-jewel, so escalation ships wired + unit-tested but **default-off**,
-  to be enabled after the paid QA run validates the v4 prompt empirically.
+  to be enabled after the paid QA run validates the v5 prompt empirically.
 - **Accepted tradeoff — the escalation's 2nd paid call skips the worker's
   budget gate.** The worker checks budget once before `extract()`; the in-adapter
   retry doesn't re-check. This is bounded (at most one extra call per attempt,

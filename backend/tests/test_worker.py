@@ -81,6 +81,9 @@ def make_settings(tmp_path: Path, **overrides) -> Settings:
         monthly_llm_budget_usd="10",
         max_extraction_attempts_per_day="25",
         chefclaw_extractor="fake",
+        # Illustration-path coverage stays on the fake image generator; sprite
+        # mode (the app default) has its own tests that override this to "sprite".
+        chefclaw_image_generator="fake",
         media_retention="discard",
         scratch_dir=str(tmp_path / "scratch"),
         media_dir=str(tmp_path / "media"),
@@ -101,9 +104,14 @@ def make_worker(
     settings: Settings,
     extractor: FakeExtractor,
     image_generator: FakeImageGenerator | None = None,
+    frame_grabber=None,
 ) -> tuple[Worker, RecordingSleeper]:
     sleeper = RecordingSleeper()
     generator = image_generator or FakeImageGenerator()
+    kwargs = {}
+    if frame_grabber is not None:
+        # never shell out to real ffmpeg in CI: a fake grabber records + fakes.
+        kwargs["frame_grabber"] = frame_grabber
     worker = Worker(
         store=store,
         adapters=[source],
@@ -113,6 +121,7 @@ def make_worker(
         image_generator_factory=lambda _settings: generator,
         sleeper=sleeper,
         jitter=lambda: 0.25,  # deterministic politeness delay: 2 + 3*0.25 = 2.75
+        **kwargs,
     )
     return worker, sleeper
 
@@ -269,7 +278,7 @@ async def test_happy_path_multi_dish_atomic_store(tmp_path: Path) -> None:
     # extraction_meta carries the §16.4-adjacent audit fields:
     meta = store.recipes[0].extraction_meta
     assert meta["model_id"] == "fake-extractor"
-    assert meta["prompt_version"] == "v3"
+    assert meta["prompt_version"] == "v4"
     assert meta["tokens"] == {"in": 1000, "out": 250, "thinking": 0}
     assert "extracted_at" in meta and "media_resolution" in meta
     # Derived estimates land in the SEPARATE column, never in the document:
@@ -693,7 +702,9 @@ class ConflictNoRowsStore(FakeJobStore):
     """store_results reports the UNIQUE violation but NO racer rows exist —
     the inconsistent-datastore shape (a non-dedupe IntegrityError)."""
 
-    async def store_results(self, job, documents, estimates, tags, *, extraction_meta):
+    async def store_results(
+        self, job, documents, estimates, tags, cover_sprite_ids, *, extraction_meta
+    ):
         return None
 
 
@@ -1366,7 +1377,7 @@ async def test_run_forever_backfills_once_when_enabled(tmp_path: Path) -> None:
         settings=settings,
         extractor_factory=lambda _s: FakeExtractor(),
         image_generator_factory=lambda _s: images,
-        backfill_illustrations_on_start=True,
+        backfill_covers_on_start=True,
         sleeper=YieldingSleeper(),
         jitter=lambda: 0.0,
     )
@@ -1411,7 +1422,7 @@ async def test_backfill_enqueues_in_background_and_loop_drains_all(tmp_path: Pat
         settings=settings,
         extractor_factory=lambda _s: FakeExtractor(),
         image_generator_factory=lambda _s: images,
-        backfill_illustrations_on_start=True,
+        backfill_covers_on_start=True,
         sleeper=YieldingSleeper(),
         jitter=lambda: 0.0,
     )

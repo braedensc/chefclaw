@@ -180,14 +180,20 @@ function RecipeHero({ detail, doc }: { detail: RecipeDetail; doc: RecipeDoc }) {
     </h1>
   );
 
+  // A cover exists when there's a served image (real frame / illustration) OR
+  // an assigned sprite (the default) — CoverImage resolves the precedence
+  // (served image → sprite → gradient) internally.
+  const hasCover = detail.has_image || detail.cover_sprite_id != null;
+
   return (
     <header className="mt-4">
-      {detail.has_image ? (
+      {hasCover ? (
         <div className="relative overflow-hidden rounded-card border border-line">
           <CoverImage
             recipeId={detail.id}
-            hasImage
+            hasImage={detail.has_image ?? false}
             platform={detail.platform}
+            coverSpriteId={detail.cover_sprite_id}
             alt={`${zhTitle ?? enTitle ?? 'Untitled dish'} — cover photo`}
             className="aspect-[21/9] w-full"
           />
@@ -246,7 +252,7 @@ function RegenerateIllustration({
         type="button"
         disabled={regenerate.isPending}
         onClick={() => regenerate.mutate({ path: { recipe_id: recipeId } })}
-        className="rounded-field border border-line-bright px-3.5 py-1.5 font-display text-[11px] font-semibold tracking-[0.16em] text-ink-dim uppercase transition hover:border-cyan/55 hover:text-cyan disabled:opacity-50"
+        className="tap-target rounded-field border border-line-bright px-3.5 py-1.5 font-display text-[11px] font-semibold tracking-[0.16em] text-ink-dim uppercase transition hover:border-cyan/55 hover:text-cyan disabled:opacity-50"
       >
         {hasImage ? 'Regenerate illustration' : 'Generate illustration'}
       </button>
@@ -332,7 +338,7 @@ function IngredientsSection({ ingredients }: { ingredients: IngredientDoc[] }) {
           lang="zh"
           aria-pressed={showOriginal}
           onClick={() => setShowOriginal((value) => !value)}
-          className={`rounded-field border px-3.5 py-1.5 text-sm font-medium transition ${
+          className={`tap-target rounded-field border px-3.5 py-1.5 text-sm font-medium transition ${
             showOriginal
               ? 'border-cyan/70 text-cyan glow-cyan glow-text-cyan'
               : 'border-line-bright text-ink-dim hover:border-cyan/50 hover:text-cyan'
@@ -535,7 +541,7 @@ function RawJsonDrawer({ detail }: { detail: RecipeDetail }) {
         type="button"
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
-        className="rounded-field border border-line-bright px-3.5 py-1.5 font-display text-xs font-semibold tracking-[0.16em] text-ink-dim uppercase transition hover:border-cyan/55 hover:text-cyan"
+        className="tap-target rounded-field border border-line-bright px-3.5 py-1.5 font-display text-xs font-semibold tracking-[0.16em] text-ink-dim uppercase transition hover:border-cyan/55 hover:text-cyan"
       >
         {open ? 'Hide raw JSON' : 'Show raw JSON'}
       </button>
@@ -561,9 +567,9 @@ function RawJsonDrawer({ detail }: { detail: RecipeDetail }) {
 }
 
 const fieldClass =
-  'mt-1.5 w-full rounded-field border border-line-bright bg-panel-deep px-3.5 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-cyan/70 focus:glow-cyan focus:outline-none';
+  'tap-field mt-1.5 w-full rounded-field border border-line-bright bg-panel-deep px-3.5 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-cyan/70 focus:glow-cyan focus:outline-none';
 const saveButtonClass =
-  'rounded-field border border-line-bright px-3.5 py-2 font-display text-xs font-semibold tracking-[0.16em] text-ink-dim uppercase transition hover:border-cyan/55 hover:text-cyan disabled:opacity-50';
+  'tap-target rounded-field border border-line-bright px-3.5 py-2 font-display text-xs font-semibold tracking-[0.16em] text-ink-dim uppercase transition hover:border-cyan/55 hover:text-cyan disabled:opacity-50';
 const metaLabelClass =
   'block font-display text-[11px] font-semibold tracking-[0.2em] text-ink-dim uppercase';
 
@@ -797,7 +803,7 @@ function DeleteControl({ recipeId }: { recipeId: string }) {
         <button
           type="button"
           onClick={() => setConfirming(true)}
-          className="rounded-field border border-chili/50 px-3.5 py-1.5 font-display text-xs font-semibold tracking-[0.16em] text-chili-bright uppercase transition hover:border-chili hover:glow-chili"
+          className="tap-target rounded-field border border-chili/50 px-3.5 py-1.5 font-display text-xs font-semibold tracking-[0.16em] text-chili-bright uppercase transition hover:border-chili hover:glow-chili"
         >
           Delete recipe
         </button>
@@ -815,14 +821,14 @@ function DeleteControl({ recipeId }: { recipeId: string }) {
               onClick={() =>
                 deleteRecipe.mutate({ path: { recipe_id: recipeId } })
               }
-              className="rounded-field border border-chili bg-chili/15 px-3.5 py-1.5 font-display text-xs font-semibold tracking-[0.14em] text-chili-bright uppercase glow-chili transition hover:bg-chili/25 disabled:opacity-50"
+              className="tap-target rounded-field border border-chili bg-chili/15 px-3.5 py-1.5 font-display text-xs font-semibold tracking-[0.14em] text-chili-bright uppercase glow-chili transition hover:bg-chili/25 disabled:opacity-50"
             >
               Delete permanently
             </button>
             <button
               type="button"
               onClick={() => setConfirming(false)}
-              className="rounded-field border border-line-bright px-3.5 py-1.5 font-display text-xs font-semibold tracking-[0.14em] text-ink-dim uppercase transition hover:border-cyan/55 hover:text-cyan"
+              className="tap-target rounded-field border border-line-bright px-3.5 py-1.5 font-display text-xs font-semibold tracking-[0.14em] text-ink-dim uppercase transition hover:border-cyan/55 hover:text-cyan"
             >
               Cancel
             </button>

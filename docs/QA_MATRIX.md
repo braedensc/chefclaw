@@ -51,7 +51,7 @@ creator/dish (all public 美食作家王刚 / classic tutorials).
 |---|------|------|-------------------|------------------|
 | 1 | Single-dish | Paid | 1 recipe; bilingual; verbatim quantities | ✅ 王刚 红烧肉 → 1 recipe, 16 ing, verbatim (`400克`→400 g/mass, `几根`→approx), 13 steps, est 0/2, tags ok. (1st upload hit a transient Gemini processing fail; **succeeded on retry**.) |
 | 2 | Multi-dish | Paid | N recipes under one identity; siblings related | ⚠️ Composite `一鱼两吃` (将军过桥) → model returned **1** dish (a sound judgment — it's one named dish). Extreme 12-dish 年夜饭 → download-timeout (see #4). Clean N-distinct-recipe *live* demo not captured; the atomic N-recipe store is unit-tested (`test_worker`). |
-| 3 | Heavy text / **escalation** | Paid | v4 envelope; `unreadable`→ one higher-res retry; summed spend | ✅ v4 envelope works live (`prompt=v4`, clean extraction). Escalation **did not fire** (model reported legible) — the firing path is unit-tested. **Surfaced the `prep_state` bug (below); fixed.** |
+| 3 | Heavy text / **escalation** | Paid | v5 envelope; `unreadable`→ one higher-res retry; summed spend | ✅ v5 envelope prompt works live (clean extraction). Escalation **did not fire** (model reported legible) — the firing path is unit-tested. **Surfaced the `prep_state` bug (below); fixed.** |
 | 4 | Long video | Paid | Completes under deadline, or fails typed (retryable), never wedges queue | ✅ 13.5-min video (73 MB) completed within deadlines. Extreme 12-dish video **exceeded the download deadline → typed timeout** (retryable), queue not wedged — the designed behavior. |
 | 5 | 适量-heavy | Paid | 适量/少许 → `value:null, unit:null, approx`; no fabricated number | ✅ 脆皮蛋饼 → 15 ing, **7 approx (适量)**, 8 valued, 0 fabricated. Hard Rule 7 intact. |
 | 6 | Non-cooking | Paid | `[]` → 0 recipes (not an error) | ✅ A game video → model emitted **1 dish with 0 ingredients** → correctly **`validation_failed`** (raw preserved, nothing fabricated). Not the `[]` path, but the same safe outcome; the drawer copy ("may not be a cooking video, nothing saved") fits exactly. |
@@ -66,7 +66,7 @@ creator/dish (all public 美食作家王刚 / classic tutorials).
    knife-work (`"sliced"`, `"cut into chunks"`) in `prep_state`, whose enum is
    only physical states (dried/fresh/cooked/raw/frozen) → `validation_failed`
    rejects the *entire* recipe. **Fix:** tightened the `prep_state` guidance in
-   the v3 + v4 prompts (state-only; knife-work belongs in `notes`, as the example
+   the v4 + v5 prompts (state-only; knife-work belongs in `notes`, as the example
    already shows). The fix is in the PROMPT, not the validator — `documents.py`
    deliberately **never coerces or repairs, rejects whole** (a Hard-Rule-7-grade
    invariant), so the correct fix is to make the model emit valid output, not to
@@ -94,8 +94,8 @@ real usage shows prep_state slips are frequent after the prompt fix.
 ## Per-case notes
 
 **#3 escalation.** Escalation is **opt-in** (`GEMINI_MEDIA_RESOLUTION_MAX` empty =
-off). Off, the pipeline uses the v3 prompt and one call at the base resolution
-(today's behavior). On, the Gemini adapter uses the v4 envelope prompt and, when
+off). Off, the pipeline uses the v4 prompt and one call at the base resolution
+(today's behavior). On, the Gemini adapter uses the v5 envelope prompt and, when
 `capture_quality.on_screen_text == "unreadable"`, retries the same uploaded video
 once at the ceiling. Watch the api logs for
 `gemini media-resolution escalation: on-screen text unreadable at low — retrying once at high`.
