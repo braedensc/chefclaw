@@ -196,15 +196,26 @@ class StubFiles:
 
 
 class StubModels:
-    """Stand-in for client.aio.models."""
+    """Stand-in for client.aio.models.
 
-    def __init__(self, response=None, error=None):
+    ``response``/``error`` give the same result on every call; ``responses`` (a
+    list, each item either a response or an Exception to raise) drives distinct
+    per-call behavior for the escalation path (first call at base res, second at
+    the ceiling)."""
+
+    def __init__(self, response=None, error=None, responses=None):
         self.response = response
         self.error = error
+        self.responses = list(responses) if responses is not None else None
         self.calls: list[dict] = []
 
     async def generate_content(self, *, model, contents, config=None):
         self.calls.append({"model": model, "contents": contents, "config": config})
+        if self.responses is not None:
+            result = self.responses.pop(0)
+            if isinstance(result, BaseException):
+                raise result
+            return result
         if self.error is not None:
             raise self.error
         return self.response
@@ -487,3 +498,132 @@ async def test_gemini_stamps_prompt_version_v4():
     extractor = make_gemini(files, models)
     outcome = await extractor.extract(VIDEO, None, None)
     assert outcome.usage.prompt_version == "v4"
+
+
+# ── media-resolution escalation (V2-C) ──────────────────────────────────────
+
+
+def envelope(dishes, on_screen_text, usage=None):
+    """A v5-envelope Gemini response (dishes + the legibility self-report)."""
+    return gemini_response(
+        json.dumps({"dishes": dishes, "capture_quality": {"on_screen_text": on_screen_text}}),
+        usage,
+    )
+
+
+DISHES_HI = [{"dish_name": {"en": "Mapo tofu", "original": "麻婆豆腐"}, "ingredients": [1, 2, 3]}]
+LOW = genai_types.MediaResolution.MEDIA_RESOLUTION_LOW
+HIGH = genai_types.MediaResolution.MEDIA_RESOLUTION_HIGH
+
+
+def escalating_gemini(files, models):
+    return make_gemini(
+        files, models, gemini_media_resolution="low", gemini_media_resolution_max="high"
+    )
+
+
+def test_gemini_escalation_ceiling_must_be_above_base():
+    files = StubFiles(upload_result=active_file())
+    # ceiling == base, ceiling < base, and an unknown ceiling all fail closed.
+    for base, ceiling in [("high", "high"), ("medium", "low"), ("low", "ultra")]:
+        with pytest.raises(ConfigError):
+            make_gemini(
+                files,
+                StubModels(),
+                gemini_media_resolution=base,
+                gemini_media_resolution_max=ceiling,
+            )
+
+
+async def test_gemini_escalation_config_uses_v5_prompt_and_stamps_version():
+    files = StubFiles(upload_result=active_file())
+    models = StubModels(response=envelope(DISHES, "legible"))
+    extractor = escalating_gemini(files, models)
+
+    outcome = await extractor.extract(VIDEO, None, None)
+
+    assert outcome.dishes == DISHES
+    assert outcome.usage.prompt_version == "v5"
+    # A legible read never escalates: exactly one call, at the base resolution.
+    assert len(models.calls) == 1
+    assert models.calls[0]["config"].media_resolution == LOW
+    # The v5 envelope prompt (with the capture-quality self-report) reached the model.
+    assert "capture_quality" in models.calls[0]["contents"][1]
+
+
+async def test_gemini_escalates_once_when_text_unreadable():
+    usage_low = SimpleNamespace(
+        prompt_token_count=1000, candidates_token_count=200, thoughts_token_count=None
+    )
+    usage_high = SimpleNamespace(
+        prompt_token_count=1500, candidates_token_count=260, thoughts_token_count=None
+    )
+    files = StubFiles(upload_result=active_file())
+    models = StubModels(
+        responses=[
+            envelope(DISHES, "unreadable", usage_low),  # base: flags missed text
+            envelope(DISHES_HI, "legible", usage_high),  # high: the richer read
+        ]
+    )
+    extractor = escalating_gemini(files, models)
+
+    outcome = await extractor.extract(VIDEO, None, None)
+
+    # Exactly two paid calls: base at low, then a single retry at the ceiling,
+    # reusing the ONE uploaded file (deleted once).
+    assert len(models.calls) == 2
+    assert models.calls[0]["config"].media_resolution == LOW
+    assert models.calls[1]["config"].media_resolution == HIGH
+    assert files.deleted == ["files/test-upload"]
+    # The escalated (higher-resolution) dishes win.
+    assert outcome.dishes == DISHES_HI
+    # Usage is SUMMED so the single ledger row reflects both calls' real cost.
+    assert outcome.usage.tokens_in == 2500
+    assert outcome.usage.tokens_out == 460
+    assert any("escalated" in w for w in outcome.warnings)
+
+
+async def test_gemini_does_not_escalate_when_text_reported_none():
+    files = StubFiles(upload_result=active_file())
+    models = StubModels(response=envelope(DISHES, "none"))
+    extractor = escalating_gemini(files, models)
+
+    outcome = await extractor.extract(VIDEO, None, None)
+
+    assert outcome.dishes == DISHES
+    assert len(models.calls) == 1  # no missed text ⇒ no second call
+
+
+async def test_gemini_escalation_retry_failure_keeps_base_result():
+    usage_low = SimpleNamespace(
+        prompt_token_count=1000, candidates_token_count=200, thoughts_token_count=None
+    )
+    files = StubFiles(upload_result=active_file())
+    models = StubModels(
+        responses=[
+            envelope(DISHES, "unreadable", usage_low),  # base succeeds
+            api_error(429, "RESOURCE_EXHAUSTED", "throttled"),  # escalation fails
+        ]
+    )
+    extractor = escalating_gemini(files, models)
+
+    outcome = await extractor.extract(VIDEO, None, None)
+
+    # The base extraction already succeeded — a failed escalation never loses it.
+    assert len(models.calls) == 2
+    assert outcome.dishes == DISHES
+    assert outcome.usage.tokens_in == 1000  # base usage, un-summed
+    assert any("escalation" in w and "failed" in w for w in outcome.warnings)
+
+
+async def test_gemini_escalation_tolerates_a_bare_array_response():
+    """Escalation enabled but the model ignored the envelope and returned a bare
+    v4 array: parse it anyway (backward-tolerant), and never escalate (no signal)."""
+    files = StubFiles(upload_result=active_file())
+    models = StubModels(response=gemini_response(json.dumps(DISHES)))
+    extractor = escalating_gemini(files, models)
+
+    outcome = await extractor.extract(VIDEO, None, None)
+
+    assert outcome.dishes == DISHES
+    assert len(models.calls) == 1

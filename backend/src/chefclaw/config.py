@@ -117,7 +117,17 @@ class Settings(BaseSettings):
     chefclaw_extractor: str = "fake"
     gemini_api_key: str = ""
     gemini_model: str = "gemini-2.5-flash"  # model id is config, never hardcoded
-    gemini_media_resolution: str = "low"  # escalate only if overlay text is missed
+    gemini_media_resolution: str = "low"  # base resolution; escalate only if overlay text is missed
+    # One-shot media-resolution escalation (V2-C, ADR 2026-07-07-extractor-
+    # robustness-qa). EMPTY (default) = escalation OFF: extraction uses the
+    # base resolution and the unchanged v4 prompt — the safe, no-extra-spend
+    # default. Set to a resolution ABOVE the base (e.g. "high" when base is
+    # "low") to enable it: the Gemini adapter then uses the v5 prompt, and when
+    # the model reports on-screen text it could not read at the base resolution,
+    # it retries the SAME uploaded video ONCE at this ceiling (one extra paid
+    # call, bounded, summed into the attempt's ledger row). Unknown value, or a
+    # value not strictly above the base, ⇒ ConfigError (fail-closed).
+    gemini_media_resolution_max: str = ""
     # Qwen fallback via DashScope OpenAI-compatible mode (CHEFCLAW_EXTRACTOR=qwen;
     # fail-closed when keyless). Region/data-governance review is a HUMAN
     # precondition before first real use — docs/SERVICES.md §3. The base URL is

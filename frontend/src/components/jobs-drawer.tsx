@@ -244,6 +244,54 @@ interface JobErrorActionProps {
   onRetryIllustration: (recipeId: string) => void;
 }
 
+/**
+ * Human, actionable copy for every error_type — no bare "Error"/"Try again".
+ * Retryable types render this line ABOVE a Retry button; non-retryable types
+ * render it as the sole guidance. error_type strings mirror the backend
+ * taxonomy (backend/src/chefclaw/errors.py); the substrings the jobs-drawer
+ * tests + golden contract pin (docs/RUNBOOK.md, "Budget cap reached", "Check
+ * server configuration") are preserved verbatim.
+ */
+const ERROR_GUIDANCE: Record<string, string> = {
+  // ── retryable (transient) — a Retry button follows this line ──────────────
+  download_failed:
+    "Couldn't download the video — a network hiccup, or the post may be private or region-locked. Retry to try again.",
+  extraction_failed:
+    'The video downloaded but the recipe extraction failed. This is usually transient — retry to try again.',
+  rate_limited:
+    'The platform or AI service throttled us. Give it a moment, then retry.',
+  interrupted:
+    'The server restarted while this job was running — nothing was charged. Retry to pick it back up.',
+  illustration_failed:
+    "The cover illustration couldn't be generated. The recipe is already saved — retry just the cover.",
+  // ── non-retryable — retrying would fail identically, so guidance only ─────
+  cookies_expired:
+    'The Rednote session has expired — refresh the cookie per the runbook (docs/RUNBOOK.md §1), then paste the link again.',
+  budget_exceeded:
+    'Budget cap reached — extraction pauses until the monthly budget or daily attempt cap resets.',
+  config_error:
+    'Check server configuration (budget caps, API keys, and adapter settings) — the server refused to run a paid call.',
+  unsupported_url:
+    "That link isn't a supported cooking video. chefclaw reads Bilibili and Rednote (Xiaohongshu) video links — double-check the URL and paste a video link.",
+  image_note_unsupported:
+    'This Rednote post is an image gallery (图文), not a video. chefclaw reads recipes from cooking videos — paste a video post instead.',
+  validation_failed:
+    "chefclaw read the video but the result didn't form a valid recipe — it may not be a cooking video, or the layout was unusual. Nothing was saved.",
+  upload_too_large:
+    'That file is over the upload size limit. Trim or compress the video, then upload it again.',
+};
+
+const GENERIC_GUIDANCE =
+  'Something went wrong on the server. Check the server logs; if it keeps happening, it may be a bug.';
+
+function GuidanceLine({ errorType }: { errorType: string }) {
+  return (
+    <p className="mt-1.5 text-ink-dim">
+      {ERROR_GUIDANCE[errorType] ?? GENERIC_GUIDANCE}
+    </p>
+  );
+}
+
 /** Maps the typed error taxonomy onto UI actions (plan §7 screen 3). */
 function JobErrorAction({
   job,
@@ -258,16 +306,19 @@ function JobErrorAction({
     if (job.type === 'illustration') {
       const recipeId = job.recipe_ids?.[0];
       return (
-        <button
-          type="button"
-          disabled={recipeId == null || retryPending}
-          onClick={() => {
-            if (recipeId != null) onRetryIllustration(recipeId);
-          }}
-          className="tap-target mt-2 rounded-field border border-cyan/60 bg-cyan/10 px-3.5 py-1.5 font-display text-[11px] font-bold tracking-[0.16em] text-cyan uppercase glow-cyan transition hover:bg-cyan/20 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          Retry
-        </button>
+        <>
+          <GuidanceLine errorType={errorType} />
+          <button
+            type="button"
+            disabled={recipeId == null || retryPending}
+            onClick={() => {
+              if (recipeId != null) onRetryIllustration(recipeId);
+            }}
+            className="tap-target mt-2 rounded-field border border-cyan/60 bg-cyan/10 px-3.5 py-1.5 font-display text-[11px] font-bold tracking-[0.16em] text-cyan uppercase glow-cyan transition hover:bg-cyan/20 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Retry
+          </button>
+        </>
       );
     }
     // Upload jobs cannot be re-queued from a link: their url is either a
@@ -284,40 +335,22 @@ function JobErrorAction({
       );
     }
     return (
-      <button
-        type="button"
-        disabled={job.url == null || retryPending}
-        onClick={() => {
-          if (job.url != null) onRetry(job.url);
-        }}
-        className="tap-target mt-2 rounded-field border border-cyan/60 bg-cyan/10 px-3.5 py-1.5 font-display text-[11px] font-bold tracking-[0.16em] text-cyan uppercase glow-cyan transition hover:bg-cyan/20 disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        Retry
-      </button>
+      <>
+        <GuidanceLine errorType={errorType} />
+        <button
+          type="button"
+          disabled={job.url == null || retryPending}
+          onClick={() => {
+            if (job.url != null) onRetry(job.url);
+          }}
+          className="tap-target mt-2 rounded-field border border-cyan/60 bg-cyan/10 px-3.5 py-1.5 font-display text-[11px] font-bold tracking-[0.16em] text-cyan uppercase glow-cyan transition hover:bg-cyan/20 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Retry
+        </button>
+      </>
     );
   }
-  if (errorType === 'cookies_expired') {
-    return (
-      <p className="mt-1.5 text-ink-dim">
-        The Rednote cookie has expired — follow the cookie-refresh runbook
-        (docs/RUNBOOK.md §1).
-      </p>
-    );
-  }
-  if (errorType === 'budget_exceeded') {
-    return (
-      <p className="mt-1.5 text-ink-dim">
-        Budget cap reached — extraction pauses until the monthly budget or daily
-        attempt cap resets.
-      </p>
-    );
-  }
-  if (errorType === 'config_error') {
-    return (
-      <p className="mt-1.5 text-ink-dim">
-        Check server configuration (budget and adapter settings).
-      </p>
-    );
-  }
-  return null;
+  // Every non-retryable type gets a specific, actionable line (falling back to
+  // GENERIC_GUIDANCE for an unrecognized type) — never a bare error string.
+  return <GuidanceLine errorType={errorType} />;
 }

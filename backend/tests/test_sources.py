@@ -587,7 +587,12 @@ async def test_rednote_fetch_missing_duration_stays_none(tmp_path: Path) -> None
     assert media.title == "无时长字段的视频"
 
 
-async def test_rednote_fetch_image_note_downloads_all_media(tmp_path: Path) -> None:
+async def test_rednote_fetch_image_note_fails_fast_without_download(tmp_path: Path) -> None:
+    """Image (图文) notes fast-fail on ``作品类型`` BEFORE any media download or
+    paid model call (ADR 2026-07-07-cross-device-and-extractor-qa, option a):
+    the video extractor can't read a still-image recipe, so paying for one is
+    guaranteed waste. No CDN request is made."""
+    captured: dict[str, Any] = {}
     detail_response = httpx.Response(
         200,
         json={
@@ -604,13 +609,14 @@ async def test_rednote_fetch_image_note_downloads_all_media(tmp_path: Path) -> N
     )
     source = RednoteSource(
         settings(xhs_sidecar_url="http://xhs:5556"),
-        transport=sidecar_transport({}, detail_response=detail_response),
+        transport=sidecar_transport(captured, detail_response=detail_response),
     )
-    media = await source.fetch(rednote_ref(), tmp_path)
-    expected = [tmp_path / f"{NOTE_ID}-0.jpg", tmp_path / f"{NOTE_ID}-1.png"]
-    assert media.video_path == expected[0]
-    assert [Path(p) for p in media.extra["media_paths"]] == expected
-    assert all(p.read_bytes() == b"media-bytes" for p in expected)
+    with pytest.raises(errors.ImageNoteUnsupportedError):
+        await source.fetch(rednote_ref(), tmp_path)
+    # The detail (metadata) call happened, but NO media was downloaded.
+    assert "detail_json" in captured
+    assert "media_headers" not in captured
+    assert list(tmp_path.iterdir()) == []
 
 
 async def test_rednote_guest_login_required_message_names_the_tier(tmp_path: Path) -> None:

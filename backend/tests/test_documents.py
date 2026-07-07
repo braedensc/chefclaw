@@ -301,6 +301,37 @@ def test_unknown_extra_fields_rejected() -> None:
     _assert_rejected(raw)
 
 
+def test_unknown_prep_state_relocated_to_notes_not_rejected() -> None:
+    """V2-C canonicalization: knife-work mis-slotted into the state-only
+    prep_state moves into notes instead of failing the WHOLE recipe — prep_state
+    is a descriptor, not verbatim food data (Hard Rule 7 governs quantities)."""
+    raw = make_hongshaorou()
+    ing = raw["ingredients"][0]
+    ing["prep_state"] = "sliced"
+    ing["notes"] = None
+    doc = validate_document(raw)
+    assert doc.ingredients[0].prep_state is None
+    assert doc.ingredients[0].notes == "sliced"  # the model's value survives
+
+    # An existing note is appended to, never clobbered.
+    raw = make_hongshaorou()
+    ing = raw["ingredients"][0]
+    ing["prep_state"] = "cut into chunks"
+    ing["notes"] = "肥瘦相间"
+    doc = validate_document(raw)
+    assert doc.ingredients[0].prep_state is None
+    assert doc.ingredients[0].notes == "肥瘦相间; cut into chunks"
+
+
+def test_valid_prep_state_is_untouched() -> None:
+    raw = make_hongshaorou()
+    raw["ingredients"][0]["prep_state"] = "fresh"
+    raw["ingredients"][0]["notes"] = None
+    doc = validate_document(raw)
+    assert doc.ingredients[0].prep_state == "fresh"
+    assert doc.ingredients[0].notes is None
+
+
 def test_empty_ingredients_rejected() -> None:
     raw = make_hongshaorou()
     raw["ingredients"] = []
