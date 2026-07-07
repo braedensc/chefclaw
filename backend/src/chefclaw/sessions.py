@@ -62,21 +62,28 @@ async def resolve_owner(
     sessionmaker: async_sessionmaker[AsyncSession],
     token_hash: str,
     *,
+    idle_timeout_hours: int | None = None,
     now: datetime | None = None,
 ) -> uuid.UUID | None:
-    """The owner behind an UNEXPIRED session whose user is still active, else
-    None. Bumps last_seen_at only when it is stale (throttled — critique M8)."""
+    """The owner behind a LIVE session whose user is still active, else None.
+    Live = unexpired (absolute ``expires_at``) AND — when ``idle_timeout_hours``
+    is set and > 0 — used within the idle window (``last_seen_at`` newer than
+    now - idle_timeout). Bumps last_seen_at only when it is stale (throttled —
+    critique M8), which is what makes the idle window load-bearing (V2-D)."""
     now = now or datetime.now(UTC)
+    conditions = [
+        Session.token_hash == token_hash,
+        Session.expires_at > now,
+        User.status == UserStatus.ACTIVE.value,
+    ]
+    if idle_timeout_hours and idle_timeout_hours > 0:
+        conditions.append(Session.last_seen_at > now - timedelta(hours=idle_timeout_hours))
     async with sessionmaker() as session:
         row = (
             await session.execute(
                 select(Session.id, Session.owner_id, Session.last_seen_at)
                 .join(User, User.id == Session.owner_id)
-                .where(
-                    Session.token_hash == token_hash,
-                    Session.expires_at > now,
-                    User.status == UserStatus.ACTIVE.value,
-                )
+                .where(*conditions)
                 .limit(1)
             )
         ).first()

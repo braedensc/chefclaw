@@ -28,6 +28,7 @@ The sidecar sits on the internal compose network only — its API is
 unauthenticated by design, so it must never get a published host port.
 """
 
+import asyncio
 import re
 from pathlib import Path
 from typing import Any
@@ -37,6 +38,7 @@ import httpx
 
 from chefclaw import errors
 from chefclaw.config import Settings
+from chefclaw.netguard import UnsafeFetchTargetError, assert_public_url
 from chefclaw.sources import CanonicalRef, FetchedMedia
 
 _NOTE_RE = re.compile(r"/(?:explore|discovery/item)/([0-9a-fA-F]{24})")
@@ -59,6 +61,11 @@ _IMAGE_NOTE_MARKER = "图文"
 
 _DETAIL_TIMEOUT = 60.0
 _MEDIA_TIMEOUT = 300.0
+# The media download is the ONE fetch target the user/sidecar influences that
+# isn't host-allowlisted (V2-D audit): bound both how many files and how big each
+# is so a crafted note can't exhaust the shared-volume disk. A 480p cooking clip
+# is tens of MB; reuse the upload cap (MAX_UPLOAD_MB) as the per-file ceiling.
+_MAX_MEDIA_FILES = 20
 
 
 class RednoteSource:
@@ -271,7 +278,9 @@ class RednoteSource:
             raise errors.DownloadFailedError(
                 f"sidecar returned no media URLs for {ref.canonical_id}"
             )
-        return urls
+        # Bound the file count (an image gallery could list many) — our target is
+        # a single cooking video; cap so a crafted note can't fan out downloads.
+        return urls[:_MAX_MEDIA_FILES]
 
     async def _download_media(
         self,
@@ -281,12 +290,33 @@ class RednoteSource:
         index: int,
         dest_dir: Path,
     ) -> Path:
-        """Step 2: the api downloads the media itself (sidecar stays stateless)."""
+        """Step 2: the api downloads the media itself (sidecar stays stateless).
+
+        SSRF guard (V2-D): the media URL comes from the sidecar's parse of note
+        content, not from a host-allowlisted paste — so resolve its host and
+        refuse a non-public target (127.0.0.1, 169.254.169.254 cloud metadata, a
+        compose-internal host) BEFORE fetching. Byte-capped so a crafted note
+        can't fill the shared-volume disk."""
+        # The SSRF DNS pre-resolve guards the REAL egress path only; an injected
+        # MockTransport (tests) fully controls reachability with no real socket,
+        # so the guard is inert there. Blocking DNS runs off the event loop; a
+        # non-public target is a deterministic refusal (not retryable — the same
+        # URL always resolves the same way).
+        if self._transport is None:
+            try:
+                await asyncio.to_thread(assert_public_url, media_url)
+            except UnsafeFetchTargetError as exc:
+                err = errors.DownloadFailedError(f"refusing unsafe media URL: {exc}")
+                err.retryable = False
+                raise err from exc
+
         headers = {}
         if self._settings.xhs_user_agent:
             headers["User-Agent"] = self._settings.xhs_user_agent
         suffix = _suffix_from_url(media_url)
         path = dest_dir / f"{ref.canonical_id}-{index}{suffix}"
+        max_bytes = self._settings.max_upload_mb * 1024 * 1024
+        written = 0
         try:
             async with client.stream("GET", media_url, headers=headers) as response:
                 if response.status_code == 429:
@@ -297,6 +327,14 @@ class RednoteSource:
                     )
                 with path.open("wb") as out:
                     async for chunk in response.aiter_bytes():
+                        written += len(chunk)
+                        if written > max_bytes:
+                            err = errors.DownloadFailedError(
+                                f"media download exceeds the {self._settings.max_upload_mb} MB "
+                                f"cap for {ref.canonical_id}"
+                            )
+                            err.retryable = False  # the same bytes are always too big
+                            raise err
                         out.write(chunk)
         except httpx.HTTPError as exc:
             raise errors.DownloadFailedError(

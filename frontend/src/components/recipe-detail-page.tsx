@@ -8,6 +8,7 @@ import {
   deleteRecipeApiRecipesRecipeIdDeleteMutation,
   getRecipeApiRecipesRecipeIdGetOptions,
   getRecipeApiRecipesRecipeIdGetQueryKey,
+  healthApiHealthGetOptions,
   listJobsApiJobsGetQueryKey,
   listRecipesApiRecipesGetOptions,
   listRecipesApiRecipesGetQueryKey,
@@ -228,6 +229,11 @@ function RecipeHero({ detail, doc }: { detail: RecipeDetail; doc: RecipeDoc }) {
  * Enqueue a fresh cover illustration (its own retriable job). The new image
  * appears once the worker processes the job — so this confirms the enqueue and
  * points at the Jobs drawer rather than optimistically swapping the cover.
+ *
+ * Rendered ONLY in an illustration cover mode (fake/gemini). In the default
+ * `sprite` mode covers are inline sprites — there is no illustration to
+ * (re)generate, and enqueuing one would just fail — so the control is hidden
+ * (V2-F). The mode comes from /api/health (cached).
  */
 function RegenerateIllustration({
   recipeId,
@@ -237,6 +243,7 @@ function RegenerateIllustration({
   hasImage: boolean;
 }) {
   const queryClient = useQueryClient();
+  const healthQuery = useQuery(healthApiHealthGetOptions());
   const regenerate = useMutation({
     ...regenerateIllustrationApiRecipesRecipeIdIllustrationPostMutation(),
     onSuccess: () => {
@@ -245,6 +252,11 @@ function RegenerateIllustration({
       });
     },
   });
+
+  // Show only once health confirms an illustration mode — hidden while loading
+  // and in sprite mode (the common case), so no broken button ever appears.
+  const coverMode = healthQuery.data?.cover_mode;
+  if (coverMode !== 'fake' && coverMode !== 'gemini') return null;
 
   return (
     <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
@@ -456,6 +468,18 @@ function StepsSection({ steps }: { steps: StepDoc[] }) {
   );
 }
 
+/**
+ * A URL is safe to use as an href only if it is http(s). source_url is
+ * persisted third-party/upload-provenance data; React does NOT sanitize href,
+ * so a javascript:/data: URL would execute on click (V2-D audit). The backend
+ * now rejects non-http(s) provenance at the upload boundary; this is the
+ * defense-in-depth render guard. Returns undefined for anything unsafe (also
+ * covers the local://<id> placeholder for a no-provenance upload).
+ */
+function httpHref(url: string): string | undefined {
+  return /^https?:\/\//i.test(url) ? url : undefined;
+}
+
 function SourceSection({
   detail,
   doc,
@@ -474,14 +498,16 @@ function SourceSection({
           by <span className="text-ink">{doc.source.creator}</span>
         </span>
       )}
-      <a
-        href={detail.source_url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="font-display text-xs font-semibold tracking-[0.16em] text-cyan uppercase underline decoration-cyan/40 underline-offset-4 transition hover:glow-text-cyan"
-      >
-        View original
-      </a>
+      {httpHref(detail.source_url) && (
+        <a
+          href={httpHref(detail.source_url)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-display text-xs font-semibold tracking-[0.16em] text-cyan uppercase underline decoration-cyan/40 underline-offset-4 transition hover:glow-text-cyan"
+        >
+          View original
+        </a>
+      )}
       <span className="min-w-0 flex-1 truncate text-right font-mono text-xs text-ink-faint">
         {detail.source_url}
       </span>

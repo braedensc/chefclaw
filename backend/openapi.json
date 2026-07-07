@@ -151,6 +151,11 @@
             ],
             "title": "Cookie Set Date"
           },
+          "cover_mode": {
+            "default": "sprite",
+            "title": "Cover Mode",
+            "type": "string"
+          },
           "daily_attempt_cap": {
             "anyOf": [
               {

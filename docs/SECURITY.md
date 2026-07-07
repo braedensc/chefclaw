@@ -219,6 +219,49 @@ enters the pipeline under any circumstances.**
 
 ---
 
+## Session, request & fetch security (V2-D)
+
+The M2 accounts work replaced the single shared bearer with per-user identity; the V2-D
+audit added the request-side controls below (ADR
+`docs/adr/2026-07-07-security-audit-v2.md`).
+
+- **Opaque server-side sessions.** The `chefclaw_session` cookie carries a random
+  256-bit token; only its sha256 is stored (`sessions` table), so a DB dump can't be
+  replayed. HttpOnly + `SameSite=Lax` + env-derived `Secure` (always Secure in a `vps`
+  env). Lookup = one indexed `WHERE token_hash = sha256(cookie)`.
+- **Instant revocation.** Logout DELETEs the session row — server-side, immediate. A
+  de-invited/disabled user's sessions stop resolving on their next request (the resolve
+  join requires `users.status = 'active'`). This is the whole reason sessions are
+  stateful, not JWT.
+- **Absolute TTL + idle timeout.** `SESSION_TTL_HOURS` (default 720 = 30d) caps
+  lifetime; `SESSION_IDLE_TIMEOUT_HOURS` (default 336 = 14d) expires a session unused
+  for that long even before the absolute cap (`last_seen_at`, throttled to one write
+  per 5 min, is the signal). 0 disables the idle check.
+- **Request throttle (append-only events).** `request_events` rows counted over a
+  trailing 60 s window — no mutable counter to race, no cron to reset. Two buckets:
+  authenticated (per session, `RATE_LIMIT_AUTHENTICATED_PER_MINUTE`, default 300 — a
+  runaway/compromised-session backstop, well above human use) and public/pre-auth (per
+  client IP, `RATE_LIMIT_PUBLIC_PER_MINUTE`, default 30 — covers `/api/auth/google/
+  callback` and `/api/invites/{token}`). **Fail-open**: a limiter DB error allows the
+  request (the app never wedges on the limiter; a real DB outage already 503s from
+  `require_owner`). 429 + `Retry-After` on breach. 0 disables a bucket. *Residual*: the
+  client IP is the direct peer — a future reverse proxy needs a trusted-proxy
+  `X-Forwarded-For` read.
+- **SSRF guard on the one non-allowlisted fetch.** Paste URLs are host-allowlisted per
+  platform; the Rednote CDN media URL the sidecar returns from note content is not, so
+  it is DNS-resolved and refused if it points at a private/loopback/link-local
+  (169.254.169.254 metadata) address, and byte-capped at `MAX_UPLOAD_MB`. *Residual*:
+  the redirect chain re-checks only the initial host (DNS-rebinding + per-hop are noted
+  in the ADR — close before any cloud exposure).
+- **Provenance-URL scheme guard.** The upload path's free-form `provenance_url` becomes
+  the recipe's rendered "View original" href, so it is refused unless http(s) (a
+  `javascript:`/`data:` URL would be a stored-XSS link); the SPA render guards too.
+- **Dependency audit in CI.** `pip-audit` (Python) and `npm audit --audit-level=high`
+  (JS) run on every PR — driven to zero. Dependabot (a human-enabled GitHub toggle)
+  tracks the long tail.
+
+---
+
 ## Runbooks
 
 **Security incident** (alert from Dependabot / secret scanning / Sentry):
@@ -232,6 +275,17 @@ holds it (Actions secret / platform secret / `.env.local` — all three are isol
 walk the list). For a DB password: reset at the dashboard, update the backup/deploy
 connection-string secret. App-facing anon keys are public by design and need no rotation
 panic — RLS is the guard.
+
+**`CHEFCLAW_API_TOKEN` → session cutover (timing).** The legacy shared bearer is DEAD
+post-M2: auth is cookie sessions, the bearer branch was removed at the PR 2/4 cutover,
+and `HTTPBearer` is gone from the OpenAPI security scheme. `CHEFCLAW_API_TOKEN` grants
+no access — there is **no dual bearer-or-session window** to keep it alive for, so drop
+it from `.env.local` at the next deploy; no coordinated rotation is needed. The real
+credential to rotate now is `GOOGLE_OAUTH_CLIENT_SECRET`: rotate at the Cloud Console,
+update `.env.local`, restart — existing sessions survive (they don't depend on the OAuth
+secret). To force a full re-auth after a suspected OAuth-secret compromise, also
+`TRUNCATE sessions` (every device re-signs-in). See `docs/RUNBOOK.md` §6 for the
+session-management commands.
 
 **Backup restore:** download the encrypted artifact →
 `gpg --batch --passphrase "$BACKUP_GPG_PASSPHRASE" -d backup.sql.gpg > backup.sql` →
