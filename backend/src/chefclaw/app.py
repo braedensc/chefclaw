@@ -16,9 +16,10 @@ from typing import Annotated, Any, Literal
 
 import httpx
 from fastapi import APIRouter, Depends, FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from chefclaw import db, observability, spend
 from chefclaw.auth import require_owner
@@ -310,6 +311,32 @@ def _content_length(scope: Any) -> int | None:
     return None
 
 
+class SPAStaticFiles(StaticFiles):
+    """StaticFiles(html=True) serves index.html only at '/' — a hard
+    navigation or refresh on a client-side route (/settings, /recipes/{id})
+    would 404 as JSON. Serve index.html for route-shaped misses instead so
+    the SPA router takes over. Two carve-outs keep real 404s honest:
+    /api/* (an unknown API path must stay a JSON 404, never HTML) and
+    file-shaped paths (a missing bundle like /assets/app.js must fail
+    loudly, not load index.html under a .js content-type)."""
+
+    async def get_response(self, path: str, scope: Any) -> Response:
+        try:
+            return await super().get_response(path, scope)
+        except StarletteHTTPException as exc:
+            if exc.status_code != 404 or not _is_spa_route(path):
+                raise
+            return await super().get_response("index.html", scope)
+
+
+def _is_spa_route(path: str) -> bool:
+    """Route-shaped = not under api/ and no extension in the final segment.
+    ``path`` is mount-relative (no leading slash)."""
+    if path == "api" or path.startswith("api/"):
+        return False
+    return "." not in path.rsplit("/", 1)[-1]
+
+
 def create_app() -> FastAPI:
     """Build the application: API routes, then the SPA mount (prod mode)."""
     app = FastAPI(title="chefclaw", version="0.1.0", lifespan=_lifespan)
@@ -337,6 +364,6 @@ def create_app() -> FastAPI:
     if static_dir:
         static_path = Path(static_dir)
         if static_path.is_dir():
-            app.mount("/", StaticFiles(directory=static_path, html=True), name="spa")
+            app.mount("/", SPAStaticFiles(directory=static_path, html=True), name="spa")
 
     return app
