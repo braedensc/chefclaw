@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="dpBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="dpbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#3a1120"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <linearGradient id="dpbowl" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="55%" stop-color="#100b0d"/><stop offset="100%" stop-color="#070506"/>
+    </linearGradient>
+    <radialGradient id="dpsauce" cx="50%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#9c2b10"/><stop offset="50%" stop-color="#661408"/><stop offset="100%" stop-color="#3b0b05"/>
+    </radialGradient>
+    <linearGradient id="dpskin" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#cf5226"/><stop offset="60%" stop-color="#9c320f"/><stop offset="100%" stop-color="#82200e"/>
+    </linearGradient>
+    <linearGradient id="dpstrata" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7c3a20"/><stop offset="30%" stop-color="#f6ddb2"/><stop offset="52%" stop-color="#6b2f16"/><stop offset="72%" stop-color="#f6ddb2"/><stop offset="100%" stop-color="#5e2410"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#dpbg)"/>
+  <!-- steam -->
+  <path d="M126 56 C116 38 136 30 126 10" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#dpBlur3)"/>
+  <path d="M196 54 C188 38 206 30 198 10" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#dpBlur3)"/>
+  <ellipse cx="160" cy="188" rx="146" ry="21" fill="#000" opacity=".5"/>
+  <!-- small dark bowl -->
+  <path d="M64 122 C64 150 106 168 160 168 C214 168 256 150 256 122 Z" fill="url(#dpbowl)"/>
+  <ellipse cx="160" cy="122" rx="96" ry="26" fill="#0f0d13"/>
+  <ellipse cx="160" cy="122" rx="96" ry="26" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="123" rx="84" ry="21" fill="#140708"/>
+  <!-- neon steam arc -->
+  <path d="M70 114 Q112 88 168 86" stroke="#ff4d6d" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- glossy dark-red braising liquid -->
+  <ellipse cx="160" cy="124" rx="80" ry="19" fill="url(#dpsauce)"/>
+  <ellipse cx="140" cy="118" rx="26" ry="5" fill="#c2401a" opacity=".35" transform="rotate(-8 140 118)"/>
+  <!-- THE hero: one iconic layered cube tied with twine -->
+  <g transform="translate(160 108)">
+    <!-- cube body: side face (strata) -->
+    <path d="M-40 -18 L40 -18 L40 30 L-40 30 Z" fill="url(#dpstrata)" stroke="#3a1608" stroke-width="1.6"/>
+    <!-- glossy caramel top face (skin) -->
+    <path d="M-40 -18 L-24 -34 L56 -34 L40 -18 Z" fill="url(#dpskin)" stroke="#3a1608" stroke-width="1.6"/>
+    <!-- right side face darker -->
+    <path d="M40 -18 L56 -34 L56 14 L40 30 Z" fill="#5e2410" stroke="#3a1608" stroke-width="1.6"/>
+    <!-- fat-layer glisten lines on front strata -->
+    <path d="M-38 -8 L38 -8" stroke="#f6ddb2" stroke-width="2.4" opacity=".85"/>
+    <path d="M-38 8 L38 8" stroke="#f6ddb2" stroke-width="2.2" opacity=".7"/>
+    <path d="M-38 20 L38 20" stroke="#8a4a24" stroke-width="1.4" opacity=".6"/>
+    <!-- glossy top highlight -->
+    <path d="M-30 -26 L44 -26" stroke="#f2a068" stroke-width="3" opacity=".55" stroke-linecap="round"/>
+    <!-- kitchen twine tie (the signature) -->
+    <path d="M-8 -34 L-8 30" stroke="#e8d9a8" stroke-width="3.4" opacity=".92"/>
+    <path d="M-8 -34 L-8 30" stroke="#b39860" stroke-width="1.2" opacity=".7"/>
+    <path d="M-24 -6 C-30 -12 -30 6 -24 0" stroke="#e8d9a8" stroke-width="3.4" fill="none" opacity=".85"/>
+    <!-- knot -->
+    <circle cx="-8" cy="-2" r="3.6" fill="#e8d9a8"/>
+    <circle cx="-8" cy="-2" r="3.6" fill="none" stroke="#b39860" stroke-width="1" opacity=".7"/>
+    <!-- glaze drip down the front -->
+    <path d="M20 30 C22 40 18 44 20 50" stroke="#7a1809" stroke-width="3" fill="none" opacity=".7" stroke-linecap="round"/>
+  </g>
+  <!-- glossy sauce lap in front -->
+  <path d="M96 134 C130 144 200 144 226 132" stroke="#4a0f06" stroke-width="3" fill="none" opacity=".7" stroke-linecap="round"/>
+  <!-- scallion garnish across the top -->
+  <rect x="150" y="70" width="9" height="2.8" rx="1.4" fill="#5ecb4e" transform="rotate(-14 155 71)"/>
+  <rect x="176" y="72" width="9" height="2.8" rx="1.4" fill="#3f9c37" transform="rotate(12 181 73)"/>
+  <rect x="164" y="76" width="7" height="2.6" rx="1.3" fill="#58c14a" transform="rotate(4 168 77)"/>
+  <!-- star anise hint in sauce -->
+  <g transform="translate(206 122)" opacity=".85">
+    <path d="M0 -5 L1.4 -1.5 L5 -1.5 L2.2 1 L3.4 5 L0 2.6 L-3.4 5 L-2.2 1 L-5 -1.5 L-1.4 -1.5 Z" fill="#3a1608" stroke="#5a2a14" stroke-width=".8"/>
+  </g>
+  <!-- gloss dots -->
+  <circle cx="150" cy="82" r="1.6" fill="#fff" opacity=".65"/>
+  <circle cx="176" cy="92" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="128" cy="128" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

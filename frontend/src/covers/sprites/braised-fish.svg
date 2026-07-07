@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="bfBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="bfbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#3a1120"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <radialGradient id="bfsauce" cx="50%" cy="34%" r="82%">
+      <stop offset="0%" stop-color="#9c2b10"/><stop offset="50%" stop-color="#661408"/><stop offset="100%" stop-color="#3b0b05"/>
+    </radialGradient>
+    <linearGradient id="bfbody" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#cf5226"/><stop offset="45%" stop-color="#9c320f"/><stop offset="100%" stop-color="#6e2410"/>
+    </linearGradient>
+    <linearGradient id="bfbelly" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e88a4a"/><stop offset="100%" stop-color="#b0521f"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#bfbg)"/>
+  <!-- steam -->
+  <path d="M120 56 C110 38 130 30 120 10" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#bfBlur3)"/>
+  <path d="M204 54 C196 38 214 30 206 10" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#bfBlur3)"/>
+  <ellipse cx="160" cy="188" rx="156" ry="21" fill="#000" opacity=".5"/>
+  <!-- oval platter -->
+  <ellipse cx="160" cy="128" rx="140" ry="44" fill="#141018"/>
+  <ellipse cx="160" cy="128" rx="140" ry="44" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="128" rx="126" ry="36" fill="#0f0d13"/>
+  <!-- neon steam arc -->
+  <path d="M46 116 Q98 86 164 84" stroke="#ff4d6d" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- glossy dark braising sauce pool -->
+  <ellipse cx="160" cy="132" rx="116" ry="26" fill="url(#bfsauce)"/>
+  <ellipse cx="132" cy="124" rx="30" ry="6" fill="#c2401a" opacity=".35" transform="rotate(-8 132 124)"/>
+  <!-- fish body: red-braised, glossy dark -->
+  <g transform="translate(0 4)">
+    <!-- tail -->
+    <path d="M250 118 C268 104 288 102 294 106 C288 116 290 124 294 134 C288 138 268 136 250 122 Z" fill="url(#bfbody)" stroke="#4a1608" stroke-width="1.4"/>
+    <path d="M266 110 L286 108 M268 118 L290 120 M266 126 L286 132" stroke="#7a2a12" stroke-width="1.3" opacity=".6"/>
+    <!-- main body -->
+    <path d="M52 120 C64 96 112 84 168 84 C214 84 250 98 258 120 C250 140 214 152 168 152 C112 152 64 140 52 120 Z" fill="url(#bfbody)"/>
+    <!-- belly highlight (glazed sheen) -->
+    <path d="M70 128 C110 116 200 116 244 128 C200 146 110 146 70 128 Z" fill="url(#bfbelly)" opacity=".7"/>
+    <!-- glossy caramel sheen along the back -->
+    <path d="M64 114 C104 94 210 94 250 114" stroke="#f2a068" stroke-width="3" fill="none" opacity=".5" stroke-linecap="round"/>
+    <!-- rose neon sheen along the back -->
+    <path d="M74 112 C110 94 208 94 244 112" stroke="#ff8fa8" stroke-width="3" fill="none" opacity=".22" stroke-linecap="round"/>
+    <!-- score-cut marks (braise slashes) filled with sauce -->
+    <path d="M120 100 q8 24 -2 44 M144 96 q8 26 -2 48 M168 96 q8 26 -2 48 M192 100 q8 24 -2 44" stroke="#5a1206" stroke-width="2.4" fill="none" opacity=".7"/>
+    <!-- head -->
+    <path d="M52 120 C58 106 72 98 84 96 C80 108 80 132 84 144 C72 142 58 134 52 120 Z" fill="#8a3818" stroke="#4a1608" stroke-width="1.2"/>
+    <!-- gill line -->
+    <path d="M86 100 C82 112 82 128 86 140" stroke="#5a2010" stroke-width="1.6" fill="none" opacity=".7"/>
+    <!-- eye -->
+    <circle cx="70" cy="116" r="5.5" fill="#e8c49a"/>
+    <circle cx="70" cy="116" r="3.2" fill="#1a0e08"/>
+    <circle cx="68.6" cy="114.6" r="1.1" fill="#fff" opacity=".85"/>
+    <!-- top fin -->
+    <path d="M120 84 C130 72 150 70 164 76 C158 82 150 84 140 84 Z" fill="#a84a24" opacity=".9"/>
+    <path d="M126 80 L128 74 M138 78 L140 72 M150 78 L152 73" stroke="#6e2f0d" stroke-width="1.1" opacity=".6"/>
+    <path d="M52 120 C64 96 112 84 168 84 C214 84 250 98 258 120 C250 140 214 152 168 152 C112 152 64 140 52 120 Z" fill="none" stroke="#4a1608" stroke-width="1.4" opacity=".5"/>
+  </g>
+  <!-- ginger + scallion slivers heaped on top -->
+  <g stroke-linecap="round" fill="none">
+    <path d="M110 108 C120 100 134 100 146 106" stroke="#6abf5a" stroke-width="3"/>
+    <path d="M132 104 C144 98 160 98 172 104" stroke="#58c14a" stroke-width="3"/>
+    <path d="M154 106 C166 100 182 100 194 108" stroke="#3f9c37" stroke-width="2.8"/>
+  </g>
+  <rect x="124" y="102" width="12" height="2.6" rx="1.3" fill="#f2d98c" transform="rotate(-14 130 103)"/>
+  <rect x="152" y="100" width="12" height="2.6" rx="1.3" fill="#efd082" transform="rotate(10 158 101)"/>
+  <!-- diced red chili on top -->
+  <rect x="140" y="112" width="8" height="2.4" rx="1.2" fill="#e0341f" transform="rotate(-20 144 113)"/>
+  <rect x="184" y="110" width="8" height="2.2" rx="1.1" fill="#e0341f" transform="rotate(14 188 111)"/>
+  <!-- glossy sauce drizzle in front -->
+  <path d="M84 140 C130 150 210 150 244 136" stroke="#4a0f06" stroke-width="3" fill="none" opacity=".7" stroke-linecap="round"/>
+  <!-- gloss dots -->
+  <circle cx="128" cy="110" r="1.4" fill="#fff" opacity=".6"/>
+  <circle cx="176" cy="112" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="150" cy="120" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

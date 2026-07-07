@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="hgBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="hgbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#102e35"/><stop offset="45%" stop-color="#0b090b"/><stop offset="100%" stop-color="#060507"/>
+    </radialGradient>
+    <linearGradient id="hgsteamer" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#c79a5a"/><stop offset="50%" stop-color="#9a6f3a"/><stop offset="100%" stop-color="#5e4020"/>
+    </linearGradient>
+    <radialGradient id="hgwrap" cx="42%" cy="30%" r="82%">
+      <stop offset="0%" stop-color="#fdfaf2"/><stop offset="55%" stop-color="#f0ead8"/><stop offset="100%" stop-color="#d8cdb2"/>
+    </radialGradient>
+    <radialGradient id="hgfilling" cx="45%" cy="35%" r="80%">
+      <stop offset="0%" stop-color="#ffb99a"/><stop offset="60%" stop-color="#f68a5e"/><stop offset="100%" stop-color="#d85a34"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#hgbg)"/>
+  <!-- steam (dim-sum = lots of steam) -->
+  <path d="M110 56 C100 36 120 28 110 8" stroke="#fff" stroke-width="7" fill="none" opacity=".11" filter="url(#hgBlur3)"/>
+  <path d="M160 50 C152 32 170 24 162 6" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#hgBlur3)"/>
+  <path d="M210 56 C202 38 220 30 212 10" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#hgBlur3)"/>
+  <ellipse cx="160" cy="188" rx="156" ry="22" fill="#000" opacity=".5"/>
+  <!-- bamboo steamer basket: outer woven ring -->
+  <ellipse cx="160" cy="130" rx="140" ry="46" fill="url(#hgsteamer)"/>
+  <!-- woven slat texture on the rim -->
+  <g stroke="#5e4020" stroke-width="1.4" opacity=".55">
+    <path d="M28 130 q0 -14 4 -22 M44 128 q0 -18 4 -26 M240 102 q4 8 4 26 M270 108 q2 8 2 20 M292 130 q-2 -12 -4 -20"/>
+  </g>
+  <ellipse cx="160" cy="130" rx="140" ry="46" fill="none" stroke="#3d2a12" stroke-width="2"/>
+  <!-- inner basket floor (darker) -->
+  <ellipse cx="160" cy="126" rx="120" ry="38" fill="#7a5730"/>
+  <ellipse cx="160" cy="126" rx="120" ry="38" fill="none" stroke="#4d3617" stroke-width="2.4"/>
+  <ellipse cx="160" cy="126" rx="108" ry="32" fill="#6b4b28"/>
+  <!-- neon steam arc -->
+  <path d="M50 116 Q102 84 168 82" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- three translucent pleated shrimp dumplings; pink shrimp shows through -->
+  <!-- back dumpling -->
+  <g transform="translate(160 100) scale(.9)">
+    <path d="M-30 8 C-30 -12 -12 -22 0 -22 C12 -22 30 -12 30 8 C30 16 16 20 0 20 C-16 20 -30 16 -30 8 Z" fill="url(#hgwrap)" stroke="#c7b78f" stroke-width="1.4"/>
+    <!-- pink shrimp filling glowing through the skin -->
+    <ellipse cx="0" cy="4" rx="20" ry="11" fill="url(#hgfilling)" opacity=".72"/>
+    <!-- pleats along the crest -->
+    <path d="M-24 -4 q4 -10 8 -12 M-14 -10 q4 -9 8 -12 M-4 -14 q3 -8 8 -10 M6 -13 q4 -8 9 -8 M16 -10 q4 -7 9 -4" stroke="#b8a878" stroke-width="1.3" fill="none" opacity=".8"/>
+    <ellipse cx="-9" cy="-6" rx="8" ry="4" fill="#fff" opacity=".38"/>
+  </g>
+  <!-- front-left dumpling -->
+  <g transform="translate(114 130)">
+    <path d="M-32 8 C-32 -14 -12 -24 0 -24 C12 -24 32 -14 32 8 C32 17 17 22 0 22 C-17 22 -32 17 -32 8 Z" fill="url(#hgwrap)" stroke="#c7b78f" stroke-width="1.5"/>
+    <ellipse cx="0" cy="4" rx="22" ry="12" fill="url(#hgfilling)" opacity=".75"/>
+    <path d="M-26 -3 q4 -11 9 -13 M-15 -11 q4 -10 9 -13 M-4 -15 q3 -9 9 -11 M7 -14 q4 -9 10 -9 M18 -11 q5 -8 10 -5" stroke="#b8a878" stroke-width="1.4" fill="none" opacity=".82"/>
+    <ellipse cx="-10" cy="-7" rx="9" ry="4.5" fill="#fff" opacity=".4"/>
+  </g>
+  <!-- front-right dumpling -->
+  <g transform="translate(206 132)">
+    <path d="M-30 8 C-30 -13 -11 -23 0 -23 C11 -23 30 -13 30 8 C30 16 16 21 0 21 C-16 21 -30 16 -30 8 Z" fill="url(#hgwrap)" stroke="#c7b78f" stroke-width="1.5"/>
+    <ellipse cx="0" cy="4" rx="20" ry="11" fill="url(#hgfilling)" opacity=".75"/>
+    <path d="M-24 -3 q4 -10 9 -12 M-13 -10 q4 -9 9 -12 M-2 -14 q3 -8 9 -10 M9 -13 q4 -8 10 -7 M18 -10 q5 -7 9 -4" stroke="#b8a878" stroke-width="1.4" fill="none" opacity=".82"/>
+    <ellipse cx="-9" cy="-6" rx="8" ry="4" fill="#fff" opacity=".4"/>
+  </g>
+  <!-- tiny scallion / carrot fleck garnish on top of the dumplings -->
+  <rect x="150" y="94" width="6" height="2.4" rx="1.2" fill="#5ecb4e" transform="rotate(-14 153 95)"/>
+  <rect x="108" y="122" width="6" height="2.4" rx="1.2" fill="#3f9c37" transform="rotate(18 111 123)"/>
+  <rect x="200" y="124" width="6" height="2.4" rx="1.2" fill="#f2a13a" transform="rotate(-10 203 125)"/>
+  <!-- steam-gloss dots -->
+  <circle cx="150" cy="96" r="1.4" fill="#fff" opacity=".6"/>
+  <circle cx="104" cy="124" r="1.3" fill="#fff" opacity=".55"/>
+  <circle cx="196" cy="126" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

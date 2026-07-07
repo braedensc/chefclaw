@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="kdBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="kdbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <linearGradient id="kdbowl" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="55%" stop-color="#100b0d"/><stop offset="100%" stop-color="#070506"/>
+    </linearGradient>
+    <radialGradient id="kdrice" cx="46%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#fbf5e6"/><stop offset="60%" stop-color="#eee0c4"/><stop offset="100%" stop-color="#d8c49a"/>
+    </radialGradient>
+    <radialGradient id="kdegg" cx="46%" cy="34%" r="82%">
+      <stop offset="0%" stop-color="#ffe07a"/><stop offset="55%" stop-color="#f6b52e"/><stop offset="100%" stop-color="#e08a16"/>
+    </radialGradient>
+    <linearGradient id="kdcrumb" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e9a24a"/><stop offset="52%" stop-color="#cf7c2a"/><stop offset="100%" stop-color="#9c4f14"/>
+    </linearGradient>
+    <radialGradient id="kdyolk" cx="42%" cy="34%" r="72%">
+      <stop offset="0%" stop-color="#ffcf52"/><stop offset="60%" stop-color="#f2941a"/><stop offset="100%" stop-color="#cf6a0e"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#kdbg)"/>
+  <!-- steam -->
+  <path d="M120 56 C110 38 130 30 120 10" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#kdBlur3)"/>
+  <path d="M204 54 C196 38 214 30 206 10" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#kdBlur3)"/>
+  <ellipse cx="160" cy="188" rx="150" ry="22" fill="#000" opacity=".5"/>
+  <!-- donburi bowl -->
+  <path d="M46 114 C46 156 98 180 160 180 C222 180 274 156 274 114 Z" fill="url(#kdbowl)"/>
+  <path d="M46 114 C46 156 98 180 160 180 C222 180 274 156 274 114" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <!-- decorative rim ring -->
+  <path d="M58 132 C76 150 116 162 160 162 C204 162 244 150 262 132" stroke="#ffd60a" stroke-width="2" fill="none" opacity=".2"/>
+  <ellipse cx="160" cy="114" rx="118" ry="30" fill="#0d0d10"/>
+  <ellipse cx="160" cy="114" rx="118" ry="30" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <!-- neon steam arc -->
+  <path d="M56 106 Q104 78 166 76" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- rice bed -->
+  <ellipse cx="160" cy="114" rx="104" ry="24" fill="url(#kdrice)"/>
+  <!-- egg binding wash pooling over rice -->
+  <path d="M64 116 C90 104 230 104 256 116 C230 130 90 130 64 116 Z" fill="url(#kdegg)" opacity=".92"/>
+  <path d="M64 116 C90 104 230 104 256 116" stroke="#ffe9a8" stroke-width="1.4" fill="none" opacity=".5"/>
+  <!-- silky egg ribbons -->
+  <path d="M96 112 C112 106 130 108 146 112" stroke="#fff0b0" stroke-width="2.4" fill="none" opacity=".7" stroke-linecap="round"/>
+  <path d="M176 112 C192 106 210 108 224 114" stroke="#fff0b0" stroke-width="2.4" fill="none" opacity=".7" stroke-linecap="round"/>
+  <!-- sliced breaded cutlet fanned across the top -->
+  <g>
+    <g transform="translate(112 100) rotate(-14)">
+      <path d="M-16 -10 C-8 -14 8 -14 16 -10 L14 10 C6 14 -6 14 -14 10 Z" fill="url(#kdcrumb)"/>
+      <path d="M-16 -10 C-8 -14 8 -14 16 -10 L14 10 C6 14 -6 14 -14 10 Z" fill="none" stroke="#7a3a10" stroke-width="1.3" opacity=".55"/>
+      <path d="M-13 -3 C-5 -6 5 -6 13 -2" stroke="#f6dcae" stroke-width="3" fill="none" opacity=".85"/>
+      <path d="M-12 4 C-4 1 4 1 12 5" stroke="#e9c48c" stroke-width="2" fill="none" opacity=".6"/>
+    </g>
+    <g transform="translate(148 96) rotate(-4)">
+      <path d="M-16 -10 C-8 -14 8 -14 16 -10 L14 10 C6 14 -6 14 -14 10 Z" fill="url(#kdcrumb)"/>
+      <path d="M-16 -10 C-8 -14 8 -14 16 -10 L14 10 C6 14 -6 14 -14 10 Z" fill="none" stroke="#7a3a10" stroke-width="1.3" opacity=".55"/>
+      <path d="M-13 -3 C-5 -6 5 -6 13 -2" stroke="#f8e2b4" stroke-width="3" fill="none" opacity=".9"/>
+      <path d="M-12 4 C-4 1 4 1 12 5" stroke="#e9c48c" stroke-width="2" fill="none" opacity=".6"/>
+    </g>
+    <g transform="translate(184 98) rotate(6)">
+      <path d="M-16 -10 C-8 -14 8 -14 16 -10 L14 10 C6 14 -6 14 -14 10 Z" fill="url(#kdcrumb)"/>
+      <path d="M-16 -10 C-8 -14 8 -14 16 -10 L14 10 C6 14 -6 14 -14 10 Z" fill="none" stroke="#7a3a10" stroke-width="1.3" opacity=".55"/>
+      <path d="M-13 -3 C-5 -6 5 -6 13 -2" stroke="#f6dcae" stroke-width="3" fill="none" opacity=".85"/>
+      <path d="M-12 4 C-4 1 4 1 12 5" stroke="#e9c48c" stroke-width="2" fill="none" opacity=".6"/>
+    </g>
+    <g transform="translate(216 106) rotate(14)">
+      <path d="M-14 -9 C-7 -12 7 -12 14 -9 L12 9 C5 12 -5 12 -12 9 Z" fill="url(#kdcrumb)"/>
+      <path d="M-14 -9 C-7 -12 7 -12 14 -9 L12 9 C5 12 -5 12 -12 9 Z" fill="none" stroke="#7a3a10" stroke-width="1.2" opacity=".55"/>
+      <path d="M-11 -2 C-4 -5 4 -5 11 -1" stroke="#f6dcae" stroke-width="2.6" fill="none" opacity=".85"/>
+    </g>
+  </g>
+  <!-- runny egg yolk nestled on top -->
+  <g transform="translate(150 122)">
+    <ellipse rx="13" ry="10" fill="url(#kdyolk)"/>
+    <ellipse cx="-3" cy="-2.5" rx="4" ry="3" fill="#ffe6a0" opacity=".8"/>
+  </g>
+  <!-- scallion flecks -->
+  <rect x="120" y="118" width="7" height="2.6" rx="1.3" fill="#58c14a" transform="rotate(-18 123 119)"/>
+  <rect x="176" y="120" width="7" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(16 179 121)"/>
+  <rect x="200" y="122" width="6" height="2.4" rx="1.2" fill="#5ecb4e" transform="rotate(-10 203 123)"/>
+  <rect x="138" y="126" width="6" height="2.4" rx="1.2" fill="#58c14a" transform="rotate(24 141 127)"/>
+  <!-- shichimi / sesame specks -->
+  <circle cx="130" cy="108" r="1.2" fill="#8a2a10"/>
+  <circle cx="196" cy="110" r="1.2" fill="#f8eed6"/>
+  <circle cx="168" cy="104" r="1.1" fill="#8a2a10"/>
+  <!-- gloss dots -->
+  <circle cx="118" cy="106" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="200" cy="104" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="150" cy="118" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

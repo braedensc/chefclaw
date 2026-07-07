@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="suBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="subg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#102e35"/><stop offset="45%" stop-color="#0b090b"/><stop offset="100%" stop-color="#060507"/>
+    </radialGradient>
+    <linearGradient id="suboard" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#241610"/><stop offset="50%" stop-color="#352418"/><stop offset="100%" stop-color="#1d1109"/>
+    </linearGradient>
+    <linearGradient id="surice" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fbf6ec"/><stop offset="100%" stop-color="#e2d6c2"/>
+    </linearGradient>
+    <linearGradient id="s3salmon" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ff9d63"/><stop offset="100%" stop-color="#e86a2f"/>
+    </linearGradient>
+    <linearGradient id="sutuna" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e2504e"/><stop offset="100%" stop-color="#b52d2f"/>
+    </linearGradient>
+    <linearGradient id="sutamago" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffd873"/><stop offset="100%" stop-color="#f0ab2c"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#subg)"/>
+  <!-- soft steam (cool serve, but keep the wisp convention subtly) -->
+  <path d="M116 56 C106 40 124 32 116 14" stroke="#fff" stroke-width="7" fill="none" opacity=".08" filter="url(#suBlur3)"/>
+  <path d="M204 54 C196 40 212 32 206 14" stroke="#fff" stroke-width="6" fill="none" opacity=".07" filter="url(#suBlur3)"/>
+  <ellipse cx="160" cy="186" rx="156" ry="22" fill="#000" opacity=".5"/>
+  <!-- rectangular wooden sushi board (geta-style) -->
+  <g>
+    <path d="M40 150 L52 100 L268 100 L280 150 Z" fill="url(#suboard)" stroke="#3d2a1c" stroke-width="2.5"/>
+    <path d="M52 100 L268 100" stroke="#4a3422" stroke-width="1.4" opacity=".6"/>
+    <path d="M46 126 L274 126" stroke="#1c1109" stroke-width="1.2" opacity=".5"/>
+    <!-- board feet -->
+    <rect x="66" y="150" width="14" height="9" rx="1.5" fill="#160d07"/>
+    <rect x="240" y="150" width="14" height="9" rx="1.5" fill="#160d07"/>
+  </g>
+  <!-- neon steam arc (cyan cool family) -->
+  <path d="M50 108 Q106 82 168 82" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".38" stroke-linecap="round"/>
+  <!-- SALMON NIGIRI (left): rice pillow + draped salmon slab -->
+  <g transform="translate(84 116) rotate(-4)">
+    <path d="M-24 12 a24 11 0 0 0 48 0 v-6 a24 11 0 0 1 -48 0 Z" fill="#d8ccb6"/>
+    <ellipse cx="0" cy="6" rx="24" ry="11" fill="url(#surice)"/>
+    <path d="M-24 -2 C-16 -14 16 -14 24 -2 C18 6 -18 6 -24 -2 Z" fill="url(#s3salmon)" stroke="#c0521f" stroke-width="1.1"/>
+    <path d="M-14 -6 Q-2 -10 -14 -2 M2 -8 Q14 -11 2 -4 M-8 -3 Q6 -6 -8 0" stroke="#ffd0a8" stroke-width="1.4" fill="none" opacity=".7"/>
+  </g>
+  <!-- TUNA NIGIRI (centre-back): deep red slab -->
+  <g transform="translate(160 106) rotate(3)">
+    <path d="M-23 11 a23 10.5 0 0 0 46 0 v-6 a23 10.5 0 0 1 -46 0 Z" fill="#d8ccb6"/>
+    <ellipse cx="0" cy="5" rx="23" ry="10.5" fill="url(#surice)"/>
+    <path d="M-23 -3 C-15 -13 15 -13 23 -3 C17 5 -17 5 -23 -3 Z" fill="url(#sutuna)" stroke="#8f2022" stroke-width="1.1"/>
+    <path d="M-12 -6 Q0 -9 12 -6" stroke="#f07a76" stroke-width="1.2" fill="none" opacity=".6"/>
+    <path d="M-10 -1 Q0 -4 10 -1" stroke="#f07a76" stroke-width="1" fill="none" opacity=".4"/>
+  </g>
+  <!-- TAMAGO NIGIRI (right): yellow egg block with nori belt -->
+  <g transform="translate(236 118) rotate(5)">
+    <path d="M-22 11 a22 10 0 0 0 44 0 v-6 a22 10 0 0 1 -44 0 Z" fill="#d8ccb6"/>
+    <ellipse cx="0" cy="5" rx="22" ry="10" fill="url(#surice)"/>
+    <rect x="-20" y="-11" width="40" height="14" rx="2.5" fill="url(#sutamago)" stroke="#c78a1c" stroke-width="1.1"/>
+    <path d="M-20 -6 h40 M-20 -1 h40" stroke="#e0a52c" stroke-width="1" opacity=".5"/>
+    <!-- nori belt -->
+    <rect x="-4" y="-12" width="8" height="18" fill="#1c2a1e" opacity=".92"/>
+  </g>
+  <!-- MAKI ROLL PAIR (front-centre): two nori-wrapped rounds with rice + salmon core -->
+  <g transform="translate(132 138)">
+    <circle r="15" fill="#1c2a1e"/>
+    <circle r="12" fill="url(#surice)"/>
+    <circle r="5.5" fill="#e86a2f"/>
+    <circle r="5.5" fill="none" stroke="#ffb282" stroke-width="1.2" opacity=".6"/>
+    <circle cx="-4" cy="-3" r="1.6" fill="#f4ebd8"/>
+    <circle cx="5" cy="4" r="1.4" fill="#f4ebd8"/>
+  </g>
+  <g transform="translate(166 142)">
+    <circle r="14" fill="#1c2a1e"/>
+    <circle r="11" fill="url(#surice)"/>
+    <circle r="5" fill="#4e8a3a"/>
+    <circle r="5" fill="none" stroke="#8fd06e" stroke-width="1.1" opacity=".6"/>
+    <circle cx="-3" cy="-2" r="1.4" fill="#f4ebd8"/>
+    <circle cx="4" cy="3" r="1.3" fill="#f4ebd8"/>
+  </g>
+  <!-- wasabi mound + pickled ginger + sesame -->
+  <path d="M198 138 q6 -8 12 0 q-6 4 -12 0 Z" fill="#8fbf3a" stroke="#6f9c28" stroke-width="1"/>
+  <path d="M64 140 q7 -5 12 1 q-4 5 -12 -1 Z" fill="#f4c8b6" stroke="#dba088" stroke-width="1" opacity=".9"/>
+  <path d="M70 143 q6 -4 11 1 q-4 4 -11 -1 Z" fill="#f0b6a0" stroke="#dba088" stroke-width="1" opacity=".85"/>
+  <circle cx="120" cy="118" r="1.1" fill="#f8eed6"/>
+  <circle cx="176" cy="108" r="1.1" fill="#f8eed6"/>
+  <circle cx="240" cy="120" r="1" fill="#260903"/>
+  <!-- gloss dots -->
+  <circle cx="82" cy="110" r="1.5" fill="#fff" opacity=".6"/>
+  <circle cx="158" cy="100" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="130" cy="134" r="1.3" fill="#fff" opacity=".5"/>
+</svg>

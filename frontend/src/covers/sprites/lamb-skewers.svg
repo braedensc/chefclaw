@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="lsBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="lsbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <linearGradient id="lsmeat" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#a85428"/><stop offset="48%" stop-color="#7c3a20"/><stop offset="100%" stop-color="#5e2410"/>
+    </linearGradient>
+    <linearGradient id="lsfat" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f6ddb2"/><stop offset="100%" stop-color="#d8b47f"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#lsbg)"/>
+  <!-- smoky steam -->
+  <path d="M118 56 C108 38 128 30 118 12" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#lsBlur3)"/>
+  <path d="M204 54 C196 38 214 30 206 10" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#lsBlur3)"/>
+  <ellipse cx="160" cy="188" rx="156" ry="20" fill="#000" opacity=".5"/>
+  <!-- grill rack / board under the skewers -->
+  <rect x="34" y="108" width="252" height="58" rx="10" fill="#100b0d"/>
+  <rect x="34" y="108" width="252" height="58" rx="10" fill="none" stroke="#2c2136" stroke-width="2.6"/>
+  <!-- glowing charcoal bars across the grill -->
+  <g stroke-linecap="round" opacity=".8">
+    <path d="M52 158 H268" stroke="#3a1c10" stroke-width="4"/>
+    <path d="M52 158 H268" stroke="#e2541a" stroke-width="1.6" opacity=".45"/>
+    <path d="M52 150 H268" stroke="#2e1710" stroke-width="3"/>
+  </g>
+  <!-- ember glow spots -->
+  <circle cx="80" cy="158" r="2.4" fill="#ff6a24" opacity=".55"/>
+  <circle cx="150" cy="160" r="2.2" fill="#ff7a34" opacity=".5"/>
+  <circle cx="224" cy="158" r="2.4" fill="#ff6a24" opacity=".55"/>
+  <!-- warm neon steam arc (local warm-white) -->
+  <path d="M50 100 Q104 72 168 74" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- four skewers laid across the rack, cumin-dusted lamb cubes -->
+  <!-- skewer A (top) -->
+  <g transform="translate(0 -2)">
+    <path d="M40 96 L286 90" stroke="#b98a4e" stroke-width="4.5" stroke-linecap="round"/>
+    <path d="M40 96 L58 95" stroke="#a67a40" stroke-width="4.5" stroke-linecap="round"/>
+  </g>
+  <g>
+    <rect x="70" y="86" width="20" height="18" rx="3.5" fill="url(#lsmeat)" stroke="#3a1a0c" stroke-width="1.2" transform="rotate(-3 80 95)"/>
+    <rect x="72" y="88" width="16" height="4" rx="1.6" fill="url(#lsfat)" opacity=".8" transform="rotate(-3 80 90)"/>
+    <rect x="92" y="85" width="16" height="18" rx="3.2" fill="#5e2410" stroke="#3a1a0c" stroke-width="1.2" transform="rotate(2 100 94)"/>
+    <rect x="110" y="86" width="20" height="18" rx="3.5" fill="url(#lsmeat)" stroke="#3a1a0c" stroke-width="1.2" transform="rotate(-2 120 95)"/>
+    <rect x="112" y="88" width="16" height="4" rx="1.6" fill="url(#lsfat)" opacity=".75" transform="rotate(-2 120 90)"/>
+    <rect x="132" y="85" width="18" height="18" rx="3.2" fill="#6b2f16" stroke="#3a1a0c" stroke-width="1.2" transform="rotate(3 141 94)"/>
+    <rect x="152" y="86" width="20" height="17" rx="3.4" fill="url(#lsmeat)" stroke="#3a1a0c" stroke-width="1.2"/>
+  </g>
+  <!-- skewer B (bottom) -->
+  <g transform="translate(0 34)">
+    <path d="M40 96 L286 92" stroke="#a67a40" stroke-width="4.5" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(48 34)">
+    <rect x="70" y="86" width="20" height="18" rx="3.5" fill="url(#lsmeat)" stroke="#3a1a0c" stroke-width="1.2" transform="rotate(3 80 95)"/>
+    <rect x="72" y="88" width="16" height="4" rx="1.6" fill="url(#lsfat)" opacity=".8" transform="rotate(3 80 90)"/>
+    <rect x="92" y="85" width="16" height="18" rx="3.2" fill="#5e2410" stroke="#3a1a0c" stroke-width="1.2" transform="rotate(-2 100 94)"/>
+    <rect x="110" y="86" width="20" height="18" rx="3.5" fill="url(#lsmeat)" stroke="#3a1a0c" stroke-width="1.2" transform="rotate(2 120 95)"/>
+    <rect x="112" y="88" width="16" height="4" rx="1.6" fill="url(#lsfat)" opacity=".75" transform="rotate(2 120 90)"/>
+    <rect x="132" y="86" width="18" height="17" rx="3.2" fill="#6b2f16" stroke="#3a1a0c" stroke-width="1.2" transform="rotate(-3 141 94)"/>
+  </g>
+  <!-- charred edges highlight on front skewer meat -->
+  <path d="M74 104 q10 3 20 0 M114 104 q10 3 20 0 M156 103 q9 3 16 0" stroke="#2a1108" stroke-width="2" fill="none" opacity=".6" stroke-linecap="round"/>
+  <!-- cumin + chili-flake dusting scattered over the meat -->
+  <g>
+    <circle cx="82" cy="90" r="1" fill="#7a4a12"/><circle cx="100" cy="92" r="1" fill="#8a5a1e"/><circle cx="122" cy="90" r="1" fill="#7a4a12"/>
+    <circle cx="144" cy="92" r="1" fill="#8a5a1e"/><circle cx="162" cy="90" r="1" fill="#7a4a12"/>
+    <circle cx="132" cy="124" r="1" fill="#8a5a1e"/><circle cx="154" cy="126" r="1" fill="#7a4a12"/><circle cx="176" cy="124" r="1" fill="#8a5a1e"/><circle cx="200" cy="126" r="1" fill="#7a4a12"/>
+    <rect x="90" y="87" width="4" height="1.6" rx="0.8" fill="#c0341c" transform="rotate(20 92 88)"/>
+    <rect x="128" y="88" width="4" height="1.6" rx="0.8" fill="#c0341c" transform="rotate(-16 130 89)"/>
+    <rect x="164" y="122" width="4" height="1.6" rx="0.8" fill="#c0341c" transform="rotate(24 166 123)"/>
+    <rect x="196" y="123" width="4" height="1.6" rx="0.8" fill="#c0341c" transform="rotate(-12 198 124)"/>
+  </g>
+  <!-- sesame + scallion fleck -->
+  <circle cx="106" cy="90" r="1.1" fill="#f8eed6"/><circle cx="148" cy="124" r="1.1" fill="#f8eed6"/>
+  <rect x="118" y="126" width="6" height="2.4" rx="1.2" fill="#5ecb4e" transform="rotate(-14 121 127)"/>
+  <!-- oil gloss dots -->
+  <circle cx="88" cy="90" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="140" cy="124" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="170" cy="92" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

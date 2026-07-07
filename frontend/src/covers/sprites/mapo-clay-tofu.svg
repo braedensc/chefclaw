@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="mcBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="mcbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#123138"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <linearGradient id="mcpot" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5a3a2a"/><stop offset="45%" stop-color="#3d2418"/><stop offset="100%" stop-color="#1c0f08"/>
+    </linearGradient>
+    <radialGradient id="mcsauce" cx="50%" cy="34%" r="82%">
+      <stop offset="0%" stop-color="#7a3a14"/><stop offset="52%" stop-color="#54240c"/><stop offset="100%" stop-color="#301206"/>
+    </radialGradient>
+    <linearGradient id="mctofu" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f9f2df"/><stop offset="100%" stop-color="#e3cda4"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#mcbg)"/>
+  <!-- steam -->
+  <path d="M120 58 C110 40 130 32 120 12" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#mcBlur3)"/>
+  <path d="M200 54 C192 38 210 30 202 10" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#mcBlur3)"/>
+  <ellipse cx="160" cy="188" rx="158" ry="22" fill="#000" opacity=".5"/>
+  <!-- clay pot body with side handles -->
+  <ellipse cx="46" cy="120" rx="12" ry="9" fill="#4a2c1c"/>
+  <ellipse cx="274" cy="120" rx="12" ry="9" fill="#4a2c1c"/>
+  <path d="M40 112 C40 156 96 178 160 178 C224 178 280 156 280 112 Z" fill="url(#mcpot)"/>
+  <!-- clay body sheen band -->
+  <path d="M52 126 C70 150 110 164 160 164 C210 164 250 150 268 126" stroke="#7a4c34" stroke-width="3" fill="none" opacity=".4" stroke-linecap="round"/>
+  <ellipse cx="160" cy="112" rx="120" ry="32" fill="#2a1509"/>
+  <ellipse cx="160" cy="112" rx="120" ry="32" fill="none" stroke="#6b4029" stroke-width="3"/>
+  <ellipse cx="160" cy="112" rx="108" ry="26" fill="#1c0d06"/>
+  <!-- neon steam arc -->
+  <path d="M56 104 Q104 76 166 74" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- glossy braising sauce -->
+  <ellipse cx="160" cy="114" rx="101" ry="24" fill="url(#mcsauce)"/>
+  <ellipse cx="130" cy="106" rx="30" ry="7" fill="#a35226" opacity=".35" transform="rotate(-8 130 106)"/>
+  <!-- soft tofu cubes half-submerged, warm-glazed edges -->
+  <g stroke="#a3600f" stroke-width="1.3">
+    <g transform="translate(112 108) rotate(-8)">
+      <rect x="-14" y="-12" width="28" height="24" rx="3" fill="url(#mctofu)"/>
+      <path d="M-14 -6 L14 -6" stroke="#c98a44" stroke-width="1.1" opacity=".5"/>
+      <ellipse cx="-5" cy="-5" rx="6" ry="3" fill="#fffdf2" opacity=".7" stroke="none"/>
+    </g>
+    <g transform="translate(178 104) rotate(6)">
+      <rect x="-15" y="-13" width="30" height="26" rx="3" fill="url(#mctofu)"/>
+      <path d="M-15 -5 L15 -5" stroke="#c98a44" stroke-width="1.1" opacity=".5"/>
+      <ellipse cx="-6" cy="-6" rx="6" ry="3" fill="#fffdf2" opacity=".7" stroke="none"/>
+    </g>
+    <g transform="translate(146 122) rotate(12)">
+      <rect x="-13" y="-11" width="26" height="22" rx="3" fill="url(#mctofu)"/>
+      <path d="M-13 -4 L13 -4" stroke="#c98a44" stroke-width="1.1" opacity=".5"/>
+      <ellipse cx="-4" cy="-4" rx="5" ry="3" fill="#fffdf2" opacity=".7" stroke="none"/>
+    </g>
+    <g transform="translate(210 120) rotate(-10)">
+      <rect x="-12" y="-10" width="24" height="20" rx="3" fill="url(#mctofu)"/>
+      <ellipse cx="-4" cy="-4" rx="5" ry="2.6" fill="#fffdf2" opacity=".65" stroke="none"/>
+    </g>
+  </g>
+  <!-- minced pork / mushroom bits in the sauce -->
+  <circle cx="98" cy="120" r="3" fill="#5e2410"/>
+  <circle cx="160" cy="112" r="3" fill="#6b2f16"/>
+  <circle cx="196" cy="118" r="2.6" fill="#5e2410"/>
+  <circle cx="130" cy="116" r="2.4" fill="#6b2f16"/>
+  <circle cx="176" cy="124" r="2.4" fill="#5e2410"/>
+  <!-- diced red chili + scallion garnish -->
+  <rect x="102" y="98" width="6" height="2.4" rx="1.2" fill="#e0341f" transform="rotate(-20 105 99)"/>
+  <rect x="188" y="96" width="6" height="2.4" rx="1.2" fill="#e0341f" transform="rotate(14 191 97)"/>
+  <rect x="120" y="126" width="7" height="2.6" rx="1.3" fill="#58c14a" transform="rotate(-14 123 127)"/>
+  <rect x="164" y="98" width="7" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(18 167 99)"/>
+  <rect x="200" y="106" width="6" height="2.4" rx="1.2" fill="#5ecb4e" transform="rotate(-8 203 107)"/>
+  <!-- oil gloss dots -->
+  <circle cx="118" cy="102" r="1.4" fill="#fff" opacity=".6"/>
+  <circle cx="182" cy="98" r="1.3" fill="#fff" opacity=".55"/>
+  <circle cx="150" cy="116" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

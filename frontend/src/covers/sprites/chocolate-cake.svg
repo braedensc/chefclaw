@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="chBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="chbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#3a1120"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <radialGradient id="chplate" cx="50%" cy="30%" r="82%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <linearGradient id="chsponge" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6a3d26"/><stop offset="100%" stop-color="#4a2515"/>
+    </linearGradient>
+    <linearGradient id="chganache" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4a2213"/><stop offset="50%" stop-color="#2e130a"/><stop offset="100%" stop-color="#1c0b05"/>
+    </linearGradient>
+    <linearGradient id="chcream" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8a5636"/><stop offset="100%" stop-color="#6b3d23"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#chbg)"/>
+  <!-- steam wisps -->
+  <path d="M132 52 C122 36 142 28 132 10" stroke="#fff" stroke-width="7" fill="none" opacity=".08" filter="url(#chBlur3)"/>
+  <path d="M204 54 C196 38 214 30 206 12" stroke="#fff" stroke-width="6" fill="none" opacity=".07" filter="url(#chBlur3)"/>
+  <ellipse cx="160" cy="188" rx="150" ry="21" fill="#000" opacity=".5"/>
+  <!-- dessert plate -->
+  <ellipse cx="160" cy="150" rx="132" ry="34" fill="url(#chplate)"/>
+  <ellipse cx="160" cy="150" rx="132" ry="34" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="150" rx="116" ry="26" fill="#0e0d11"/>
+  <!-- neon steam arc -->
+  <path d="M64 132 Q108 96 168 92" stroke="#ff4d6d" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- chocolate sauce puddle -->
+  <ellipse cx="160" cy="152" rx="98" ry="16" fill="#20100a" opacity=".85"/>
+  <ellipse cx="132" cy="150" rx="26" ry="5" fill="#3d1c0f" opacity=".5"/>
+  <!-- CAKE SLICE: tall triangular wedge, layered, pointing right -->
+  <g>
+    <!-- side face (visible cut) showing sponge + cream layers -->
+    <path d="M104 58 L220 78 L212 148 L108 138 Z" fill="url(#chsponge)"/>
+    <!-- cream layers between sponge -->
+    <path d="M104 82 L220 100 L219 110 L104 92 Z" fill="url(#chcream)"/>
+    <path d="M105 108 L217 124 L216 134 L105 118 Z" fill="url(#chcream)"/>
+    <!-- sponge crumb hints -->
+    <circle cx="130" cy="72" r="1.4" fill="#3a1f12" opacity=".7"/>
+    <circle cx="160" cy="76" r="1.2" fill="#7a4a2e" opacity=".7"/>
+    <circle cx="150" cy="126" r="1.3" fill="#3a1f12" opacity=".7"/>
+    <circle cx="190" cy="120" r="1.2" fill="#7a4a2e" opacity=".6"/>
+    <circle cx="176" cy="100" r="1.2" fill="#3a1f12" opacity=".6"/>
+    <!-- front (frosted) triangular face -->
+    <path d="M220 78 L212 148 L246 138 L252 70 Z" fill="url(#chganache)"/>
+    <!-- glossy ganache top crown -->
+    <path d="M104 58 L220 78 L252 70 C232 52 150 44 104 58 Z" fill="url(#chganache)"/>
+    <path d="M110 60 C150 50 210 56 244 68" stroke="#7a3a20" stroke-width="1.6" fill="none" opacity=".55"/>
+    <!-- ganache drip down the front -->
+    <path d="M230 92 C228 104 234 110 230 120 C226 112 224 100 230 92 Z" fill="#2a130a"/>
+    <path d="M244 100 C242 112 248 118 244 128 C240 120 238 108 244 100 Z" fill="#2a130a"/>
+    <!-- outer edges -->
+    <path d="M104 58 L220 78 L212 148 L108 138 Z" fill="none" stroke="#2a140b" stroke-width="1.4" opacity=".5"/>
+    <path d="M220 78 L252 70 L246 138 L212 148 Z" fill="none" stroke="#160a05" stroke-width="1.2" opacity=".5"/>
+  </g>
+  <!-- piped cream rosette on top + a cherry -->
+  <ellipse cx="150" cy="56" rx="12" ry="6" fill="#f3e6d4"/>
+  <ellipse cx="150" cy="54" rx="8" ry="4" fill="#fff6ec" opacity=".9"/>
+  <circle cx="150" cy="50" r="6" fill="#d92a2a"/>
+  <circle cx="148" cy="48" r="2" fill="#ff6a6a" opacity=".8"/>
+  <path d="M150 44 C154 38 158 38 160 34" stroke="#4a6b2a" stroke-width="1.6" fill="none"/>
+  <!-- chocolate curl shavings garnish -->
+  <path d="M126 66 C122 62 130 60 132 64" stroke="#2a130a" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+  <path d="M188 66 C184 62 192 60 194 64" stroke="#2a130a" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+  <!-- gloss highlights on ganache -->
+  <circle cx="180" cy="70" r="1.6" fill="#fff" opacity=".5"/>
+  <circle cx="236" cy="88" r="1.4" fill="#fff" opacity=".45"/>
+  <circle cx="222" cy="104" r="1.2" fill="#fff" opacity=".4"/>
+</svg>

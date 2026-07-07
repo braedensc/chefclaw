@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="zjBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="zjbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="zjbowl" cx="50%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <radialGradient id="zjnest" cx="46%" cy="34%" r="78%">
+      <stop offset="0%" stop-color="#e6cf9d"/><stop offset="58%" stop-color="#d9bd85"/><stop offset="100%" stop-color="#bd9c5f"/>
+    </radialGradient>
+    <radialGradient id="zjpaste" cx="44%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#6b4029"/><stop offset="55%" stop-color="#3d2113"/><stop offset="100%" stop-color="#1c0d06"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#zjbg)"/>
+  <!-- steam -->
+  <path d="M124 56 C114 38 134 30 124 12" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#zjBlur3)"/>
+  <path d="M198 52 C190 36 208 28 200 10" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#zjBlur3)"/>
+  <ellipse cx="160" cy="188" rx="156" ry="22" fill="#000" opacity=".5"/>
+  <!-- shallow noodle bowl -->
+  <ellipse cx="160" cy="128" rx="132" ry="52" fill="url(#zjbowl)"/>
+  <ellipse cx="160" cy="128" rx="132" ry="52" fill="none" stroke="#26262e" stroke-width="3"/>
+  <ellipse cx="160" cy="128" rx="116" ry="43" fill="#0c0c0f"/>
+  <!-- neon steam arc -->
+  <path d="M56 112 Q104 80 168 76" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- pale noodle nest (round strands) -->
+  <path d="M62 132 C66 106 104 92 160 92 C216 92 254 106 258 132 C230 154 196 158 160 158 C124 158 90 154 62 132 Z" fill="#a4894e" opacity=".55"/>
+  <path d="M66 128 C70 100 106 88 160 88 C214 88 250 100 254 128 C228 148 196 152 160 152 C124 152 92 148 66 128 Z" fill="url(#zjnest)"/>
+  <!-- noodle strand loops -->
+  <g fill="none" stroke-linecap="round" opacity=".85">
+    <path d="M80 130 C96 108 128 104 158 108" stroke="#cdb078" stroke-width="6"/>
+    <path d="M100 138 C120 116 156 114 190 120" stroke="#e6cf9d" stroke-width="6"/>
+    <path d="M76 122 C100 104 140 100 178 104" stroke="#d9bd85" stroke-width="6"/>
+    <path d="M118 142 C140 122 178 122 214 130" stroke="#cdb078" stroke-width="6"/>
+    <path d="M144 138 C168 120 206 120 240 128" stroke="#e6cf9d" stroke-width="6"/>
+    <path d="M96 128 C118 110 152 108 184 112" stroke="#fff1c9" stroke-width="2" opacity=".7"/>
+    <path d="M128 136 C152 118 190 118 224 124" stroke="#8a5a1e" stroke-width="2.2" opacity=".5"/>
+    <path d="M84 134 C104 116 138 114 168 118" stroke="#7a4c14" stroke-width="2" opacity=".45"/>
+  </g>
+  <!-- dark bean-paste + pork mound heaped on top -->
+  <path d="M112 116 C104 100 122 90 146 92 C162 84 190 90 196 104 C210 108 214 124 200 132 C196 146 168 150 146 146 C124 150 104 140 108 128 C104 122 108 118 112 116 Z" fill="url(#zjpaste)"/>
+  <path d="M116 112 C110 100 126 94 144 96 C160 90 182 96 188 106" fill="none" stroke="#7c4a28" stroke-width="1.4" opacity=".6"/>
+  <!-- glossy diced pork nuggets in the paste -->
+  <g stroke="#240a03" stroke-width="1.1" opacity=".95">
+    <rect x="124" y="106" width="12" height="10" rx="2.5" fill="#8a5a2e" transform="rotate(-12 130 111)"/>
+    <rect x="150" y="100" width="12" height="10" rx="2.5" fill="#9c6636" transform="rotate(8 156 105)"/>
+    <rect x="170" y="112" width="12" height="10" rx="2.5" fill="#7c4a24" transform="rotate(-6 176 117)"/>
+    <rect x="138" y="122" width="12" height="10" rx="2.5" fill="#9c6636" transform="rotate(14 144 127)"/>
+    <rect x="164" y="126" width="11" height="9" rx="2.4" fill="#8a5a2e" transform="rotate(-16 169 130)"/>
+    <rect x="184" y="118" width="11" height="9" rx="2.4" fill="#7c4a24" transform="rotate(6 189 122)"/>
+  </g>
+  <!-- paste gloss highlights -->
+  <ellipse cx="132" cy="106" rx="4" ry="2" fill="#c98a52" opacity=".55"/>
+  <ellipse cx="176" cy="108" rx="4" ry="2" fill="#c98a52" opacity=".5"/>
+  <ellipse cx="150" cy="128" rx="3.4" ry="1.8" fill="#c98a52" opacity=".5"/>
+  <!-- fresh cucumber julienne over the top -->
+  <rect x="98" y="112" width="26" height="3.2" rx="1.6" fill="#6abf5a" transform="rotate(-14 111 113)"/>
+  <rect x="196" y="118" width="26" height="3.2" rx="1.6" fill="#58c14a" transform="rotate(10 209 119)"/>
+  <rect x="120" y="98" width="22" height="3" rx="1.5" fill="#5ecb4e" transform="rotate(6 131 99)"/>
+  <rect x="176" y="98" width="22" height="3" rx="1.5" fill="#3f9c37" transform="rotate(-8 187 99)"/>
+  <rect x="132" y="140" width="24" height="3" rx="1.5" fill="#6abf5a" transform="rotate(-18 144 141)"/>
+  <!-- chopsticks lifting strands from upper right -->
+  <g transform="rotate(-26 246 60)">
+    <rect x="196" y="52" width="72" height="5" rx="2.5" fill="#b98a4e"/>
+    <rect x="196" y="62" width="72" height="5" rx="2.5" fill="#a67a40"/>
+  </g>
+  <!-- lifted noodle strand off the chopsticks -->
+  <path d="M212 80 C214 96 210 106 200 112" stroke="#e6cf9d" stroke-width="5" fill="none" opacity=".9" stroke-linecap="round"/>
+  <path d="M222 78 C226 94 224 104 216 110" stroke="#d9bd85" stroke-width="5" fill="none" opacity=".9" stroke-linecap="round"/>
+  <!-- oil gloss dots -->
+  <circle cx="118" cy="120" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="188" cy="126" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="156" cy="112" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

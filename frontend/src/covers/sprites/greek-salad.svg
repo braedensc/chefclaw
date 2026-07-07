@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="nnBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="gkbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#123138"/><stop offset="45%" stop-color="#0a0a0b"/><stop offset="100%" stop-color="#060607"/>
+    </radialGradient>
+    <radialGradient id="gkbowl" cx="50%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <linearGradient id="gktom" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ff7350"/><stop offset="100%" stop-color="#d33220"/>
+    </linearGradient>
+    <linearGradient id="gkfeta" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fbf7ee"/><stop offset="100%" stop-color="#e6dcc7"/>
+    </linearGradient>
+    <linearGradient id="gkcuke" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#bfe89a"/><stop offset="100%" stop-color="#7fc95c"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#gkbg)"/>
+  <path d="M120 56 C110 38 130 30 120 12" stroke="#fff" stroke-width="7" fill="none" opacity=".08" filter="url(#nnBlur3)"/>
+  <path d="M200 54 C192 38 210 30 202 12" stroke="#fff" stroke-width="6" fill="none" opacity=".06" filter="url(#nnBlur3)"/>
+  <ellipse cx="160" cy="188" rx="156" ry="22" fill="#000" opacity=".5"/>
+  <!-- wide shallow bowl -->
+  <ellipse cx="160" cy="130" rx="138" ry="52" fill="url(#gkbowl)"/>
+  <ellipse cx="160" cy="130" rx="138" ry="52" fill="none" stroke="#26262e" stroke-width="3"/>
+  <ellipse cx="160" cy="128" rx="122" ry="43" fill="#0e100f"/>
+  <!-- neon steam arc (cyan for fresh/savory) -->
+  <path d="M52 118 Q104 88 166 84" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".38" stroke-linecap="round"/>
+
+  <!-- a few torn romaine bits underneath (sparse, so the cubes read) -->
+  <path d="M96 118 C90 104 102 94 114 98 C110 110 110 124 100 128 C94 126 96 122 96 118 Z" fill="#5cb246" opacity=".85"/>
+  <path d="M214 116 C220 102 232 94 242 100 C236 112 232 124 222 128 C214 126 214 120 214 116 Z" fill="#4ea23c" opacity=".85"/>
+
+  <!-- CHUNKY tossed cubes: tomato wedges, feta cubes, cucumber, onion, olives -->
+  <!-- back layer (smaller, scale .84) -->
+  <g transform="translate(0 0)" opacity=".95">
+    <!-- tomato wedge -->
+    <path d="M120 96 C126 90 136 90 140 96 C138 104 130 108 122 104 Z" fill="url(#gktom)" transform="rotate(-8 130 98)"/>
+    <path d="M124 96 C128 100 132 100 136 97" stroke="#ffc9a0" stroke-width="1.2" fill="none" opacity=".6" transform="rotate(-8 130 98)"/>
+    <!-- feta cube back -->
+    <rect x="176" y="94" width="18" height="16" rx="2" fill="url(#gkfeta)" stroke="#cdbf9e" stroke-width="1" transform="rotate(10 185 102)"/>
+    <!-- cucumber half-moon back -->
+    <path d="M148 92 C158 88 166 94 164 102 C156 100 150 98 148 92 Z" fill="url(#gkcuke)" stroke="#5fa93f" stroke-width="1"/>
+  </g>
+
+  <!-- front layer (larger) -->
+  <!-- tomato wedges -->
+  <g transform="translate(108 118) rotate(-14)">
+    <path d="M0 0 C10 -10 26 -10 34 0 C28 12 12 14 2 8 Z" fill="url(#gktom)" stroke="#b3271a" stroke-width="1.2"/>
+    <path d="M6 2 C14 6 22 6 30 1" stroke="#ff9d7d" stroke-width="1.6" fill="none" opacity=".7"/>
+    <ellipse cx="16" cy="-3" rx="8" ry="2.4" fill="#ffd9a2" opacity=".55"/>
+  </g>
+  <g transform="translate(178 122) rotate(12)">
+    <path d="M0 0 C10 -10 26 -10 34 0 C28 12 12 14 2 8 Z" fill="url(#gktom)" stroke="#b3271a" stroke-width="1.2"/>
+    <path d="M6 2 C14 6 22 6 30 1" stroke="#ff9d7d" stroke-width="1.6" fill="none" opacity=".7"/>
+    <ellipse cx="16" cy="-3" rx="8" ry="2.4" fill="#ffd9a2" opacity=".55"/>
+  </g>
+  <!-- big feta cubes (hero white blocks) -->
+  <g transform="translate(140 108) rotate(-6)">
+    <rect x="0" y="0" width="26" height="22" rx="3" fill="url(#gkfeta)" stroke="#cdbf9e" stroke-width="1.2"/>
+    <path d="M0 6 L26 6 M8 0 L8 22" stroke="#d8cdb2" stroke-width="1" opacity=".5"/>
+    <rect x="3" y="2" width="9" height="5" rx="1.5" fill="#fffdf7" opacity=".75"/>
+  </g>
+  <g transform="translate(200 106) rotate(14)">
+    <rect x="0" y="0" width="22" height="19" rx="3" fill="url(#gkfeta)" stroke="#cdbf9e" stroke-width="1.2"/>
+    <path d="M0 6 L22 6" stroke="#d8cdb2" stroke-width="1" opacity=".5"/>
+    <rect x="3" y="2" width="8" height="4" rx="1.5" fill="#fffdf7" opacity=".75"/>
+  </g>
+  <!-- cucumber half-moons -->
+  <g transform="translate(112 100) rotate(8)">
+    <path d="M0 0 C14 -6 26 2 22 14 C10 12 2 8 0 0 Z" fill="url(#gkcuke)" stroke="#5fa93f" stroke-width="1.2"/>
+    <path d="M4 2 C12 0 18 4 18 10" stroke="#eafbdc" stroke-width="1.6" fill="none" opacity=".6"/>
+    <path d="M14 -2 L15 12" stroke="#5fa93f" stroke-width="1" opacity=".5"/>
+  </g>
+  <g transform="translate(170 96) rotate(-12)">
+    <path d="M0 0 C14 -6 26 2 22 14 C10 12 2 8 0 0 Z" fill="url(#gkcuke)" stroke="#5fa93f" stroke-width="1.2"/>
+    <path d="M4 2 C12 0 18 4 18 10" stroke="#eafbdc" stroke-width="1.6" fill="none" opacity=".6"/>
+  </g>
+  <!-- red onion slivers -->
+  <path d="M132 132 C146 126 162 128 172 134" stroke="#b478ff" stroke-width="3.4" fill="none" stroke-linecap="round" opacity=".8"/>
+  <path d="M150 138 C162 133 176 134 186 140" stroke="#a463f0" stroke-width="3" fill="none" stroke-linecap="round" opacity=".75"/>
+  <!-- kalamata olives (dark glossy) -->
+  <ellipse cx="126" cy="120" rx="7" ry="9" fill="#3a1a2e" transform="rotate(-16 126 120)"/>
+  <ellipse cx="124" cy="116" rx="2.4" ry="3" fill="#7a4a66" opacity=".8" transform="rotate(-16 124 116)"/>
+  <ellipse cx="204" cy="122" rx="7" ry="9" fill="#301526" transform="rotate(12 204 122)"/>
+  <ellipse cx="202" cy="118" rx="2.2" ry="2.8" fill="#6e4258" opacity=".8"/>
+  <ellipse cx="164" cy="128" rx="6.5" ry="8.5" fill="#3a1a2e" transform="rotate(4 164 128)"/>
+  <ellipse cx="162" cy="124" rx="2.2" ry="2.8" fill="#7a4a66" opacity=".8"/>
+
+  <!-- oregano flecks + olive-oil gloss -->
+  <circle cx="150" cy="118" r="1.2" fill="#4d7a3a"/>
+  <circle cx="184" cy="114" r="1.1" fill="#4d7a3a"/>
+  <circle cx="132" cy="128" r="1.1" fill="#4d7a3a"/>
+  <circle cx="196" cy="130" r="1" fill="#4d7a3a"/>
+  <path d="M120 136 C144 143 188 143 206 134" stroke="#f2e4a8" stroke-width="2.2" fill="none" opacity=".4" stroke-linecap="round"/>
+  <circle cx="158" cy="112" r="1.5" fill="#fff" opacity=".6"/>
+  <circle cx="190" cy="120" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="128" cy="126" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="nnBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="b3bg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#123138"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <radialGradient id="b3bun" cx="42%" cy="22%" r="86%">
+      <stop offset="0%" stop-color="#fffdf6"/><stop offset="58%" stop-color="#f4ecd8"/><stop offset="100%" stop-color="#dcc9a4"/>
+    </radialGradient>
+    <linearGradient id="b3steamer" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7c5a2e"/><stop offset="100%" stop-color="#3f2c14"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#b3bg)"/>
+  <ellipse cx="160" cy="186" rx="150" ry="22" fill="#000" opacity=".5"/>
+  <path d="M116 52 C108 34 126 26 116 6" stroke="#fff" stroke-width="7" fill="none" opacity=".11" filter="url(#nnBlur3)"/>
+  <path d="M170 48 C162 32 178 24 170 4" stroke="#fff" stroke-width="6" fill="none" opacity=".09" filter="url(#nnBlur3)"/>
+  <path d="M212 56 C204 40 220 32 212 12" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#nnBlur3)"/>
+  <!-- bamboo steamer -->
+  <ellipse cx="160" cy="134" rx="128" ry="50" fill="url(#b3steamer)"/>
+  <ellipse cx="160" cy="134" rx="128" ry="50" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="128" rx="122" ry="46" fill="#513818"/>
+  <ellipse cx="160" cy="126" rx="112" ry="41" fill="#2a1c0c"/>
+  <g stroke="#6a4a22" stroke-width="1.4" opacity=".4" fill="none">
+    <path d="M62 132 Q160 112 258 132"/>
+    <path d="M60 142 Q160 124 260 142"/>
+  </g>
+  <path d="M62 112 Q106 80 168 76" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- big fluffy round mantou-style pork bun, twisted-pleat crown -->
+  <!-- back bun -->
+  <g transform="translate(96 60) rotate(-3) scale(.8)">
+    <ellipse cx="46" cy="34" rx="48" ry="34" fill="url(#b3bun)"/>
+    <path d="M46 8 C40 14 36 24 40 32 M46 8 C52 14 56 24 52 32 M46 8 C46 16 46 26 46 34 M46 8 C34 12 26 22 30 30 M46 8 C58 12 66 22 62 30" stroke="#d8c194" stroke-width="1.4" fill="none" opacity=".55" stroke-linecap="round"/>
+    <circle cx="46" cy="10" r="4" fill="#ecdcb6"/>
+    <ellipse cx="34" cy="24" rx="14" ry="9" fill="#fff" opacity=".22"/>
+  </g>
+  <g transform="translate(178 56) rotate(4) scale(.8)">
+    <ellipse cx="46" cy="34" rx="48" ry="34" fill="url(#b3bun)"/>
+    <path d="M46 8 C40 14 36 24 40 32 M46 8 C52 14 56 24 52 32 M46 8 C46 16 46 26 46 34 M46 8 C34 12 26 22 30 30 M46 8 C58 12 66 22 62 30" stroke="#d8c194" stroke-width="1.4" fill="none" opacity=".55" stroke-linecap="round"/>
+    <circle cx="46" cy="10" r="4" fill="#ecdcb6"/>
+    <ellipse cx="34" cy="24" rx="14" ry="9" fill="#fff" opacity=".22"/>
+  </g>
+  <!-- front buns -->
+  <g transform="translate(72 84) rotate(-5)">
+    <ellipse cx="52" cy="38" rx="54" ry="38" fill="url(#b3bun)"/>
+    <path d="M52 8 C45 15 40 27 45 37 M52 8 C59 15 64 27 59 37 M52 8 C52 18 52 30 52 40 M52 8 C38 13 29 25 34 35 M52 8 C66 13 75 25 70 35" stroke="#ccb488" stroke-width="1.6" fill="none" opacity=".7" stroke-linecap="round"/>
+    <circle cx="52" cy="10" r="4.6" fill="#eddcb4"/>
+    <ellipse cx="38" cy="26" rx="18" ry="11" fill="#fff" opacity=".3"/>
+    <circle cx="34" cy="20" r="2" fill="#fff" opacity=".85"/>
+  </g>
+  <g transform="translate(148 92) rotate(3)">
+    <ellipse cx="52" cy="38" rx="54" ry="38" fill="url(#b3bun)"/>
+    <path d="M52 8 C45 15 40 27 45 37 M52 8 C59 15 64 27 59 37 M52 8 C52 18 52 30 52 40 M52 8 C38 13 29 25 34 35 M52 8 C66 13 75 25 70 35" stroke="#ccb488" stroke-width="1.6" fill="none" opacity=".7" stroke-linecap="round"/>
+    <circle cx="52" cy="10" r="4.6" fill="#eddcb4"/>
+    <ellipse cx="38" cy="26" rx="18" ry="11" fill="#fff" opacity=".3"/>
+    <circle cx="34" cy="20" r="2" fill="#fff" opacity=".85"/>
+  </g>
+  <!-- gloss dots -->
+  <circle cx="112" cy="112" r="1.5" fill="#fff" opacity=".55"/>
+  <circle cx="182" cy="122" r="1.4" fill="#fff" opacity=".5"/>
+  <circle cx="216" cy="116" r="1.3" fill="#fff" opacity=".45"/>
+</svg>

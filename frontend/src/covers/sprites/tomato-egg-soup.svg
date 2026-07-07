@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="nnBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="tebg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#38101e"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <linearGradient id="tebowl" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="55%" stop-color="#100b0d"/><stop offset="100%" stop-color="#070506"/>
+    </linearGradient>
+    <radialGradient id="tebroth" cx="50%" cy="30%" r="82%">
+      <stop offset="0%" stop-color="#ff7350"/><stop offset="52%" stop-color="#e64a2a"/><stop offset="100%" stop-color="#b52c14"/>
+    </radialGradient>
+    <linearGradient id="tetom" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ff8a5e"/><stop offset="100%" stop-color="#dd3320"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#tebg)"/>
+  <!-- steam -->
+  <path d="M118 60 C108 42 128 34 118 14" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#nnBlur3)"/>
+  <path d="M200 56 C192 40 210 32 202 12" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#nnBlur3)"/>
+  <ellipse cx="160" cy="188" rx="158" ry="22" fill="#000" opacity=".5"/>
+  <!-- deep round bowl -->
+  <path d="M46 106 C46 152 100 178 160 178 C220 178 274 152 274 106 Z" fill="url(#tebowl)"/>
+  <ellipse cx="160" cy="106" rx="120" ry="31" fill="#0d0d10"/>
+  <ellipse cx="160" cy="106" rx="120" ry="31" fill="none" stroke="#271b22" stroke-width="3"/>
+  <ellipse cx="160" cy="106" rx="108" ry="26" fill="#1a0b0a"/>
+  <!-- neon steam arc (rose family) -->
+  <path d="M58 98 Q104 72 164 70" stroke="#ff4d6d" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- tomato broth -->
+  <ellipse cx="160" cy="108" rx="101" ry="23" fill="url(#tebroth)"/>
+  <ellipse cx="134" cy="100" rx="30" ry="6" fill="#ff9d7d" opacity=".4" transform="rotate(-8 134 100)"/>
+  <!-- egg-flower ribbons: soft yellow feathery drifts across the broth -->
+  <g stroke-linecap="round" fill="none">
+    <path d="M94 102 C110 94 124 100 138 95 C150 91 162 98 176 93" stroke="#ffe89a" stroke-width="4" opacity=".9"/>
+    <path d="M108 114 C124 108 138 112 154 107 C168 103 184 110 200 105" stroke="#ffdd76" stroke-width="3.4" opacity=".85"/>
+    <path d="M148 118 C164 114 178 118 196 113 C208 110 218 113 228 111" stroke="#ffe89a" stroke-width="3" opacity=".8"/>
+    <path d="M116 108 C126 104 136 106 146 103" stroke="#fff3c8" stroke-width="2.2" opacity=".7"/>
+    <path d="M172 108 C182 104 194 106 204 103" stroke="#fff3c8" stroke-width="2.2" opacity=".7"/>
+  </g>
+  <!-- tomato wedges: curved soft segments floating (back layer) -->
+  <g transform="translate(114 100) rotate(-14) scale(.85)">
+    <path d="M0 0 C4 -12 20 -14 30 -8 C24 2 8 6 0 0 Z" fill="url(#tetom)" stroke="#b52c14" stroke-width="1.2"/>
+    <path d="M4 -3 C10 -8 20 -9 26 -6" stroke="#ffb494" stroke-width="1.6" fill="none" opacity=".6"/>
+    <ellipse cx="12" cy="-6" rx="5" ry="2.4" fill="#ffd9a2" opacity=".5"/>
+  </g>
+  <g transform="translate(190 104) rotate(16) scale(.85)">
+    <path d="M0 0 C4 -12 20 -14 30 -8 C24 2 8 6 0 0 Z" fill="url(#tetom)" stroke="#b52c14" stroke-width="1.2"/>
+    <path d="M4 -3 C10 -8 20 -9 26 -6" stroke="#ffb494" stroke-width="1.6" fill="none" opacity=".55"/>
+  </g>
+  <!-- tomato wedges front (larger, brighter) -->
+  <g transform="translate(126 116) rotate(8)">
+    <path d="M0 0 C5 -14 23 -16 35 -9 C28 3 9 7 0 0 Z" fill="url(#tetom)" stroke="#b52c14" stroke-width="1.3"/>
+    <path d="M5 -4 C12 -9 24 -10 31 -7" stroke="#ffc09e" stroke-width="1.8" fill="none" opacity=".6"/>
+    <ellipse cx="14" cy="-7" rx="6" ry="2.8" fill="#ffd9a2" opacity=".55"/>
+  </g>
+  <g transform="translate(172 118) rotate(-10)">
+    <path d="M0 0 C5 -14 23 -16 35 -9 C28 3 9 7 0 0 Z" fill="url(#tetom)" stroke="#b52c14" stroke-width="1.3"/>
+    <path d="M5 -4 C12 -9 24 -10 31 -7" stroke="#ffc09e" stroke-width="1.8" fill="none" opacity=".6"/>
+    <ellipse cx="14" cy="-7" rx="6" ry="2.8" fill="#ffd9a2" opacity=".55"/>
+  </g>
+  <!-- scallion flecks scattered on top -->
+  <rect x="122" y="104" width="7" height="2.6" rx="1.3" fill="#58c14a" transform="rotate(-18 125 105)"/>
+  <rect x="164" y="110" width="7" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(14 167 111)"/>
+  <rect x="196" y="102" width="6" height="2.4" rx="1.2" fill="#58c14a" transform="rotate(-8 199 103)"/>
+  <rect x="140" y="120" width="6" height="2.4" rx="1.2" fill="#6abf5a" transform="rotate(24 143 121)"/>
+  <!-- oil gloss dots -->
+  <circle cx="118" cy="102" r="1.4" fill="#fff" opacity=".6"/>
+  <circle cx="184" cy="106" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="152" cy="112" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

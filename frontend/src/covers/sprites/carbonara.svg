@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="cbBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="cbbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="cbnest" cx="46%" cy="34%" r="78%">
+      <stop offset="0%" stop-color="#fdf3d6"/><stop offset="58%" stop-color="#f2dca6"/><stop offset="100%" stop-color="#dcbe80"/>
+    </radialGradient>
+    <radialGradient id="cbplate" cx="50%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <linearGradient id="cbfork" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d9dde2"/><stop offset="100%" stop-color="#8b939c"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#cbbg)"/>
+  <!-- steam -->
+  <path d="M120 56 C110 38 130 30 120 12" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#cbBlur3)"/>
+  <path d="M196 52 C188 36 206 28 198 10" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#cbBlur3)"/>
+  <ellipse cx="160" cy="188" rx="156" ry="22" fill="#000" opacity=".5"/>
+  <!-- wide shallow pasta plate -->
+  <ellipse cx="160" cy="130" rx="140" ry="46" fill="url(#cbplate)"/>
+  <ellipse cx="160" cy="130" rx="140" ry="46" fill="none" stroke="#26262e" stroke-width="3"/>
+  <ellipse cx="160" cy="130" rx="124" ry="37" fill="#0e0e11"/>
+  <!-- neon steam arc (warm/amber family) -->
+  <path d="M52 118 Q104 88 168 84" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- creamy sauce pool base under the nest -->
+  <ellipse cx="160" cy="132" rx="112" ry="30" fill="#e8d3a2" opacity=".35"/>
+
+  <!-- ===== the strand nest (twirled spaghetti) ===== -->
+  <!-- base mound so strands sit on a pale form -->
+  <path d="M74 130 C82 106 118 96 160 96 C202 96 238 106 246 130 C222 148 194 154 160 154 C126 154 98 148 74 130 Z" fill="url(#cbnest)"/>
+  <path d="M74 130 C82 106 118 96 160 96 C202 96 238 106 246 130" fill="none" stroke="#fff3cf" stroke-width="1.4" opacity=".4"/>
+  <!-- twirled strand loops (creamy spaghetti); round caps, no fill -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M92 128 C96 110 128 104 156 108 C186 112 214 118 226 132" stroke="#e9cf94" stroke-width="6.5"/>
+    <path d="M100 120 C118 104 156 102 190 108 C214 112 228 122 232 130" stroke="#f0dba7" stroke-width="6.5"/>
+    <path d="M88 134 C110 122 150 120 186 126 C208 130 222 136 232 140" stroke="#dcc084" stroke-width="6"/>
+    <path d="M112 112 C140 100 178 102 208 114" stroke="#f6e6b8" stroke-width="6"/>
+    <path d="M96 140 C126 132 168 132 204 140" stroke="#e2c88c" stroke-width="6"/>
+    <path d="M128 106 C154 98 188 102 214 116" stroke="#efdaa6" stroke-width="5.6"/>
+    <!-- bright highlight strands -->
+    <path d="M108 122 C136 110 172 110 202 120" stroke="#fff1c9" stroke-width="2" opacity=".85"/>
+    <path d="M120 132 C150 124 184 126 212 134" stroke="#fff1c9" stroke-width="1.8" opacity=".7"/>
+    <!-- shadow strands for depth -->
+    <path d="M100 132 C130 124 168 124 200 132" stroke="#8a5a1e" stroke-width="2.2" opacity=".45"/>
+    <path d="M116 144 C146 138 182 138 210 144" stroke="#7a4c14" stroke-width="2" opacity=".4"/>
+  </g>
+
+  <!-- ===== fork lifting strands (upper-left) ===== -->
+  <g transform="translate(96 70) rotate(-24)">
+    <rect x="-3" y="0" width="6" height="44" rx="3" fill="url(#cbfork)"/>
+    <rect x="-13" y="-2" width="3" height="16" rx="1.5" fill="url(#cbfork)"/>
+    <rect x="-6" y="-2" width="3" height="16" rx="1.5" fill="url(#cbfork)"/>
+    <rect x="1" y="-2" width="3" height="16" rx="1.5" fill="url(#cbfork)"/>
+    <rect x="8" y="-2" width="3" height="16" rx="1.5" fill="url(#cbfork)"/>
+    <path d="M-11 6 L11 6" stroke="url(#cbfork)" stroke-width="3"/>
+  </g>
+  <!-- strands draping off the fork tines -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M80 96 C82 110 90 118 100 118" stroke="#f0dba7" stroke-width="4.6"/>
+    <path d="M86 98 C88 112 98 120 110 118" stroke="#e9cf94" stroke-width="4.6"/>
+    <path d="M92 98 C94 110 104 116 116 116" stroke="#f6e6b8" stroke-width="4.2"/>
+    <path d="M84 97 C86 110 94 116 104 116" stroke="#fff1c9" stroke-width="1.6" opacity=".8"/>
+  </g>
+
+  <!-- ===== bacon/pancetta bits ===== -->
+  <g>
+    <rect x="118" y="112" width="12" height="7" rx="2" fill="#c05633" transform="rotate(-14 124 115)"/>
+    <rect x="118" y="112" width="12" height="2.6" rx="1.3" fill="#f0c8a0" transform="rotate(-14 124 115)" opacity=".8"/>
+  </g>
+  <g>
+    <rect x="176" y="118" width="13" height="7" rx="2" fill="#b34e2c" transform="rotate(18 182 121)"/>
+    <rect x="176" y="118" width="13" height="2.6" rx="1.3" fill="#eec39a" transform="rotate(18 182 121)" opacity=".8"/>
+  </g>
+  <g>
+    <rect x="150" y="132" width="11" height="6.4" rx="2" fill="#bd5230" transform="rotate(-6 155 135)"/>
+    <rect x="150" y="132" width="11" height="2.4" rx="1.2" fill="#f0c8a0" transform="rotate(-6 155 135)" opacity=".75"/>
+  </g>
+  <g>
+    <rect x="200" y="128" width="10" height="6" rx="2" fill="#b34e2c" transform="rotate(10 205 131)"/>
+  </g>
+
+  <!-- ===== black-pepper flecks (the carbonara signature) ===== -->
+  <circle cx="112" cy="118" r="1.5" fill="#241812"/>
+  <circle cx="140" cy="110" r="1.4" fill="#241812"/>
+  <circle cx="166" cy="114" r="1.6" fill="#241812"/>
+  <circle cx="190" cy="112" r="1.3" fill="#241812"/>
+  <circle cx="128" cy="128" r="1.4" fill="#241812"/>
+  <circle cx="156" cy="124" r="1.5" fill="#241812"/>
+  <circle cx="184" cy="126" r="1.3" fill="#241812"/>
+  <circle cx="146" cy="138" r="1.4" fill="#241812"/>
+  <circle cx="204" cy="120" r="1.3" fill="#241812"/>
+  <circle cx="122" cy="136" r="1.2" fill="#241812"/>
+
+  <!-- egg-yolk gloss + oily sheen dots -->
+  <circle cx="130" cy="116" r="2" fill="#ffd66a" opacity=".7"/>
+  <circle cx="180" cy="120" r="1.8" fill="#ffd66a" opacity=".6"/>
+  <circle cx="118" cy="114" r="1.4" fill="#fff" opacity=".6"/>
+  <circle cx="172" cy="110" r="1.3" fill="#fff" opacity=".55"/>
+  <circle cx="150" cy="128" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

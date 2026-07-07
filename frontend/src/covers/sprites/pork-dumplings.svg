@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="nnBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="b1bg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#113036"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <linearGradient id="b1skin" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f8eecb"/><stop offset="55%" stop-color="#ecd7a0"/><stop offset="100%" stop-color="#d3b477"/>
+    </linearGradient>
+    <radialGradient id="b1belly" cx="45%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#fdf6dc"/><stop offset="100%" stop-color="#e3c98c"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#b1bg)"/>
+  <ellipse cx="160" cy="186" rx="154" ry="22" fill="#000" opacity=".5"/>
+  <path d="M128 58 C120 42 136 34 128 14" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#nnBlur3)"/>
+  <path d="M196 54 C188 38 204 30 196 12" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#nnBlur3)"/>
+  <!-- plate -->
+  <ellipse cx="160" cy="128" rx="126" ry="52" fill="#141018"/>
+  <ellipse cx="160" cy="128" rx="126" ry="52" fill="none" stroke="#26262e" stroke-width="3"/>
+  <ellipse cx="160" cy="128" rx="110" ry="43" fill="#0d0d10"/>
+  <path d="M60 112 Q104 80 166 76" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- one crescent dumpling unit reused via translate/rotate -->
+  <!-- back dumpling -->
+  <g transform="translate(96 74) rotate(-5) scale(.82)">
+    <path d="M0 40 C-4 20 20 6 44 6 C68 6 92 20 88 40 C74 34 58 32 44 32 C30 32 14 34 0 40 Z" fill="url(#b1skin)"/>
+    <path d="M0 40 C-4 20 20 6 44 6 C68 6 92 20 88 40" fill="none" stroke="#b89653" stroke-width="1.4" opacity=".5"/>
+    <path d="M12 34 C10 22 18 16 24 18 M30 30 C28 18 36 14 42 16 M52 30 C50 18 58 15 64 17 M70 33 C68 23 74 18 80 21" stroke="#c9a862" stroke-width="1.6" fill="none" opacity=".6" stroke-linecap="round"/>
+    <ellipse cx="40" cy="18" rx="20" ry="5" fill="#fff" opacity=".22"/>
+  </g>
+  <g transform="translate(178 70) rotate(4) scale(.82)">
+    <path d="M0 40 C-4 20 20 6 44 6 C68 6 92 20 88 40 C74 34 58 32 44 32 C30 32 14 34 0 40 Z" fill="url(#b1skin)"/>
+    <path d="M0 40 C-4 20 20 6 44 6 C68 6 92 20 88 40" fill="none" stroke="#b89653" stroke-width="1.4" opacity=".5"/>
+    <path d="M12 34 C10 22 18 16 24 18 M30 30 C28 18 36 14 42 16 M52 30 C50 18 58 15 64 17 M70 33 C68 23 74 18 80 21" stroke="#c9a862" stroke-width="1.6" fill="none" opacity=".6" stroke-linecap="round"/>
+    <ellipse cx="40" cy="18" rx="20" ry="5" fill="#fff" opacity=".22"/>
+  </g>
+  <!-- front dumplings -->
+  <g transform="translate(70 92) rotate(-8)">
+    <path d="M0 44 C-4 22 22 6 48 6 C74 6 100 22 96 44 C80 37 62 35 48 35 C34 35 16 37 0 44 Z" fill="url(#b1skin)"/>
+    <path d="M0 44 C-4 22 22 6 48 6 C74 6 100 22 96 44" fill="none" stroke="#a3853f" stroke-width="1.5" opacity=".55"/>
+    <path d="M14 37 C12 24 20 17 26 20 M32 32 C30 19 39 15 45 18 M56 32 C54 19 63 16 69 19 M76 36 C74 25 81 20 87 23" stroke="#c9a862" stroke-width="1.8" fill="none" opacity=".7" stroke-linecap="round"/>
+    <ellipse cx="44" cy="19" rx="24" ry="6" fill="#fff" opacity=".28"/>
+    <path d="M18 26 C30 20 66 20 78 26" stroke="#6a8a3a" stroke-width="1.6" fill="none" opacity=".35" stroke-linecap="round"/>
+    <circle cx="34" cy="16" r="1.7" fill="#fff" opacity=".7"/>
+  </g>
+  <g transform="translate(126 100) rotate(3)">
+    <path d="M0 44 C-4 22 22 6 48 6 C74 6 100 22 96 44 C80 37 62 35 48 35 C34 35 16 37 0 44 Z" fill="url(#b1skin)"/>
+    <path d="M0 44 C-4 22 22 6 48 6 C74 6 100 22 96 44" fill="none" stroke="#a3853f" stroke-width="1.5" opacity=".55"/>
+    <path d="M14 37 C12 24 20 17 26 20 M32 32 C30 19 39 15 45 18 M56 32 C54 19 63 16 69 19 M76 36 C74 25 81 20 87 23" stroke="#c9a862" stroke-width="1.8" fill="none" opacity=".7" stroke-linecap="round"/>
+    <ellipse cx="44" cy="19" rx="24" ry="6" fill="url(#b1belly)" opacity=".5"/>
+    <path d="M18 26 C30 20 66 20 78 26" stroke="#6a8a3a" stroke-width="1.6" fill="none" opacity=".35" stroke-linecap="round"/>
+    <circle cx="34" cy="16" r="1.7" fill="#fff" opacity=".8"/>
+  </g>
+  <g transform="translate(184 94) rotate(-4)">
+    <path d="M0 44 C-4 22 22 6 48 6 C74 6 100 22 96 44 C80 37 62 35 48 35 C34 35 16 37 0 44 Z" fill="url(#b1skin)"/>
+    <path d="M0 44 C-4 22 22 6 48 6 C74 6 100 22 96 44" fill="none" stroke="#a3853f" stroke-width="1.5" opacity=".55"/>
+    <path d="M14 37 C12 24 20 17 26 20 M32 32 C30 19 39 15 45 18 M56 32 C54 19 63 16 69 19 M76 36 C74 25 81 20 87 23" stroke="#c9a862" stroke-width="1.8" fill="none" opacity=".7" stroke-linecap="round"/>
+    <ellipse cx="44" cy="19" rx="24" ry="6" fill="#fff" opacity=".28"/>
+    <path d="M18 26 C30 20 66 20 78 26" stroke="#6a8a3a" stroke-width="1.6" fill="none" opacity=".35" stroke-linecap="round"/>
+    <circle cx="34" cy="16" r="1.7" fill="#fff" opacity=".7"/>
+  </g>
+  <!-- dipping-sauce glint + chive/scallion flecks + gloss -->
+  <ellipse cx="150" cy="150" rx="30" ry="6" fill="#241207" opacity=".5"/>
+  <rect x="108" y="86" width="7" height="2.6" rx="1.3" fill="#5ecb4e" transform="rotate(-18 111 87)"/>
+  <rect x="170" y="90" width="7" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(14 173 91)"/>
+  <rect x="140" y="128" width="6" height="2.4" rx="1.2" fill="#58c14a" transform="rotate(-26 143 129)"/>
+  <rect x="200" y="120" width="6" height="2.4" rx="1.2" fill="#5ecb4e" transform="rotate(10 203 121)"/>
+  <circle cx="98" cy="104" r="1.5" fill="#fff" opacity=".6"/>
+  <circle cx="164" cy="118" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="220" cy="112" r="1.3" fill="#fff" opacity=".5"/>
+</svg>

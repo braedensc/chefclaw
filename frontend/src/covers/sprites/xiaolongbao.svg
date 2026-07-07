@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="nnBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="b2bg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#102e35"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <radialGradient id="b2bun" cx="42%" cy="24%" r="82%">
+      <stop offset="0%" stop-color="#fdf6de"/><stop offset="60%" stop-color="#eddcac"/><stop offset="100%" stop-color="#cdb078"/>
+    </radialGradient>
+    <linearGradient id="b2steamer" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7c5a2e"/><stop offset="100%" stop-color="#3f2c14"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#b2bg)"/>
+  <ellipse cx="160" cy="186" rx="150" ry="22" fill="#000" opacity=".5"/>
+  <!-- extra steam: these are famously juicy/hot -->
+  <path d="M118 56 C110 38 128 30 118 10" stroke="#fff" stroke-width="7" fill="none" opacity=".11" filter="url(#nnBlur3)"/>
+  <path d="M160 48 C152 32 168 24 160 6" stroke="#fff" stroke-width="6" fill="none" opacity=".1" filter="url(#nnBlur3)"/>
+  <path d="M204 56 C196 40 212 32 204 12" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#nnBlur3)"/>
+  <!-- bamboo steamer basket -->
+  <ellipse cx="160" cy="130" rx="128" ry="52" fill="url(#b2steamer)"/>
+  <ellipse cx="160" cy="130" rx="128" ry="52" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="124" rx="122" ry="48" fill="#513818"/>
+  <ellipse cx="160" cy="122" rx="112" ry="43" fill="#2a1c0c"/>
+  <!-- bamboo slat ribs -->
+  <g stroke="#6a4a22" stroke-width="1.4" opacity=".4" fill="none">
+    <path d="M62 128 Q160 106 258 128"/>
+    <path d="M60 138 Q160 118 260 138"/>
+  </g>
+  <path d="M62 110 Q106 78 168 74" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- soup dumpling unit: pleated purse shape reused -->
+  <!-- back buns -->
+  <g transform="translate(102 66) rotate(-3) scale(.82)">
+    <path d="M2 38 C-2 20 12 4 40 4 C68 4 82 20 78 38 C64 44 16 44 2 38 Z" fill="url(#b2bun)"/>
+    <path d="M40 6 L40 14 M40 14 C34 16 28 22 24 34 M40 14 C46 16 52 22 56 34 M40 14 C36 18 32 26 30 36 M40 14 C44 18 48 26 50 36" stroke="#c8ab6c" stroke-width="1.4" fill="none" opacity=".6" stroke-linecap="round"/>
+    <circle cx="40" cy="10" r="3.6" fill="#e8d29a"/>
+    <ellipse cx="30" cy="24" rx="10" ry="6" fill="#fff" opacity=".2"/>
+  </g>
+  <g transform="translate(176 62) rotate(4) scale(.82)">
+    <path d="M2 38 C-2 20 12 4 40 4 C68 4 82 20 78 38 C64 44 16 44 2 38 Z" fill="url(#b2bun)"/>
+    <path d="M40 6 L40 14 M40 14 C34 16 28 22 24 34 M40 14 C46 16 52 22 56 34 M40 14 C36 18 32 26 30 36 M40 14 C44 18 48 26 50 36" stroke="#c8ab6c" stroke-width="1.4" fill="none" opacity=".6" stroke-linecap="round"/>
+    <circle cx="40" cy="10" r="3.6" fill="#e8d29a"/>
+    <ellipse cx="30" cy="24" rx="10" ry="6" fill="#fff" opacity=".2"/>
+  </g>
+  <!-- front buns -->
+  <g transform="translate(78 86) rotate(-6)">
+    <path d="M2 44 C-2 22 14 4 46 4 C78 4 94 22 90 44 C74 51 18 51 2 44 Z" fill="url(#b2bun)"/>
+    <path d="M46 6 L46 16 M46 16 C39 18 32 26 27 40 M46 16 C53 18 60 26 65 40 M46 16 C41 20 36 30 34 42 M46 16 C51 20 56 30 58 42" stroke="#b8974f" stroke-width="1.6" fill="none" opacity=".7" stroke-linecap="round"/>
+    <circle cx="46" cy="12" r="4.2" fill="#efdba4"/>
+    <ellipse cx="34" cy="26" rx="13" ry="7" fill="#fff" opacity=".28"/>
+    <circle cx="30" cy="20" r="1.8" fill="#fff" opacity=".8"/>
+  </g>
+  <g transform="translate(140 94) rotate(3)">
+    <path d="M2 44 C-2 22 14 4 46 4 C78 4 94 22 90 44 C74 51 18 51 2 44 Z" fill="url(#b2bun)"/>
+    <path d="M46 6 L46 16 M46 16 C39 18 32 26 27 40 M46 16 C53 18 60 26 65 40 M46 16 C41 20 36 30 34 42 M46 16 C51 20 56 30 58 42" stroke="#b8974f" stroke-width="1.6" fill="none" opacity=".7" stroke-linecap="round"/>
+    <circle cx="46" cy="12" r="4.2" fill="#efdba4"/>
+    <ellipse cx="34" cy="26" rx="13" ry="7" fill="#fff" opacity=".28"/>
+    <circle cx="30" cy="20" r="1.8" fill="#fff" opacity=".8"/>
+  </g>
+  <!-- garnish + gloss -->
+  <rect x="118" y="84" width="6" height="2.4" rx="1.2" fill="#5ecb4e" transform="rotate(-16 121 85)"/>
+  <rect x="188" y="96" width="6" height="2.4" rx="1.2" fill="#3f9c37" transform="rotate(20 191 97)"/>
+  <rect x="150" y="128" width="6" height="2.4" rx="1.2" fill="#58c14a" transform="rotate(-24 153 129)"/>
+  <circle cx="108" cy="108" r="1.5" fill="#fff" opacity=".6"/>
+  <circle cx="176" cy="120" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="212" cy="112" r="1.3" fill="#fff" opacity=".5"/>
+</svg>

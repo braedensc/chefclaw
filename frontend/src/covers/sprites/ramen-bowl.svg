@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="rmBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="rmbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <linearGradient id="rmbowl" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="55%" stop-color="#100b0d"/><stop offset="100%" stop-color="#070506"/>
+    </linearGradient>
+    <radialGradient id="rmbroth" cx="50%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#e0a54e"/><stop offset="52%" stop-color="#c07d2c"/><stop offset="100%" stop-color="#8a5216"/>
+    </radialGradient>
+    <linearGradient id="rmegg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff4d4"/><stop offset="100%" stop-color="#f0e2bc"/>
+    </linearGradient>
+    <radialGradient id="rmyolk" cx="42%" cy="34%" r="72%">
+      <stop offset="0%" stop-color="#ffcf5a"/><stop offset="60%" stop-color="#f39a1e"/><stop offset="100%" stop-color="#cf6d10"/>
+    </radialGradient>
+    <linearGradient id="rmchashu" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#a65a32"/><stop offset="100%" stop-color="#6e3315"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#rmbg)"/>
+  <!-- steam -->
+  <path d="M120 56 C110 38 130 30 120 10" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#rmBlur3)"/>
+  <path d="M204 54 C196 38 214 30 206 10" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#rmBlur3)"/>
+  <ellipse cx="160" cy="188" rx="150" ry="22" fill="#000" opacity=".5"/>
+  <!-- deep round bowl -->
+  <path d="M40 112 C40 158 96 182 160 182 C224 182 280 158 280 112 Z" fill="url(#rmbowl)"/>
+  <path d="M40 112 C40 158 96 182 160 182 C224 182 280 158 280 112" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <!-- painted band around the bowl rim (night-market ceramic) -->
+  <path d="M52 132 C70 150 112 162 160 162 C208 162 250 150 268 132" stroke="#35e0ff" stroke-width="2" fill="none" opacity=".22"/>
+  <ellipse cx="160" cy="112" rx="120" ry="30" fill="#0d0d10"/>
+  <ellipse cx="160" cy="112" rx="120" ry="30" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <!-- neon steam arc -->
+  <path d="M56 104 Q104 76 166 74" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- creamy tonkotsu broth -->
+  <ellipse cx="160" cy="114" rx="108" ry="24" fill="url(#rmbroth)"/>
+  <ellipse cx="132" cy="106" rx="30" ry="6" fill="#f3c579" opacity=".35" transform="rotate(-6 132 106)"/>
+  <!-- pale noodle strand nest peeking through broth -->
+  <g stroke-linecap="round" fill="none" opacity=".95">
+    <path d="M96 118 C120 104 160 104 188 116" stroke="#e6cf9d" stroke-width="4"/>
+    <path d="M100 124 C128 112 168 112 196 122" stroke="#d9bd85" stroke-width="4"/>
+    <path d="M108 112 C132 102 168 102 192 110" stroke="#f0dca6" stroke-width="3.4"/>
+    <path d="M120 120 C144 110 176 110 200 118" stroke="#cdb078" stroke-width="3.4"/>
+    <path d="M96 118 C120 104 160 104 188 116" stroke="#fff1c9" stroke-width="1.4" opacity=".6"/>
+    <path d="M108 112 C132 102 168 102 192 110" stroke="#7a4c14" stroke-width="1.6" opacity=".4"/>
+  </g>
+  <!-- chashu pork slice (rolled, rendered) top-left -->
+  <g transform="translate(96 98) rotate(-8)">
+    <ellipse rx="20" ry="13" fill="url(#rmchashu)"/>
+    <ellipse rx="20" ry="13" fill="none" stroke="#4a1f0c" stroke-width="1.4" opacity=".55"/>
+    <path d="M-15 -3 Q0 -8 15 -3" stroke="#d9a075" stroke-width="2.2" fill="none" opacity=".7"/>
+    <path d="M-14 3 Q0 -1 14 3" stroke="#f2d6bc" stroke-width="1.8" fill="none" opacity=".6"/>
+    <ellipse cx="-6" cy="-4" rx="5" ry="2" fill="#fff" opacity=".22"/>
+  </g>
+  <!-- soft-boiled ajitama egg half (yolk showing) right -->
+  <g transform="translate(214 108) rotate(6)">
+    <ellipse rx="18" ry="15" fill="url(#rmegg)"/>
+    <ellipse rx="18" ry="15" fill="none" stroke="#c9b487" stroke-width="1.2" opacity=".6"/>
+    <ellipse cx="1" cy="1" rx="9" ry="8" fill="url(#rmyolk)"/>
+    <ellipse cx="-2" cy="-2" rx="3.2" ry="2.6" fill="#ffe9a8" opacity=".8"/>
+  </g>
+  <!-- nori sheet standing at back -->
+  <g transform="translate(148 74) rotate(-4)">
+    <rect x="-13" y="-24" width="26" height="34" rx="2" fill="#132218"/>
+    <rect x="-13" y="-24" width="26" height="34" rx="2" fill="none" stroke="#2c4a34" stroke-width="1.2" opacity=".7"/>
+    <path d="M-9 -18 L9 -18 M-9 -10 L9 -10 M-9 -2 L9 -2 M-9 6 L9 6" stroke="#1e3626" stroke-width="1" opacity=".8"/>
+    <ellipse cx="-4" cy="-16" rx="6" ry="3" fill="#3a5c44" opacity=".3"/>
+  </g>
+  <!-- chopsticks lifting a few strands from the bowl -->
+  <g transform="rotate(-24 210 70)">
+    <rect x="196" y="34" width="5" height="70" rx="2.5" fill="#b98a4e"/>
+    <rect x="204" y="34" width="5" height="70" rx="2.5" fill="#a67a40"/>
+    <rect x="196" y="34" width="5" height="8" rx="2.5" fill="#d8b06a"/>
+    <rect x="204" y="34" width="5" height="8" rx="2.5" fill="#c79a58"/>
+  </g>
+  <!-- noodle strands dangling from chopstick tips -->
+  <g stroke-linecap="round" fill="none">
+    <path d="M186 96 C184 108 190 116 186 128" stroke="#e6cf9d" stroke-width="3"/>
+    <path d="M192 98 C194 110 188 118 192 130" stroke="#f0dca6" stroke-width="3"/>
+    <path d="M186 96 C184 108 190 116 186 128" stroke="#fff1c9" stroke-width="1.2" opacity=".6"/>
+  </g>
+  <!-- scallion + bamboo shoot flecks -->
+  <rect x="120" y="106" width="7" height="2.6" rx="1.3" fill="#58c14a" transform="rotate(-18 123 107)"/>
+  <rect x="158" y="100" width="7" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(16 161 101)"/>
+  <rect x="180" y="122" width="7" height="2.6" rx="1.3" fill="#58c14a" transform="rotate(-8 183 123)"/>
+  <rect x="140" y="122" width="6" height="2.4" rx="1.2" fill="#6abf5a" transform="rotate(24 143 123)"/>
+  <rect x="168" y="118" width="8" height="2.6" rx="1.3" fill="#e6d29a" transform="rotate(10 172 119)"/>
+  <circle cx="150" cy="112" r="1.8" fill="#e0341f"/>
+  <!-- oil gloss dots on broth -->
+  <circle cx="126" cy="110" r="2" fill="#ffe6b0" opacity=".55"/>
+  <circle cx="172" cy="108" r="1.6" fill="#ffe6b0" opacity=".5"/>
+  <circle cx="150" cy="120" r="1.3" fill="#fff" opacity=".5"/>
+</svg>

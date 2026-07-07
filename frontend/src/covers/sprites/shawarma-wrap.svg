@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="nnBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="sw1bg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <linearGradient id="sw1flat" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f6e4bc"/><stop offset="52%" stop-color="#e8cf98"/><stop offset="100%" stop-color="#cfa96c"/>
+    </linearGradient>
+    <linearGradient id="sw1end" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f4e2b8"/><stop offset="100%" stop-color="#d8b47f"/>
+    </linearGradient>
+    <linearGradient id="sw1chk" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#cf7a34"/><stop offset="100%" stop-color="#8f4818"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#sw1bg)"/>
+  <!-- steam -->
+  <path d="M124 56 C114 38 134 30 124 10" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#nnBlur3)"/>
+  <path d="M200 52 C192 36 210 28 202 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#nnBlur3)"/>
+  <ellipse cx="160" cy="188" rx="156" ry="21" fill="#000" opacity=".5"/>
+  <!-- wooden serving board -->
+  <ellipse cx="160" cy="132" rx="140" ry="42" fill="#1c1410"/>
+  <ellipse cx="160" cy="132" rx="140" ry="42" fill="none" stroke="#2f2216" stroke-width="3"/>
+  <ellipse cx="160" cy="132" rx="126" ry="35" fill="#140e0a"/>
+  <path d="M60 128 Q120 118 240 122" stroke="#3a2a18" stroke-width="1.2" fill="none" opacity=".5"/>
+  <!-- neon steam arc -->
+  <path d="M56 118 Q104 88 168 84" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- rolled wrap body lying diagonally -->
+  <g transform="rotate(-16 160 118)">
+    <!-- under-shadow -->
+    <path d="M74 128 C74 118 88 112 108 112 L236 112 C252 112 262 120 262 128 C262 136 252 144 236 144 L108 144 C88 144 74 138 74 128 Z" fill="#000" opacity=".35"/>
+    <!-- main tortilla tube -->
+    <path d="M78 122 C78 112 92 106 112 106 L232 106 C248 106 258 114 258 122 C258 130 248 138 232 138 L112 138 C92 138 78 132 78 122 Z" fill="url(#sw1flat)"/>
+    <!-- tortilla fold seam highlight -->
+    <path d="M96 110 Q170 104 244 112" stroke="#fff1cf" stroke-width="2" fill="none" opacity=".45" stroke-linecap="round"/>
+    <path d="M100 132 Q170 138 236 130" stroke="#a9834c" stroke-width="1.6" fill="none" opacity=".55" stroke-linecap="round"/>
+    <!-- griddle char spots on the flatbread -->
+    <ellipse cx="130" cy="118" rx="9" ry="4" fill="#b98a4e" opacity=".45"/>
+    <ellipse cx="184" cy="124" rx="8" ry="3.6" fill="#a9763c" opacity=".4"/>
+    <ellipse cx="214" cy="116" rx="7" ry="3.2" fill="#b98a4e" opacity=".4"/>
+    <!-- overlapping fold flap at right -->
+    <path d="M230 106 C250 108 260 116 258 124 C252 118 240 114 228 116 Z" fill="#e0c286" opacity=".9"/>
+    <!-- cut OPEN end at left: exposed filling spiral -->
+    <ellipse cx="96" cy="122" rx="20" ry="18" fill="url(#sw1end)"/>
+    <ellipse cx="96" cy="122" rx="20" ry="18" fill="none" stroke="#b98a4e" stroke-width="1.4" opacity=".6"/>
+    <!-- inner filling packed in the open end -->
+    <path d="M84 116 C90 110 104 110 108 118 C112 112 106 124 98 126 C90 130 80 124 84 116 Z" fill="url(#sw1chk)"/>
+    <path d="M90 124 C96 118 108 120 110 128 C104 134 92 134 88 128 Z" fill="#b85e24"/>
+    <!-- shredded chicken strands -->
+    <path d="M84 120 q8 -2 16 0 M86 126 q8 2 15 -1" stroke="#e39a4e" stroke-width="1.6" fill="none" opacity=".8" stroke-linecap="round"/>
+    <!-- lettuce green poking out -->
+    <path d="M82 114 C88 108 96 108 100 112 C94 116 86 118 82 114 Z" fill="#6abf5a"/>
+    <path d="M100 130 C106 134 96 138 90 134 Z" fill="#58c14a"/>
+    <!-- tomato dice + white garlic sauce in the filling -->
+    <circle cx="102" cy="116" r="2.6" fill="#dd3320"/>
+    <circle cx="92" cy="130" r="2.4" fill="#e0341f"/>
+    <circle cx="104" cy="126" r="2.2" fill="#f4ead0" opacity=".9"/>
+    <circle cx="88" cy="120" r="1.8" fill="#f4ead0" opacity=".85"/>
+  </g>
+  <!-- drizzle of garlic-tahini sauce over the wrap -->
+  <path d="M118 108 C150 100 196 100 224 106" stroke="#f4ead0" stroke-width="2.4" fill="none" opacity=".6" stroke-linecap="round"/>
+  <!-- scattered parsley + sumac flecks on top -->
+  <rect x="150" y="98" width="7" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(-18 153 99)"/>
+  <rect x="186" y="102" width="7" height="2.6" rx="1.3" fill="#58c14a" transform="rotate(14 189 103)"/>
+  <rect x="132" y="104" width="6" height="2.4" rx="1.2" fill="#3f9c37" transform="rotate(24 135 105)"/>
+  <circle cx="168" cy="100" r="1.8" fill="#c31f12"/>
+  <circle cx="204" cy="106" r="1.6" fill="#e0341f"/>
+  <!-- gloss dots -->
+  <circle cx="146" cy="106" r="1.4" fill="#fff" opacity=".6"/>
+  <circle cx="200" cy="112" r="1.3" fill="#fff" opacity=".55"/>
+  <circle cx="96" cy="118" r="1.3" fill="#fff" opacity=".5"/>
+</svg>

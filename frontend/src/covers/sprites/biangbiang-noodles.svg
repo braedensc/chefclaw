@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="bbBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="bbbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="bbbowl" cx="50%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <linearGradient id="bbbelt" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f0dca0"/><stop offset="50%" stop-color="#dcbf80"/><stop offset="100%" stop-color="#b9975a"/>
+    </linearGradient>
+    <radialGradient id="bboil" cx="46%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#ef5520"/><stop offset="50%" stop-color="#b02408"/><stop offset="100%" stop-color="#7a1305"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#bbbg)"/>
+  <!-- steam -->
+  <path d="M122 56 C112 38 132 30 122 12" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#bbBlur3)"/>
+  <path d="M202 52 C194 36 212 28 204 10" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#bbBlur3)"/>
+  <ellipse cx="160" cy="188" rx="156" ry="22" fill="#000" opacity=".5"/>
+  <!-- wide bowl -->
+  <ellipse cx="160" cy="128" rx="134" ry="53" fill="url(#bbbowl)"/>
+  <ellipse cx="160" cy="128" rx="134" ry="53" fill="none" stroke="#26262e" stroke-width="3"/>
+  <ellipse cx="160" cy="128" rx="118" ry="44" fill="#0c0c0f"/>
+  <!-- neon steam arc -->
+  <path d="M56 112 Q106 80 168 76" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- wide flat belt-noodle ribbons (hand-pulled, folded thick strands) -->
+  <g fill="url(#bbbelt)" stroke="#8a5a1e" stroke-width="1.3" stroke-linejoin="round">
+    <path d="M60 130 C74 108 118 100 168 104 C210 108 244 118 256 132 C244 140 236 130 214 128 C226 138 214 146 196 140 C182 148 168 138 156 140 C142 148 124 140 116 134 C102 142 84 138 74 132 C68 136 62 134 60 130 Z" opacity=".97"/>
+  </g>
+  <!-- individual belt ribbons with highlight + shadow edges for width -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M74 124 C100 106 148 102 196 110" stroke="#dcbf80" stroke-width="13"/>
+    <path d="M74 124 C100 106 148 102 196 110" stroke="#fff1c9" stroke-width="2.4" opacity=".55"/>
+    <path d="M74 132 C100 116 150 114 200 122" stroke="#7a4c14" stroke-width="2" opacity=".5"/>
+    <path d="M92 140 C120 122 168 120 216 128" stroke="#dcbf80" stroke-width="12"/>
+    <path d="M92 140 C120 122 168 120 216 128" stroke="#fff1c9" stroke-width="2.2" opacity=".5"/>
+    <path d="M92 148 C120 132 168 130 216 138" stroke="#7a4c14" stroke-width="2" opacity=".45"/>
+    <path d="M112 118 C140 104 184 104 224 114" stroke="#e6cf9d" stroke-width="11"/>
+    <path d="M112 118 C140 104 184 104 224 114" stroke="#fff1c9" stroke-width="2" opacity=".5"/>
+  </g>
+  <!-- sizzling chili-oil pour pooled over the noodle center (油泼) -->
+  <path d="M118 108 C112 96 132 90 152 94 C168 88 194 94 200 108 C210 114 208 130 192 134 C186 148 158 150 140 144 C120 148 108 134 112 122 C108 116 112 110 118 108 Z" fill="url(#bboil)" opacity=".92"/>
+  <path d="M124 106 C120 98 136 94 150 96 C164 92 184 96 190 106" fill="none" stroke="#ff7a3a" stroke-width="1.4" opacity=".6"/>
+  <!-- coarse chili flakes in the oil -->
+  <g>
+    <rect x="128" y="104" width="7" height="3" rx="1.4" fill="#c31f12" transform="rotate(-20 131 105)"/>
+    <rect x="150" y="100" width="7" height="3" rx="1.4" fill="#e0341f" transform="rotate(12 153 101)"/>
+    <rect x="172" y="108" width="7" height="3" rx="1.4" fill="#c31f12" transform="rotate(-8 175 109)"/>
+    <rect x="138" y="118" width="7" height="3" rx="1.4" fill="#e0341f" transform="rotate(24 141 119)"/>
+    <rect x="164" y="124" width="7" height="3" rx="1.4" fill="#a81c0e" transform="rotate(-14 167 125)"/>
+    <rect x="182" y="120" width="6" height="2.8" rx="1.3" fill="#e0341f" transform="rotate(8 185 121)"/>
+  </g>
+  <!-- toasted garlic + peppercorn specks -->
+  <circle cx="140" cy="110" r="1.6" fill="#f2ddb0"/>
+  <circle cx="176" cy="116" r="1.6" fill="#f2ddb0"/>
+  <circle cx="156" cy="130" r="1.5" fill="#f2ddb0"/>
+  <circle cx="130" cy="122" r="1.3" fill="#260903"/>
+  <circle cx="186" cy="108" r="1.3" fill="#260903"/>
+  <!-- fresh scallion + a green bok-choy leaf tucked at the side -->
+  <path d="M212 118 C224 108 238 108 246 116 C238 124 224 124 212 120 Z" fill="#3f9c37" opacity=".9"/>
+  <path d="M214 118 C226 112 238 112 244 117" stroke="#6abf5a" stroke-width="1.4" fill="none" opacity=".7"/>
+  <rect x="102" y="112" width="8" height="2.8" rx="1.4" fill="#58c14a" transform="rotate(-16 106 113)"/>
+  <rect x="118" y="104" width="8" height="2.8" rx="1.4" fill="#6abf5a" transform="rotate(10 122 105)"/>
+  <rect x="196" y="132" width="8" height="2.8" rx="1.4" fill="#3f9c37" transform="rotate(-10 200 133)"/>
+  <!-- oil gloss dots -->
+  <circle cx="146" cy="108" r="1.6" fill="#fff" opacity=".6"/>
+  <circle cx="182" cy="118" r="1.4" fill="#fff" opacity=".5"/>
+  <circle cx="158" cy="126" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

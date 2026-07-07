@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="sf1Blur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="sf1bg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#102e35"/><stop offset="45%" stop-color="#0b090b"/><stop offset="100%" stop-color="#060507"/>
+    </radialGradient>
+    <linearGradient id="sf1steak" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6b3218"/><stop offset="45%" stop-color="#4a1c0e"/><stop offset="100%" stop-color="#301108"/>
+    </linearGradient>
+    <linearGradient id="sf1sear" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8a4a24"/><stop offset="100%" stop-color="#5a2612"/>
+    </linearGradient>
+    <linearGradient id="sf1fry" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f6cf6a"/><stop offset="55%" stop-color="#e2a838"/><stop offset="100%" stop-color="#b4761d"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#sf1bg)"/>
+  <!-- steam -->
+  <path d="M112 54 C102 36 122 28 112 8" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#sf1Blur3)"/>
+  <path d="M196 52 C188 36 206 28 198 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#sf1Blur3)"/>
+  <ellipse cx="160" cy="188" rx="156" ry="22" fill="#000" opacity=".5"/>
+  <!-- oval plate -->
+  <ellipse cx="160" cy="132" rx="144" ry="46" fill="#141018"/>
+  <ellipse cx="160" cy="132" rx="144" ry="46" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="132" rx="130" ry="38" fill="#0f0d13"/>
+  <!-- neon steam arc (cyan) -->
+  <path d="M48 116 Q100 84 164 82" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- SEARED STEAK on the left half -->
+  <g transform="translate(0 2)">
+    <!-- steak body (thick seared cut) -->
+    <path d="M52 122 C52 104 74 92 104 92 C130 92 148 104 148 122 C148 140 128 150 100 150 C72 150 52 140 52 122 Z" fill="url(#sf1steak)"/>
+    <!-- top seared crust surface -->
+    <path d="M56 116 C58 100 78 90 104 90 C128 90 146 100 148 116 C130 124 74 124 56 116 Z" fill="url(#sf1sear)"/>
+    <!-- grill-mark char lines -->
+    <path d="M70 100 L112 116 M84 96 L126 112 M98 94 L138 110" stroke="#1c0d06" stroke-width="3" opacity=".55" stroke-linecap="round"/>
+    <!-- pink medium-rare interior peeking at the cut edge -->
+    <path d="M52 122 C52 132 66 142 88 146 C86 138 84 130 86 122 C72 124 60 124 52 122 Z" fill="#c1523f"/>
+    <path d="M60 126 C68 128 78 128 86 126" stroke="#e08a72" stroke-width="1.6" fill="none" opacity=".7"/>
+    <!-- steak outline -->
+    <path d="M52 122 C52 104 74 92 104 92 C130 92 148 104 148 122 C148 140 128 150 100 150 C72 150 52 140 52 122 Z" fill="none" stroke="#240a03" stroke-width="1.4" opacity=".5"/>
+    <!-- glossy butter/herb sheen -->
+    <ellipse cx="96" cy="104" rx="16" ry="5" fill="#c78a4a" opacity=".4"/>
+    <!-- pat of herb butter melting on top -->
+    <path d="M104 100 C108 96 116 96 118 101 C116 106 108 106 104 102 Z" fill="#f2d98c" opacity=".85"/>
+    <path d="M108 99 l2 -3 M114 100 l2 -3" stroke="#3f9c37" stroke-width="1.2"/>
+  </g>
+  <!-- FRITES: a fan of golden fries on the right half -->
+  <g stroke-linejoin="round">
+    <g transform="translate(178 108) rotate(-24)"><rect width="52" height="10" rx="2.4" fill="url(#sf1fry)" stroke="#9a5f16" stroke-width="1"/><rect y="1.6" width="52" height="2.4" rx="1.2" fill="#ffe6a0" opacity=".7"/></g>
+    <g transform="translate(182 116) rotate(-10)"><rect width="56" height="10" rx="2.4" fill="url(#sf1fry)" stroke="#9a5f16" stroke-width="1"/><rect y="1.6" width="56" height="2.4" rx="1.2" fill="#ffe6a0" opacity=".65"/></g>
+    <g transform="translate(180 124) rotate(4)"><rect width="54" height="10" rx="2.4" fill="url(#sf1fry)" stroke="#9a5f16" stroke-width="1"/><rect y="1.6" width="54" height="2.4" rx="1.2" fill="#ffe6a0" opacity=".7"/></g>
+    <g transform="translate(178 132) rotate(16)"><rect width="50" height="9" rx="2.2" fill="url(#sf1fry)" stroke="#9a5f16" stroke-width="1"/><rect y="1.4" width="50" height="2.2" rx="1.1" fill="#ffe6a0" opacity=".6"/></g>
+    <g transform="translate(190 102) rotate(-34)"><rect width="46" height="9" rx="2.2" fill="url(#sf1fry)" stroke="#9a5f16" stroke-width="1"/><rect y="1.4" width="46" height="2.2" rx="1.1" fill="#ffe6a0" opacity=".65"/></g>
+    <g transform="translate(186 140) rotate(26)"><rect width="44" height="9" rx="2.2" fill="url(#sf1fry)" stroke="#9a5f16" stroke-width="1"/><rect y="1.4" width="44" height="2.2" rx="1.1" fill="#ffe6a0" opacity=".55"/></g>
+  </g>
+  <!-- salt flakes + parsley on the plate -->
+  <rect x="140" y="140" width="6" height="2.4" rx="1.2" fill="#3f9c37" transform="rotate(-14 143 141)"/>
+  <rect x="118" y="146" width="5" height="2.2" rx="1.1" fill="#2f7d2b" transform="rotate(20 120 147)"/>
+  <circle cx="132" cy="144" r="1.1" fill="#fff" opacity=".8"/>
+  <circle cx="160" cy="150" r="1" fill="#fff" opacity=".7"/>
+  <!-- gloss dots -->
+  <circle cx="92" cy="100" r="1.5" fill="#fff" opacity=".6"/>
+  <circle cx="206" cy="116" r="1.4" fill="#fff" opacity=".5"/>
+  <circle cx="200" cy="130" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="nnBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="gcbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#123138"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <linearGradient id="gcbowl" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="55%" stop-color="#100b0d"/><stop offset="100%" stop-color="#070506"/>
+    </linearGradient>
+    <radialGradient id="gccurry" cx="50%" cy="30%" r="82%">
+      <stop offset="0%" stop-color="#b7cf78"/><stop offset="48%" stop-color="#8bb050"/><stop offset="100%" stop-color="#5f8a38"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#gcbg)"/>
+  <!-- steam -->
+  <path d="M116 62 C106 44 126 36 116 16" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#nnBlur3)"/>
+  <path d="M202 58 C194 42 212 34 204 14" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#nnBlur3)"/>
+  <ellipse cx="160" cy="188" rx="158" ry="22" fill="#000" opacity=".5"/>
+  <!-- deep round bowl -->
+  <path d="M50 106 C50 154 102 178 160 178 C218 178 270 154 270 106 Z" fill="url(#gcbowl)"/>
+  <ellipse cx="160" cy="106" rx="112" ry="30" fill="#0d0d10"/>
+  <ellipse cx="160" cy="106" rx="112" ry="30" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="106" rx="100" ry="24" fill="#0c1210"/>
+  <!-- neon steam arc -->
+  <path d="M56 98 Q104 72 164 70" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- creamy green coconut curry surface -->
+  <ellipse cx="160" cy="108" rx="95" ry="21" fill="url(#gccurry)"/>
+  <!-- coconut-milk swirl on the surface -->
+  <path d="M92 106 C120 98 150 116 190 106 C214 100 232 108 240 104" stroke="#eef4d6" stroke-width="2.6" fill="none" opacity=".55" stroke-linecap="round"/>
+  <path d="M108 116 C132 110 156 122 186 114" stroke="#f4f8e2" stroke-width="2" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- red-oil sheen droplets on the coconut surface -->
+  <ellipse cx="124" cy="102" rx="9" ry="3.6" fill="#e0621f" opacity=".55" transform="rotate(-8 124 102)"/>
+  <ellipse cx="196" cy="112" rx="7" ry="3" fill="#e0621f" opacity=".5" transform="rotate(6 196 112)"/>
+  <circle cx="150" cy="116" r="2.6" fill="#e8791f" opacity=".55"/>
+  <!-- chicken chunks (pale poached) half-submerged -->
+  <g stroke="#c9b487" stroke-width="1.1">
+    <path d="M116 100 C110 94 120 88 130 92 C138 88 144 96 140 102 C142 108 132 112 124 108 C116 110 112 104 116 100 Z" fill="#f0e6cc"/>
+    <ellipse cx="124" cy="94" rx="6" ry="2.4" fill="#fbf5e4" opacity=".7"/>
+  </g>
+  <g stroke="#c9b487" stroke-width="1.1">
+    <path d="M182 104 C176 98 186 92 196 96 C204 92 210 100 206 106 C208 112 198 116 190 112 C182 114 178 108 182 104 Z" fill="#ece1c4"/>
+    <ellipse cx="190" cy="98" rx="6" ry="2.4" fill="#fbf5e4" opacity=".7"/>
+  </g>
+  <!-- Thai eggplant / pea-eggplant balls (small green spheres) -->
+  <g>
+    <circle cx="146" cy="98" r="6.5" fill="#8fb34c"/>
+    <circle cx="146" cy="98" r="6.5" fill="none" stroke="#5f8a38" stroke-width="1"/>
+    <ellipse cx="144" cy="95.5" rx="2.4" ry="1.4" fill="#d3e28f" opacity=".8"/>
+    <circle cx="168" cy="112" r="5.5" fill="#a2c257"/>
+    <circle cx="168" cy="112" r="5.5" fill="none" stroke="#5f8a38" stroke-width="1"/>
+    <ellipse cx="166" cy="110" rx="2" ry="1.2" fill="#d3e28f" opacity=".8"/>
+    <circle cx="204" cy="100" r="4.6" fill="#8fb34c"/>
+    <circle cx="204" cy="100" r="4.6" fill="none" stroke="#5f8a38" stroke-width="1"/>
+  </g>
+  <!-- red chili slivers floating (color pop) -->
+  <g>
+    <path d="M128 116 C138 113 148 115 154 118 C148 121 138 121 128 118 Z" fill="#e0341f" transform="rotate(-10 140 117)"/>
+    <path d="M172 118 C182 115 192 117 198 120 C192 123 182 123 172 120 Z" fill="#c31f12" transform="rotate(12 184 119)"/>
+  </g>
+  <!-- Thai basil leaves (pointed dark-green, on top) -->
+  <g>
+    <path d="M134 104 C130 96 138 90 146 94 C150 100 144 108 136 108 C134 107 133 106 134 104 Z" fill="#2f7d2b"/>
+    <path d="M140 96 L138 106" stroke="#5ecb4e" stroke-width="1" opacity=".6"/>
+    <path d="M180 108 C176 100 184 94 192 98 C196 104 190 112 182 112 C180 111 179 110 180 108 Z" fill="#3f9c37"/>
+    <path d="M186 100 L184 110" stroke="#6abf5a" stroke-width="1" opacity=".6"/>
+    <path d="M158 118 C154 111 162 106 169 110 C172 115 166 121 159 121 C157 120 157 119 158 118 Z" fill="#2f7d2b"/>
+  </g>
+  <!-- kaffir-lime / scallion sliver flecks -->
+  <rect x="150" y="100" width="7" height="2.4" rx="1.2" fill="#58c14a" transform="rotate(-16 153 101)"/>
+  <rect x="196" y="110" width="6" height="2.2" rx="1.1" fill="#3f9c37" transform="rotate(18 199 111)"/>
+  <!-- oil gloss dots -->
+  <circle cx="126" cy="100" r="1.4" fill="#fff" opacity=".6"/>
+  <circle cx="182" cy="104" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="158" cy="112" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

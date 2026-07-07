@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="dd1Blur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="dd1bg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="dd1oil" cx="50%" cy="36%" r="80%">
+      <stop offset="0%" stop-color="#ef5520"/><stop offset="55%" stop-color="#b02408"/><stop offset="100%" stop-color="#7a1305"/>
+    </radialGradient>
+    <!-- warm crumbly-pork gradient: lit brown top, NOT near-black -->
+    <radialGradient id="dd1mince" cx="46%" cy="24%" r="82%">
+      <stop offset="0%" stop-color="#b06a30"/><stop offset="55%" stop-color="#894c1e"/><stop offset="100%" stop-color="#5e3212"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#dd1bg)"/>
+  <path d="M120 52 C112 36 128 28 120 10" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#dd1Blur3)"/>
+  <path d="M200 50 C192 34 208 26 200 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#dd1Blur3)"/>
+  <ellipse cx="160" cy="188" rx="152" ry="22" fill="#000" opacity=".5"/>
+  <!-- bowl -->
+  <ellipse cx="160" cy="124" rx="116" ry="66" fill="#141013"/>
+  <ellipse cx="160" cy="124" rx="116" ry="66" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="120" rx="100" ry="54" fill="#0c0a0d"/>
+  <path d="M66 104 Q108 66 168 60" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".45" stroke-linecap="round"/>
+  <!-- chili-oil pool -->
+  <ellipse cx="160" cy="120" rx="98" ry="52" fill="url(#dd1oil)"/>
+  <ellipse cx="126" cy="98" rx="34" ry="9" fill="#ff9a55" opacity=".3" transform="rotate(-10 126 98)"/>
+  <ellipse cx="160" cy="120" rx="92" ry="47" fill="none" stroke="#ff6a3a" stroke-width="2" opacity=".3"/>
+  <!-- pale noodle nest slicked in oil -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M92 108 C124 90 196 88 228 106" stroke="#e6cf9d" stroke-width="6"/>
+    <path d="M110 100 C136 88 184 88 210 100" stroke="#d9bd85" stroke-width="6"/>
+    <path d="M78 122 C110 98 210 98 242 124" stroke="#e6cf9d" stroke-width="7"/>
+    <path d="M88 136 C122 110 198 110 232 138" stroke="#d9bd85" stroke-width="7"/>
+    <path d="M104 148 C132 128 188 128 216 148" stroke="#cdb078" stroke-width="6"/>
+    <path d="M96 112 C126 94 194 92 224 110" stroke="#fff1c9" stroke-width="2" opacity=".7"/>
+    <path d="M84 134 C116 108 202 108 236 136" stroke="#fff1c9" stroke-width="2" opacity=".55"/>
+    <path d="M100 146 C130 124 186 124 214 146" stroke="#a3300f" stroke-width="2.4" opacity=".45"/>
+    <path d="M82 122 C114 98 208 98 240 124" stroke="#8a5a1e" stroke-width="2" opacity=".45"/>
+  </g>
+  <!-- cast shadow UNDER the mince mound (so it reads as sitting proud, not a hole) -->
+  <ellipse cx="162" cy="112" rx="46" ry="16" fill="#3a1305" opacity=".55"/>
+  <!-- minced pork mound: domed warm-brown mass lifted above the noodles -->
+  <path d="M118 104 C122 84 146 74 162 74 C180 74 204 84 206 104 C200 116 182 122 162 122 C142 122 124 116 118 104 Z" fill="url(#dd1mince)"/>
+  <!-- lit top surface of the dome -->
+  <path d="M124 100 C130 84 148 78 162 78 C178 78 196 84 200 100 C186 92 174 90 162 90 C148 90 136 92 124 100 Z" fill="#bd7838" opacity=".7"/>
+  <path d="M118 104 C122 84 146 74 162 74 C180 74 204 84 206 104" fill="none" stroke="#c98040" stroke-width="1.4" opacity=".55"/>
+  <!-- crumble texture: many warm meat crumbs, mid + light + dark for grain -->
+  <g fill="#a05e28">
+    <circle cx="138" cy="90" r="3.4"/><circle cx="150" cy="84" r="3"/><circle cx="164" cy="88" r="3.6"/>
+    <circle cx="178" cy="84" r="3.2"/><circle cx="190" cy="92" r="3"/><circle cx="144" cy="100" r="3.2"/>
+    <circle cx="160" cy="102" r="3.4"/><circle cx="176" cy="100" r="3"/><circle cx="128" cy="98" r="2.8"/>
+    <circle cx="192" cy="104" r="2.8"/>
+  </g>
+  <g fill="#caa060">
+    <circle cx="141" cy="87" r="1.6"/><circle cx="154" cy="82" r="1.5"/><circle cx="167" cy="85" r="1.7"/>
+    <circle cx="180" cy="82" r="1.5"/><circle cx="149" cy="97" r="1.6"/><circle cx="163" cy="98" r="1.7"/>
+    <circle cx="179" cy="96" r="1.5"/><circle cx="188" cy="89" r="1.4"/><circle cx="133" cy="95" r="1.4"/>
+  </g>
+  <g fill="#5a3214">
+    <circle cx="146" cy="93" r="1.5"/><circle cx="159" cy="90" r="1.6"/><circle cx="172" cy="93" r="1.5"/>
+    <circle cx="184" cy="98" r="1.4"/><circle cx="152" cy="105" r="1.4"/><circle cx="170" cy="106" r="1.4"/>
+    <circle cx="136" cy="104" r="1.3"/><circle cx="188" cy="98" r="1.2"/>
+  </g>
+  <!-- ya cai (preserved veg) flecks in mince -->
+  <rect x="150" y="90" width="5" height="2.4" rx="1.2" fill="#3a5a1e" transform="rotate(18 152 91)"/>
+  <rect x="170" y="86" width="5" height="2.4" rx="1.2" fill="#2f4a18" transform="rotate(-22 172 87)"/>
+  <rect x="158" y="102" width="4.6" height="2.2" rx="1.1" fill="#3a5a1e" transform="rotate(10 160 103)"/>
+  <!-- chili-oil sheen glinting on the meat -->
+  <ellipse cx="150" cy="86" rx="8" ry="2.6" fill="#ff8a3a" opacity=".4" transform="rotate(-8 150 86)"/>
+  <ellipse cx="180" cy="94" rx="7" ry="2.4" fill="#ff8a3a" opacity=".35" transform="rotate(10 180 94)"/>
+  <!-- crushed peanuts scattered on noodles -->
+  <g fill="#e6b866" stroke="#a9772e" stroke-width=".9" stroke-opacity=".5">
+    <ellipse cx="104" cy="120" rx="5.5" ry="4" transform="rotate(-18 104 120)"/>
+    <ellipse cx="216" cy="118" rx="5.5" ry="4" transform="rotate(22 216 118)"/>
+    <ellipse cx="124" cy="138" rx="5" ry="3.6" transform="rotate(8 124 138)"/>
+    <ellipse cx="196" cy="136" rx="5" ry="3.6" transform="rotate(-14 196 136)"/>
+    <ellipse cx="160" cy="140" rx="5" ry="3.6" transform="rotate(4 160 140)"/>
+  </g>
+  <!-- scallion greens -->
+  <rect x="110" y="108" width="7" height="2.8" rx="1.4" fill="#58c14a" transform="rotate(-20 113 109)"/>
+  <rect x="204" y="106" width="7" height="2.8" rx="1.4" fill="#6abf5a" transform="rotate(16 207 107)"/>
+  <rect x="126" y="128" width="6" height="2.6" rx="1.3" fill="#2f7d2b" transform="rotate(28 129 129)"/>
+  <rect x="192" y="126" width="6" height="2.6" rx="1.3" fill="#58c14a" transform="rotate(-16 195 127)"/>
+  <rect x="150" y="118" width="6" height="2.6" rx="1.3" fill="#6abf5a" transform="rotate(8 153 119)"/>
+  <!-- sesame -->
+  <ellipse cx="134" cy="112" rx="2" ry="1.2" fill="#f8eed6" transform="rotate(20 134 112)"/>
+  <ellipse cx="188" cy="112" rx="2" ry="1.2" fill="#f8eed6" transform="rotate(-16 188 112)"/>
+  <ellipse cx="162" cy="118" rx="2" ry="1.2" fill="#f8eed6" transform="rotate(6 162 118)"/>
+  <!-- oil glints -->
+  <circle cx="118" cy="116" r="1.3" fill="#ffd88a" opacity=".8"/>
+  <circle cx="202" cy="122" r="1.3" fill="#ffd88a" opacity=".75"/>
+  <circle cx="150" cy="134" r="1.1" fill="#ffd88a" opacity=".7"/>
+</svg>

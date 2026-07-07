@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="nnBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="kfcbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#3a1120"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <radialGradient id="kfcpiece" cx="40%" cy="30%" r="82%">
+      <stop offset="0%" stop-color="#e26a1e"/><stop offset="52%" stop-color="#b8420f"/><stop offset="100%" stop-color="#7c2408"/>
+    </radialGradient>
+    <linearGradient id="kfcglaze" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ff5a2a" stop-opacity=".9"/><stop offset="100%" stop-color="#c11f14" stop-opacity=".9"/>
+    </linearGradient>
+    <radialGradient id="kfcplate" cx="50%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#kfcbg)"/>
+  <!-- steam -->
+  <path d="M122 58 C112 40 132 32 122 12" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#nnBlur3)"/>
+  <path d="M200 54 C192 38 210 30 202 10" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#nnBlur3)"/>
+  <ellipse cx="160" cy="186" rx="152" ry="22" fill="#000" opacity=".5"/>
+  <!-- oval plate -->
+  <ellipse cx="160" cy="128" rx="132" ry="50" fill="url(#kfcplate)"/>
+  <ellipse cx="160" cy="128" rx="132" ry="50" fill="none" stroke="#271b22" stroke-width="3"/>
+  <ellipse cx="160" cy="128" rx="116" ry="41" fill="#0d0b0d"/>
+  <!-- neon steam arc -->
+  <path d="M58 110 Q104 82 168 78" stroke="#ff4d6d" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- gochujang glaze pool sheen under the pieces -->
+  <ellipse cx="160" cy="130" rx="100" ry="26" fill="#5c130a" opacity=".55"/>
+  <ellipse cx="138" cy="122" rx="30" ry="7" fill="#ff5a2a" opacity=".25" transform="rotate(-8 138 122)"/>
+  <!-- craggy fried-chicken pieces (glazed, glossy, irregular lobes) -->
+  <!-- back-left drumette -->
+  <g transform="translate(102 106) scale(.86)">
+    <path d="M-2 -18 C10 -26 26 -22 32 -10 C40 -4 40 12 30 20 C18 30 -2 30 -14 20 C-26 12 -24 -6 -12 -14 C-9 -18 -6 -19 -2 -18 Z" fill="url(#kfcpiece)" stroke="#5a1c06" stroke-width="1.4" opacity="1"/>
+    <path d="M-10 -8 C-4 -14 8 -16 16 -12 M-14 6 C-6 12 12 14 22 8" stroke="#8a2f0c" stroke-width="1.3" fill="none" opacity=".6"/>
+    <path d="M-2 -18 C10 -26 26 -22 32 -10 C36 -6 37 2 32 8 C22 4 8 2 -6 6 C-14 2 -12 -12 -2 -18 Z" fill="url(#kfcglaze)"/>
+    <ellipse cx="6" cy="-10" rx="9" ry="4" fill="#ffb078" opacity=".65"/>
+  </g>
+  <!-- back-right wing -->
+  <g transform="translate(214 108) scale(.84) rotate(12)">
+    <path d="M-4 -18 C10 -24 26 -20 32 -8 C40 0 36 16 24 22 C10 30 -8 28 -18 18 C-28 8 -22 -8 -10 -15 C-8 -17 -6 -18 -4 -18 Z" fill="url(#kfcpiece)" stroke="#5a1c06" stroke-width="1.4"/>
+    <path d="M-12 -6 C-4 -12 10 -14 18 -10 M-16 8 C-6 14 12 14 22 6" stroke="#8a2f0c" stroke-width="1.3" fill="none" opacity=".6"/>
+    <path d="M-4 -18 C10 -24 26 -20 32 -8 C36 -3 36 4 31 9 C20 4 6 3 -8 7 C-16 2 -14 -12 -4 -18 Z" fill="url(#kfcglaze)"/>
+    <ellipse cx="8" cy="-9" rx="9" ry="4" fill="#ffb078" opacity=".6"/>
+  </g>
+  <!-- front-center drumstick (largest hero) -->
+  <g transform="translate(160 126) scale(1.02)">
+    <path d="M-6 -22 C10 -30 30 -26 38 -12 C48 -2 46 18 32 28 C16 40 -10 38 -24 26 C-38 14 -32 -8 -16 -18 C-12 -21 -9 -22 -6 -22 Z" fill="url(#kfcpiece)" stroke="#4e1805" stroke-width="1.5"/>
+    <path d="M-16 -8 C-6 -16 12 -18 24 -12 M-22 10 C-8 18 16 20 30 10 M-12 22 C0 28 18 26 28 18" stroke="#7c2708" stroke-width="1.4" fill="none" opacity=".6"/>
+    <path d="M-6 -22 C10 -30 30 -26 38 -12 C43 -5 43 6 37 12 C22 5 4 4 -12 9 C-22 3 -18 -14 -6 -22 Z" fill="url(#kfcglaze)"/>
+    <ellipse cx="10" cy="-12" rx="12" ry="5" fill="#ffbe86" opacity=".7"/>
+    <ellipse cx="-6" cy="8" rx="6" ry="2.6" fill="#ff9a5a" opacity=".5"/>
+  </g>
+  <!-- front-left small nugget -->
+  <g transform="translate(108 138) scale(.72) rotate(-8)">
+    <path d="M-2 -16 C10 -22 24 -18 30 -8 C36 0 32 14 20 20 C8 26 -8 24 -16 14 C-24 6 -18 -8 -8 -13 C-6 -15 -4 -16 -2 -16 Z" fill="url(#kfcpiece)" stroke="#5a1c06" stroke-width="1.4"/>
+    <path d="M-2 -16 C10 -22 24 -18 30 -8 C33 -3 33 3 28 8 C18 3 6 2 -6 6 C-14 1 -12 -10 -2 -16 Z" fill="url(#kfcglaze)"/>
+    <ellipse cx="6" cy="-8" rx="8" ry="3.4" fill="#ffb078" opacity=".6"/>
+  </g>
+  <!-- front-right small nugget -->
+  <g transform="translate(212 140) scale(.72) rotate(10)">
+    <path d="M-2 -16 C10 -22 24 -18 30 -8 C36 0 32 14 20 20 C8 26 -8 24 -16 14 C-24 6 -18 -8 -8 -13 C-6 -15 -4 -16 -2 -16 Z" fill="url(#kfcpiece)" stroke="#5a1c06" stroke-width="1.4"/>
+    <path d="M-2 -16 C10 -22 24 -18 30 -8 C33 -3 33 3 28 8 C18 3 6 2 -6 6 C-14 1 -12 -10 -2 -16 Z" fill="url(#kfcglaze)"/>
+    <ellipse cx="6" cy="-8" rx="8" ry="3.4" fill="#ffb078" opacity=".6"/>
+  </g>
+  <!-- toasted sesame seeds scattered on the glaze -->
+  <g fill="#f8eed6">
+    <ellipse cx="120" cy="112" rx="1.8" ry="1" transform="rotate(20 120 112)"/>
+    <ellipse cx="150" cy="120" rx="1.8" ry="1" transform="rotate(-14 150 120)"/>
+    <ellipse cx="176" cy="116" rx="1.8" ry="1" transform="rotate(30 176 116)"/>
+    <ellipse cx="204" cy="118" rx="1.8" ry="1" transform="rotate(-8 204 118)"/>
+    <ellipse cx="138" cy="134" rx="1.8" ry="1" transform="rotate(12 138 134)"/>
+    <ellipse cx="182" cy="132" rx="1.8" ry="1" transform="rotate(-22 182 132)"/>
+    <ellipse cx="160" cy="108" rx="1.8" ry="1" transform="rotate(6 160 108)"/>
+  </g>
+  <!-- scallion + diced chili flecks -->
+  <rect x="132" y="110" width="7" height="2.6" rx="1.3" fill="#5ecb4e" transform="rotate(-18 135 111)"/>
+  <rect x="188" y="120" width="7" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(16 191 121)"/>
+  <rect x="150" y="140" width="6" height="2.4" rx="1.2" fill="#58c14a" transform="rotate(24 153 141)"/>
+  <circle cx="168" cy="120" r="2" fill="#e0341f"/>
+  <circle cx="118" cy="128" r="2" fill="#e0341f"/>
+  <circle cx="206" cy="130" r="2" fill="#e0341f"/>
+  <!-- oil gloss dots -->
+  <circle cx="150" cy="112" r="1.4" fill="#fff" opacity=".6"/>
+  <circle cx="176" cy="122" r="1.3" fill="#fff" opacity=".55"/>
+  <circle cx="132" cy="132" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

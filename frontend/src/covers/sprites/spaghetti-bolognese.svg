@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="b1Blur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="b1bg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#3a1120"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <radialGradient id="b1plate" cx="42%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#f3ede1"/><stop offset="65%" stop-color="#ddd3c2"/><stop offset="100%" stop-color="#b7ab97"/>
+    </radialGradient>
+    <radialGradient id="b1nest" cx="46%" cy="34%" r="78%">
+      <stop offset="0%" stop-color="#efd9a4"/><stop offset="60%" stop-color="#dcbf85"/><stop offset="100%" stop-color="#b8975a"/>
+    </radialGradient>
+    <radialGradient id="b1ragu" cx="40%" cy="28%" r="82%">
+      <stop offset="0%" stop-color="#e05230"/><stop offset="55%" stop-color="#b62d19"/><stop offset="100%" stop-color="#7e180a"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#b1bg)"/>
+  <!-- steam -->
+  <path d="M132 56 C122 38 142 30 132 10" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#b1Blur3)"/>
+  <path d="M196 54 C188 38 206 30 198 10" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#b1Blur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="186" rx="150" ry="20" fill="#000" opacity=".5"/>
+  <!-- rose neon steam arc (behind the plate) -->
+  <path d="M52 112 Q100 82 166 80" stroke="#ff4d6d" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- OVAL WHITE PLATE: dark ring rim + pale eating surface -->
+  <ellipse cx="160" cy="128" rx="138" ry="54" fill="#171219"/>
+  <ellipse cx="160" cy="128" rx="138" ry="54" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="128" rx="126" ry="47" fill="url(#b1plate)"/>
+  <!-- soft rim shading on the plate well -->
+  <ellipse cx="160" cy="132" rx="104" ry="38" fill="#c8bda9" opacity=".5"/>
+  <ellipse cx="160" cy="130" rx="92" ry="33" fill="#efe7d9" opacity=".55"/>
+  <!-- ============ TANGLED SPAGHETTI NEST: short, jumbled, overlapping strands (NOT radiating legs) ============ -->
+  <!-- soft base mound of pasta so gaps don't show the plate -->
+  <ellipse cx="158" cy="126" rx="82" ry="34" fill="url(#b1nest)"/>
+  <ellipse cx="158" cy="126" rx="82" ry="34" fill="#c9a968" opacity=".35"/>
+  <g fill="none" stroke-linecap="round" clip-path="none">
+    <!-- lower base strands (kept SHORT and curled within the mound) -->
+    <path d="M96 138 C112 148 138 148 150 138" stroke="#cdb078" stroke-width="6.5"/>
+    <path d="M150 142 C168 150 196 148 214 138" stroke="#cdb078" stroke-width="6.5"/>
+    <path d="M104 130 C118 122 134 124 142 134" stroke="#d9bd85" stroke-width="6"/>
+    <path d="M170 134 C186 126 204 128 214 136" stroke="#d9bd85" stroke-width="6"/>
+    <path d="M118 146 C132 150 150 150 162 144" stroke="#cdb078" stroke-width="6"/>
+    <!-- middle jumble: little arcs, hooks and loops going every which way -->
+    <path d="M108 120 C120 110 138 112 144 124" stroke="#e6cf9d" stroke-width="6"/>
+    <path d="M124 132 C114 124 116 112 130 110" stroke="#d9bd85" stroke-width="5.5"/>
+    <path d="M186 118 C200 110 214 116 210 128" stroke="#e6cf9d" stroke-width="6"/>
+    <path d="M198 130 C210 124 212 112 200 108" stroke="#d9bd85" stroke-width="5.5"/>
+    <path d="M132 120 C142 112 152 116 150 126" stroke="#e6cf9d" stroke-width="5.5"/>
+    <path d="M170 124 C180 116 190 120 188 130" stroke="#e6cf9d" stroke-width="5.5"/>
+    <path d="M112 128 C104 120 108 110 118 108" stroke="#cdb078" stroke-width="5.5"/>
+    <path d="M204 122 C214 118 216 108 206 104" stroke="#cdb078" stroke-width="5.5"/>
+    <!-- short curly loops (twirls) scattered, breaking up any radial read -->
+    <path d="M126 116 C118 110 122 100 132 102 C140 104 140 114 132 116" stroke="#e6cf9d" stroke-width="5"/>
+    <path d="M190 114 C182 108 186 98 196 100 C204 102 204 112 196 114" stroke="#e6cf9d" stroke-width="5"/>
+    <path d="M150 112 C144 106 148 98 156 100 C162 102 162 110 156 112" stroke="#d9bd85" stroke-width="5"/>
+    <path d="M172 110 C166 104 170 96 178 98 C184 100 184 108 178 110" stroke="#d9bd85" stroke-width="5"/>
+    <!-- a few loose end-strands poking up over the rim, but SHORT (no legs) -->
+    <path d="M100 116 C92 108 96 100 106 102" stroke="#e6cf9d" stroke-width="5"/>
+    <path d="M216 118 C224 110 220 102 210 104" stroke="#e6cf9d" stroke-width="5"/>
+    <!-- highlight strands (glossy sheen) -->
+    <path d="M110 118 C122 108 140 110 146 122" stroke="#fff1c9" stroke-width="2" opacity=".8"/>
+    <path d="M186 116 C200 108 214 114 210 126" stroke="#fff1c9" stroke-width="2" opacity=".75"/>
+    <path d="M124 132 C114 124 116 112 130 110" stroke="#fff1c9" stroke-width="1.8" opacity=".6"/>
+    <!-- shadow strands (depth in the crevices) -->
+    <path d="M118 146 C132 150 150 150 162 144" stroke="#7a4c14" stroke-width="2.2" opacity=".55"/>
+    <path d="M150 142 C168 150 196 148 214 138" stroke="#7a4c14" stroke-width="2.2" opacity=".5"/>
+    <path d="M104 130 C118 122 134 124 142 134" stroke="#8a5a1e" stroke-width="1.8" opacity=".45"/>
+  </g>
+  <!-- ============ RED MEAT-SAUCE DOLLOP: chunky rounded scoop mounded CENTER-TOP of the nest ============ -->
+  <path d="M132 100 C138 86 158 80 176 82 C196 84 208 94 208 106 C208 120 192 128 172 128 C150 128 134 120 130 110 C129 106 130 102 132 100 Z" fill="url(#b1ragu)"/>
+  <path d="M132 100 C138 86 158 80 176 82 C196 84 208 94 208 106 C208 120 192 128 172 128 C150 128 134 120 130 110 C129 106 130 102 132 100 Z" fill="none" stroke="#7e180a" stroke-width="1.3" opacity=".5"/>
+  <!-- glossy top sheen on the scoop -->
+  <ellipse cx="162" cy="94" rx="26" ry="8" fill="#ff8258" opacity=".4" transform="rotate(-5 162 94)"/>
+  <!-- sauce laps drizzling down over the nest (short, on the front face only) -->
+  <path d="M146 124 C142 134 146 140 156 140" stroke="#a52412" stroke-width="4.5" fill="none" opacity=".85" stroke-linecap="round"/>
+  <path d="M186 126 C196 132 196 140 186 142" stroke="#9c2010" stroke-width="4" fill="none" opacity=".8" stroke-linecap="round"/>
+  <path d="M168 128 C168 136 170 140 176 140" stroke="#a52412" stroke-width="3.5" fill="none" opacity=".75" stroke-linecap="round"/>
+  <!-- minced-beef bits clustered in the ragù -->
+  <ellipse cx="148" cy="104" rx="5" ry="3.6" fill="#7a3420" transform="rotate(-12 148 104)"/>
+  <ellipse cx="166" cy="98" rx="5.4" ry="3.8" fill="#8a3c24" transform="rotate(8 166 98)"/>
+  <ellipse cx="186" cy="102" rx="5" ry="3.6" fill="#6e2e1a" transform="rotate(-6 186 102)"/>
+  <ellipse cx="158" cy="110" rx="5.2" ry="3.6" fill="#8a3c24" transform="rotate(16 158 110)"/>
+  <ellipse cx="178" cy="112" rx="4.8" ry="3.4" fill="#7a3420" transform="rotate(-14 178 112)"/>
+  <ellipse cx="196" cy="110" rx="4.6" ry="3.2" fill="#6e2e1a" transform="rotate(10 196 110)"/>
+  <ellipse cx="142" cy="114" rx="4.4" ry="3.2" fill="#8a3c24" transform="rotate(-20 142 114)"/>
+  <ellipse cx="172" cy="118" rx="4.6" ry="3.2" fill="#6e2e1a" transform="rotate(6 172 118)"/>
+  <!-- beef highlights -->
+  <circle cx="164" cy="96" r="1.4" fill="#c98a6a" opacity=".7"/>
+  <circle cx="156" cy="108" r="1.3" fill="#c98a6a" opacity=".6"/>
+  <circle cx="184" cy="100" r="1.2" fill="#c98a6a" opacity=".55"/>
+  <!-- ============ FORK resting on the RIGHT RIM, twirling 2-3 strands ============ -->
+  <g stroke-linecap="round">
+    <!-- handle angling down onto the right rim -->
+    <path d="M298 40 L232 118" stroke="#c9ccd2" stroke-width="5"/>
+    <path d="M298 40 L232 118" stroke="#8f939b" stroke-width="1.6" opacity=".5"/>
+    <!-- tines splaying at the head -->
+    <path d="M282 58 L268 74 M287 62 L273 78 M292 66 L278 82 M297 70 L283 86" stroke="#c9ccd2" stroke-width="2.4"/>
+    <!-- 2-3 strands wound around the tines, trailing back into the nest -->
+    <path d="M276 78 C260 72 244 84 240 104 C238 116 240 124 234 128" stroke="#e6cf9d" stroke-width="5" fill="none"/>
+    <path d="M282 82 C268 78 252 90 248 108 C246 120 248 126 242 130" stroke="#d9bd85" stroke-width="4.5" fill="none"/>
+    <path d="M279 80 C264 75 248 87 244 106" stroke="#fff1c9" stroke-width="1.6" fill="none" opacity=".7"/>
+  </g>
+  <!-- ============ basil leaf on top-left of the sauce ============ -->
+  <g>
+    <path d="M122 92 C114 82 120 70 134 70 C132 84 132 92 122 92 Z" fill="#3f9c37"/>
+    <path d="M126 88 L131 74" stroke="#2f7d2b" stroke-width="1" opacity=".7"/>
+    <path d="M128 96 C136 94 142 98 142 104 C134 104 130 102 128 96 Z" fill="#58c14a"/>
+  </g>
+  <!-- ============ parmesan flecks scattered over the sauce + nest ============ -->
+  <rect x="150" y="90" width="4.6" height="2.6" rx="1" fill="#f6eccf" transform="rotate(24 152 91)"/>
+  <rect x="188" y="90" width="4.6" height="2.6" rx="1" fill="#fbf3dc" transform="rotate(-18 190 91)"/>
+  <rect x="168" y="104" width="4.4" height="2.4" rx="1" fill="#f6eccf" transform="rotate(12 170 105)"/>
+  <rect x="138" y="122" width="4.2" height="2.4" rx="1" fill="#fbf3dc" transform="rotate(-28 140 123)"/>
+  <rect x="200" y="118" width="4.2" height="2.4" rx="1" fill="#f6eccf" transform="rotate(8 202 119)"/>
+  <rect x="118" y="132" width="4" height="2.2" rx="1" fill="#fbf3dc" transform="rotate(18 120 133)"/>
+  <!-- gloss dots -->
+  <circle cx="158" cy="96" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="188" cy="104" r="1.4" fill="#fff" opacity=".5"/>
+  <circle cx="170" cy="120" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

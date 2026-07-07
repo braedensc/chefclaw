@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="nnBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="hsbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#123138"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <linearGradient id="hsbowl" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="55%" stop-color="#100b0d"/><stop offset="100%" stop-color="#070506"/>
+    </linearGradient>
+    <radialGradient id="hsbroth" cx="50%" cy="30%" r="82%">
+      <stop offset="0%" stop-color="#7a4a1c"/><stop offset="52%" stop-color="#4f2c10"/><stop offset="100%" stop-color="#301809"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#hsbg)"/>
+  <!-- steam -->
+  <path d="M118 60 C108 42 128 34 118 14" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#nnBlur3)"/>
+  <path d="M200 56 C192 40 210 32 202 12" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#nnBlur3)"/>
+  <ellipse cx="160" cy="188" rx="158" ry="22" fill="#000" opacity=".5"/>
+  <!-- deep round bowl -->
+  <path d="M46 106 C46 152 100 178 160 178 C220 178 274 152 274 106 Z" fill="url(#hsbowl)"/>
+  <ellipse cx="160" cy="106" rx="120" ry="31" fill="#0d0d10"/>
+  <ellipse cx="160" cy="106" rx="120" ry="31" fill="none" stroke="#26262e" stroke-width="3"/>
+  <ellipse cx="160" cy="106" rx="108" ry="26" fill="#140b07"/>
+  <!-- neon steam arc (teal family) -->
+  <path d="M58 98 Q104 72 164 70" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- dark hot-sour broth -->
+  <ellipse cx="160" cy="108" rx="101" ry="23" fill="url(#hsbroth)"/>
+  <ellipse cx="134" cy="100" rx="30" ry="6" fill="#a06428" opacity=".3" transform="rotate(-8 134 100)"/>
+  <!-- egg-drop ribbons swirling (thin pale yellow feathery streaks) -->
+  <g stroke-linecap="round" fill="none">
+    <path d="M96 104 C112 96 126 100 140 96 C152 92 164 98 176 94" stroke="#f6d873" stroke-width="3.4" opacity=".85"/>
+    <path d="M110 114 C126 108 138 112 154 108 C168 104 182 110 198 106" stroke="#ffe89a" stroke-width="3" opacity=".8"/>
+    <path d="M150 118 C166 114 180 118 196 114 C208 111 218 114 226 112" stroke="#f2cf6a" stroke-width="2.8" opacity=".75"/>
+  </g>
+  <!-- white silken tofu batons (pale, translucent) -->
+  <g>
+    <rect x="108" y="102" width="26" height="7" rx="2.2" fill="#f4ecd8" stroke="#d9c9a6" stroke-width="1" opacity=".95" transform="rotate(-12 121 105)"/>
+    <rect x="150" y="110" width="28" height="7" rx="2.2" fill="#f9f2df" stroke="#dccca8" stroke-width="1" opacity=".95" transform="rotate(8 164 113)"/>
+    <rect x="182" y="100" width="24" height="6.5" rx="2.2" fill="#f4ecd8" stroke="#d9c9a6" stroke-width="1" opacity=".95" transform="rotate(-6 194 103)"/>
+    <rect x="126" y="118" width="24" height="6.5" rx="2.2" fill="#f9f2df" stroke="#dccca8" stroke-width="1" opacity=".9" transform="rotate(16 138 121)"/>
+  </g>
+  <!-- black wood-ear mushroom slivers (the hot-sour signature) -->
+  <g fill="#1c130f">
+    <path d="M112 96 C120 90 130 92 132 98 C126 104 116 104 112 96 Z" transform="rotate(-10 122 97)"/>
+    <path d="M168 96 C176 90 186 92 188 98 C182 104 172 104 168 96 Z" transform="rotate(12 178 97)"/>
+    <path d="M142 122 C150 116 160 118 162 124 C156 130 146 130 142 122 Z" transform="rotate(-6 152 123)"/>
+    <path d="M196 114 C204 108 214 110 216 116 C210 122 200 122 196 114 Z" transform="rotate(8 206 115)"/>
+  </g>
+  <g fill="none" stroke="#3a2a20" stroke-width="1">
+    <path d="M116 96 C122 93 128 94 130 98" transform="rotate(-10 122 97)"/>
+    <path d="M172 96 C178 93 184 94 186 98" transform="rotate(12 178 97)"/>
+  </g>
+  <!-- red chili oil swirl + diced chili accents (the "hot") -->
+  <path d="M104 110 C124 116 150 116 172 112" stroke="#c93312" stroke-width="2.4" fill="none" opacity=".55" stroke-linecap="round"/>
+  <rect x="132" y="106" width="7" height="2.6" rx="1.3" fill="#e0341f" transform="rotate(-18 135 107)"/>
+  <rect x="186" y="118" width="7" height="2.6" rx="1.3" fill="#e0341f" transform="rotate(14 189 119)"/>
+  <rect x="158" y="104" width="6" height="2.4" rx="1.2" fill="#e0341f" transform="rotate(24 161 105)"/>
+  <!-- scallion / cilantro flecks -->
+  <rect x="120" y="108" width="7" height="2.6" rx="1.3" fill="#58c14a" transform="rotate(-16 123 109)"/>
+  <rect x="170" y="114" width="7" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(12 173 115)"/>
+  <rect x="204" y="106" width="6" height="2.4" rx="1.2" fill="#58c14a" transform="rotate(-8 207 107)"/>
+  <!-- floating white-pepper flecks + gloss dots -->
+  <circle cx="128" cy="112" r="1" fill="#f4ecd0" opacity=".8"/>
+  <circle cx="176" cy="108" r="1" fill="#f4ecd0" opacity=".8"/>
+  <circle cx="118" cy="102" r="1.4" fill="#fff" opacity=".6"/>
+  <circle cx="184" cy="106" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="152" cy="114" r="1.2" fill="#fff" opacity=".5"/>
+</svg>
