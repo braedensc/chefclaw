@@ -25,12 +25,15 @@ from chefclaw.covers import AssignmentMiss
 from chefclaw.documents import EstimatedAttributes, RecipeDocument
 from chefclaw.extractors import ExtractionUsage
 from chefclaw.models import CoverMiss, Job, JobStatus, JobType, Recipe, User
+from chefclaw.services import users
 
 __all__ = [
     "ACTIVE_ILLUSTRATION_STATUSES",
     "ACTIVE_STATUSES",
     "RUNNING_STATUSES",
+    "AdminSpendReader",
     "JobStore",
+    "PostgresAdminSpendReader",
     "PostgresJobStore",
     "PostgresSpendReader",
     "RecipeFrameRef",
@@ -207,6 +210,8 @@ class JobStore(Protocol):
     async def reconcile_interrupted(self) -> int: ...
 
     async def check_budget(self, owner_id: uuid.UUID) -> None: ...
+
+    async def get_paid_tier(self, owner_id: uuid.UUID) -> bool: ...
 
     async def record_spend(
         self,
@@ -642,6 +647,10 @@ class PostgresJobStore:
         async with self._sessionmaker() as session:
             await spend.check_budget(session, self._settings, owner_id)
 
+    async def get_paid_tier(self, owner_id: uuid.UUID) -> bool:
+        async with self._sessionmaker() as session:
+            return await users.read_paid_tier(session, owner_id)
+
     async def record_spend(
         self,
         *,
@@ -676,3 +685,23 @@ class PostgresSpendReader:
     async def summary(self, owner_id: uuid.UUID, *, days: int) -> spend.SpendSummary:
         async with self._sessionmaker() as session:
             return await spend.spend_summary(session, self._settings, owner_id, days=days)
+
+
+class AdminSpendReader(Protocol):
+    """What GET /api/admin/spend needs — the whole-tenant rollup. Kept beside
+    SpendReader so the CI unit tier fakes it (no database) and the golden tier
+    runs it."""
+
+    async def summary(self) -> spend.AdminSpendSummary: ...
+
+
+class PostgresAdminSpendReader:
+    """Real cross-user ledger rollup for GET /api/admin/spend (admin only)."""
+
+    def __init__(self, sessionmaker: async_sessionmaker[AsyncSession], settings: Settings) -> None:
+        self._sessionmaker = sessionmaker
+        self._settings = settings
+
+    async def summary(self) -> spend.AdminSpendSummary:
+        async with self._sessionmaker() as session:
+            return await spend.admin_spend_summary(session, self._settings)

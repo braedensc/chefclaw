@@ -189,6 +189,9 @@ function ExtractionSection({ health }: { health: HealthResponse }) {
   const budget = health.budget_monthly_usd ?? null;
   const attemptsToday = health.attempts_today ?? null;
   const dailyCap = health.daily_attempt_cap ?? null;
+  // M3: caps are the EFFECTIVE ones (per-user override, else global env).
+  // budget_is_personal flags a per-user monthly override so the bar can say so.
+  const isPersonal = health.budget_is_personal ?? false;
   return (
     <Section label="Extraction">
       <dl className="mt-3 grid grid-cols-[8rem_1fr] gap-y-2 text-sm">
@@ -199,6 +202,11 @@ function ExtractionSection({ health }: { health: HealthResponse }) {
           <span className="text-ink-dim font-mono text-xs">
             {health.model ?? 'unknown'}
           </span>
+          {health.paid_tier && (
+            <span className="text-gold ml-2 text-xs font-medium">
+              paid tier
+            </span>
+          )}
         </Row>
         {attemptsToday !== null && dailyCap !== null && (
           <Row label="attempts today">
@@ -223,7 +231,7 @@ function ExtractionSection({ health }: { health: HealthResponse }) {
           read (is the database up?).
         </p>
       ) : (
-        <SpendBar spendUsd={spend} budgetUsd={budget} />
+        <SpendBar spendUsd={spend} budgetUsd={budget} isPersonal={isPersonal} />
       )}
     </Section>
   );
@@ -232,9 +240,11 @@ function ExtractionSection({ health }: { health: HealthResponse }) {
 function SpendBar({
   spendUsd,
   budgetUsd,
+  isPersonal = false,
 }: {
   spendUsd: number;
   budgetUsd: number;
+  isPersonal?: boolean;
 }) {
   const fraction = spendUsd / budgetUsd;
   const widthPct = Math.min(100, Math.max(0, fraction * 100));
@@ -249,6 +259,11 @@ function SpendBar({
           {' '}
           of ${budgetUsd.toFixed(2)} budget
         </span>
+        {isPersonal && (
+          <span className="text-cyan ml-2 text-xs font-medium">
+            personal cap
+          </span>
+        )}
       </p>
       <div
         role="progressbar"

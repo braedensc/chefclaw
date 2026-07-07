@@ -252,6 +252,96 @@ async def test_enqueue_upload_and_rehash_dedupe(tmp_path: Path) -> None:
     assert len(store.jobs) == 1
 
 
+# ─── M3 per-user paid tier: the owner's tier picks the extraction model ──────
+
+
+def _recording_worker(
+    store: FakeJobStore, source: FakeSource, settings: Settings, extractor: FakeExtractor
+) -> tuple[Worker, list[str]]:
+    """A worker whose extractor factory RECORDS the gemini_model it was handed —
+    the effective per-owner model the paid-tier swap produced."""
+    seen: list[str] = []
+
+    def factory(effective: Settings) -> FakeExtractor:
+        seen.append(effective.gemini_model)
+        return extractor
+
+    worker = Worker(
+        store=store,
+        adapters=[source],
+        settings=settings,
+        extractor_factory=factory,
+        image_generator_factory=lambda _s: FakeImageGenerator(),
+        sleeper=RecordingSleeper(),
+        jitter=lambda: 0.25,
+    )
+    return worker, seen
+
+
+async def test_paid_tier_owner_extracts_with_paid_model(tmp_path: Path) -> None:
+    store, source = FakeJobStore(), make_source()
+    settings = make_settings(
+        tmp_path,
+        chefclaw_extractor="gemini",
+        gemini_api_key="k",
+        gemini_model="gemini-2.5-flash",
+        gemini_paid_model="gemini-2.5-pro",
+    )
+    store.paid_tiers[OWNER_ID] = True
+    worker, seen = _recording_worker(store, source, settings, FakeExtractor())
+
+    await enqueue_extract(store, OWNER_ID, FAKE_URL, [source], settings)
+    job = await claim_and_process(worker, store)
+
+    assert job.status == "stored"
+    assert seen == ["gemini-2.5-pro"]  # the paid model, swapped in for this owner
+
+
+async def test_free_tier_owner_extracts_with_global_model(tmp_path: Path) -> None:
+    store, source = FakeJobStore(), make_source()
+    settings = make_settings(
+        tmp_path,
+        chefclaw_extractor="gemini",
+        gemini_api_key="k",
+        gemini_model="gemini-2.5-flash",
+        gemini_paid_model="gemini-2.5-pro",
+    )
+    # No entry in store.paid_tiers ⇒ free tier (matches the real DB default).
+    worker, seen = _recording_worker(store, source, settings, FakeExtractor())
+
+    await enqueue_extract(store, OWNER_ID, FAKE_URL, [source], settings)
+    await claim_and_process(worker, store)
+
+    assert seen == ["gemini-2.5-flash"]  # the global default, no swap
+
+
+async def test_paid_tier_failed_attempt_ledgers_the_paid_model(tmp_path: Path) -> None:
+    """A paid-tier owner whose attempt dies BEFORE usage exists still attributes
+    the paid model in the ledger (the daily-cap row must name the real model)."""
+
+    class _Boom(FakeExtractor):
+        async def extract(self, *args, **kwargs):
+            # usage=None ⇒ the ledger synthesizes the model from the owner's
+            # effective settings (the paid model), which is what we're asserting.
+            raise errors.ExtractionFailedError("boom")
+
+    store, source = FakeJobStore(), make_source()
+    settings = make_settings(
+        tmp_path,
+        chefclaw_extractor="gemini",
+        gemini_api_key="k",
+        gemini_model="gemini-2.5-flash",
+        gemini_paid_model="gemini-2.5-pro",
+    )
+    store.paid_tiers[OWNER_ID] = True
+    worker, _ = _recording_worker(store, source, settings, _Boom())
+
+    await enqueue_extract(store, OWNER_ID, FAKE_URL, [source], settings)
+    await claim_and_process(worker, store)
+
+    assert [row["model"] for row in store.spend_rows] == ["gemini-2.5-pro"]
+
+
 # ─── the stage machine, happy path ───────────────────────────────────────────
 
 

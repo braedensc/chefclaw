@@ -4,11 +4,13 @@ import json
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
+import pytest
+from fastapi import FastAPI
 from httpx import ASGITransport, AsyncClient
 
 from chefclaw.app import _backup_status, create_app
 from chefclaw.config import Settings, get_settings
-from tests.conftest import TEST_TOKEN, bearer
+from tests.conftest import OWNER_ID, TEST_TOKEN, bearer
 
 
 async def test_health_401_without_session(unauth_client: AsyncClient, ping_ok: None) -> None:
@@ -38,6 +40,7 @@ async def test_health_200_full_shape(client: AsyncClient, ping_ok: None) -> None
         "backup_finished_at": None,
         "extractor": "fake",  # the conftest Settings default
         "model": "fake-extractor",
+        "paid_tier": False,
         "cover_mode": "sprite",  # V2-F default cover mode
         "spend_month_usd": None,
         # V2-A: caps are null (conftest Settings leave the budget pair unset —
@@ -46,6 +49,7 @@ async def test_health_200_full_shape(client: AsyncClient, ping_ok: None) -> None
         # never initialised in the unit tier.
         "budget_monthly_usd": None,
         "daily_attempt_cap": None,
+        "budget_is_personal": False,
         "attempts_today": None,
         "worker": "not_running",
         "sentry_enabled": False,
@@ -257,3 +261,101 @@ async def test_health_owner_scoped_readouts_resolve(client: AsyncClient, ping_ok
     response = await client.get("/api/health", headers=bearer(TEST_TOKEN))
     assert response.status_code == 200
     assert response.json()["status"] == "ok"
+
+
+# ── M3: /api/health surfaces the EFFECTIVE (per-user-or-global) cap ──────────
+
+
+def _budget_app() -> FastAPI:
+    """A fake-auth app with the global env budget configured (so parse_budget
+    succeeds and the per-user override read runs)."""
+    app = create_app()
+    app.dependency_overrides[get_settings] = lambda: Settings(
+        chefclaw_auth_provider="fake",
+        chefclaw_fake_owner_id=str(OWNER_ID),
+        monthly_llm_budget_usd="10",
+        max_extraction_attempts_per_day="25",
+    )
+    return app
+
+
+async def test_health_reports_global_cap_when_no_per_user_override(ping_ok: None) -> None:
+    """No per-user override (columns NULL) ⇒ the global env cap shows and
+    budget_is_personal is False (conftest stubs _user_budget_caps → None,None)."""
+    transport = ASGITransport(app=_budget_app())
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        response = await client.get("/api/health", headers=bearer(TEST_TOKEN))
+    body = response.json()
+    assert body["budget_monthly_usd"] == 10.0
+    assert body["daily_attempt_cap"] == 25
+    assert body["budget_is_personal"] is False
+
+
+async def test_health_surfaces_per_user_override(
+    ping_ok: None, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A per-user override REPLACES the global cap in the readout and flags
+    budget_is_personal so the Settings bar can label it a personal cap."""
+    from decimal import Decimal
+
+    from chefclaw import app as app_module
+
+    async def fake_caps(owner_id):
+        return Decimal("3.00"), 5
+
+    monkeypatch.setattr(app_module, "_user_budget_caps", fake_caps)
+    transport = ASGITransport(app=_budget_app())
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        response = await client.get("/api/health", headers=bearer(TEST_TOKEN))
+    body = response.json()
+    assert body["budget_monthly_usd"] == 3.0  # the per-user cap, not the global 10
+    assert body["daily_attempt_cap"] == 5
+    assert body["budget_is_personal"] is True
+
+
+async def test_health_reports_paid_tier_owner_effective_model(
+    ping_ok: None, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A paid-tier owner's health readout shows the PAID model + paid_tier True;
+    the model field is the caller's effective model, not the global default."""
+    from chefclaw import app as app_module
+
+    async def paid(owner_id):
+        return True
+
+    monkeypatch.setattr(app_module, "_owner_paid_tier", paid)
+    app = create_app()
+    app.dependency_overrides[get_settings] = lambda: Settings(
+        chefclaw_auth_provider="fake",
+        chefclaw_fake_owner_id=str(OWNER_ID),
+        chefclaw_extractor="gemini",
+        gemini_api_key="k",
+        gemini_model="gemini-2.5-flash",
+        gemini_paid_model="gemini-2.5-pro",
+    )
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        response = await client.get("/api/health", headers=bearer(TEST_TOKEN))
+    body = response.json()
+    assert body["paid_tier"] is True
+    assert body["model"] == "gemini-2.5-pro"
+
+
+async def test_health_free_tier_owner_shows_global_model(ping_ok: None) -> None:
+    """A free-tier owner (conftest stubs _owner_paid_tier → False) shows the
+    global default model and paid_tier False."""
+    app = create_app()
+    app.dependency_overrides[get_settings] = lambda: Settings(
+        chefclaw_auth_provider="fake",
+        chefclaw_fake_owner_id=str(OWNER_ID),
+        chefclaw_extractor="gemini",
+        gemini_api_key="k",
+        gemini_model="gemini-2.5-flash",
+        gemini_paid_model="gemini-2.5-pro",
+    )
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        response = await client.get("/api/health", headers=bearer(TEST_TOKEN))
+    body = response.json()
+    assert body["paid_tier"] is False
+    assert body["model"] == "gemini-2.5-flash"

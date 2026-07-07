@@ -2,7 +2,7 @@
 
 import { type Client, type ClientMeta, formDataBodySerializer, type Options as Options2, type RequestResult, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { CreateInviteApiAdminInvitesPostData, CreateInviteApiAdminInvitesPostErrors, CreateInviteApiAdminInvitesPostResponses, DeleteRecipeApiRecipesRecipeIdDeleteData, DeleteRecipeApiRecipesRecipeIdDeleteErrors, DeleteRecipeApiRecipesRecipeIdDeleteResponses, ExtractRecipeApiRecipesExtractPostData, ExtractRecipeApiRecipesExtractPostErrors, ExtractRecipeApiRecipesExtractPostResponses, GetJobApiJobsJobIdGetData, GetJobApiJobsJobIdGetErrors, GetJobApiJobsJobIdGetResponses, GetRecipeApiRecipesRecipeIdGetData, GetRecipeApiRecipesRecipeIdGetErrors, GetRecipeApiRecipesRecipeIdGetResponses, GetRecipeImageApiRecipesRecipeIdImageGetData, GetRecipeImageApiRecipesRecipeIdImageGetErrors, GetRecipeImageApiRecipesRecipeIdImageGetResponses, GetSpendApiSpendGetData, GetSpendApiSpendGetErrors, GetSpendApiSpendGetResponses, GoogleCallbackApiAuthGoogleCallbackGetData, GoogleCallbackApiAuthGoogleCallbackGetErrors, GoogleCallbackApiAuthGoogleCallbackGetResponses, GoogleLoginApiAuthGoogleLoginGetData, GoogleLoginApiAuthGoogleLoginGetErrors, GoogleLoginApiAuthGoogleLoginGetResponses, HealthApiHealthGetData, HealthApiHealthGetResponses, ListInvitesApiAdminInvitesGetData, ListInvitesApiAdminInvitesGetErrors, ListInvitesApiAdminInvitesGetResponses, ListJobsApiJobsGetData, ListJobsApiJobsGetErrors, ListJobsApiJobsGetResponses, ListRecipesApiRecipesGetData, ListRecipesApiRecipesGetErrors, ListRecipesApiRecipesGetResponses, ListUsersApiAdminUsersGetData, ListUsersApiAdminUsersGetResponses, LogoutApiAuthLogoutPostData, LogoutApiAuthLogoutPostResponses, MeApiMeGetData, MeApiMeGetResponses, PatchRecipeApiRecipesRecipeIdPatchData, PatchRecipeApiRecipesRecipeIdPatchErrors, PatchRecipeApiRecipesRecipeIdPatchResponses, PublicInviteApiInvitesTokenGetData, PublicInviteApiInvitesTokenGetErrors, PublicInviteApiInvitesTokenGetResponses, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostData, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostErrors, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostResponses, RevokeInviteApiAdminInvitesInviteIdRevokePostData, RevokeInviteApiAdminInvitesInviteIdRevokePostErrors, RevokeInviteApiAdminInvitesInviteIdRevokePostResponses, SetUserRealCoversApiAdminUsersUserIdPatchData, SetUserRealCoversApiAdminUsersUserIdPatchErrors, SetUserRealCoversApiAdminUsersUserIdPatchResponses, UploadRecipeVideoApiRecipesUploadPostData, UploadRecipeVideoApiRecipesUploadPostErrors, UploadRecipeVideoApiRecipesUploadPostResponses } from './types.gen';
+import type { AdminSpendApiAdminSpendGetData, AdminSpendApiAdminSpendGetResponses, CreateInviteApiAdminInvitesPostData, CreateInviteApiAdminInvitesPostErrors, CreateInviteApiAdminInvitesPostResponses, DeleteRecipeApiRecipesRecipeIdDeleteData, DeleteRecipeApiRecipesRecipeIdDeleteErrors, DeleteRecipeApiRecipesRecipeIdDeleteResponses, ExtractRecipeApiRecipesExtractPostData, ExtractRecipeApiRecipesExtractPostErrors, ExtractRecipeApiRecipesExtractPostResponses, GetJobApiJobsJobIdGetData, GetJobApiJobsJobIdGetErrors, GetJobApiJobsJobIdGetResponses, GetRecipeApiRecipesRecipeIdGetData, GetRecipeApiRecipesRecipeIdGetErrors, GetRecipeApiRecipesRecipeIdGetResponses, GetRecipeImageApiRecipesRecipeIdImageGetData, GetRecipeImageApiRecipesRecipeIdImageGetErrors, GetRecipeImageApiRecipesRecipeIdImageGetResponses, GetSpendApiSpendGetData, GetSpendApiSpendGetErrors, GetSpendApiSpendGetResponses, GoogleCallbackApiAuthGoogleCallbackGetData, GoogleCallbackApiAuthGoogleCallbackGetErrors, GoogleCallbackApiAuthGoogleCallbackGetResponses, GoogleLoginApiAuthGoogleLoginGetData, GoogleLoginApiAuthGoogleLoginGetErrors, GoogleLoginApiAuthGoogleLoginGetResponses, HealthApiHealthGetData, HealthApiHealthGetResponses, ListInvitesApiAdminInvitesGetData, ListInvitesApiAdminInvitesGetErrors, ListInvitesApiAdminInvitesGetResponses, ListJobsApiJobsGetData, ListJobsApiJobsGetErrors, ListJobsApiJobsGetResponses, ListRecipesApiRecipesGetData, ListRecipesApiRecipesGetErrors, ListRecipesApiRecipesGetResponses, ListUsersApiAdminUsersGetData, ListUsersApiAdminUsersGetResponses, LogoutApiAuthLogoutPostData, LogoutApiAuthLogoutPostResponses, MeApiMeGetData, MeApiMeGetResponses, PatchRecipeApiRecipesRecipeIdPatchData, PatchRecipeApiRecipesRecipeIdPatchErrors, PatchRecipeApiRecipesRecipeIdPatchResponses, PublicInviteApiInvitesTokenGetData, PublicInviteApiInvitesTokenGetErrors, PublicInviteApiInvitesTokenGetResponses, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostData, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostErrors, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostResponses, RevokeInviteApiAdminInvitesInviteIdRevokePostData, RevokeInviteApiAdminInvitesInviteIdRevokePostErrors, RevokeInviteApiAdminInvitesInviteIdRevokePostResponses, SetUserRealCoversApiAdminUsersUserIdPatchData, SetUserRealCoversApiAdminUsersUserIdPatchErrors, SetUserRealCoversApiAdminUsersUserIdPatchResponses, UpdateUserBudgetApiAdminUsersUserIdBudgetPatchData, UpdateUserBudgetApiAdminUsersUserIdBudgetPatchErrors, UpdateUserBudgetApiAdminUsersUserIdBudgetPatchResponses, UploadRecipeVideoApiRecipesUploadPostData, UploadRecipeVideoApiRecipesUploadPostErrors, UploadRecipeVideoApiRecipesUploadPostResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -51,6 +51,16 @@ export const createInviteApiAdminInvitesPost = <ThrowOnError extends boolean = f
 export const revokeInviteApiAdminInvitesInviteIdRevokePost = <ThrowOnError extends boolean = false>(options: Options<RevokeInviteApiAdminInvitesInviteIdRevokePostData, ThrowOnError>): RequestResult<RevokeInviteApiAdminInvitesInviteIdRevokePostResponses, RevokeInviteApiAdminInvitesInviteIdRevokePostErrors, ThrowOnError> => (options.client ?? client).post<RevokeInviteApiAdminInvitesInviteIdRevokePostResponses, RevokeInviteApiAdminInvitesInviteIdRevokePostErrors, ThrowOnError>({ url: '/api/admin/invites/{invite_id}/revoke', ...options });
 
 /**
+ * Admin Spend
+ *
+ * Whole-tenant spend rollup (admin only): each user's month-to-date spend +
+ * effective caps + paid tier, plus tenant totals and the global env defaults.
+ * The per-owner history stays at GET /api/spend; this is the cross-user view
+ * the per-user caps (M3) made necessary.
+ */
+export const adminSpendApiAdminSpendGet = <ThrowOnError extends boolean = false>(options?: Options<AdminSpendApiAdminSpendGetData, ThrowOnError>): RequestResult<AdminSpendApiAdminSpendGetResponses, unknown, ThrowOnError> => (options?.client ?? client).get<AdminSpendApiAdminSpendGetResponses, unknown, ThrowOnError>({ url: '/api/admin/spend', ...options });
+
+/**
  * List Users
  *
  * Every member + their private real-frame grant (V2-F). NEVER a secret —
@@ -67,6 +77,25 @@ export const listUsersApiAdminUsersGet = <ThrowOnError extends boolean = false>(
  */
 export const setUserRealCoversApiAdminUsersUserIdPatch = <ThrowOnError extends boolean = false>(options: Options<SetUserRealCoversApiAdminUsersUserIdPatchData, ThrowOnError>): RequestResult<SetUserRealCoversApiAdminUsersUserIdPatchResponses, SetUserRealCoversApiAdminUsersUserIdPatchErrors, ThrowOnError> => (options.client ?? client).patch<SetUserRealCoversApiAdminUsersUserIdPatchResponses, SetUserRealCoversApiAdminUsersUserIdPatchErrors, ThrowOnError>({
     url: '/api/admin/users/{user_id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Update User Budget
+ *
+ * Set a user's per-user cost controls (M3): budget/rate caps + the paid
+ * Gemini tier flag. Partial update — an omitted field is left unchanged, an
+ * explicit ``null`` clears a cap back to the global env cap. Caps only
+ * redistribute WITHIN the globally enabled budget — a per-user cap never
+ * re-enables fail-closed spend (chefclaw.spend.check_budget); paid_tier only
+ * swaps the model within the same budget gate. Missing user ⇒ 404.
+ */
+export const updateUserBudgetApiAdminUsersUserIdBudgetPatch = <ThrowOnError extends boolean = false>(options: Options<UpdateUserBudgetApiAdminUsersUserIdBudgetPatchData, ThrowOnError>): RequestResult<UpdateUserBudgetApiAdminUsersUserIdBudgetPatchResponses, UpdateUserBudgetApiAdminUsersUserIdBudgetPatchErrors, ThrowOnError> => (options.client ?? client).patch<UpdateUserBudgetApiAdminUsersUserIdBudgetPatchResponses, UpdateUserBudgetApiAdminUsersUserIdBudgetPatchErrors, ThrowOnError>({
+    url: '/api/admin/users/{user_id}/budget',
     ...options,
     headers: {
         'Content-Type': 'application/json',

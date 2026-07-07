@@ -5,6 +5,78 @@ export type ClientOptions = {
 };
 
 /**
+ * AdminSpendOut
+ *
+ * GET /api/admin/spend (admin only): month-to-date spend + effective caps
+ * per user, plus tenant totals and the global env defaults (null when the
+ * budget config is fail-closed).
+ */
+export type AdminSpendOut = {
+    /**
+     * Budget Monthly Usd
+     */
+    budget_monthly_usd?: number | null;
+    /**
+     * Daily Attempt Cap
+     */
+    daily_attempt_cap?: number | null;
+    /**
+     * Total Attempts Today
+     */
+    total_attempts_today: number;
+    /**
+     * Total Month To Date Usd
+     */
+    total_month_to_date_usd: number;
+    /**
+     * Users
+     */
+    users: Array<AdminUserSpend>;
+};
+
+/**
+ * AdminUserSpend
+ *
+ * One user's row in the admin cross-user spend rollup. Caps are the
+ * EFFECTIVE ones (per-user override, else the global default; null under
+ * fail-closed config); ``cap_is_personal`` flags a per-user monthly override.
+ */
+export type AdminUserSpend = {
+    /**
+     * Attempts Today
+     */
+    attempts_today: number;
+    /**
+     * Budget Monthly Usd
+     */
+    budget_monthly_usd?: number | null;
+    /**
+     * Cap Is Personal
+     */
+    cap_is_personal?: boolean;
+    /**
+     * Daily Attempt Cap
+     */
+    daily_attempt_cap?: number | null;
+    /**
+     * Email
+     */
+    email: string;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Month To Date Usd
+     */
+    month_to_date_usd: number;
+    /**
+     * Paid Tier
+     */
+    paid_tier: boolean;
+};
+
+/**
  * Body_upload_recipe_video_api_recipes_upload_post
  */
 export type BodyUploadRecipeVideoApiRecipesUploadPost = {
@@ -81,6 +153,10 @@ export type HealthResponse = {
      */
     backup_finished_at?: string | null;
     /**
+     * Budget Is Personal
+     */
+    budget_is_personal?: boolean;
+    /**
      * Budget Monthly Usd
      */
     budget_monthly_usd?: number | null;
@@ -112,6 +188,10 @@ export type HealthResponse = {
      * Model
      */
     model?: string;
+    /**
+     * Paid Tier
+     */
+    paid_tier?: boolean;
     /**
      * Sentry Enabled
      */
@@ -689,6 +769,65 @@ export type UserAdminRow = {
 };
 
 /**
+ * UserBudgetOut
+ *
+ * A user's per-user cost controls after the write. ``null`` on a cap means
+ * no per-user override (the global env cap applies); ``paid_tier`` false means
+ * the global GEMINI_MODEL (free) default.
+ */
+export type UserBudgetOut = {
+    /**
+     * Email
+     */
+    email: string;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Max Attempts Per Day
+     */
+    max_attempts_per_day?: number | null;
+    /**
+     * Monthly Budget Usd
+     */
+    monthly_budget_usd?: number | null;
+    /**
+     * Paid Tier
+     */
+    paid_tier?: boolean;
+};
+
+/**
+ * UserBudgetPatch
+ *
+ * PATCH /api/admin/users/{user_id}/budget body (M3 per-user cost controls).
+ * All fields optional — a PARTIAL update keyed on which fields the request
+ * sends: a field PRESENT sets it, a cap PRESENT+``null`` CLEARS it (the
+ * account falls back to the global env cap), ABSENT leaves it unchanged.
+ * Positive caps only — 0/negative is a 422 (use ``null`` to clear). The router
+ * reads ``model_fields_set`` to tell 'clear' from 'leave alone'.
+ *
+ * ``paid_tier`` toggles this account onto the paid Gemini model
+ * (GEMINI_PAID_MODEL) for its extractions — it is not a cap, so ``null`` is
+ * not accepted; send true/false.
+ */
+export type UserBudgetPatch = {
+    /**
+     * Max Attempts Per Day
+     */
+    max_attempts_per_day?: number | null;
+    /**
+     * Monthly Budget Usd
+     */
+    monthly_budget_usd?: number | null;
+    /**
+     * Paid Tier
+     */
+    paid_tier?: boolean | null;
+};
+
+/**
  * ValidationError
  */
 export type ValidationError = {
@@ -823,6 +962,22 @@ export type RevokeInviteApiAdminInvitesInviteIdRevokePostResponses = {
     200: unknown;
 };
 
+export type AdminSpendApiAdminSpendGetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/admin/spend';
+};
+
+export type AdminSpendApiAdminSpendGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: AdminSpendOut;
+};
+
+export type AdminSpendApiAdminSpendGetResponse = AdminSpendApiAdminSpendGetResponses[keyof AdminSpendApiAdminSpendGetResponses];
+
 export type ListUsersApiAdminUsersGetData = {
     body?: never;
     path?: never;
@@ -872,6 +1027,40 @@ export type SetUserRealCoversApiAdminUsersUserIdPatchResponses = {
 };
 
 export type SetUserRealCoversApiAdminUsersUserIdPatchResponse = SetUserRealCoversApiAdminUsersUserIdPatchResponses[keyof SetUserRealCoversApiAdminUsersUserIdPatchResponses];
+
+export type UpdateUserBudgetApiAdminUsersUserIdBudgetPatchData = {
+    body: UserBudgetPatch;
+    path: {
+        /**
+         * User Id
+         */
+        user_id: string;
+    };
+    query?: never;
+    url: '/api/admin/users/{user_id}/budget';
+};
+
+export type UpdateUserBudgetApiAdminUsersUserIdBudgetPatchErrors = {
+    /**
+     * Not Found
+     */
+    404: ErrorBody;
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type UpdateUserBudgetApiAdminUsersUserIdBudgetPatchError = UpdateUserBudgetApiAdminUsersUserIdBudgetPatchErrors[keyof UpdateUserBudgetApiAdminUsersUserIdBudgetPatchErrors];
+
+export type UpdateUserBudgetApiAdminUsersUserIdBudgetPatchResponses = {
+    /**
+     * Successful Response
+     */
+    200: UserBudgetOut;
+};
+
+export type UpdateUserBudgetApiAdminUsersUserIdBudgetPatchResponse = UpdateUserBudgetApiAdminUsersUserIdBudgetPatchResponses[keyof UpdateUserBudgetApiAdminUsersUserIdBudgetPatchResponses];
 
 export type GoogleCallbackApiAuthGoogleCallbackGetData = {
     body?: never;

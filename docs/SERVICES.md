@@ -47,7 +47,18 @@ server secret at birth: never a `VITE_*` var, never in the frontend bundle.
 - **Cost:** fail-closed budget guardrails — `MONTHLY_LLM_BUDGET_USD` /
   `MAX_EXTRACTION_ATTEMPTS_PER_DAY` unset or unparseable ⇒ no paid calls (typed config
   error); `llm_spend` ledger written per model attempt including failures; budget +
-  daily-cap check before every paid call.
+  daily-cap check before every paid call. Per-user caps override the global defaults
+  when set (M3, `docs/adr/2026-07-07-per-user-budget-caps.md`).
+- **Model quality tier (M3 — distinct from the data/billing tier above):**
+  `GEMINI_MODEL` is the *model* everyone runs by default (`gemini-2.5-flash`, cheap).
+  `GEMINI_PAID_MODEL` (`gemini-2.5-pro`) buys higher extraction quality at ~4x input /
+  ~3x output token cost (both priced, padded, in `chefclaw.spend.GEMINI_PRICING`, so the
+  same fail-closed budget gate bounds pro spend — no new guardrail). Two ways to enable
+  it: flip `GEMINI_MODEL` itself (**global** — everyone), or set a specific account's
+  `users.paid_tier` via `PATCH /api/admin/users/{id}/budget` (**per-user** — that
+  account's extractions use `GEMINI_PAID_MODEL`). The swap lives once in
+  `extractors.extractor_settings_for_tier` and is scoped to extraction only (cover
+  illustration stays global).
 - **Provisioning** *(you, in dashboards)*: aistudio.google.com → sign in → "Get API
   key" → create key → paste into `.env.local`.
 - **Provisioning record:** 2026-07-05 — **not yet provisioned** (lands with Phase 2).

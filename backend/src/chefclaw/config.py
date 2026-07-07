@@ -116,7 +116,17 @@ class Settings(BaseSettings):
     # accidental spend); compose sets "gemini" for the real stack.
     chefclaw_extractor: str = "fake"
     gemini_api_key: str = ""
-    gemini_model: str = "gemini-2.5-flash"  # model id is config, never hardcoded
+    # Model id is config, never hardcoded. TIER FLIP (M3): "gemini-2.5-flash" is
+    # the free/cheap default; "gemini-2.5-pro" is the PAID tier — higher quality
+    # at ~4x in / ~3x out token cost (both priced, padded, in
+    # spend.GEMINI_PRICING, so the fail-closed budget gate bounds pro spend
+    # unchanged). GEMINI_MODEL is the GLOBAL default everyone gets; a per-user
+    # paid_tier flag (users.paid_tier, set by the admin budget endpoint) bumps
+    # THAT account to GEMINI_PAID_MODEL instead — see
+    # extractors.extractor_settings_for_tier and
+    # docs/adr/2026-07-07-per-user-budget-caps.md.
+    gemini_model: str = "gemini-2.5-flash"
+    gemini_paid_model: str = "gemini-2.5-pro"  # the per-user paid_tier model
     gemini_media_resolution: str = "low"  # base resolution; escalate only if overlay text is missed
     # One-shot media-resolution escalation (V2-C, ADR 2026-07-07-extractor-
     # robustness-qa). EMPTY (default) = escalation OFF: extraction uses the

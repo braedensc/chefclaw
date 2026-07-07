@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ApiError } from '../api-error';
@@ -68,6 +68,29 @@ describe('AdminInvitesPage', () => {
     genState.me = meOut({ is_admin: false });
     renderApp('/admin/invites');
     expect(await screen.findByText(/don't have access/i)).toBeInTheDocument();
+  });
+
+  it('shows the cross-user spend rollup with per-user caps and paid tier', async () => {
+    renderApp('/admin/invites');
+
+    const spend = within(await screen.findByRole('region', { name: 'Spend' }));
+    // Tenant total.
+    expect(await spend.findByText(/\$3\.50/)).toBeInTheDocument();
+    // Per-user rows: the paid owner and the capped friend.
+    expect(spend.getByText('owner@localhost')).toBeInTheDocument();
+    expect(spend.getByText('friend@x.com')).toBeInTheDocument();
+    expect(spend.getByText('$3.00')).toBeInTheDocument();
+    // The friend's per-user cap is marked personal.
+    expect(spend.getByText(/of \$2\.00 \(personal\)/)).toBeInTheDocument();
+  });
+
+  it('degrades gracefully when the spend rollup fails', async () => {
+    genState.adminSpendError = new ApiError(503, 'Service Unavailable', {
+      detail: 'db down',
+    });
+    renderApp('/admin/invites');
+    const spend = within(await screen.findByRole('region', { name: 'Spend' }));
+    expect(await spend.findByText(/could not load spend/i)).toBeInTheDocument();
   });
 
   it('lists members and toggles a real-frame cover grant', async () => {

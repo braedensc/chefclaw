@@ -26,6 +26,7 @@ __all__ = [
     "ExtractionUsage",
     "ExtractorAdapter",
     "extractor_model_id",
+    "extractor_settings_for_tier",
     "get_extractor",
 ]
 
@@ -115,10 +116,25 @@ def get_extractor(settings: Settings) -> ExtractorAdapter:
     )
 
 
+def extractor_settings_for_tier(settings: Settings, *, paid_tier: bool) -> Settings:
+    """The effective extractor settings for one job's owner (M3 per-user paid
+    tier). A ``paid_tier`` owner on the GEMINI extractor gets
+    ``gemini_paid_model`` swapped into ``gemini_model`` so the constructed
+    extractor + the ledger's model attribution both bill the paid model;
+    everyone else (free tier, or the qwen/fake extractors, which ignore the
+    flag) gets the settings unchanged. Pure — returns a copy, never mutates.
+    The single source of truth for the swap, used by the worker AND
+    ``/api/health`` so they can never disagree on which model an owner runs."""
+    if paid_tier and settings.chefclaw_extractor == "gemini":
+        return settings.model_copy(update={"gemini_model": settings.gemini_paid_model})
+    return settings
+
+
 def extractor_model_id(settings: Settings) -> str:
     """The model id the configured extractor would bill against — used by the
     spend ledger for attempts that died before usage existed, and by
-    ``/api/health``'s readout. Never constructs an adapter (no key checks)."""
+    ``/api/health``'s readout. Never constructs an adapter (no key checks).
+    Pass ``extractor_settings_for_tier(...)`` to get an owner's paid-tier model."""
     if settings.chefclaw_extractor == "gemini":
         return settings.gemini_model
     if settings.chefclaw_extractor == "qwen":

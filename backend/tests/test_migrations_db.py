@@ -115,6 +115,24 @@ async def test_m2_migration_backfills_owner_and_swaps_dedupe(migrated_db) -> Non
         assert tables == {"invites", "sessions", "request_events"}
 
 
+async def test_m3_migration_adds_paid_tier_default_false(migrated_db) -> None:
+    """The M3 migration (a1c2e3f4b5d6) adds users.paid_tier NOT NULL default
+    false — the seed owner backfilled to false, and a new insert without the
+    column defaults false (no data migration needed)."""
+    async with migrated_db.begin() as conn:
+        seed = (await conn.execute(text("SELECT paid_tier FROM users"))).scalar_one()
+        assert seed is False
+        inserted = (
+            await conn.execute(
+                text(
+                    "INSERT INTO users (name, email) VALUES ('p', 'p@x') "
+                    "RETURNING paid_tier"
+                )
+            )
+        ).scalar_one()
+        assert inserted is False
+
+
 async def test_m2_owner_scoped_unique_allows_two_owners_same_canonical(migrated_db) -> None:
     """Against the MIGRATED schema: two owners hold the SAME (platform,
     canonical_id, dish_index) with no conflict — the swap's whole point. The

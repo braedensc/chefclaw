@@ -3,6 +3,7 @@
 // realistic data: 原文 fields, verbatim raw_text quantities ("适量" included).
 
 import type {
+  AdminSpendOut,
   HealthResponse,
   InviteOut,
   InvitePublicOut,
@@ -213,10 +214,12 @@ export function healthResponse(
     backup_finished_at: '2026-07-06T03:30:00+00:00',
     extractor: 'gemini',
     model: 'gemini-2.5-flash',
+    paid_tier: false,
     cover_mode: 'sprite', // V2-F default; illustration-control tests override to 'gemini'
     spend_month_usd: 0.2,
     budget_monthly_usd: 10,
     daily_attempt_cap: 25,
+    budget_is_personal: false,
     attempts_today: 1,
     worker: 'alive',
     sentry_enabled: false,
@@ -273,6 +276,41 @@ export function spendSummary(
             tokens_thinking: 50,
           },
         ],
+      },
+    ],
+    ...overrides,
+  };
+}
+
+/** A /api/admin/spend rollup: the paid-tier owner + a capped friend. */
+export function adminSpendSummary(
+  overrides: Partial<AdminSpendOut> = {},
+): AdminSpendOut {
+  return {
+    total_month_to_date_usd: 3.5,
+    total_attempts_today: 7,
+    budget_monthly_usd: 25,
+    daily_attempt_cap: 20,
+    users: [
+      {
+        id: '01890000-0000-7000-8000-000000000001',
+        email: 'owner@localhost',
+        paid_tier: true,
+        month_to_date_usd: 3.0,
+        attempts_today: 6,
+        budget_monthly_usd: 25,
+        daily_attempt_cap: 20,
+        cap_is_personal: false,
+      },
+      {
+        id: '01890000-0000-7000-8000-000000000002',
+        email: 'friend@x.com',
+        paid_tier: false,
+        month_to_date_usd: 0.5,
+        attempts_today: 1,
+        budget_monthly_usd: 2,
+        daily_attempt_cap: 5,
+        cap_is_personal: true,
       },
     ],
     ...overrides,

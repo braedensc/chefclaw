@@ -17,6 +17,8 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 __all__ = [
+    "AdminSpendOut",
+    "AdminUserSpend",
     "ErrorBody",
     "ExtractRequest",
     "InviteCreate",
@@ -35,6 +37,8 @@ __all__ = [
     "UserAdminList",
     "UserAdminPatch",
     "UserAdminRow",
+    "UserBudgetOut",
+    "UserBudgetPatch",
 ]
 
 
@@ -117,6 +121,64 @@ class InvitePublicOut(BaseModel):
 
     status: str
     email: str | None = None
+
+
+class UserBudgetPatch(BaseModel):
+    """PATCH /api/admin/users/{user_id}/budget body (M3 per-user cost controls).
+    All fields optional — a PARTIAL update keyed on which fields the request
+    sends: a field PRESENT sets it, a cap PRESENT+``null`` CLEARS it (the
+    account falls back to the global env cap), ABSENT leaves it unchanged.
+    Positive caps only — 0/negative is a 422 (use ``null`` to clear). The router
+    reads ``model_fields_set`` to tell 'clear' from 'leave alone'.
+
+    ``paid_tier`` toggles this account onto the paid Gemini model
+    (GEMINI_PAID_MODEL) for its extractions — it is not a cap, so ``null`` is
+    not accepted; send true/false."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    monthly_budget_usd: float | None = Field(default=None, gt=0)
+    max_attempts_per_day: int | None = Field(default=None, gt=0)
+    paid_tier: bool | None = None
+
+
+class UserBudgetOut(BaseModel):
+    """A user's per-user cost controls after the write. ``null`` on a cap means
+    no per-user override (the global env cap applies); ``paid_tier`` false means
+    the global GEMINI_MODEL (free) default."""
+
+    id: uuid.UUID
+    email: str
+    monthly_budget_usd: float | None = None
+    max_attempts_per_day: int | None = None
+    paid_tier: bool = False
+
+
+class AdminUserSpend(BaseModel):
+    """One user's row in the admin cross-user spend rollup. Caps are the
+    EFFECTIVE ones (per-user override, else the global default; null under
+    fail-closed config); ``cap_is_personal`` flags a per-user monthly override."""
+
+    id: uuid.UUID
+    email: str
+    paid_tier: bool
+    month_to_date_usd: float
+    attempts_today: int
+    budget_monthly_usd: float | None = None
+    daily_attempt_cap: int | None = None
+    cap_is_personal: bool = False
+
+
+class AdminSpendOut(BaseModel):
+    """GET /api/admin/spend (admin only): month-to-date spend + effective caps
+    per user, plus tenant totals and the global env defaults (null when the
+    budget config is fail-closed)."""
+
+    total_month_to_date_usd: float
+    total_attempts_today: int
+    budget_monthly_usd: float | None = None
+    daily_attempt_cap: int | None = None
+    users: list[AdminUserSpend]
 
 
 class ErrorBody(BaseModel):

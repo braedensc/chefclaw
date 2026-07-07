@@ -154,11 +154,16 @@ class User(Base):
     is_admin: Mapped[bool] = mapped_column(
         Boolean, nullable=False, server_default=text("false")
     )
-    # M3-readiness per-user caps: added now so the shape is stable, but UNUSED by
-    # M2 logic (spend.check_budget still reads the GLOBAL env budget in M2 —
-    # all users share one pool until M3 wires these in). NULL = no per-user cap.
+    # M3 per-user caps: a non-NULL column OVERRIDES the global env budget for
+    # this account (spend.check_budget); NULL = use the global default.
     monthly_budget_usd: Mapped[Decimal | None] = mapped_column(Numeric(10, 2))
     max_attempts_per_day: Mapped[int | None] = mapped_column(Integer)
+    # M3 per-user paid tier: when true this account's extractions use
+    # GEMINI_PAID_MODEL (gemini-2.5-pro) instead of the global GEMINI_MODEL
+    # (gemini-2.5-flash) default. Set via the admin budget endpoint.
+    paid_tier: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, server_default=text("false")
+    )
     # V2-F private real-frame cover grant: when TRUE (and the global
     # CHEFCLAW_REAL_COVERS switch is also on), this user may capture + SEE real
     # finished-dish video frames on their own recipes; otherwise they only ever
