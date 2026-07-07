@@ -17,6 +17,21 @@ export default tseslint.config(
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
+  // The PWA service worker (V2-C) is a hand-written classic worker script, not
+  // a TS module — declare its runtime globals so no-undef passes.
+  {
+    files: ['public/sw.js'],
+    languageOptions: {
+      sourceType: 'script',
+      globals: {
+        self: 'readonly',
+        caches: 'readonly',
+        fetch: 'readonly',
+        URL: 'readonly',
+        console: 'readonly',
+      },
+    },
+  },
   // eslint-config-prettier LAST so it disables every stylistic rule.
   prettier,
 );
