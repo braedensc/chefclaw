@@ -213,6 +213,30 @@ async def test_upload_413_when_content_length_exceeds_cap(tmp_path: Path) -> Non
     assert not (tmp_path / "chefclaw-uploads" / "incoming").exists()
 
 
+@pytest.mark.parametrize(
+    "bad_url",
+    ["javascript:alert(1)", "data:text/html,<script>alert(1)</script>", "vbscript:msgbox"],
+)
+async def test_upload_rejects_non_http_provenance_url(tmp_path: Path, bad_url: str) -> None:
+    """provenance_url becomes the recipe's source_url, rendered as a 'View
+    original' href — so a non-http(s) scheme (javascript:/data:) is refused at
+    the boundary (400) BEFORE any file is spooled (V2-D stored-XSS finding)."""
+    store = FakeJobStore()
+    settings = Settings(chefclaw_api_token=TEST_TOKEN, scratch_dir=str(tmp_path))
+    app = build_app(store, settings=settings)
+    async with client_for(app) as client:
+        resp = await client.post(
+            "/api/recipes/upload",
+            files={"file": ("v.mp4", b"bytes", "video/mp4")},
+            data={"provenance_url": bad_url},
+            headers=bearer(TEST_TOKEN),
+        )
+    assert resp.status_code == 400
+    assert resp.json()["error_type"] == "unsupported_url"
+    # Rejected before the handler spooled anything.
+    assert not (tmp_path / "chefclaw-uploads" / "incoming").exists()
+
+
 async def test_upload_streaming_guard_rejects_over_settings_cap(tmp_path: Path) -> None:
     """Backstop for a Content-Length-less (chunked) upload: the middleware
     passes (body < the default app-state cap), and the handler's streaming

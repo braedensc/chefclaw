@@ -401,3 +401,62 @@ share link. If it works, it was note-level, not IP-level — stay put.
   works there too. **End-to-end socks5 through the sidecar is still
   unverified** — if rung b fails inside the sidecar, front the SOCKS5 with a
   small HTTP proxy (note the result in the ADR).
+
+---
+
+## 6. Session management (M2 opaque sessions + V2-D controls)
+
+Auth is server-side opaque sessions (ADR `2026-07-07-m2-accounts-and-invites`); the
+row lives in `sessions` (only the cookie's sha256 is stored). SQL below runs against
+the **compose DB** (`docker compose exec postgres psql -U chefclaw chefclaw`) — the
+irreplaceable production volume, so read-only first, mutate deliberately.
+
+### Sign a user out
+
+- **This device** — the user clicks logout: `POST /api/auth/logout` DELETEs the current
+  session row. Instant, server-side (the reason sessions are stateful, not JWT).
+- **Every device ("lost laptop")** — delete all of a user's sessions:
+  ```sql
+  DELETE FROM sessions WHERE owner_id = (SELECT id FROM users WHERE email = '<addr>');
+  ```
+  Each device is signed out on its next request.
+
+### Boot / de-invite a member
+
+Disable the account — their sessions stop resolving **immediately** (the resolve join
+requires `status='active'`), no row deletion needed:
+```sql
+UPDATE users SET status = 'disabled' WHERE email = '<addr>';
+```
+Re-enable with `status = 'active'`. (Also revoke any pending invite for them —
+`POST /api/admin/invites/{id}/revoke`, or the admin UI.)
+
+### Lifetimes (defaults, env-tunable)
+
+- **Absolute TTL** — `SESSION_TTL_HOURS=720` (30 days): the hard cap from mint time.
+- **Idle timeout** — `SESSION_IDLE_TIMEOUT_HOURS=336` (14 days): a session unused this
+  long stops resolving before the absolute cap (`last_seen_at` is the signal, written
+  at most once per 5 min). Set `0` to disable the idle check.
+- Expired/idle rows just stop resolving — a lazy sweep is optional, never required:
+  ```sql
+  DELETE FROM sessions WHERE expires_at < now();
+  ```
+
+### Force a global re-auth
+
+After a suspected `GOOGLE_OAUTH_CLIENT_SECRET` compromise (rotate it first — see
+`docs/SECURITY.md` "Key rotation"), invalidate every live session:
+```sql
+TRUNCATE sessions;
+```
+Everyone re-signs-in with Google; the invite gate is untouched.
+
+### Request throttle (V2-D)
+
+Per-session (authed) and per-IP (public) trailing-window limits back the endpoints
+(`RATE_LIMIT_AUTHENTICATED_PER_MINUTE` / `RATE_LIMIT_PUBLIC_PER_MINUTE`, 60 s window;
+`0` disables a bucket). It is **fail-open** — a limiter DB error allows the request, so
+a DB hiccup never locks you out. Event rows live in `request_events` (append-only,
+self-pruning per key); a 429 carries `Retry-After`. If a legitimate burst (a big
+library page fanning out `/image` loads, repeated reloads) ever trips the authed limit,
+raise `RATE_LIMIT_AUTHENTICATED_PER_MINUTE` and restart.

@@ -9,6 +9,7 @@ import tempfile
 import uuid
 from pathlib import Path
 from typing import Annotated
+from urllib.parse import urlparse
 
 from fastapi import APIRouter, Depends, File, Form, Response, UploadFile
 
@@ -82,6 +83,18 @@ async def upload_recipe_video(
     """The §16.10 tier-2 floor: manual save + upload. Same job contract; the
     content-addressed canonical id means re-uploading the same bytes dedupes
     exactly like a re-pasted URL."""
+    # provenance_url is free-form here (the paste path is host-allowlisted; this
+    # isn't). It becomes the recipe's source_url, which the SPA renders as a
+    # "View original" href — so refuse anything but http(s) at the boundary, or a
+    # javascript:/data: URL would be a stored XSS link (V2-D audit finding).
+    if provenance_url and provenance_url.strip():
+        scheme = urlparse(provenance_url).scheme.lower()
+        if scheme not in ("http", "https"):
+            return error_response(
+                400,
+                "unsupported_url",
+                "provenance_url must be an http(s) link (or omitted).",
+            )
     incoming_dir = (
         Path(settings.scratch_dir or tempfile.gettempdir()) / "chefclaw-uploads" / "incoming"
     )

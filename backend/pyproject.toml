@@ -36,6 +36,7 @@ dev = [
     "pytest-asyncio",
     "httpx",
     "ruff",
+    "pip-audit>=2.10.1",
 ]
 
 [build-system]

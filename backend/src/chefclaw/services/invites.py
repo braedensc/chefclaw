@@ -222,9 +222,18 @@ async def _consume_invite(
         )
         s.add(user)
         await s.flush()  # populate user.id
+        # DB-enforced single-use + TTL (V2-D): the UPDATE itself carries the full
+        # WHERE status='pending' AND expires_at > now() predicate, so single-use
+        # holds at the datastore even independently of the FOR UPDATE lock above —
+        # rowcount==1 is the atomic gate; anything else (already consumed / expired
+        # under us) rolls the whole transaction back.
         result = await s.execute(
             update(Invite)
-            .where(Invite.id == invite.id, Invite.status == InviteStatus.PENDING.value)
+            .where(
+                Invite.id == invite.id,
+                Invite.status == InviteStatus.PENDING.value,
+                Invite.expires_at > now,
+            )
             .values(
                 status=InviteStatus.ACCEPTED.value,
                 accepted_user_id=user.id,

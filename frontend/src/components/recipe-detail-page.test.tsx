@@ -286,4 +286,38 @@ describe('RecipeDetailPage', () => {
       ),
     );
   });
+
+  it('does not render a clickable "View original" for a non-http(s) source_url (XSS guard)', async () => {
+    // source_url is persisted third-party/upload-provenance data; a javascript:
+    // URL as an href would execute on click (V2-D). The guard drops the link.
+    genState.recipesById['r1'] = recipeDetail({
+      source_url: 'javascript:alert(document.cookie)',
+    });
+
+    renderApp('/recipes/r1');
+
+    // The page renders (the URL still shows as escaped text) …
+    expect(
+      await screen.findByText('javascript:alert(document.cookie)'),
+    ).toBeInTheDocument();
+    // … but there is no clickable link, and nothing carries a javascript: href.
+    expect(
+      screen.queryByRole('link', { name: /view original/i }),
+    ).not.toBeInTheDocument();
+    expect(document.querySelector('a[href^="javascript:"]')).toBeNull();
+  });
+
+  it('renders a "View original" link for an http(s) source_url', async () => {
+    genState.recipesById['r1'] = recipeDetail({
+      source_url: 'https://www.bilibili.com/video/BV1xx',
+    });
+
+    renderApp('/recipes/r1');
+
+    const link = await screen.findByRole('link', { name: /view original/i });
+    expect(link).toHaveAttribute(
+      'href',
+      'https://www.bilibili.com/video/BV1xx',
+    );
+  });
 });

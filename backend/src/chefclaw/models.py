@@ -339,12 +339,35 @@ class Invite(Base):
     accepted_at: Mapped[datetime | None] = mapped_column(TIMESTAMP(timezone=True))
 
 
+class RequestEvent(Base):
+    """Append-only request-rate event (V2-D security audit). One row per served
+    request against a rate-limited surface, keyed by a coarse identity string:
+    ``session:<sha256(cookie)>`` for an authed cookie, ``ip:<addr>`` for the
+    public/pre-auth endpoints. The trailing-window COUNT over ``key`` IS the
+    throttle — no mutable counter to race, no cron to reset (kit append-only
+    pattern, docs/SECURITY.md). Deliberately NO FK to sessions/users: a logout
+    DELETEs the session row, but its rate events linger harmlessly (append-only
+    log lifecycle never conflicts with record lifecycle — docs/SECURITY.md)."""
+
+    __tablename__ = "request_events"
+    __table_args__ = (Index("ix_request_events_key_created_at", "key", "created_at"),)
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, server_default=text("uuidv7()")
+    )
+    key: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP(timezone=True), nullable=False, server_default=text("now()")
+    )
+
+
 class Session(Base):
     """A server-side opaque session (M2). The cookie carries a random 256-bit
     token; only its sha256 ``token_hash`` is stored, so a DB dump can't be
     replayed. Lookups are ``WHERE token_hash = sha256(cookie) AND expires_at >
-    now()``. Instant revocation (logout / de-invite) is a DELETE of the row —
-    the reason this is stateful, not a JWT."""
+    now()`` (plus an idle-timeout check on ``last_seen_at`` — V2-D). Instant
+    revocation (logout / de-invite) is a DELETE of the row — the reason this is
+    stateful, not a JWT."""
 
     __tablename__ = "sessions"
 

@@ -20,10 +20,12 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(extra="ignore")
 
-    # Auth is disabled-closed: an empty token means every request gets a 401
-    # telling the operator to set CHEFCLAW_API_TOKEN (see auth.require_owner).
-    # LEGACY: kept through the M2 deploy window; the bearer branch is DELETED at
-    # cutover (hard switch to cookie sessions — no dual bearer-or-session mode).
+    # DEAD post-M2 (kept only so old .env.local files don't error on the unknown
+    # key). The bearer branch was removed at the M2 cutover — auth is cookie
+    # sessions now (auth.require_owner), and HTTPBearer is gone from the OpenAPI
+    # security scheme. This grants NO access; drop it from .env.local at the next
+    # deploy (docs/SECURITY.md — the token→session cutover). Still on the Sentry
+    # scrub denylist as belt-and-braces.
     chefclaw_api_token: str = ""
 
     # ── M2 auth (ADR 2026-07-07-m2-accounts-and-invites) ────────────────────
@@ -45,6 +47,25 @@ class Settings(BaseSettings):
     chefclaw_fake_owner_id: str = "01890000-0000-7000-8000-000000000001"
     # Absolute session lifetime for the opaque server-side sessions (720h = 30d).
     session_ttl_hours: int = 720
+    # Idle-timeout (V2-D): a session unused for longer than this stops resolving
+    # BEFORE its absolute expires_at (last_seen_at is recorded on each resolve —
+    # this makes it load-bearing). Comfortably above the 5-min last_seen_at write
+    # throttle so a live session is never falsely expired. 0 DISABLES the idle
+    # check (absolute TTL still applies). Default 14 days.
+    session_idle_timeout_hours: int = 336
+
+    # ── Rate limiting (V2-D security audit) ─────────────────────────────────
+    # Trailing-window request throttle (append-only event rows — no mutable
+    # counter to race). Two buckets, 60-second window, per-minute caps:
+    #  - authenticated: keyed per SESSION — a generous backstop against a
+    #    runaway/compromised session (real browsing bursts image loads, so this
+    #    is well above human use; it stops abuse, not normal use).
+    #  - public: keyed per client IP — covers the pre-auth endpoints
+    #    (/api/auth/google/callback, /api/invites/{token}); strict enough that
+    #    neither can be hammered.
+    # 0 DISABLES that bucket (fail-open). See chefclaw.ratelimit.
+    rate_limit_authenticated_per_minute: int = 300
+    rate_limit_public_per_minute: int = 30
 
     # ── M2 invites + transactional email (PR 3) ─────────────────────────────
     # Email-provider selection, mirroring the auth/extractor seams. "fake"
