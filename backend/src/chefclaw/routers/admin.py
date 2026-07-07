@@ -13,26 +13,32 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Response
 from fastapi.responses import JSONResponse
 
-from chefclaw import db
+from chefclaw import app_config, db
 from chefclaw.auth import require_admin
 from chefclaw.config import Settings, get_settings
 from chefclaw.emailer import get_email_adapter
 from chefclaw.errors import ConfigError, EmailSendError
 from chefclaw.routers.deps import error_response, get_admin_spend_reader
 from chefclaw.schemas import (
+    AdminConfigOut,
+    AdminConfigPatch,
     AdminSpendOut,
     AdminUserSpend,
     ErrorBody,
+    InfraItem,
     InviteCreate,
     InviteList,
     InviteOut,
     InvitePublicOut,
+    RuntimeConfigItem,
+    SecretStatus,
     UserAdminList,
     UserAdminPatch,
     UserAdminRow,
     UserBudgetOut,
     UserBudgetPatch,
 )
+from chefclaw.services import config as config_service
 from chefclaw.services import invites, users
 from chefclaw.services.repo import AdminSpendReader
 
@@ -222,6 +228,75 @@ async def set_user_real_covers(
     if user is None:
         return error_response(404, "not_found", f"no user {user_id}")
     return UserAdminRow.model_validate(user)
+
+
+# ── runtime-policy config panel (ADR 2026-07-07-admin-config-panel) ──────────
+
+
+def _build_config_out(settings: Settings, overrides: dict[str, str]) -> AdminConfigOut:
+    """Assemble the admin config view from the registry + env ``Settings`` +
+    current overrides. Secrets are STATUS ONLY (a boolean derived from env
+    presence — never a value); infra is read-only non-secret values."""
+    runtime = []
+    for spec in app_config.SPECS:
+        env_value = config_service.render_value(getattr(settings, spec.key))
+        has_override = spec.key in overrides
+        override_value = overrides[spec.key] if has_override else None
+        runtime.append(
+            RuntimeConfigItem(
+                key=spec.key,
+                category=spec.category,
+                control=spec.control,
+                description=spec.description,
+                choices=list(spec.choices),
+                env_value=env_value,
+                override_value=override_value,
+                effective_value=override_value if has_override else env_value,
+                source="override" if has_override else "env",
+            )
+        )
+    secrets = [
+        SecretStatus(key=key, configured=bool(str(getattr(settings, key)).strip()))
+        for key in config_service.SECRET_STATUS_KEYS
+    ]
+    infra = [
+        InfraItem(key=key, value=config_service.render_value(getattr(settings, key)))
+        for key in config_service.INFRA_KEYS
+    ]
+    return AdminConfigOut(runtime_policy=runtime, secrets=secrets, infra=infra)
+
+
+@router.get("/admin/config", response_model=AdminConfigOut)
+async def get_config(
+    owner_id: Annotated[uuid.UUID, Depends(require_admin)],
+    settings: Annotated[Settings, Depends(get_settings)],
+) -> AdminConfigOut:
+    """The whole admin config surface: editable runtime policy (with env default,
+    override, and effective value per flag), secret STATUS (never a value), and
+    read-only deploy/infra settings."""
+    overrides = await config_service.read_overrides(db.get_sessionmaker())
+    return _build_config_out(settings, overrides)
+
+
+@router.patch("/admin/config", response_model=AdminConfigOut, responses={422: _ERR})
+async def patch_config(
+    body: AdminConfigPatch,
+    owner_id: Annotated[uuid.UUID, Depends(require_admin)],
+    settings: Annotated[Settings, Depends(get_settings)],
+) -> AdminConfigOut | JSONResponse:
+    """Set/clear runtime-policy overrides (one audited transaction). A string
+    SETS the override, JSON ``null`` CLEARS it (revert to env), an absent key is
+    unchanged. An unknown/non-editable (e.g. secret) key or an invalid value ⇒
+    422 with a per-key message and NOTHING persisted. Changes take effect on the
+    NEXT job — no restart."""
+    try:
+        await config_service.apply_changes(
+            db.get_sessionmaker(), body.updates, changed_by=owner_id, base=settings
+        )
+    except config_service.ConfigValidationError as exc:
+        return error_response(422, "config_invalid", str(exc))
+    overrides = await config_service.read_overrides(db.get_sessionmaker())
+    return _build_config_out(settings, overrides)
 
 
 @router.get("/invites/{token}", response_model=InvitePublicOut)

@@ -1,6 +1,64 @@
 {
   "components": {
     "schemas": {
+      "AdminConfigOut": {
+        "description": "GET /api/admin/config — the whole admin config surface in one call:\neditable runtime policy + secret status + read-only infra.",
+        "properties": {
+          "infra": {
+            "items": {
+              "$ref": "#/components/schemas/InfraItem"
+            },
+            "title": "Infra",
+            "type": "array"
+          },
+          "runtime_policy": {
+            "items": {
+              "$ref": "#/components/schemas/RuntimeConfigItem"
+            },
+            "title": "Runtime Policy",
+            "type": "array"
+          },
+          "secrets": {
+            "items": {
+              "$ref": "#/components/schemas/SecretStatus"
+            },
+            "title": "Secrets",
+            "type": "array"
+          }
+        },
+        "required": [
+          "runtime_policy",
+          "secrets",
+          "infra"
+        ],
+        "title": "AdminConfigOut",
+        "type": "object"
+      },
+      "AdminConfigPatch": {
+        "additionalProperties": false,
+        "description": "PATCH /api/admin/config body. ``updates`` maps an editable runtime-policy\nkey to its new value: a string SETS the override, JSON ``null`` CLEARS it\n(revert to the env default). An absent key is left unchanged. An unknown or\nnon-editable (e.g. a secret) key ⇒ 422 — a secret can never be written.",
+        "properties": {
+          "updates": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Updates",
+            "type": "object"
+          }
+        },
+        "required": [
+          "updates"
+        ],
+        "title": "AdminConfigPatch",
+        "type": "object"
+      },
       "AdminSpendOut": {
         "description": "GET /api/admin/spend (admin only): month-to-date spend + effective caps\nper user, plus tenant totals and the global env defaults (null when the\nbudget config is fail-closed).",
         "properties": {
@@ -356,6 +414,30 @@
           "db"
         ],
         "title": "HealthResponse",
+        "type": "object"
+      },
+      "InfraItem": {
+        "description": "A deploy/infra setting: read-only here, env-only, needs a restart to\nchange (not a secret — a plain non-sensitive value).",
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "requires_restart": {
+            "default": true,
+            "title": "Requires Restart",
+            "type": "boolean"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "value"
+        ],
+        "title": "InfraItem",
         "type": "object"
       },
       "InviteCreate": {
@@ -1060,6 +1142,92 @@
         "title": "RecipeSummary",
         "type": "object"
       },
+      "RuntimeConfigItem": {
+        "description": "One editable runtime-policy flag as the admin panel sees it. Every value\nrenders as a STRING (``bool`` → 'true'/'false'); the frontend interprets by\n``control``. ``override_value`` is null when the flag is inheriting the env\ndefault; ``effective_value`` is what the pipeline actually uses.",
+        "properties": {
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "choices": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Choices",
+            "type": "array"
+          },
+          "control": {
+            "title": "Control",
+            "type": "string"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "effective_value": {
+            "title": "Effective Value",
+            "type": "string"
+          },
+          "env_value": {
+            "title": "Env Value",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "override_value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Override Value"
+          },
+          "source": {
+            "enum": [
+              "env",
+              "override"
+            ],
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "category",
+          "control",
+          "description",
+          "choices",
+          "env_value",
+          "effective_value",
+          "source"
+        ],
+        "title": "RuntimeConfigItem",
+        "type": "object"
+      },
+      "SecretStatus": {
+        "description": "A server secret shown as STATUS ONLY — never a value (Hard Rules 2/3/4).\n``configured`` is derived from env presence.",
+        "properties": {
+          "configured": {
+            "title": "Configured",
+            "type": "boolean"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "configured"
+        ],
+        "title": "SecretStatus",
+        "type": "object"
+      },
       "SpendDay": {
         "description": "One UTC day of ledger activity; days with zero attempts are omitted.",
         "properties": {
@@ -1406,6 +1574,68 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/admin/config": {
+      "get": {
+        "description": "The whole admin config surface: editable runtime policy (with env default,\noverride, and effective value per flag), secret STATUS (never a value), and\nread-only deploy/infra settings.",
+        "operationId": "get_config_api_admin_config_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminConfigOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Config",
+        "tags": [
+          "invites"
+        ]
+      },
+      "patch": {
+        "description": "Set/clear runtime-policy overrides (one audited transaction). A string\nSETS the override, JSON ``null`` CLEARS it (revert to env), an absent key is\nunchanged. An unknown/non-editable (e.g. secret) key or an invalid value ⇒\n422 with a per-key message and NOTHING persisted. Changes take effect on the\nNEXT job — no restart.",
+        "operationId": "patch_config_api_admin_config_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminConfigPatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminConfigOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Patch Config",
+        "tags": [
+          "invites"
+        ]
+      }
+    },
     "/api/admin/invites": {
       "get": {
         "description": "List invites (newest first), optionally filtered by status. NEVER returns\na token_hash.",

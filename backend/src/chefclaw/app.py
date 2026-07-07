@@ -22,7 +22,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from chefclaw import db, observability, ratelimit, spend
+from chefclaw import app_config, db, observability, ratelimit, spend
 from chefclaw.auth import assert_prod_auth_safe, require_owner
 from chefclaw.config import Settings, get_settings
 from chefclaw.errors import ConfigError
@@ -234,6 +234,16 @@ async def _effective_budget_caps(
     return float(eff_monthly), int(eff_daily), user_monthly is not None
 
 
+async def _effective_settings(settings: Settings) -> Settings:
+    """Env settings overlaid with the ``app_config`` runtime-policy overrides
+    (ADR 2026-07-07-admin-config-panel) — the same effective settings the worker
+    resolves, so health and the pipeline never drift. A module-level seam so the
+    unit tier can stub it like the ledger reads (the local compose DB is
+    PRODUCTION — kit inversion; the unit tier must never open a real
+    connection). Called only when the DB is reachable."""
+    return await app_config.effective_settings(db.get_sessionmaker(), settings)
+
+
 def _worker_status(app: FastAPI) -> Literal["alive", "dead", "not_running"]:
     """'dead' is the silent killer this exists for: the worker task crashed
     but the api still answers — no job would ever run again."""
@@ -255,14 +265,21 @@ async def health(
     """Health check. NOT publicly exempt from auth — it exposes spend/cookie
     state (plan §16 amendment 3)."""
     db_ok = await db.ping()
+    # Runtime-policy overlay (ADR 2026-07-07-admin-config-panel): reflect any
+    # app_config overrides (cover mode, model tier, budget) in the readout — but
+    # ONLY when the DB is reachable, so the no-DB CI smoke keeps the env values.
+    # Same effective settings the worker resolves, so health and the pipeline
+    # never drift. Infra fields below (sidecar, cookie, backup, extractor) are
+    # never overridable and keep the env ``settings``.
+    eff = await _effective_settings(settings) if db_ok else settings
     backup, backup_finished_at = _backup_status(settings)
     budget_monthly_usd, daily_attempt_cap, budget_is_personal = await _effective_budget_caps(
-        settings, owner_id
+        eff, owner_id
     )
     # The caller's effective extraction model (paid-tier owners run the paid
     # model). Same swap the worker uses, so health and the pipeline agree.
     paid_tier = await _owner_paid_tier(owner_id) if db_ok else False
-    model = extractor_model_id(extractor_settings_for_tier(settings, paid_tier=paid_tier))
+    model = extractor_model_id(extractor_settings_for_tier(eff, paid_tier=paid_tier))
     return HealthResponse(
         status="ok" if db_ok else "degraded",
         db="ok" if db_ok else "unreachable",
@@ -274,7 +291,7 @@ async def health(
         extractor=settings.chefclaw_extractor,
         model=model,
         paid_tier=paid_tier,
-        cover_mode=settings.chefclaw_image_generator,
+        cover_mode=eff.chefclaw_image_generator,
         spend_month_usd=await _spend_month_to_date(owner_id) if db_ok else None,
         budget_monthly_usd=budget_monthly_usd,
         daily_attempt_cap=daily_attempt_cap,

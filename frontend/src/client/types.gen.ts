@@ -5,6 +5,44 @@ export type ClientOptions = {
 };
 
 /**
+ * AdminConfigOut
+ *
+ * GET /api/admin/config — the whole admin config surface in one call:
+ * editable runtime policy + secret status + read-only infra.
+ */
+export type AdminConfigOut = {
+    /**
+     * Infra
+     */
+    infra: Array<InfraItem>;
+    /**
+     * Runtime Policy
+     */
+    runtime_policy: Array<RuntimeConfigItem>;
+    /**
+     * Secrets
+     */
+    secrets: Array<SecretStatus>;
+};
+
+/**
+ * AdminConfigPatch
+ *
+ * PATCH /api/admin/config body. ``updates`` maps an editable runtime-policy
+ * key to its new value: a string SETS the override, JSON ``null`` CLEARS it
+ * (revert to the env default). An absent key is left unchanged. An unknown or
+ * non-editable (e.g. a secret) key ⇒ 422 — a secret can never be written.
+ */
+export type AdminConfigPatch = {
+    /**
+     * Updates
+     */
+    updates: {
+        [key: string]: string | null;
+    };
+};
+
+/**
  * AdminSpendOut
  *
  * GET /api/admin/spend (admin only): month-to-date spend + effective caps
@@ -212,6 +250,27 @@ export type HealthResponse = {
      * Worker
      */
     worker?: 'alive' | 'dead' | 'not_running';
+};
+
+/**
+ * InfraItem
+ *
+ * A deploy/infra setting: read-only here, env-only, needs a restart to
+ * change (not a secret — a plain non-sensitive value).
+ */
+export type InfraItem = {
+    /**
+     * Key
+     */
+    key: string;
+    /**
+     * Requires Restart
+     */
+    requires_restart?: boolean;
+    /**
+     * Value
+     */
+    value: string;
 };
 
 /**
@@ -616,6 +675,70 @@ export type RecipeSummary = {
 };
 
 /**
+ * RuntimeConfigItem
+ *
+ * One editable runtime-policy flag as the admin panel sees it. Every value
+ * renders as a STRING (``bool`` → 'true'/'false'); the frontend interprets by
+ * ``control``. ``override_value`` is null when the flag is inheriting the env
+ * default; ``effective_value`` is what the pipeline actually uses.
+ */
+export type RuntimeConfigItem = {
+    /**
+     * Category
+     */
+    category: string;
+    /**
+     * Choices
+     */
+    choices: Array<string>;
+    /**
+     * Control
+     */
+    control: string;
+    /**
+     * Description
+     */
+    description: string;
+    /**
+     * Effective Value
+     */
+    effective_value: string;
+    /**
+     * Env Value
+     */
+    env_value: string;
+    /**
+     * Key
+     */
+    key: string;
+    /**
+     * Override Value
+     */
+    override_value?: string | null;
+    /**
+     * Source
+     */
+    source: 'env' | 'override';
+};
+
+/**
+ * SecretStatus
+ *
+ * A server secret shown as STATUS ONLY — never a value (Hard Rules 2/3/4).
+ * ``configured`` is derived from env presence.
+ */
+export type SecretStatus = {
+    /**
+     * Configured
+     */
+    configured: boolean;
+    /**
+     * Key
+     */
+    key: string;
+};
+
+/**
  * SpendDay
  *
  * One UTC day of ledger activity; days with zero attempts are omitted.
@@ -854,6 +977,47 @@ export type ValidationError = {
      */
     type: string;
 };
+
+export type GetConfigApiAdminConfigGetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/admin/config';
+};
+
+export type GetConfigApiAdminConfigGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: AdminConfigOut;
+};
+
+export type GetConfigApiAdminConfigGetResponse = GetConfigApiAdminConfigGetResponses[keyof GetConfigApiAdminConfigGetResponses];
+
+export type PatchConfigApiAdminConfigPatchData = {
+    body: AdminConfigPatch;
+    path?: never;
+    query?: never;
+    url: '/api/admin/config';
+};
+
+export type PatchConfigApiAdminConfigPatchErrors = {
+    /**
+     * Unprocessable Content
+     */
+    422: ErrorBody;
+};
+
+export type PatchConfigApiAdminConfigPatchError = PatchConfigApiAdminConfigPatchErrors[keyof PatchConfigApiAdminConfigPatchErrors];
+
+export type PatchConfigApiAdminConfigPatchResponses = {
+    /**
+     * Successful Response
+     */
+    200: AdminConfigOut;
+};
+
+export type PatchConfigApiAdminConfigPatchResponse = PatchConfigApiAdminConfigPatchResponses[keyof PatchConfigApiAdminConfigPatchResponses];
 
 export type ListInvitesApiAdminInvitesGetData = {
     body?: never;

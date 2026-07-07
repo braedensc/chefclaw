@@ -12,6 +12,8 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from typing import Any
 
+from chefclaw import app_config
+from chefclaw.config import Settings
 from chefclaw.covers import AssignmentMiss
 from chefclaw.documents import EstimatedAttributes, RecipeDocument
 from chefclaw.extractors import ExtractionUsage
@@ -48,6 +50,10 @@ class FakeJobStore:
         self.budget_failure: Exception | None = None
         self.fail_store_once = False
         self.budget_checks = 0
+        # Runtime-policy overrides (ADR admin-config-panel). Default empty ⇒
+        # effective_settings returns the worker's base unchanged; a test sets
+        # e.g. {"chefclaw_image_generator": "fake"} to exercise per-job pickup.
+        self.config_overrides: dict[str, Any] = {}
         # M3 per-user paid tier: owner_id → True. Default (absent) is the free
         # tier, matching the real store's False-when-no-row contract.
         self.paid_tiers: dict[uuid.UUID, bool] = {}
@@ -390,6 +396,9 @@ class FakeJobStore:
                 job.error_detail = "reconciled by fake store"
                 count += 1
         return count
+
+    async def effective_settings(self, base: Settings) -> Settings:
+        return app_config.apply_overrides(base, self.config_overrides)
 
     async def check_budget(self, owner_id: uuid.UUID) -> None:
         self.budget_checks += 1

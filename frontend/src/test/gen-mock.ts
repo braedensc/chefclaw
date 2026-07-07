@@ -16,6 +16,7 @@ import { vi } from 'vitest';
 import type { Mock } from 'vitest';
 
 import type {
+  AdminConfigOut,
   AdminSpendOut,
   HealthResponse,
   InviteOut,
@@ -28,6 +29,7 @@ import type {
   UserAdminRow,
 } from '../client/types.gen';
 import {
+  adminConfig,
   adminSpendSummary,
   healthResponse,
   invitePublic,
@@ -78,6 +80,11 @@ interface GenState {
   adminSpendError: Error | null;
   /** PATCH /api/admin/users/{id}/budget — per-user caps + paid tier (M3). */
   updateUserBudget: MutationMock;
+  /** GET /api/admin/config — the runtime-policy + secrets + infra view. */
+  adminConfig: AdminConfigOut;
+  /** When set, the admin-config queryFn throws it instead. */
+  adminConfigError: Error | null;
+  patchConfig: MutationMock;
   extract: MutationMock;
   upload: MutationMock;
   patch: MutationMock;
@@ -116,6 +123,9 @@ export const genState: GenState = {
   adminSpend: adminSpendSummary(),
   adminSpendError: null,
   updateUserBudget: mutationMock(),
+  adminConfig: adminConfig(),
+  adminConfigError: null,
+  patchConfig: mutationMock(),
   extract: mutationMock(),
   upload: mutationMock(),
   patch: mutationMock(),
@@ -145,6 +155,9 @@ export function resetGenState(): void {
   genState.adminSpend = adminSpendSummary();
   genState.adminSpendError = null;
   genState.updateUserBudget = mutationMock();
+  genState.adminConfig = adminConfig();
+  genState.adminConfigError = null;
+  genState.patchConfig = mutationMock();
   genState.extract = mutationMock();
   genState.upload = mutationMock();
   genState.patch = mutationMock();
@@ -315,9 +328,25 @@ export function genMockModule() {
         return genState.adminSpend;
       },
     }),
+
     // admin-invites-page.tsx per-user budget/tier PATCH (Budgets & tier).
     updateUserBudgetApiAdminUsersUserIdBudgetPatchMutation: () => ({
       mutationFn: (options: unknown) => genState.updateUserBudget(options),
+    }),
+
+    // admin-config-page.tsx — genState.adminConfigError drives failures.
+    getConfigApiAdminConfigGetQueryKey: () => [
+      { _id: 'getConfigApiAdminConfigGet' },
+    ],
+    getConfigApiAdminConfigGetOptions: () => ({
+      queryKey: [{ _id: 'getConfigApiAdminConfigGet' }],
+      queryFn: async () => {
+        if (genState.adminConfigError) throw genState.adminConfigError;
+        return genState.adminConfig;
+      },
+    }),
+    patchConfigApiAdminConfigPatchMutation: () => ({
+      mutationFn: (options: unknown) => genState.patchConfig(options),
     }),
   };
 }

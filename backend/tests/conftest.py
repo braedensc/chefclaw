@@ -52,10 +52,17 @@ def stub_spend_readout(monkeypatch: pytest.MonkeyPatch) -> None:
     async def fake_paid_tier(owner_id: uuid.UUID) -> bool:
         return False
 
+    async def fake_effective_settings(settings: Settings) -> Settings:
+        # No app_config overlay in the unit tier (never opens the prod DB); the
+        # override overlay is exercised at the golden/DB tier and in app_config
+        # unit tests. Health reflects the env settings unchanged here.
+        return settings
+
     from chefclaw import app as app_module
 
     monkeypatch.setattr(app_module, "_spend_month_to_date", fake_spend)
     monkeypatch.setattr(app_module, "_attempts_today", fake_attempts)
+    monkeypatch.setattr(app_module, "_effective_settings", fake_effective_settings)
     # M3: the health endpoint's per-user reads must never open the real
     # (production) DB in the unit tier — default to 'no per-user override' /
     # 'free tier'.

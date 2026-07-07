@@ -3,8 +3,8 @@
 import { type DefaultError, type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { adminSpendApiAdminSpendGet, createInviteApiAdminInvitesPost, deleteRecipeApiRecipesRecipeIdDelete, extractRecipeApiRecipesExtractPost, getJobApiJobsJobIdGet, getRecipeApiRecipesRecipeIdGet, getRecipeImageApiRecipesRecipeIdImageGet, getSpendApiSpendGet, googleCallbackApiAuthGoogleCallbackGet, googleLoginApiAuthGoogleLoginGet, healthApiHealthGet, listInvitesApiAdminInvitesGet, listJobsApiJobsGet, listRecipesApiRecipesGet, listUsersApiAdminUsersGet, logoutApiAuthLogoutPost, meApiMeGet, type Options, patchRecipeApiRecipesRecipeIdPatch, publicInviteApiInvitesTokenGet, regenerateIllustrationApiRecipesRecipeIdIllustrationPost, revokeInviteApiAdminInvitesInviteIdRevokePost, setUserRealCoversApiAdminUsersUserIdPatch, updateUserBudgetApiAdminUsersUserIdBudgetPatch, uploadRecipeVideoApiRecipesUploadPost } from '../sdk.gen';
-import type { AdminSpendApiAdminSpendGetData, AdminSpendApiAdminSpendGetResponse, CreateInviteApiAdminInvitesPostData, CreateInviteApiAdminInvitesPostError, CreateInviteApiAdminInvitesPostResponse, DeleteRecipeApiRecipesRecipeIdDeleteData, DeleteRecipeApiRecipesRecipeIdDeleteError, DeleteRecipeApiRecipesRecipeIdDeleteResponse, ExtractRecipeApiRecipesExtractPostData, ExtractRecipeApiRecipesExtractPostError, ExtractRecipeApiRecipesExtractPostResponse, GetJobApiJobsJobIdGetData, GetJobApiJobsJobIdGetError, GetJobApiJobsJobIdGetResponse, GetRecipeApiRecipesRecipeIdGetData, GetRecipeApiRecipesRecipeIdGetError, GetRecipeApiRecipesRecipeIdGetResponse, GetRecipeImageApiRecipesRecipeIdImageGetData, GetRecipeImageApiRecipesRecipeIdImageGetError, GetSpendApiSpendGetData, GetSpendApiSpendGetError, GetSpendApiSpendGetResponse, GoogleCallbackApiAuthGoogleCallbackGetData, GoogleCallbackApiAuthGoogleCallbackGetError, GoogleLoginApiAuthGoogleLoginGetData, GoogleLoginApiAuthGoogleLoginGetError, HealthApiHealthGetData, HealthApiHealthGetResponse, ListInvitesApiAdminInvitesGetData, ListInvitesApiAdminInvitesGetError, ListInvitesApiAdminInvitesGetResponse, ListJobsApiJobsGetData, ListJobsApiJobsGetError, ListJobsApiJobsGetResponse, ListRecipesApiRecipesGetData, ListRecipesApiRecipesGetError, ListRecipesApiRecipesGetResponse, ListUsersApiAdminUsersGetData, ListUsersApiAdminUsersGetResponse, LogoutApiAuthLogoutPostData, LogoutApiAuthLogoutPostResponse, MeApiMeGetData, MeApiMeGetResponse, PatchRecipeApiRecipesRecipeIdPatchData, PatchRecipeApiRecipesRecipeIdPatchError, PatchRecipeApiRecipesRecipeIdPatchResponse, PublicInviteApiInvitesTokenGetData, PublicInviteApiInvitesTokenGetError, PublicInviteApiInvitesTokenGetResponse, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostData, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostError, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostResponse, RevokeInviteApiAdminInvitesInviteIdRevokePostData, RevokeInviteApiAdminInvitesInviteIdRevokePostError, SetUserRealCoversApiAdminUsersUserIdPatchData, SetUserRealCoversApiAdminUsersUserIdPatchError, SetUserRealCoversApiAdminUsersUserIdPatchResponse, UpdateUserBudgetApiAdminUsersUserIdBudgetPatchData, UpdateUserBudgetApiAdminUsersUserIdBudgetPatchError, UpdateUserBudgetApiAdminUsersUserIdBudgetPatchResponse, UploadRecipeVideoApiRecipesUploadPostData, UploadRecipeVideoApiRecipesUploadPostError, UploadRecipeVideoApiRecipesUploadPostResponse } from '../types.gen';
+import { adminSpendApiAdminSpendGet, createInviteApiAdminInvitesPost, deleteRecipeApiRecipesRecipeIdDelete, extractRecipeApiRecipesExtractPost, getConfigApiAdminConfigGet, getJobApiJobsJobIdGet, getRecipeApiRecipesRecipeIdGet, getRecipeImageApiRecipesRecipeIdImageGet, getSpendApiSpendGet, googleCallbackApiAuthGoogleCallbackGet, googleLoginApiAuthGoogleLoginGet, healthApiHealthGet, listInvitesApiAdminInvitesGet, listJobsApiJobsGet, listRecipesApiRecipesGet, listUsersApiAdminUsersGet, logoutApiAuthLogoutPost, meApiMeGet, type Options, patchConfigApiAdminConfigPatch, patchRecipeApiRecipesRecipeIdPatch, publicInviteApiInvitesTokenGet, regenerateIllustrationApiRecipesRecipeIdIllustrationPost, revokeInviteApiAdminInvitesInviteIdRevokePost, setUserRealCoversApiAdminUsersUserIdPatch, updateUserBudgetApiAdminUsersUserIdBudgetPatch, uploadRecipeVideoApiRecipesUploadPost } from '../sdk.gen';
+import type { AdminSpendApiAdminSpendGetData, AdminSpendApiAdminSpendGetResponse, CreateInviteApiAdminInvitesPostData, CreateInviteApiAdminInvitesPostError, CreateInviteApiAdminInvitesPostResponse, DeleteRecipeApiRecipesRecipeIdDeleteData, DeleteRecipeApiRecipesRecipeIdDeleteError, DeleteRecipeApiRecipesRecipeIdDeleteResponse, ExtractRecipeApiRecipesExtractPostData, ExtractRecipeApiRecipesExtractPostError, ExtractRecipeApiRecipesExtractPostResponse, GetConfigApiAdminConfigGetData, GetConfigApiAdminConfigGetResponse, GetJobApiJobsJobIdGetData, GetJobApiJobsJobIdGetError, GetJobApiJobsJobIdGetResponse, GetRecipeApiRecipesRecipeIdGetData, GetRecipeApiRecipesRecipeIdGetError, GetRecipeApiRecipesRecipeIdGetResponse, GetRecipeImageApiRecipesRecipeIdImageGetData, GetRecipeImageApiRecipesRecipeIdImageGetError, GetSpendApiSpendGetData, GetSpendApiSpendGetError, GetSpendApiSpendGetResponse, GoogleCallbackApiAuthGoogleCallbackGetData, GoogleCallbackApiAuthGoogleCallbackGetError, GoogleLoginApiAuthGoogleLoginGetData, GoogleLoginApiAuthGoogleLoginGetError, HealthApiHealthGetData, HealthApiHealthGetResponse, ListInvitesApiAdminInvitesGetData, ListInvitesApiAdminInvitesGetError, ListInvitesApiAdminInvitesGetResponse, ListJobsApiJobsGetData, ListJobsApiJobsGetError, ListJobsApiJobsGetResponse, ListRecipesApiRecipesGetData, ListRecipesApiRecipesGetError, ListRecipesApiRecipesGetResponse, ListUsersApiAdminUsersGetData, ListUsersApiAdminUsersGetResponse, LogoutApiAuthLogoutPostData, LogoutApiAuthLogoutPostResponse, MeApiMeGetData, MeApiMeGetResponse, PatchConfigApiAdminConfigPatchData, PatchConfigApiAdminConfigPatchError, PatchConfigApiAdminConfigPatchResponse, PatchRecipeApiRecipesRecipeIdPatchData, PatchRecipeApiRecipesRecipeIdPatchError, PatchRecipeApiRecipesRecipeIdPatchResponse, PublicInviteApiInvitesTokenGetData, PublicInviteApiInvitesTokenGetError, PublicInviteApiInvitesTokenGetResponse, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostData, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostError, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostResponse, RevokeInviteApiAdminInvitesInviteIdRevokePostData, RevokeInviteApiAdminInvitesInviteIdRevokePostError, SetUserRealCoversApiAdminUsersUserIdPatchData, SetUserRealCoversApiAdminUsersUserIdPatchError, SetUserRealCoversApiAdminUsersUserIdPatchResponse, UpdateUserBudgetApiAdminUsersUserIdBudgetPatchData, UpdateUserBudgetApiAdminUsersUserIdBudgetPatchError, UpdateUserBudgetApiAdminUsersUserIdBudgetPatchResponse, UploadRecipeVideoApiRecipesUploadPostData, UploadRecipeVideoApiRecipesUploadPostError, UploadRecipeVideoApiRecipesUploadPostResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -37,6 +37,51 @@ const createQueryKey = <TOptions extends Options>(id: string, options?: TOptions
         params.query = options.query;
     }
     return [params];
+};
+
+export const getConfigApiAdminConfigGetQueryKey = (options?: Options<GetConfigApiAdminConfigGetData>) => createQueryKey('getConfigApiAdminConfigGet', options);
+
+/**
+ * Get Config
+ *
+ * The whole admin config surface: editable runtime policy (with env default,
+ * override, and effective value per flag), secret STATUS (never a value), and
+ * read-only deploy/infra settings.
+ */
+export const getConfigApiAdminConfigGetOptions = (options?: Options<GetConfigApiAdminConfigGetData>) => queryOptions<GetConfigApiAdminConfigGetResponse, DefaultError, GetConfigApiAdminConfigGetResponse, ReturnType<typeof getConfigApiAdminConfigGetQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getConfigApiAdminConfigGet({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getConfigApiAdminConfigGetQueryKey(options)
+});
+
+/**
+ * Patch Config
+ *
+ * Set/clear runtime-policy overrides (one audited transaction). A string
+ * SETS the override, JSON ``null`` CLEARS it (revert to env), an absent key is
+ * unchanged. An unknown/non-editable (e.g. secret) key or an invalid value ⇒
+ * 422 with a per-key message and NOTHING persisted. Changes take effect on the
+ * NEXT job — no restart.
+ */
+export const patchConfigApiAdminConfigPatchMutation = (options?: Partial<Options<PatchConfigApiAdminConfigPatchData>>): UseMutationOptions<PatchConfigApiAdminConfigPatchResponse, PatchConfigApiAdminConfigPatchError, Options<PatchConfigApiAdminConfigPatchData>> => {
+    const mutationOptions: UseMutationOptions<PatchConfigApiAdminConfigPatchResponse, PatchConfigApiAdminConfigPatchError, Options<PatchConfigApiAdminConfigPatchData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await patchConfigApiAdminConfigPatch({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
 };
 
 export const listInvitesApiAdminInvitesGetQueryKey = (options?: Options<ListInvitesApiAdminInvitesGetData>) => createQueryKey('listInvitesApiAdminInvitesGet', options);

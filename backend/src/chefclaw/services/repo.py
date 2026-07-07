@@ -19,7 +19,7 @@ from sqlalchemy import func, select, text, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from chefclaw import spend
+from chefclaw import app_config, spend
 from chefclaw.config import Settings
 from chefclaw.covers import AssignmentMiss
 from chefclaw.documents import EstimatedAttributes, RecipeDocument
@@ -208,6 +208,8 @@ class JobStore(Protocol):
     ) -> None: ...
 
     async def reconcile_interrupted(self) -> int: ...
+
+    async def effective_settings(self, base: Settings) -> Settings: ...
 
     async def check_budget(self, owner_id: uuid.UUID) -> None: ...
 
@@ -641,11 +643,25 @@ class PostgresJobStore:
             )
             return result.rowcount or 0
 
+    # ── runtime-policy overlay (ADR admin-config-panel) ─────────────────────
+
+    async def effective_settings(self, base: Settings) -> Settings:
+        """``base`` overlaid with the ``app_config`` runtime-policy overrides.
+        The worker passes ITS base (== this store's) so the source of truth for
+        the non-overridden fields is unambiguous; the real store adds the DB
+        overlay, the CI fake returns ``base`` unchanged."""
+        return await app_config.effective_settings(self._sessionmaker, base)
+
     # ── spend (delegates to chefclaw.spend with a fresh session) ────────────
 
     async def check_budget(self, owner_id: uuid.UUID) -> None:
         async with self._sessionmaker() as session:
-            await spend.check_budget(session, self._settings, owner_id)
+            # Resolve the effective (possibly overridden) budget INSIDE the
+            # gate's own session, so the fail-closed check and the double-spend
+            # gate see one consistent config. A cleared/empty override yields the
+            # empty string parse_budget rejects ⇒ no paid calls (fail-closed).
+            settings = await app_config.effective_settings_in(session, self._settings)
+            await spend.check_budget(session, settings, owner_id)
 
     async def get_paid_tier(self, owner_id: uuid.UUID) -> bool:
         async with self._sessionmaker() as session:
@@ -664,8 +680,10 @@ class PostgresJobStore:
                 session, job_id=job_id, owner_id=owner_id, usage=usage, cost_usd=cost_usd
             )
             # After the committed write: 80%/100% crossing-edge budget alerts
-            # (best-effort — alert_budget_progress never raises; V2-A ADR).
-            await spend.alert_budget_progress(session, self._settings, owner_id, cost_usd)
+            # (best-effort — alert_budget_progress never raises; V2-A ADR). Use
+            # the EFFECTIVE budget so an overridden cap alerts at the real edge.
+            settings = await app_config.effective_settings_in(session, self._settings)
+            await spend.alert_budget_progress(session, settings, owner_id, cost_usd)
 
 
 class SpendReader(Protocol):
@@ -684,7 +702,8 @@ class PostgresSpendReader:
 
     async def summary(self, owner_id: uuid.UUID, *, days: int) -> spend.SpendSummary:
         async with self._sessionmaker() as session:
-            return await spend.spend_summary(session, self._settings, owner_id, days=days)
+            settings = await app_config.effective_settings_in(session, self._settings)
+            return await spend.spend_summary(session, settings, owner_id, days=days)
 
 
 class AdminSpendReader(Protocol):
@@ -704,4 +723,5 @@ class PostgresAdminSpendReader:
 
     async def summary(self) -> spend.AdminSpendSummary:
         async with self._sessionmaker() as session:
-            return await spend.admin_spend_summary(session, self._settings)
+            settings = await app_config.effective_settings_in(session, self._settings)
+            return await spend.admin_spend_summary(session, settings)

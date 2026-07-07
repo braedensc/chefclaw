@@ -17,9 +17,14 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 __all__ = [
+    "AdminConfigOut",
+    "AdminConfigPatch",
     "AdminSpendOut",
     "AdminUserSpend",
     "ErrorBody",
+    "InfraItem",
+    "RuntimeConfigItem",
+    "SecretStatus",
     "ExtractRequest",
     "InviteCreate",
     "InviteList",
@@ -422,3 +427,60 @@ class SpendSummaryOut(BaseModel):
     budget_monthly_usd: float | None = None
     daily_attempt_cap: int | None = None
     days: list[SpendDay]
+
+
+# ── Admin config panel (ADR 2026-07-07-admin-config-panel) ───────────────────
+
+
+class RuntimeConfigItem(BaseModel):
+    """One editable runtime-policy flag as the admin panel sees it. Every value
+    renders as a STRING (``bool`` → 'true'/'false'); the frontend interprets by
+    ``control``. ``override_value`` is null when the flag is inheriting the env
+    default; ``effective_value`` is what the pipeline actually uses."""
+
+    key: str
+    category: str  # covers | models | budget
+    control: str  # enum | bool | text | budget
+    description: str
+    choices: list[str]  # empty for free-text fields
+    env_value: str
+    override_value: str | None = None
+    effective_value: str
+    source: Literal["env", "override"]
+
+
+class SecretStatus(BaseModel):
+    """A server secret shown as STATUS ONLY — never a value (Hard Rules 2/3/4).
+    ``configured`` is derived from env presence."""
+
+    key: str
+    configured: bool
+
+
+class InfraItem(BaseModel):
+    """A deploy/infra setting: read-only here, env-only, needs a restart to
+    change (not a secret — a plain non-sensitive value)."""
+
+    key: str
+    value: str
+    requires_restart: bool = True
+
+
+class AdminConfigOut(BaseModel):
+    """GET /api/admin/config — the whole admin config surface in one call:
+    editable runtime policy + secret status + read-only infra."""
+
+    runtime_policy: list[RuntimeConfigItem]
+    secrets: list[SecretStatus]
+    infra: list[InfraItem]
+
+
+class AdminConfigPatch(BaseModel):
+    """PATCH /api/admin/config body. ``updates`` maps an editable runtime-policy
+    key to its new value: a string SETS the override, JSON ``null`` CLEARS it
+    (revert to the env default). An absent key is left unchanged. An unknown or
+    non-editable (e.g. a secret) key ⇒ 422 — a secret can never be written."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    updates: dict[str, str | None]

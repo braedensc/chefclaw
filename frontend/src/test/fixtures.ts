@@ -3,6 +3,7 @@
 // realistic data: 原文 fields, verbatim raw_text quantities ("适量" included).
 
 import type {
+  AdminConfigOut,
   AdminSpendOut,
   AdminUserSpend,
   HealthResponse,
@@ -330,6 +331,69 @@ export function adminSpendSummary(
         daily_attempt_cap: 5,
         cap_is_personal: true,
       }),
+    ],
+    ...overrides,
+  };
+}
+
+export function adminConfig(
+  overrides: Partial<AdminConfigOut> = {},
+): AdminConfigOut {
+  return {
+    runtime_policy: [
+      {
+        key: 'chefclaw_image_generator',
+        category: 'covers',
+        control: 'enum',
+        description: 'Card cover mode.',
+        choices: ['sprite', 'fake', 'gemini'],
+        env_value: 'sprite',
+        override_value: null,
+        effective_value: 'sprite',
+        source: 'env',
+      },
+      {
+        key: 'chefclaw_real_covers',
+        category: 'covers',
+        control: 'bool',
+        description: 'Global switch for private real video-frame covers.',
+        choices: ['false', 'true'],
+        env_value: 'false',
+        override_value: null,
+        effective_value: 'false',
+        source: 'env',
+      },
+      {
+        key: 'gemini_model',
+        category: 'models',
+        control: 'text',
+        description: 'Global free-tier extraction model id.',
+        choices: [],
+        env_value: 'gemini-2.5-flash',
+        override_value: null,
+        effective_value: 'gemini-2.5-flash',
+        source: 'env',
+      },
+      {
+        key: 'monthly_llm_budget_usd',
+        category: 'budget',
+        control: 'budget',
+        description:
+          'Global monthly LLM budget in USD. Empty disables paid calls.',
+        choices: [],
+        env_value: '10',
+        override_value: '25',
+        effective_value: '25',
+        source: 'override',
+      },
+    ],
+    secrets: [
+      { key: 'gemini_api_key', configured: false },
+      { key: 'db_password', configured: true },
+    ],
+    infra: [
+      { key: 'chefclaw_auth_provider', value: 'fake', requires_restart: true },
+      { key: 'public_base_url', value: '', requires_restart: true },
     ],
     ...overrides,
   };
