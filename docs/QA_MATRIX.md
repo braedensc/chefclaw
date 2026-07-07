@@ -62,15 +62,19 @@ creator/dish (all public 美食作家王刚 / classic tutorials).
 
 ### Findings & fixes (Run 1)
 
-1. **`prep_state` misuse → whole recipe lost (fixed).** The model sometimes puts
-   knife-work (`"sliced"`, `"cut into chunks"`) in `prep_state`, whose enum is
-   only physical states (dried/fresh/cooked/raw/frozen) → `validation_failed`
-   rejects the *entire* recipe. **Fix:** tightened the `prep_state` guidance in
-   the v4 + v5 prompts (state-only; knife-work belongs in `notes`, as the example
-   already shows). The fix is in the PROMPT, not the validator — `documents.py`
-   deliberately **never coerces or repairs, rejects whole** (a Hard-Rule-7-grade
-   invariant), so the correct fix is to make the model emit valid output, not to
-   silently relocate it. See _Open question_ below.
+1. **`prep_state` misuse → whole recipe lost (fixed, two layers).** The model
+   sometimes puts knife-work (`"sliced"`, `"cut into chunks"`) in `prep_state`,
+   whose enum is only physical states (dried/fresh/cooked/raw/frozen) →
+   `validation_failed` rejected the *entire* recipe. **Fix:** (a) tightened the
+   `prep_state` guidance in the v4 + v5 prompts (state-only; knife-work belongs
+   in `notes`); and (b) a targeted validator canonicalization
+   (`_relocate_unknown_prep_state`) that **moves** an out-of-enum value into
+   `notes` — where the schema already puts knife-work — and nulls `prep_state`,
+   so a residual slip never loses a recipe. This is confined to a descriptor
+   field: `prep_state` is not verbatim food-quantity data, so relocating it (the
+   model's own value, into the schema-intended field) fabricates nothing — Hard
+   Rule 7 (quantities/weights/times/counts) is untouched, and the strict
+   reject-whole posture is kept for everything that IS food data.
 2. **Gemini Files API "failed to be processed" is flaky.** A transient
    upload-processing failure that is correctly typed `extraction_failed`
    (retryable) — the worker retries up to 3×. Observed it clear on retry, and
@@ -81,15 +85,16 @@ creator/dish (all public 美食作家王刚 / classic tutorials).
    `适量`→approx, genuinely-unstated→`quantity:null`, bilingual names, derived
    estimates + tags — no fabrication anywhere.
 
-### Open question for Braeden
+### Resolved: descriptor leniency (Braeden, 2026-07-07)
 
-`prep_state` slips are now *mitigated* by the prompt, but strict validation still
-rejects a whole recipe on any residual slip (by design). A targeted **leniency**
-(relocate an out-of-enum `prep_state` into `notes` instead of failing) would make
-extraction more resilient, but it changes `documents.py`'s documented
-"never coerce, reject whole" invariant. **Recommendation: keep strict** (don't
-erode the Hard-Rule-7 trust boundary for a minor descriptor); revisit only if
-real usage shows prep_state slips are frequent after the prompt fix.
+The open question — keep strict vs. add targeted leniency for `prep_state` — was
+resolved in favor of **targeted leniency**: descriptor fields get looser, food
+data stays strict. `_relocate_unknown_prep_state` (finding 1b) makes it so a
+recipe is never lost over a mis-slotted descriptor, while every quantity/weight/
+time/count keeps the strict reject-whole, never-coerce posture. The global
+Gemini `responseSchema` (constrained decoding) was **rejected** — it would apply
+uniform coercion to the food-data fields too and can degrade transcription
+fidelity; the two-layer prompt + descriptor-canonicalization fix is preferred.
 
 ## Per-case notes
 
