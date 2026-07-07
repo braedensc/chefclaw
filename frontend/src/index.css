@@ -155,6 +155,31 @@
     inset 0 0 24px -14px color-mix(in srgb, var(--color-warm) 30%, transparent);
 }
 
+/* ---- hover halos ----
+   The card's REST rim is always lit now, so hover needs a distinctly bigger
+   move: a crisp 1px platform ring + a bright outer halo + a deep black drop
+   shadow that floats the stall off the page (paired with a lift in RecipeCard).
+   Clearly louder than glow-rest-*, so hovering still reads as "this one lights
+   up." */
+@utility glow-hover-cyan {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--color-cyan) 55%, transparent),
+    0 0 30px -4px color-mix(in srgb, var(--color-cyan) 45%, transparent),
+    0 24px 48px -26px #000;
+}
+@utility glow-hover-chili {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--color-chili) 55%, transparent),
+    0 0 30px -4px color-mix(in srgb, var(--color-chili) 45%, transparent),
+    0 24px 48px -26px #000;
+}
+@utility glow-hover-warm {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--color-warm) 45%, transparent),
+    0 0 30px -4px color-mix(in srgb, var(--color-warm) 38%, transparent),
+    0 24px 48px -26px #000;
+}
+
 @utility glow-text-chili {
   text-shadow:
     0 0 9px color-mix(in srgb, var(--color-chili) 90%, transparent),

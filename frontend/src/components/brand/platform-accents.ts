@@ -22,21 +22,21 @@ const PLATFORM_ACCENTS: Record<string, PlatformAccent> = {
   bilibili: {
     badge: 'border-platform-bilibili/60 text-platform-bilibili glow-cyan',
     cardRest: 'border-platform-bilibili/25 glow-rest-cyan',
-    cardHover: 'hover:border-platform-bilibili/60 hover:glow-cyan',
+    cardHover: 'hover:border-platform-bilibili/60 hover:glow-hover-cyan',
     titleGlow: 'glow-text-cyan',
     tint: 'var(--color-platform-bilibili)',
   },
   rednote: {
     badge: 'border-platform-rednote/60 text-platform-rednote glow-chili',
     cardRest: 'border-platform-rednote/25 glow-rest-chili',
-    cardHover: 'hover:border-platform-rednote/60 hover:glow-chili',
+    cardHover: 'hover:border-platform-rednote/60 hover:glow-hover-chili',
     titleGlow: 'glow-text-chili',
     tint: 'var(--color-platform-rednote)',
   },
   local: {
     badge: 'border-platform-local/50 text-platform-local glow-warm',
     cardRest: 'border-platform-local/20 glow-rest-warm',
-    cardHover: 'hover:border-platform-local/50 hover:glow-warm',
+    cardHover: 'hover:border-platform-local/50 hover:glow-hover-warm',
     titleGlow: 'glow-text-warm',
     tint: 'var(--color-platform-local)',
   },
@@ -46,7 +46,7 @@ const PLATFORM_ACCENTS: Record<string, PlatformAccent> = {
 export const FALLBACK_ACCENT: PlatformAccent = {
   badge: 'border-line-bright text-ink-dim',
   cardRest: 'border-line glow-rest-warm',
-  cardHover: 'hover:border-line-bright hover:glow-warm',
+  cardHover: 'hover:border-line-bright hover:glow-hover-warm',
   titleGlow: 'glow-text-warm',
   tint: 'var(--color-warm)',
 };

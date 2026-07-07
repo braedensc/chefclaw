@@ -48,6 +48,17 @@ export function AppShell({ children }: { children: ReactNode }) {
               <span className="font-display text-[21px] leading-none font-bold tracking-[0.17em] uppercase">
                 <span className="text-warm glow-text-warm">chef</span>
                 <span className="text-chili-bright glow-text-chili">claw</span>
+                {/* the storefront's "open" pip — a small always-lit sign so the
+                    header reads as live even at rest (decorative, not a jobs
+                    badge). */}
+                <span
+                  aria-hidden="true"
+                  className="ml-1.5 inline-block h-[7px] w-[7px] rounded-full bg-gold align-middle"
+                  style={{
+                    boxShadow:
+                      '0 0 8px 1px color-mix(in srgb, var(--color-gold) 80%, transparent)',
+                  }}
+                />
               </span>
               <span className="text-ink-faint hidden font-display text-[9px] leading-none font-semibold tracking-[0.3em] uppercase sm:block">
                 <span
