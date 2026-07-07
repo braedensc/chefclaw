@@ -134,7 +134,7 @@ async def test_callback_creates_real_session_for_returning_user(sessionmaker, mo
 
 
 async def test_callback_unbound_identity_creates_no_session(sessionmaker, monkeypatch) -> None:
-    """No user bound to the identity ⇒ opaque 403 with NO session row (fail
+    """No user bound to the identity ⇒ opaque redirect with NO session row (fail
     closed, no side effects — critique M6)."""
     monkeypatch.setattr(db, "get_sessionmaker", lambda: sessionmaker)
     await _seed_user(sessionmaker)  # a user, but NOT bound to the fake identity
@@ -145,7 +145,8 @@ async def test_callback_unbound_identity_creates_no_session(sessionmaker, monkey
         login = await client.get("/api/auth/google/login", follow_redirects=False)
         callback = await client.get(login.headers["location"], follow_redirects=False)
 
-    assert callback.status_code == 403
+    assert callback.status_code == 302
+    assert callback.headers["location"] == "/login?error=denied"
     async with sessionmaker() as s:
         count = await s.scalar(select(func.count(Session.id)))
     assert count == 0  # no side effects
