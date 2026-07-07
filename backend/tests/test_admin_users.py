@@ -32,7 +32,11 @@ def _admin_app(**overrides: object) -> FastAPI:
 
 def _row(**overrides: object) -> users_service.UserBudgetRow:
     fields: dict[str, object] = dict(
-        id=USER_ID, email="friend@x.com", monthly_budget_usd=None, max_attempts_per_day=None
+        id=USER_ID,
+        email="friend@x.com",
+        monthly_budget_usd=None,
+        max_attempts_per_day=None,
+        paid_tier=False,
     )
     fields.update(overrides)
     return users_service.UserBudgetRow(**fields)
@@ -58,6 +62,7 @@ async def test_set_both_caps_returns_200(monkeypatch: pytest.MonkeyPatch) -> Non
         "email": "friend@x.com",
         "monthly_budget_usd": 5.0,
         "max_attempts_per_day": 10,
+        "paid_tier": False,
     }
     assert captured["user_id"] == USER_ID
     assert captured["values"] == {"monthly_budget_usd": 5.0, "max_attempts_per_day": 10}
@@ -112,6 +117,25 @@ async def test_empty_body_is_a_noop(monkeypatch: pytest.MonkeyPatch) -> None:
         resp = await client.patch(f"/api/admin/users/{USER_ID}/budget", json={})
     assert resp.status_code == 200
     assert captured["values"] == {}
+
+
+async def test_set_paid_tier(monkeypatch: pytest.MonkeyPatch) -> None:
+    """paid_tier rides the same endpoint (per-user cost controls); true flips
+    the account onto the paid Gemini model."""
+    captured: dict[str, object] = {}
+
+    async def fake_set(sm, user_id, *, values):
+        captured["values"] = values
+        return _row(paid_tier=True)
+
+    monkeypatch.setattr(users_service, "set_user_budget", fake_set)
+    async with _client(_admin_app()) as client:
+        resp = await client.patch(
+            f"/api/admin/users/{USER_ID}/budget", json={"paid_tier": True}
+        )
+    assert resp.status_code == 200
+    assert captured["values"] == {"paid_tier": True}
+    assert resp.json()["paid_tier"] is True
 
 
 async def test_missing_user_is_404(monkeypatch: pytest.MonkeyPatch) -> None:

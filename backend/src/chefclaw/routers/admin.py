@@ -129,11 +129,12 @@ async def update_user_budget(
     body: UserBudgetPatch,
     owner_id: Annotated[uuid.UUID, Depends(require_admin)],
 ) -> UserBudgetOut | JSONResponse:
-    """Set (or clear) a user's per-user budget/rate caps (M3). Partial update:
-    an omitted field is left unchanged, an explicit ``null`` clears the override
-    back to the global env cap. These only redistribute WITHIN the globally
-    enabled budget — a per-user cap never re-enables fail-closed spend
-    (chefclaw.spend.check_budget). Missing user ⇒ 404."""
+    """Set a user's per-user cost controls (M3): budget/rate caps + the paid
+    Gemini tier flag. Partial update — an omitted field is left unchanged, an
+    explicit ``null`` clears a cap back to the global env cap. Caps only
+    redistribute WITHIN the globally enabled budget — a per-user cap never
+    re-enables fail-closed spend (chefclaw.spend.check_budget); paid_tier only
+    swaps the model within the same budget gate. Missing user ⇒ 404."""
     fields = {name: getattr(body, name) for name in body.model_fields_set}
     row = await users.set_user_budget(db.get_sessionmaker(), user_id, values=fields)
     if row is None:
@@ -145,6 +146,7 @@ async def update_user_budget(
             float(row.monthly_budget_usd) if row.monthly_budget_usd is not None else None
         ),
         max_attempts_per_day=row.max_attempts_per_day,
+        paid_tier=row.paid_tier,
     )
 
 

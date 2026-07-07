@@ -26,13 +26,14 @@ from chefclaw import db, observability, spend
 from chefclaw.auth import assert_prod_auth_safe, require_owner
 from chefclaw.config import Settings, get_settings
 from chefclaw.errors import ConfigError
-from chefclaw.extractors import extractor_model_id
+from chefclaw.extractors import extractor_model_id, extractor_settings_for_tier
 from chefclaw.routers.admin import router as admin_router
 from chefclaw.routers.auth import router as auth_router
 from chefclaw.routers.extraction import router as extraction_router
 from chefclaw.routers.jobs import router as jobs_router
 from chefclaw.routers.library import router as library_router
 from chefclaw.routers.spend import router as spend_router
+from chefclaw.services import users
 from chefclaw.services.jobs import Worker, default_source_adapters
 from chefclaw.services.repo import PostgresJobStore
 
@@ -70,7 +71,11 @@ class HealthResponse(BaseModel):
     backup: Literal["fresh", "stale", "not_configured"] = "not_configured"
     backup_finished_at: str | None = None
     extractor: str = "fake"
+    # M3: `model` is the AUTHENTICATED OWNER's effective extraction model — the
+    # paid Gemini model when they're paid_tier, else the global default; the
+    # Settings screen shows the caller what they actually run on.
     model: str = "fake-extractor"
+    paid_tier: bool = False
     spend_month_usd: float | None = None
     # V2-A additions. Caps are null when the budget config is fail-closed
     # (unset/unparseable) — the UI says "extraction disabled", never invents
@@ -185,6 +190,17 @@ async def _attempts_today(owner_id: uuid.UUID) -> int | None:
         return None
 
 
+async def _owner_paid_tier(owner_id: uuid.UUID) -> bool:
+    """Whether the authenticated owner is on the paid Gemini tier (M3), for the
+    health readout's effective model. Never raises — an unreadable row degrades
+    to the free tier (same posture as the other owner-scoped health reads)."""
+    try:
+        async with db.get_sessionmaker()() as session:
+            return await users.read_paid_tier(session, owner_id)
+    except Exception:
+        return False
+
+
 async def _user_budget_caps(owner_id: uuid.UUID) -> tuple[Decimal | None, int | None]:
     """The owner's per-user cap overrides for the health readout, or (None, None)
     when unset OR unreadable — never raises (same posture as the ledger reads).
@@ -239,6 +255,10 @@ async def health(
     budget_monthly_usd, daily_attempt_cap, budget_is_personal = await _effective_budget_caps(
         settings, owner_id
     )
+    # The caller's effective extraction model (paid-tier owners run the paid
+    # model). Same swap the worker uses, so health and the pipeline agree.
+    paid_tier = await _owner_paid_tier(owner_id) if db_ok else False
+    model = extractor_model_id(extractor_settings_for_tier(settings, paid_tier=paid_tier))
     return HealthResponse(
         status="ok" if db_ok else "degraded",
         db="ok" if db_ok else "unreachable",
@@ -248,7 +268,8 @@ async def health(
         backup=backup,
         backup_finished_at=backup_finished_at,
         extractor=settings.chefclaw_extractor,
-        model=extractor_model_id(settings),
+        model=model,
+        paid_tier=paid_tier,
         spend_month_usd=await _spend_month_to_date(owner_id) if db_ok else None,
         budget_monthly_usd=budget_monthly_usd,
         daily_attempt_cap=daily_attempt_cap,

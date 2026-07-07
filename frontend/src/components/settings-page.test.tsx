@@ -100,6 +100,29 @@ describe('SettingsPage', () => {
       expect(section.queryByText('personal cap')).not.toBeInTheDocument();
     });
 
+    it('badges the paid tier and shows the paid model for a pro-tier owner', async () => {
+      // M3: health.model is the caller's EFFECTIVE model; paid_tier flags it.
+      genState.health = healthResponse({
+        model: 'gemini-2.5-pro',
+        paid_tier: true,
+      });
+
+      renderApp('/settings');
+      const section = await findSection('Extraction');
+
+      expect(section.getByText('gemini-2.5-pro')).toBeInTheDocument();
+      expect(section.getByText('paid tier')).toBeInTheDocument();
+    });
+
+    it('omits the paid-tier badge for a free-tier owner', async () => {
+      genState.health = healthResponse({ paid_tier: false });
+
+      renderApp('/settings');
+      const section = await findSection('Extraction');
+
+      expect(section.queryByText('paid tier')).not.toBeInTheDocument();
+    });
+
     it('shows attempts today against the daily cap', async () => {
       genState.health = healthResponse({
         attempts_today: 3,

@@ -198,6 +198,7 @@ export function healthResponse(
     backup_finished_at: '2026-07-06T03:30:00+00:00',
     extractor: 'gemini',
     model: 'gemini-2.5-flash',
+    paid_tier: false,
     spend_month_usd: 0.2,
     budget_monthly_usd: 10,
     daily_attempt_cap: 25,

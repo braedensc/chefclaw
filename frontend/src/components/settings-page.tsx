@@ -202,6 +202,11 @@ function ExtractionSection({ health }: { health: HealthResponse }) {
           <span className="text-ink-dim font-mono text-xs">
             {health.model ?? 'unknown'}
           </span>
+          {health.paid_tier && (
+            <span className="text-gold ml-2 text-xs font-medium">
+              paid tier
+            </span>
+          )}
         </Row>
         {attemptsToday !== null && dailyCap !== null && (
           <Row label="attempts today">

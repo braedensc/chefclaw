@@ -169,3 +169,26 @@ async def test_per_user_daily_cap_gates_independently(sm) -> None:
     async with sm() as s:
         with pytest.raises(BudgetExceededError, match="per-user cap"):
             await spend.check_budget(s, _settings(), uid)
+
+
+# ── paid tier round-trip ─────────────────────────────────────────────────────
+
+
+async def test_paid_tier_defaults_false_and_reads_back(sm) -> None:
+    uid = await _add_user(sm, email="tier@x.com")
+    async with sm() as s:
+        assert await users.read_paid_tier(s, uid) is False  # column default
+        assert await users.read_paid_tier(s, uuid.uuid4()) is False  # no row
+
+
+async def test_set_paid_tier_round_trips(sm) -> None:
+    uid = await _add_user(sm, email="pro@x.com")
+    row = await users.set_user_budget(sm, uid, values={"paid_tier": True})
+    assert row is not None and row.paid_tier is True
+    async with sm() as s:
+        assert await users.read_paid_tier(s, uid) is True
+    # Flip it back off; caps set in the same call are independent.
+    await users.set_user_budget(sm, uid, values={"paid_tier": False, "max_attempts_per_day": 5})
+    async with sm() as s:
+        assert await users.read_paid_tier(s, uid) is False
+        assert await spend.read_user_caps(s, uid) == (None, 5)

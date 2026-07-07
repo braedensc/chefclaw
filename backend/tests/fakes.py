@@ -37,6 +37,9 @@ class FakeJobStore:
         self.budget_failure: Exception | None = None
         self.fail_store_once = False
         self.budget_checks = 0
+        # M3 per-user paid tier: owner_id → True. Default (absent) is the free
+        # tier, matching the real store's False-when-no-row contract.
+        self.paid_tiers: dict[uuid.UUID, bool] = {}
         self._clock = 0
 
     # ── helpers for tests ────────────────────────────────────────────────────
@@ -329,6 +332,9 @@ class FakeJobStore:
         self.budget_checks += 1
         if self.budget_failure is not None:
             raise self.budget_failure
+
+    async def get_paid_tier(self, owner_id: uuid.UUID) -> bool:
+        return self.paid_tiers.get(owner_id, False)
 
     async def record_spend(
         self,

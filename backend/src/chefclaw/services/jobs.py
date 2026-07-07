@@ -38,6 +38,7 @@ from chefclaw.extractors import (
     ExtractionUsage,
     ExtractorAdapter,
     extractor_model_id,
+    extractor_settings_for_tier,
     get_extractor,
 )
 from chefclaw.images import (
@@ -557,7 +558,11 @@ class Worker:
         # Budget gate FIRST (cheap, no write), immediately before the paid
         # call — retries pass through here again by construction.
         await self.store.check_budget(job.owner_id)
-        extractor = self._extractor_factory(self._settings)  # ConfigError ⇒ terminal
+        # Per-user paid tier (M3): a paid-tier owner's extraction (and its ledger
+        # attribution) run on GEMINI_PAID_MODEL instead of the global default.
+        paid_tier = await self.store.get_paid_tier(job.owner_id)
+        extractor_settings = extractor_settings_for_tier(self._settings, paid_tier=paid_tier)
+        extractor = self._extractor_factory(extractor_settings)  # ConfigError ⇒ terminal
 
         try:
             outcome = await asyncio.wait_for(
@@ -565,7 +570,7 @@ class Worker:
                 EXTRACT_TIMEOUT_SECONDS,
             )
         except TimeoutError:
-            await self._record_attempt(job, usage=None)
+            await self._record_attempt(job, usage=None, settings=extractor_settings)
             raise errors.ExtractionFailedError(
                 f"extraction timed out after {EXTRACT_TIMEOUT_SECONDS:.0f}s"
             ) from None
@@ -575,7 +580,7 @@ class Worker:
             # 429 / unparseable output), ledger the REAL tokens; otherwise
             # write zeros — the row itself is what counts either way (the
             # daily cap counts rows).
-            await self._record_attempt(job, usage=err.usage)
+            await self._record_attempt(job, usage=err.usage, settings=extractor_settings)
             raise
         except errors.ChefclawError:
             # Remaining typed errors (ConfigError: auth rejected before any
@@ -587,10 +592,10 @@ class Worker:
             # request may have reached the API and burned tokens we can't see.
             # Fail closed — ledger the attempt so the daily cap still counts
             # it. (CancelledError is BaseException and passes through above.)
-            await self._record_attempt(job, usage=None)
+            await self._record_attempt(job, usage=None, settings=extractor_settings)
             raise
 
-        await self._record_attempt(job, usage=outcome.usage)
+        await self._record_attempt(job, usage=outcome.usage, settings=extractor_settings)
 
         await self.store.set_status(job.id, JobStatus.VALIDATING.value)
         logger.info(
@@ -666,14 +671,18 @@ class Worker:
         await self._enqueue_illustrations(job, recipe_ids)
         return recipe_ids
 
-    async def _record_attempt(self, job: Job, usage: ExtractionUsage | None) -> None:
+    async def _record_attempt(
+        self, job: Job, usage: ExtractionUsage | None, *, settings: Settings
+    ) -> None:
         """One llm_spend row per model attempt, INCLUDING failures. When the
         adapter raised without token accounting we record zeros — the row
         still counts against the daily attempt cap, which is the guard that
-        bounds runaway retries."""
+        bounds runaway retries. ``settings`` is the OWNER'S effective settings
+        (paid-tier model swapped in), so a failed pre-usage attempt still
+        attributes the model the owner would have been billed for."""
         if usage is None:
             usage = ExtractionUsage(
-                model_id=extractor_model_id(self._settings),
+                model_id=extractor_model_id(settings),
                 prompt_version="unknown",
                 tokens_in=0,
                 tokens_out=0,

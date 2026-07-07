@@ -185,6 +185,11 @@
             "title": "Model",
             "type": "string"
           },
+          "paid_tier": {
+            "default": false,
+            "title": "Paid Tier",
+            "type": "boolean"
+          },
           "sentry_enabled": {
             "default": false,
             "title": "Sentry Enabled",
@@ -1049,7 +1054,7 @@
         "type": "object"
       },
       "UserBudgetOut": {
-        "description": "A user's per-user caps after the write. ``null`` on a field means no\nper-user override — the global env cap applies to that account.",
+        "description": "A user's per-user cost controls after the write. ``null`` on a cap means\nno per-user override (the global env cap applies); ``paid_tier`` false means\nthe global GEMINI_MODEL (free) default.",
         "properties": {
           "email": {
             "title": "Email",
@@ -1081,6 +1086,11 @@
               }
             ],
             "title": "Monthly Budget Usd"
+          },
+          "paid_tier": {
+            "default": false,
+            "title": "Paid Tier",
+            "type": "boolean"
           }
         },
         "required": [
@@ -1092,7 +1102,7 @@
       },
       "UserBudgetPatch": {
         "additionalProperties": false,
-        "description": "PATCH /api/admin/users/{user_id}/budget body (M3 per-user caps). Both\nfields optional — a PARTIAL update keyed on which fields the request sends:\na field PRESENT sets the per-user override, PRESENT+``null`` CLEARS it (the\naccount falls back to the global env cap), ABSENT leaves it unchanged.\nPositive values only — 0/negative is a 422 (use ``null`` to clear). The\nrouter reads ``model_fields_set`` to tell 'clear' from 'leave alone'.",
+        "description": "PATCH /api/admin/users/{user_id}/budget body (M3 per-user cost controls).\nAll fields optional — a PARTIAL update keyed on which fields the request\nsends: a field PRESENT sets it, a cap PRESENT+``null`` CLEARS it (the\naccount falls back to the global env cap), ABSENT leaves it unchanged.\nPositive caps only — 0/negative is a 422 (use ``null`` to clear). The router\nreads ``model_fields_set`` to tell 'clear' from 'leave alone'.\n\n``paid_tier`` toggles this account onto the paid Gemini model\n(GEMINI_PAID_MODEL) for its extractions — it is not a cap, so ``null`` is\nnot accepted; send true/false.",
         "properties": {
           "max_attempts_per_day": {
             "anyOf": [
@@ -1117,6 +1127,17 @@
               }
             ],
             "title": "Monthly Budget Usd"
+          },
+          "paid_tier": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paid Tier"
           }
         },
         "title": "UserBudgetPatch",
@@ -1364,7 +1385,7 @@
     },
     "/api/admin/users/{user_id}/budget": {
       "patch": {
-        "description": "Set (or clear) a user's per-user budget/rate caps (M3). Partial update:\nan omitted field is left unchanged, an explicit ``null`` clears the override\nback to the global env cap. These only redistribute WITHIN the globally\nenabled budget — a per-user cap never re-enables fail-closed spend\n(chefclaw.spend.check_budget). Missing user ⇒ 404.",
+        "description": "Set a user's per-user cost controls (M3): budget/rate caps + the paid\nGemini tier flag. Partial update — an omitted field is left unchanged, an\nexplicit ``null`` clears a cap back to the global env cap. Caps only\nredistribute WITHIN the globally enabled budget — a per-user cap never\nre-enables fail-closed spend (chefclaw.spend.check_budget); paid_tier only\nswaps the model within the same budget gate. Missing user ⇒ 404.",
         "operationId": "update_user_budget_api_admin_users__user_id__budget_patch",
         "parameters": [
           {

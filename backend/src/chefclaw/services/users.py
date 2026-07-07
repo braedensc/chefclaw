@@ -21,27 +21,36 @@ _CENT = Decimal("0.01")  # matches users.monthly_budget_usd numeric(10,2)
 
 
 class UserBudgetRow(NamedTuple):
-    """The per-user caps the admin API returns after a write. NULL = no
-    per-user override (the global env cap applies)."""
+    """The per-user cost controls the admin API returns after a write. NULL caps
+    = no per-user override (the global env cap applies); ``paid_tier`` false =
+    the global GEMINI_MODEL (free) default."""
 
     id: uuid.UUID
     email: str
     monthly_budget_usd: Decimal | None
     max_attempts_per_day: int | None
+    paid_tier: bool
+
+
+async def read_paid_tier(session: AsyncSession, owner_id: uuid.UUID) -> bool:
+    """Whether this account is on the paid Gemini tier (M3). False when no row
+    exists — the safe/cheap default (the worker then uses the global model)."""
+    value = await session.scalar(select(User.paid_tier).where(User.id == owner_id))
+    return bool(value)
 
 
 async def set_user_budget(
     sm: Sm,
     user_id: uuid.UUID,
     *,
-    values: dict[str, float | int | None],
+    values: dict[str, float | int | bool | None],
 ) -> UserBudgetRow | None:
-    """Set (or clear) a user's per-user caps in ONE transaction. ``values`` is a
-    PARTIAL map (only the keys the request sent): a key present with a number
-    sets the override, present with ``None`` clears it back to the global env
-    cap; an absent key is left untouched. The monthly amount is quantized to the
-    cent (the ``numeric(10,2)`` column). Returns the updated row, or None when
-    no user has ``user_id`` (⇒ 404 at the transport layer)."""
+    """Set (or clear) a user's per-user cost controls in ONE transaction.
+    ``values`` is a PARTIAL map (only the keys the request sent): a key present
+    with a value sets it, a cap present with ``None`` clears it back to the
+    global env cap; an absent key is left untouched. The monthly amount is
+    quantized to the cent (the ``numeric(10,2)`` column). Returns the updated
+    row, or None when no user has ``user_id`` (⇒ 404 at the transport layer)."""
     async with sm() as s, s.begin():
         user = (
             await s.execute(select(User).where(User.id == user_id).with_for_update())
@@ -55,10 +64,15 @@ async def set_user_budget(
             )
         if "max_attempts_per_day" in values:
             user.max_attempts_per_day = values["max_attempts_per_day"]
+        # paid_tier is a plain flag (not a cap): send true/false. A null is a
+        # no-op — there is no 'clear to global' for a boolean.
+        if values.get("paid_tier") is not None:
+            user.paid_tier = bool(values["paid_tier"])
         await s.flush()
         return UserBudgetRow(
             id=user.id,
             email=user.email,
             monthly_budget_usd=user.monthly_budget_usd,
             max_attempts_per_day=user.max_attempts_per_day,
+            paid_tier=user.paid_tier,
         )

@@ -104,11 +104,12 @@ export const revokeInviteApiAdminInvitesInviteIdRevokePostMutation = (options?: 
 /**
  * Update User Budget
  *
- * Set (or clear) a user's per-user budget/rate caps (M3). Partial update:
- * an omitted field is left unchanged, an explicit ``null`` clears the override
- * back to the global env cap. These only redistribute WITHIN the globally
- * enabled budget — a per-user cap never re-enables fail-closed spend
- * (chefclaw.spend.check_budget). Missing user ⇒ 404.
+ * Set a user's per-user cost controls (M3): budget/rate caps + the paid
+ * Gemini tier flag. Partial update — an omitted field is left unchanged, an
+ * explicit ``null`` clears a cap back to the global env cap. Caps only
+ * redistribute WITHIN the globally enabled budget — a per-user cap never
+ * re-enables fail-closed spend (chefclaw.spend.check_budget); paid_tier only
+ * swaps the model within the same budget gate. Missing user ⇒ 404.
  */
 export const updateUserBudgetApiAdminUsersUserIdBudgetPatchMutation = (options?: Partial<Options<UpdateUserBudgetApiAdminUsersUserIdBudgetPatchData>>): UseMutationOptions<UpdateUserBudgetApiAdminUsersUserIdBudgetPatchResponse, UpdateUserBudgetApiAdminUsersUserIdBudgetPatchError, Options<UpdateUserBudgetApiAdminUsersUserIdBudgetPatchData>> => {
     const mutationOptions: UseMutationOptions<UpdateUserBudgetApiAdminUsersUserIdBudgetPatchResponse, UpdateUserBudgetApiAdminUsersUserIdBudgetPatchError, Options<UpdateUserBudgetApiAdminUsersUserIdBudgetPatchData>> = {

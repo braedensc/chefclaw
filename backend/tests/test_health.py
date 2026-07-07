@@ -40,6 +40,7 @@ async def test_health_200_full_shape(client: AsyncClient, ping_ok: None) -> None
         "backup_finished_at": None,
         "extractor": "fake",  # the conftest Settings default
         "model": "fake-extractor",
+        "paid_tier": False,
         "spend_month_usd": None,
         # V2-A: caps are null (conftest Settings leave the budget pair unset —
         # fail-closed), the ledger reads are stubbed to None, no lifespan ran
@@ -309,3 +310,51 @@ async def test_health_surfaces_per_user_override(
     assert body["budget_monthly_usd"] == 3.0  # the per-user cap, not the global 10
     assert body["daily_attempt_cap"] == 5
     assert body["budget_is_personal"] is True
+
+
+async def test_health_reports_paid_tier_owner_effective_model(
+    ping_ok: None, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A paid-tier owner's health readout shows the PAID model + paid_tier True;
+    the model field is the caller's effective model, not the global default."""
+    from chefclaw import app as app_module
+
+    async def paid(owner_id):
+        return True
+
+    monkeypatch.setattr(app_module, "_owner_paid_tier", paid)
+    app = create_app()
+    app.dependency_overrides[get_settings] = lambda: Settings(
+        chefclaw_auth_provider="fake",
+        chefclaw_fake_owner_id=str(OWNER_ID),
+        chefclaw_extractor="gemini",
+        gemini_api_key="k",
+        gemini_model="gemini-2.5-flash",
+        gemini_paid_model="gemini-2.5-pro",
+    )
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        response = await client.get("/api/health", headers=bearer(TEST_TOKEN))
+    body = response.json()
+    assert body["paid_tier"] is True
+    assert body["model"] == "gemini-2.5-pro"
+
+
+async def test_health_free_tier_owner_shows_global_model(ping_ok: None) -> None:
+    """A free-tier owner (conftest stubs _owner_paid_tier → False) shows the
+    global default model and paid_tier False."""
+    app = create_app()
+    app.dependency_overrides[get_settings] = lambda: Settings(
+        chefclaw_auth_provider="fake",
+        chefclaw_fake_owner_id=str(OWNER_ID),
+        chefclaw_extractor="gemini",
+        gemini_api_key="k",
+        gemini_model="gemini-2.5-flash",
+        gemini_paid_model="gemini-2.5-pro",
+    )
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        response = await client.get("/api/health", headers=bearer(TEST_TOKEN))
+    body = response.json()
+    assert body["paid_tier"] is False
+    assert body["model"] == "gemini-2.5-flash"

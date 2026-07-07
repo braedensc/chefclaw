@@ -24,6 +24,7 @@ from chefclaw.config import Settings
 from chefclaw.documents import EstimatedAttributes, RecipeDocument
 from chefclaw.extractors import ExtractionUsage
 from chefclaw.models import Job, JobStatus, JobType, Recipe
+from chefclaw.services import users
 
 __all__ = [
     "ACTIVE_ILLUSTRATION_STATUSES",
@@ -165,6 +166,8 @@ class JobStore(Protocol):
     async def reconcile_interrupted(self) -> int: ...
 
     async def check_budget(self, owner_id: uuid.UUID) -> None: ...
+
+    async def get_paid_tier(self, owner_id: uuid.UUID) -> bool: ...
 
     async def record_spend(
         self,
@@ -524,6 +527,10 @@ class PostgresJobStore:
     async def check_budget(self, owner_id: uuid.UUID) -> None:
         async with self._sessionmaker() as session:
             await spend.check_budget(session, self._settings, owner_id)
+
+    async def get_paid_tier(self, owner_id: uuid.UUID) -> bool:
+        async with self._sessionmaker() as session:
+            return await users.read_paid_tier(session, owner_id)
 
     async def record_spend(
         self,

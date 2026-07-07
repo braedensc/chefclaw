@@ -113,6 +113,10 @@ export type HealthResponse = {
      */
     model?: string;
     /**
+     * Paid Tier
+     */
+    paid_tier?: boolean;
+    /**
      * Sentry Enabled
      */
     sentry_enabled?: boolean;
@@ -625,8 +629,9 @@ export type SpendSummaryOut = {
 /**
  * UserBudgetOut
  *
- * A user's per-user caps after the write. ``null`` on a field means no
- * per-user override — the global env cap applies to that account.
+ * A user's per-user cost controls after the write. ``null`` on a cap means
+ * no per-user override (the global env cap applies); ``paid_tier`` false means
+ * the global GEMINI_MODEL (free) default.
  */
 export type UserBudgetOut = {
     /**
@@ -645,17 +650,25 @@ export type UserBudgetOut = {
      * Monthly Budget Usd
      */
     monthly_budget_usd?: number | null;
+    /**
+     * Paid Tier
+     */
+    paid_tier?: boolean;
 };
 
 /**
  * UserBudgetPatch
  *
- * PATCH /api/admin/users/{user_id}/budget body (M3 per-user caps). Both
- * fields optional — a PARTIAL update keyed on which fields the request sends:
- * a field PRESENT sets the per-user override, PRESENT+``null`` CLEARS it (the
+ * PATCH /api/admin/users/{user_id}/budget body (M3 per-user cost controls).
+ * All fields optional — a PARTIAL update keyed on which fields the request
+ * sends: a field PRESENT sets it, a cap PRESENT+``null`` CLEARS it (the
  * account falls back to the global env cap), ABSENT leaves it unchanged.
- * Positive values only — 0/negative is a 422 (use ``null`` to clear). The
- * router reads ``model_fields_set`` to tell 'clear' from 'leave alone'.
+ * Positive caps only — 0/negative is a 422 (use ``null`` to clear). The router
+ * reads ``model_fields_set`` to tell 'clear' from 'leave alone'.
+ *
+ * ``paid_tier`` toggles this account onto the paid Gemini model
+ * (GEMINI_PAID_MODEL) for its extractions — it is not a cap, so ``null`` is
+ * not accepted; send true/false.
  */
 export type UserBudgetPatch = {
     /**
@@ -666,6 +679,10 @@ export type UserBudgetPatch = {
      * Monthly Budget Usd
      */
     monthly_budget_usd?: number | null;
+    /**
+     * Paid Tier
+     */
+    paid_tier?: boolean | null;
 };
 
 /**
