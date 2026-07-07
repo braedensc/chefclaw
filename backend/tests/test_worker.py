@@ -20,7 +20,12 @@ from chefclaw.extractors.fake import FakeExtractor, default_dish
 from chefclaw.images import ImageResult
 from chefclaw.models import Job
 from chefclaw.services import jobs as jobs_module
-from chefclaw.services.jobs import Worker, enqueue_extract, enqueue_upload
+from chefclaw.services.jobs import (
+    Worker,
+    enqueue_extract,
+    enqueue_illustration,
+    enqueue_upload,
+)
 from chefclaw.sources.fake import FakeSource
 from tests.fakes import FakeJobStore
 
@@ -117,6 +122,28 @@ async def claim_and_process(worker: Worker, store: FakeJobStore) -> Job:
     assert job is not None, "expected a pending job to claim"
     await worker.process(job)
     return job
+
+
+async def drain_jobs(worker: Worker, store: FakeJobStore, *, limit: int = 50) -> list[Job]:
+    """Process every remaining pending job to terminal — e.g. the per-recipe
+    illustration jobs an extraction enqueues after it stores. Bounded so a
+    stuck requeue can't spin forever."""
+    processed: list[Job] = []
+    for _ in range(limit):
+        job = await store.claim_next_job()
+        if job is None:
+            return processed
+        await worker.process(job)
+        processed.append(job)
+    raise AssertionError("drain_jobs did not reach an empty queue within limit")
+
+
+def illustration_jobs(store: FakeJobStore) -> list[Job]:
+    return [job for job in store.jobs.values() if job.type == "illustration"]
+
+
+def image_spend_rows(store: FakeJobStore) -> list[dict]:
+    return [row for row in store.spend_rows if row["model"] == "fake-image"]
 
 
 # ─── enqueue: dedupe gates the paid call (§16.1/16.2) ────────────────────────
@@ -253,12 +280,26 @@ async def test_happy_path_multi_dish_atomic_store(tmp_path: Path) -> None:
     # Auto-tags seed the editable tags column for every dish:
     assert store.recipes[0].tags == ["braise", "pork", "classic"]
     assert store.recipes[1].tags == ["braise", "pork", "classic"]
-    # Ledger rows: one extraction attempt + one illustration per dish (2).
+    # The extraction ledgers ONE attempt; images are DEFERRED to per-recipe
+    # illustration jobs (no inline image spend, image_url still NULL):
     extraction_rows = [r for r in store.spend_rows if r["model"] == "fake-extractor"]
-    image_rows = [r for r in store.spend_rows if r["model"] == "fake-image"]
     assert len(extraction_rows) == 1
     assert extraction_rows[0]["tokens_in"] == 1000
-    assert len(image_rows) == 2  # one per dish (discard-agnostic)
+    assert image_spend_rows(store) == []
+    assert [r.image_url for r in store.recipes] == [None, None]
+    # One illustration job per stored recipe was enqueued (pending, null
+    # platform so it never touches canonical dedupe, keyed to the recipe ids):
+    jobs = illustration_jobs(store)
+    assert len(jobs) == 2
+    assert all(j.status == "pending" and j.platform is None for j in jobs)
+    assert sorted(rid for j in jobs for rid in j.payload["recipe_ids"]) == sorted(
+        str(r.id) for r in store.recipes
+    )
+    # Draining them generates one image (+ one flat-cost ledger row) per dish:
+    await drain_jobs(worker, store)
+    assert len(image_spend_rows(store)) == 2
+    assert all(r.image_url is not None for r in store.recipes)
+    assert all(j.status == "stored" for j in illustration_jobs(store))
     # Per-job scratch is always cleaned:
     assert not (tmp_path / "scratch" / "chefclaw-jobs" / str(job.id)).exists()
 
@@ -662,13 +703,13 @@ async def test_reconcile_flips_running_jobs_to_interrupted() -> None:
     store = FakeJobStore()
     running = [
         store.seed_job(status=status, canonical_id=f"BV{i}")
-        for i, status in enumerate(("downloading", "extracting", "validating"))
+        for i, status in enumerate(("downloading", "extracting", "validating", "illustrating"))
     ]
     untouched_pending = store.seed_job(status="pending", canonical_id="BVp")
     untouched_stored = store.seed_job(status="stored", canonical_id="BVs")
 
     flipped = await store.reconcile_interrupted()
-    assert flipped == 3
+    assert flipped == 4  # illustrating is a RUNNING status too
     for job in running:
         assert (job.status, job.error_type) == ("failed", "interrupted")
     assert untouched_pending.status == "pending"
@@ -822,46 +863,56 @@ async def test_media_retention_keep_moves_into_archive(tmp_path: Path) -> None:
     job = await claim_and_process(worker, store)
 
     archive_dir = tmp_path / "media" / "bilibili" / "BVtest00001-p1"
-    archived = sorted(archive_dir.iterdir())
-    videos = [path for path in archived if path.suffix == ".mp4"]
+    videos = [path for path in archive_dir.iterdir() if path.suffix == ".mp4"]
     assert len(videos) == 1
-    # The illustration stage wrote next to the retained video (it does NOT
-    # depend on retention — it would land here even with discard):
-    assert archive_dir / "illustration-0.jpg" in archived
     meta = store.recipes[0].extraction_meta
     assert meta["retained_media"] == [str(videos[0])]  # illustrations are NOT retained media
+    # The illustration is its own job now — draining it writes next to the
+    # retained video (it does NOT depend on retention — it would land here even
+    # with discard):
+    await drain_jobs(worker, store)
+    assert (archive_dir / "illustration-0.jpg").is_file()
     # Scratch is still cleaned even when media was retained:
     assert not (tmp_path / "scratch" / "chefclaw-jobs" / str(job.id)).exists()
 
 
-# ─── illustrations (generated cartoon covers — best-effort, post-store) ──────
+# ─── illustrations (their own retriable job, enqueued after the store) ───────
 
 
-async def test_illustration_happy_path_persists_image_after_store(tmp_path: Path) -> None:
-    """The illustration stage runs AFTER the atomic store, writes bytes to
-    illustration-<dish_index>.jpg, sets image_url + style_version, and ledgers
-    a spend row with the image model + its flat cost. It does NOT depend on
-    media_retention (default discard here)."""
+async def test_illustration_job_persists_image_and_ledgers(tmp_path: Path) -> None:
+    """After extraction stores, a per-recipe illustration job is enqueued;
+    processing it writes illustration-<dish_index>.jpg, sets image_url +
+    style_version, flips the job to stored, and ledgers a flat-cost image spend
+    row attributed to the illustration job. Extraction itself never touches the
+    generator; images do NOT depend on media_retention (default discard here)."""
     store, source = FakeJobStore(), make_source()
     settings = make_settings(tmp_path)  # media_retention="discard"
     images = FakeImageGenerator()
     worker, _ = make_worker(store, source, settings, FakeExtractor(), images)
 
     await enqueue_extract(store, OWNER_ID, FAKE_URL, [source], settings)
-    job = await claim_and_process(worker, store)
+    extract_job = await claim_and_process(worker, store)
+    # Extraction stores WITHOUT touching the image generator:
+    assert extract_job.status == "stored"
+    assert store.recipes[0].image_url is None
+    assert images.calls == []
 
-    assert job.status == "stored"
+    processed = await drain_jobs(worker, store)
+    [illustration_job] = [j for j in processed if j.type == "illustration"]
+    assert illustration_job.status == "stored"
     archive_dir = tmp_path / "media" / "bilibili" / "BVtest00001-p1"
     expected = archive_dir / "illustration-0.jpg"
     assert store.recipes[0].image_url == str(expected)
     assert store.recipes[0].image_style_version == "cartoon-v1"
     assert Path(store.recipes[0].image_url).is_absolute()  # media root is resolve()d
     assert expected.is_file()
-    # The paid image attempt was ledgered with the image model + flat cost:
-    image_rows = [r for r in store.spend_rows if r["model"] == "fake-image"]
-    assert len(image_rows) == 1
-    assert image_rows[0]["cost_usd"] == Decimal("0.067")
-    assert image_rows[0]["tokens_in"] == 0  # flat-billed, not token-based
+    # The paid image attempt was ledgered with the image model + flat cost,
+    # attributed to the illustration job (an existing jobs row):
+    rows = image_spend_rows(store)
+    assert len(rows) == 1
+    assert rows[0]["cost_usd"] == Decimal("0.067")
+    assert rows[0]["tokens_in"] == 0  # flat-billed, not token-based
+    assert rows[0]["job_id"] == illustration_job.id
 
 
 async def test_illustration_prompt_is_text_only_never_quantities(tmp_path: Path) -> None:
@@ -874,6 +925,7 @@ async def test_illustration_prompt_is_text_only_never_quantities(tmp_path: Path)
 
     await enqueue_extract(store, OWNER_ID, FAKE_URL, [source], settings)
     await claim_and_process(worker, store)
+    await drain_jobs(worker, store)
 
     assert len(images.calls) == 1
     prompt = images.calls[0]
@@ -886,33 +938,38 @@ async def test_illustration_prompt_is_text_only_never_quantities(tmp_path: Path)
     assert "适量" not in prompt
 
 
-async def test_illustration_generator_failure_still_stores_with_none(tmp_path: Path) -> None:
-    """An image-API error must NEVER fail the job — the recipe is already
-    stored when the illustration stage runs; image_url just stays NULL."""
+async def test_illustration_job_generator_error_fails_job_leaves_image_null(
+    tmp_path: Path,
+) -> None:
+    """An image-API error fails the illustration JOB (surfaced, retriable) —
+    but the recipe is untouched (it was stored by the extraction job); image_url
+    just stays NULL and no image spend row is written."""
     store, source = FakeJobStore(), make_source()
     settings = make_settings(tmp_path)
     images = FakeImageGenerator(error=RuntimeError("image API exploded"))
     worker, _ = make_worker(store, source, settings, FakeExtractor(), images)
 
     await enqueue_extract(store, OWNER_ID, FAKE_URL, [source], settings)
-    job = await claim_and_process(worker, store)
+    extract_job = await claim_and_process(worker, store)
+    assert extract_job.status == "stored"  # the recipe store is never at risk
 
-    assert job.status == "stored"
-    assert len(job.result_recipe_ids) == 1
+    processed = await drain_jobs(worker, store)
+    [illustration_job] = [j for j in processed if j.type == "illustration"]
+    assert illustration_job.status == "failed"
+    assert illustration_job.error_type == "illustration_failed"
+    assert "1 of 1" in illustration_job.error_detail
     assert store.recipes[0].image_url is None
     # The generator failing before returning ⇒ no image spend row:
-    assert [r for r in store.spend_rows if r["model"] == "fake-image"] == []
+    assert image_spend_rows(store) == []
 
 
-async def test_illustration_budget_exceeded_skips_and_still_stores(tmp_path: Path) -> None:
-    """The illustration stage is budget-gated: check_budget raising (monthly
-    budget / daily cap) must skip the image, leave image_url NULL, and NEVER
-    fail the recipe store. The extraction budget check passed first (recipes
-    exist), so this is the illustration-stage gate refusing the image call."""
-    store, source = FakeJobStore(), make_source()
-    settings = make_settings(tmp_path)
+async def test_illustration_job_budget_exceeded_fails_job(tmp_path: Path) -> None:
+    """The illustration job is budget-gated: check_budget raising (monthly
+    budget / daily cap) fails the job as budget_exceeded, leaves image_url NULL,
+    and never generates. The extraction's own budget check passed first."""
     images = FakeImageGenerator()
-    worker, _ = make_worker(store, source, settings, FakeExtractor(), images)
+    source = make_source()
+    settings = make_settings(tmp_path)
 
     # Let extraction's budget check pass, then refuse the illustration's check.
     class OneAllowedStore(FakeJobStore):
@@ -925,12 +982,100 @@ async def test_illustration_budget_exceeded_skips_and_still_stores(tmp_path: Pat
     worker, _ = make_worker(store, source, settings, FakeExtractor(), images)
 
     await enqueue_extract(store, OWNER_ID, FAKE_URL, [source], settings)
-    job = await claim_and_process(worker, store)
+    extract_job = await claim_and_process(worker, store)
+    assert extract_job.status == "stored"
 
-    assert job.status == "stored"
+    processed = await drain_jobs(worker, store)
+    [illustration_job] = [j for j in processed if j.type == "illustration"]
+    assert illustration_job.status == "failed"
+    assert illustration_job.error_type == "budget_exceeded"
     assert store.recipes[0].image_url is None
     assert images.calls == []  # the paid image call never happened
-    assert [r for r in store.spend_rows if r["model"] == "fake-image"] == []
+    assert image_spend_rows(store) == []
+
+
+async def test_illustration_job_config_error_fails_job(tmp_path: Path) -> None:
+    """A misconfigured image generator (ConfigError before any paid call) fails
+    the illustration job as config_error — its own guidance, not a Retry."""
+    source = make_source()
+    settings = make_settings(tmp_path)
+    store = FakeJobStore()
+
+    def bad_factory(_settings):
+        raise errors.ConfigError("CHEFCLAW_IMAGE_GENERATOR=gemini but GEMINI_API_KEY is empty")
+
+    worker = Worker(
+        store=store,
+        adapters=[source],
+        settings=settings,
+        extractor_factory=lambda _s: FakeExtractor(),
+        image_generator_factory=bad_factory,
+        sleeper=RecordingSleeper(),
+        jitter=lambda: 0.25,
+    )
+
+    await enqueue_extract(store, OWNER_ID, FAKE_URL, [source], settings)
+    await claim_and_process(worker, store)
+    processed = await drain_jobs(worker, store)
+
+    [illustration_job] = [j for j in processed if j.type == "illustration"]
+    assert illustration_job.status == "failed"
+    assert illustration_job.error_type == "config_error"
+    assert image_spend_rows(store) == []
+
+
+async def test_illustration_job_no_live_recipes_is_stored_noop(tmp_path: Path) -> None:
+    """An illustration job whose recipes were hard-deleted since enqueue has
+    nothing to do — a successful no-op (stored), never a failure, no spend."""
+    store = FakeJobStore()
+    settings = make_settings(tmp_path)
+    images = FakeImageGenerator()
+    worker, _ = make_worker(store, make_source(), settings, FakeExtractor(), images)
+
+    gone_recipe_id = uuid.uuid4()  # never stored / already deleted
+    job, _ = await enqueue_illustration(store, OWNER_ID, gone_recipe_id)
+    processed = await claim_and_process(worker, store)
+
+    assert processed.id == job.id
+    assert processed.status == "stored"  # no-op success, not failed
+    assert images.calls == []
+    assert image_spend_rows(store) == []
+
+
+async def test_illustration_job_mixed_failure_prefers_budget_error(tmp_path: Path) -> None:
+    """A multi-recipe illustration job where one image over-budgets and one
+    succeeds fails the WHOLE job, and the terminal error_type prefers the
+    operator-actionable budget_exceeded over the transient illustration_failed."""
+    settings = make_settings(tmp_path)
+    images = FakeImageGenerator()
+
+    class BudgetOnSecondStore(FakeJobStore):
+        async def check_budget(self, owner_id):
+            self.budget_checks += 1
+            if self.budget_checks >= 2:  # first image ok, second over-budget
+                raise errors.BudgetExceededError("monthly LLM budget reached")
+
+    store = BudgetOnSecondStore()
+    recipe_a = store.seed_recipe(canonical_id="BVmix", dish_index=0, document=default_dish())
+    recipe_b = store.seed_recipe(canonical_id="BVmix", dish_index=1, document=default_dish())
+    # One illustration job covering BOTH recipes (hand-built batch payload):
+    job = store.seed_job(
+        type="illustration",
+        platform=None,
+        canonical_id=None,
+        payload={"recipe_ids": [str(recipe_a.id), str(recipe_b.id)]},
+    )
+    worker, _ = make_worker(store, make_source(), settings, FakeExtractor(), images)
+
+    claimed = await store.claim_next_job()
+    assert claimed.id == job.id
+    await worker.process(claimed)
+
+    assert job.status == "failed"
+    assert job.error_type == "budget_exceeded"  # not illustration_failed
+    assert recipe_a.image_url is not None  # the first image DID land
+    assert recipe_b.image_url is None
+    assert len(image_spend_rows(store)) == 1
 
 
 async def test_estimated_fields_land_on_the_recipe(tmp_path: Path) -> None:
@@ -980,33 +1125,29 @@ async def test_dish_without_tags_stores_empty_list(tmp_path: Path) -> None:
     assert store.recipes[0].tags == []
 
 
-async def test_illustration_hang_cannot_lose_the_paid_store(tmp_path: Path) -> None:
-    """The paid-work crash-loss window fix: the atomic store commits BEFORE the
-    illustration stage, so a wedged image API can no longer delay or lose paid
-    extraction — a crash mid-illustration is healed by the startup backfill."""
+async def test_extraction_store_never_waits_on_image_generation(tmp_path: Path) -> None:
+    """The paid-work crash-loss window is closed BY CONSTRUCTION: the extraction
+    job commits recipes and enqueues illustration jobs, never generating an
+    image itself — so even a wedged image generator can neither delay nor lose
+    the store (the hang would live in the separate illustration job)."""
     store, source = FakeJobStore(), make_source()
     settings = make_settings(tmp_path)
     images = FakeImageGenerator(hang=True)
     worker, _ = make_worker(store, source, settings, FakeExtractor(), images)
 
     await enqueue_extract(store, OWNER_ID, FAKE_URL, [source], settings)
-    job = await store.claim_next_job()
-    assert job is not None
-    task = asyncio.create_task(worker.process(job))
-    for _ in range(5000):
-        if job.status == "stored":
-            break
-        await asyncio.sleep(0)
+    job = await claim_and_process(worker, store)  # returns promptly — no image await
 
-    assert job.status == "stored"  # recipes landed while the generator hangs
+    assert job.status == "stored"  # recipes landed; the generator was never called
     assert len(job.result_recipe_ids) == 1
-    assert store.recipes[0].image_url is None  # the backfill's job now
-    task.cancel()
-    with pytest.raises(asyncio.CancelledError):
-        await task
+    assert store.recipes[0].image_url is None  # the illustration job owns it
+    assert images.calls == []
+    # An illustration job is queued (its generation would hang — the illustration
+    # job's problem, never the extraction's):
+    assert [j.status for j in illustration_jobs(store)] == ["pending"]
 
 
-async def test_multi_dish_illustrations_distinct_paths(tmp_path: Path) -> None:
+async def test_multi_dish_illustration_jobs_distinct_paths(tmp_path: Path) -> None:
     store, source = FakeJobStore(), make_source()
     settings = make_settings(tmp_path)
     dish_two = default_dish()
@@ -1017,20 +1158,23 @@ async def test_multi_dish_illustrations_distinct_paths(tmp_path: Path) -> None:
     )
 
     await enqueue_extract(store, OWNER_ID, FAKE_URL, [source], settings)
-    job = await claim_and_process(worker, store)
+    await claim_and_process(worker, store)
+    # One illustration job PER dish, each keyed to a single recipe:
+    jobs = illustration_jobs(store)
+    assert len(jobs) == 2
+    assert all(len(j.payload["recipe_ids"]) == 1 for j in jobs)
 
-    assert job.status == "stored"
+    await drain_jobs(worker, store)
     archive_dir = tmp_path / "media" / "bilibili" / "BVtest00001-p1"
     assert [r.image_url for r in store.recipes] == [
         str(archive_dir / "illustration-0.jpg"),
         str(archive_dir / "illustration-1.jpg"),
     ]
     assert len(images.calls) == 2  # one prompt per dish
-    # Two image spend rows (one per dish):
-    assert len([r for r in store.spend_rows if r["model"] == "fake-image"]) == 2
+    assert len(image_spend_rows(store)) == 2  # one image spend row per dish
 
 
-async def test_upload_job_illustration_lands_under_local_platform(tmp_path: Path) -> None:
+async def test_illustration_job_for_upload_recipe_lands_under_local(tmp_path: Path) -> None:
     store = FakeJobStore()
     settings = make_settings(tmp_path)
     video = tmp_path / "saved.mp4"
@@ -1039,11 +1183,33 @@ async def test_upload_job_illustration_lands_under_local_platform(tmp_path: Path
 
     images = FakeImageGenerator()
     worker, _ = make_worker(store, make_source(), settings, FakeExtractor(), images)
-    job = await claim_and_process(worker, store)
+    upload_job = await claim_and_process(worker, store)
+    assert upload_job.status == "stored"
 
-    assert job.status == "stored"
-    expected = tmp_path / "media" / "local" / job.canonical_id / "illustration-0.jpg"
+    await drain_jobs(worker, store)
+    expected = tmp_path / "media" / "local" / upload_job.canonical_id / "illustration-0.jpg"
     assert store.recipes[0].image_url == str(expected)
+
+
+async def test_enqueue_illustration_dedupes_active_job(tmp_path: Path) -> None:
+    """A second enqueue for a recipe with an ACTIVE illustration job returns
+    THAT job (dedupe gates the paid image call) — no twin. A terminal job does
+    NOT dedupe: a fresh regenerate always enqueues."""
+    store = FakeJobStore()
+    recipe = store.seed_recipe(document=default_dish())
+
+    first, existing = await enqueue_illustration(store, OWNER_ID, recipe.id)
+    assert existing is False
+    again, existing = await enqueue_illustration(store, OWNER_ID, recipe.id)
+    assert existing is True
+    assert again.id == first.id
+    assert len(illustration_jobs(store)) == 1
+
+    # Once the job is terminal, a regenerate is not a dedupe hit:
+    first.status = "stored"
+    fresh, existing = await enqueue_illustration(store, OWNER_ID, recipe.id)
+    assert existing is False
+    assert fresh.id != first.id
 
 
 # ─── illustration backfill (one-shot on worker startup, best-effort) ─────────
@@ -1063,7 +1229,7 @@ def _seed_recipe_with_job(store: FakeJobStore, **overrides):
     return recipe
 
 
-async def test_backfill_generates_illustrations_for_missing_images(tmp_path: Path) -> None:
+async def test_backfill_enqueues_illustration_jobs_for_missing_images(tmp_path: Path) -> None:
     store = FakeJobStore()
     settings = make_settings(tmp_path)
     recipe = _seed_recipe_with_job(store, image_url=None, document=default_dish())
@@ -1072,12 +1238,36 @@ async def test_backfill_generates_illustrations_for_missing_images(tmp_path: Pat
 
     await worker.backfill_illustrations()
 
+    # The backfill ENQUEUES (never inline-generates): one illustration job for
+    # the image-less recipe, keyed to it. Nothing is generated yet — the
+    # strictly-serial claim loop owns that.
+    jobs = illustration_jobs(store)
+    assert len(jobs) == 1
+    assert jobs[0].status == "pending"
+    assert jobs[0].payload["recipe_ids"] == [str(recipe.id)]
+    assert images.calls == []
+
+    # Draining the enqueued job generates + persists the image:
+    await drain_jobs(worker, store)
     expected = tmp_path / "media" / "bilibili" / "BVfake000-p1" / "illustration-0.jpg"
     assert recipe.image_url == str(expected)
     assert recipe.image_style_version == "cartoon-v1"
-    assert len(images.calls) == 1
-    # The backfill's paid image attempt was ledgered too:
-    assert len([r for r in store.spend_rows if r["model"] == "fake-image"]) == 1
+    assert len(image_spend_rows(store)) == 1
+
+
+async def test_backfill_dedupes_against_already_pending_illustration_job(tmp_path: Path) -> None:
+    """A recipe that already has a pending illustration job (e.g. the post-store
+    enqueue survived a restart) is NOT re-enqueued by the backfill — the paid
+    image call stays deduped across the restart."""
+    store = FakeJobStore()
+    settings = make_settings(tmp_path)
+    recipe = _seed_recipe_with_job(store, image_url=None, document=default_dish())
+    existing, _ = await enqueue_illustration(store, recipe.owner_id, recipe.id)
+    worker, _ = make_worker(store, make_source(), settings, FakeExtractor())
+
+    await worker.backfill_illustrations()
+
+    assert [j.id for j in illustration_jobs(store)] == [existing.id]  # no twin
 
 
 async def test_backfill_skips_recipes_with_no_locatable_job(tmp_path: Path) -> None:
@@ -1091,7 +1281,7 @@ async def test_backfill_skips_recipes_with_no_locatable_job(tmp_path: Path) -> N
 
     await worker.backfill_illustrations()
 
-    assert images.calls == []  # nothing to attribute — and no crash
+    assert illustration_jobs(store) == []  # nothing to attribute — no enqueue, no crash
     assert orphan.image_url is None
 
 
@@ -1106,25 +1296,27 @@ async def test_backfill_leaves_already_imaged_recipes_untouched(tmp_path: Path) 
 
     await worker.backfill_illustrations()
 
-    assert images.calls == []  # image_url already set — nothing to do
+    assert illustration_jobs(store) == []  # image_url already set — nothing to enqueue
     assert done.image_url == "/data/media/x/illustration-0.jpg"  # untouched
 
 
-async def test_backfill_generator_failure_never_raises(tmp_path: Path) -> None:
-    store = FakeJobStore()
+async def test_backfill_enqueue_failure_never_raises(tmp_path: Path) -> None:
+    """Best-effort: a store error while enqueueing (db hiccup) is swallowed and
+    logged — a failed backfill must never take the worker down."""
     settings = make_settings(tmp_path)
+
+    class FailingEnqueueStore(FakeJobStore):
+        async def insert_job(self, **kwargs):
+            raise RuntimeError("db connection lost")
+
+    store = FailingEnqueueStore()
     recipe = _seed_recipe_with_job(store, image_url=None, document=default_dish())
-    worker, _ = make_worker(
-        store,
-        make_source(),
-        settings,
-        FakeExtractor(),
-        FakeImageGenerator(error=RuntimeError("image API exploded")),
-    )
+    worker, _ = make_worker(store, make_source(), settings, FakeExtractor())
 
     await worker.backfill_illustrations()  # best-effort: swallowed and logged
 
     assert recipe.image_url is None
+    assert illustration_jobs(store) == []  # the enqueue failed — no job landed
 
 
 async def test_run_forever_backfills_once_when_enabled(tmp_path: Path) -> None:
@@ -1159,26 +1351,23 @@ async def test_run_forever_backfills_once_when_enabled(tmp_path: Path) -> None:
             await task
 
 
-async def test_backfill_runs_in_background_without_delaying_job_claims(tmp_path: Path) -> None:
-    """The one-shot backfill is a BACKGROUND task: a slow/wedged image pass
-    must never delay the first job claim. (Job execution stays strictly
-    serial — the backfill only runs subprocess/HTTP + row updates.)"""
+async def test_backfill_enqueues_in_background_and_loop_drains_all(tmp_path: Path) -> None:
+    """The one-shot backfill is a BACKGROUND task that only ENQUEUES (fast); the
+    strictly-serial claim loop then generates every image. A live paste and a
+    backfilled recipe both get processed by the ONE worker — serially."""
     store = FakeJobStore()
     settings = make_settings(tmp_path)
     stale = _seed_recipe_with_job(
         store, image_url=None, canonical_id="BVstale", document=default_dish()
     )
-    # The live job's generator is separate from the wedged backfill generator:
-    live_images = FakeImageGenerator()
-    backfill_images = FakeImageGenerator(hang=True)
-    generators = iter([backfill_images, live_images])
+    images = FakeImageGenerator()
     source = make_source()
     worker = Worker(
         store=store,
         adapters=[source],
         settings=settings,
         extractor_factory=lambda _s: FakeExtractor(),
-        image_generator_factory=lambda _s: next(generators),
+        image_generator_factory=lambda _s: images,
         backfill_illustrations_on_start=True,
         sleeper=YieldingSleeper(),
         jitter=lambda: 0.0,
@@ -1187,21 +1376,19 @@ async def test_backfill_runs_in_background_without_delaying_job_claims(tmp_path:
 
     task = asyncio.create_task(worker.run_forever())
     try:
-        for _ in range(5000):
-            if job.status == "stored":
+        for _ in range(20000):
+            if job.status == "stored" and stale.image_url is not None:
                 break
             await asyncio.sleep(0)
-        assert job.status == "stored"  # claimed + processed while the backfill hangs
+        assert job.status == "stored"  # the live paste completed
+        assert stale.image_url is not None  # the backfilled recipe got its cover
         assert worker.backfill_task is not None
-        assert not worker.backfill_task.done()
-        assert stale.image_url is None
     finally:
         task.cancel()
         with pytest.raises(asyncio.CancelledError):
             await task
-    # Worker shutdown cancels the backfill with it:
-    with pytest.raises(asyncio.CancelledError):
-        await worker.backfill_task
+    # Worker shutdown cancels the (already-finished) backfill task with it:
+    assert worker.backfill_task.cancelled() or worker.backfill_task.done()
 
 
 async def test_run_forever_skips_backfill_by_default(tmp_path: Path) -> None:

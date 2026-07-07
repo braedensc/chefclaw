@@ -44,6 +44,8 @@ interface GenState {
   upload: MutationMock;
   patch: MutationMock;
   deleteRecipe: MutationMock;
+  /** POST /api/recipes/{id}/illustration — regenerate/retry a cover job. */
+  regenerateIllustration: MutationMock;
   /**
    * CoverImage's blob fetch — resolve with a Blob to show the illustration;
    * the default (resolving undefined) errors the query, so images fall back
@@ -65,6 +67,7 @@ export const genState: GenState = {
   upload: mutationMock(),
   patch: mutationMock(),
   deleteRecipe: mutationMock(),
+  regenerateIllustration: mutationMock(),
   image: mutationMock(),
 };
 
@@ -81,6 +84,7 @@ export function resetGenState(): void {
   genState.upload = mutationMock();
   genState.patch = mutationMock();
   genState.deleteRecipe = mutationMock();
+  genState.regenerateIllustration = mutationMock();
   genState.image = mutationMock();
 }
 
@@ -160,6 +164,10 @@ export function genMockModule() {
     }),
     deleteRecipeApiRecipesRecipeIdDeleteMutation: () => ({
       mutationFn: (options: unknown) => genState.deleteRecipe(options),
+    }),
+    regenerateIllustrationApiRecipesRecipeIdIllustrationPostMutation: () => ({
+      mutationFn: (options: unknown) =>
+        genState.regenerateIllustration(options),
     }),
 
     // settings-page.tsx (screen 4) — genState.healthError drives failures.

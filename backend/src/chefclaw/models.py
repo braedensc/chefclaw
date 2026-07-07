@@ -56,6 +56,17 @@ class RecipeStatus(enum.StrEnum):
     FAILED = "failed"
 
 
+class JobType(enum.StrEnum):
+    """Enumerated jobs.type values (no DB CHECK — the column stays a plain
+    string; this enum is the code-side source of truth). ``illustration`` is
+    the V2-E follow-up: a retriable, on-demand-regeneratable cover-image job,
+    dispatched by the worker WITHOUT the download/extract stages (2026-07-07)."""
+
+    EXTRACT = "extract"
+    UPLOAD = "upload"
+    ILLUSTRATION = "illustration"
+
+
 class JobStatus(enum.StrEnum):
     """Enumerated jobs.status values."""
 
@@ -63,6 +74,9 @@ class JobStatus(enum.StrEnum):
     DOWNLOADING = "downloading"
     EXTRACTING = "extracting"
     VALIDATING = "validating"
+    # An illustration job's running stage (skips download/extract). Its terminal
+    # states reuse ``stored`` (success) / ``failed`` (surfaced, retriable).
+    ILLUSTRATING = "illustrating"
     STORED = "stored"
     FAILED = "failed"
 

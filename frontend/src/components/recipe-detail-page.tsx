@@ -8,9 +8,11 @@ import {
   deleteRecipeApiRecipesRecipeIdDeleteMutation,
   getRecipeApiRecipesRecipeIdGetOptions,
   getRecipeApiRecipesRecipeIdGetQueryKey,
+  listJobsApiJobsGetQueryKey,
   listRecipesApiRecipesGetOptions,
   listRecipesApiRecipesGetQueryKey,
   patchRecipeApiRecipesRecipeIdPatchMutation,
+  regenerateIllustrationApiRecipesRecipeIdIllustrationPostMutation,
 } from '../client/@tanstack/react-query.gen';
 import type { RecipeDetail } from '../client/types.gen';
 import { apiErrorMessage } from '../lib/error-message';
@@ -208,7 +210,58 @@ function RecipeHero({ detail, doc }: { detail: RecipeDetail; doc: RecipeDoc }) {
         </div>
       )}
       <HeroMeta detail={detail} doc={doc} />
+      <RegenerateIllustration
+        recipeId={detail.id}
+        hasImage={detail.has_image ?? false}
+      />
     </header>
+  );
+}
+
+/**
+ * Enqueue a fresh cover illustration (its own retriable job). The new image
+ * appears once the worker processes the job — so this confirms the enqueue and
+ * points at the Jobs drawer rather than optimistically swapping the cover.
+ */
+function RegenerateIllustration({
+  recipeId,
+  hasImage,
+}: {
+  recipeId: string;
+  hasImage: boolean;
+}) {
+  const queryClient = useQueryClient();
+  const regenerate = useMutation({
+    ...regenerateIllustrationApiRecipesRecipeIdIllustrationPostMutation(),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: listJobsApiJobsGetQueryKey(),
+      });
+    },
+  });
+
+  return (
+    <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
+      <button
+        type="button"
+        disabled={regenerate.isPending}
+        onClick={() => regenerate.mutate({ path: { recipe_id: recipeId } })}
+        className="rounded-field border border-line-bright px-3.5 py-1.5 font-display text-[11px] font-semibold tracking-[0.16em] text-ink-dim uppercase transition hover:border-cyan/55 hover:text-cyan disabled:opacity-50"
+      >
+        {hasImage ? 'Regenerate illustration' : 'Generate illustration'}
+      </button>
+      {regenerate.isSuccess && !regenerate.isPending && (
+        <span className="text-xs text-gold">
+          Queued — the new cover appears once it&rsquo;s cooked. Track it in
+          Jobs.
+        </span>
+      )}
+      {regenerate.isError && (
+        <span role="alert" className="text-xs text-chili-bright">
+          {apiErrorMessage(regenerate.error)}
+        </span>
+      )}
+    </div>
   );
 }
 

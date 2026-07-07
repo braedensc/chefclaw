@@ -292,6 +292,15 @@
             ],
             "title": "Platform"
           },
+          "recipe_ids": {
+            "default": [],
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "title": "Recipe Ids",
+            "type": "array"
+          },
           "result_recipe_ids": {
             "items": {
               "format": "uuid",
@@ -1552,6 +1561,75 @@
           }
         ],
         "summary": "Patch Recipe",
+        "tags": [
+          "recipes"
+        ]
+      }
+    },
+    "/api/recipes/{recipe_id}/illustration": {
+      "post": {
+        "description": "Enqueue an illustration job to (re)generate this recipe's cover — the\ndetail-page 'Regenerate illustration' affordance and the jobs-drawer Retry\nfor a failed illustration job both land here. Owner-scoped: a recipe that\nisn't the caller's is a 404 (never enqueue paid work for another owner).\n202 when a fresh job was enqueued, 200 when an active illustration job for\nthis recipe already exists (dedupe).",
+        "operationId": "regenerate_illustration_api_recipes__recipe_id__illustration_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "recipe_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Recipe Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobOut"
+                }
+              }
+            },
+            "description": "Existing active illustration job (dedupe hit)"
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Regenerate Illustration",
         "tags": [
           "recipes"
         ]
