@@ -2,7 +2,7 @@
 
 import { type Client, type ClientMeta, formDataBodySerializer, type Options as Options2, type RequestResult, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { AdminSpendApiAdminSpendGetData, AdminSpendApiAdminSpendGetResponses, CreateInviteApiAdminInvitesPostData, CreateInviteApiAdminInvitesPostErrors, CreateInviteApiAdminInvitesPostResponses, DeleteRecipeApiRecipesRecipeIdDeleteData, DeleteRecipeApiRecipesRecipeIdDeleteErrors, DeleteRecipeApiRecipesRecipeIdDeleteResponses, ExtractRecipeApiRecipesExtractPostData, ExtractRecipeApiRecipesExtractPostErrors, ExtractRecipeApiRecipesExtractPostResponses, GetJobApiJobsJobIdGetData, GetJobApiJobsJobIdGetErrors, GetJobApiJobsJobIdGetResponses, GetRecipeApiRecipesRecipeIdGetData, GetRecipeApiRecipesRecipeIdGetErrors, GetRecipeApiRecipesRecipeIdGetResponses, GetRecipeImageApiRecipesRecipeIdImageGetData, GetRecipeImageApiRecipesRecipeIdImageGetErrors, GetRecipeImageApiRecipesRecipeIdImageGetResponses, GetSpendApiSpendGetData, GetSpendApiSpendGetErrors, GetSpendApiSpendGetResponses, GoogleCallbackApiAuthGoogleCallbackGetData, GoogleCallbackApiAuthGoogleCallbackGetErrors, GoogleCallbackApiAuthGoogleCallbackGetResponses, GoogleLoginApiAuthGoogleLoginGetData, GoogleLoginApiAuthGoogleLoginGetErrors, GoogleLoginApiAuthGoogleLoginGetResponses, HealthApiHealthGetData, HealthApiHealthGetResponses, ListInvitesApiAdminInvitesGetData, ListInvitesApiAdminInvitesGetErrors, ListInvitesApiAdminInvitesGetResponses, ListJobsApiJobsGetData, ListJobsApiJobsGetErrors, ListJobsApiJobsGetResponses, ListRecipesApiRecipesGetData, ListRecipesApiRecipesGetErrors, ListRecipesApiRecipesGetResponses, ListUsersApiAdminUsersGetData, ListUsersApiAdminUsersGetResponses, LogoutApiAuthLogoutPostData, LogoutApiAuthLogoutPostResponses, MeApiMeGetData, MeApiMeGetResponses, PatchRecipeApiRecipesRecipeIdPatchData, PatchRecipeApiRecipesRecipeIdPatchErrors, PatchRecipeApiRecipesRecipeIdPatchResponses, PublicInviteApiInvitesTokenGetData, PublicInviteApiInvitesTokenGetErrors, PublicInviteApiInvitesTokenGetResponses, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostData, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostErrors, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostResponses, RevokeInviteApiAdminInvitesInviteIdRevokePostData, RevokeInviteApiAdminInvitesInviteIdRevokePostErrors, RevokeInviteApiAdminInvitesInviteIdRevokePostResponses, SetUserRealCoversApiAdminUsersUserIdPatchData, SetUserRealCoversApiAdminUsersUserIdPatchErrors, SetUserRealCoversApiAdminUsersUserIdPatchResponses, UpdateUserBudgetApiAdminUsersUserIdBudgetPatchData, UpdateUserBudgetApiAdminUsersUserIdBudgetPatchErrors, UpdateUserBudgetApiAdminUsersUserIdBudgetPatchResponses, UploadRecipeVideoApiRecipesUploadPostData, UploadRecipeVideoApiRecipesUploadPostErrors, UploadRecipeVideoApiRecipesUploadPostResponses } from './types.gen';
+import type { AdminSpendApiAdminSpendGetData, AdminSpendApiAdminSpendGetResponses, CreateInviteApiAdminInvitesPostData, CreateInviteApiAdminInvitesPostErrors, CreateInviteApiAdminInvitesPostResponses, DeleteRecipeApiRecipesRecipeIdDeleteData, DeleteRecipeApiRecipesRecipeIdDeleteErrors, DeleteRecipeApiRecipesRecipeIdDeleteResponses, ExtractRecipeApiRecipesExtractPostData, ExtractRecipeApiRecipesExtractPostErrors, ExtractRecipeApiRecipesExtractPostResponses, GetConfigApiAdminConfigGetData, GetConfigApiAdminConfigGetResponses, GetJobApiJobsJobIdGetData, GetJobApiJobsJobIdGetErrors, GetJobApiJobsJobIdGetResponses, GetRecipeApiRecipesRecipeIdGetData, GetRecipeApiRecipesRecipeIdGetErrors, GetRecipeApiRecipesRecipeIdGetResponses, GetRecipeImageApiRecipesRecipeIdImageGetData, GetRecipeImageApiRecipesRecipeIdImageGetErrors, GetRecipeImageApiRecipesRecipeIdImageGetResponses, GetSpendApiSpendGetData, GetSpendApiSpendGetErrors, GetSpendApiSpendGetResponses, GoogleCallbackApiAuthGoogleCallbackGetData, GoogleCallbackApiAuthGoogleCallbackGetErrors, GoogleCallbackApiAuthGoogleCallbackGetResponses, GoogleLoginApiAuthGoogleLoginGetData, GoogleLoginApiAuthGoogleLoginGetErrors, GoogleLoginApiAuthGoogleLoginGetResponses, HealthApiHealthGetData, HealthApiHealthGetResponses, ListInvitesApiAdminInvitesGetData, ListInvitesApiAdminInvitesGetErrors, ListInvitesApiAdminInvitesGetResponses, ListJobsApiJobsGetData, ListJobsApiJobsGetErrors, ListJobsApiJobsGetResponses, ListRecipesApiRecipesGetData, ListRecipesApiRecipesGetErrors, ListRecipesApiRecipesGetResponses, ListUsersApiAdminUsersGetData, ListUsersApiAdminUsersGetResponses, LogoutApiAuthLogoutPostData, LogoutApiAuthLogoutPostResponses, MeApiMeGetData, MeApiMeGetResponses, PatchConfigApiAdminConfigPatchData, PatchConfigApiAdminConfigPatchErrors, PatchConfigApiAdminConfigPatchResponses, PatchRecipeApiRecipesRecipeIdPatchData, PatchRecipeApiRecipesRecipeIdPatchErrors, PatchRecipeApiRecipesRecipeIdPatchResponses, PublicInviteApiInvitesTokenGetData, PublicInviteApiInvitesTokenGetErrors, PublicInviteApiInvitesTokenGetResponses, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostData, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostErrors, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostResponses, RevokeInviteApiAdminInvitesInviteIdRevokePostData, RevokeInviteApiAdminInvitesInviteIdRevokePostErrors, RevokeInviteApiAdminInvitesInviteIdRevokePostResponses, SetUserRealCoversApiAdminUsersUserIdPatchData, SetUserRealCoversApiAdminUsersUserIdPatchErrors, SetUserRealCoversApiAdminUsersUserIdPatchResponses, UpdateUserBudgetApiAdminUsersUserIdBudgetPatchData, UpdateUserBudgetApiAdminUsersUserIdBudgetPatchErrors, UpdateUserBudgetApiAdminUsersUserIdBudgetPatchResponses, UploadRecipeVideoApiRecipesUploadPostData, UploadRecipeVideoApiRecipesUploadPostErrors, UploadRecipeVideoApiRecipesUploadPostResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -17,6 +17,33 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
      */
     meta?: keyof ClientMeta extends never ? Record<string, unknown> : ClientMeta;
 };
+
+/**
+ * Get Config
+ *
+ * The whole admin config surface: editable runtime policy (with env default,
+ * override, and effective value per flag), secret STATUS (never a value), and
+ * read-only deploy/infra settings.
+ */
+export const getConfigApiAdminConfigGet = <ThrowOnError extends boolean = false>(options?: Options<GetConfigApiAdminConfigGetData, ThrowOnError>): RequestResult<GetConfigApiAdminConfigGetResponses, unknown, ThrowOnError> => (options?.client ?? client).get<GetConfigApiAdminConfigGetResponses, unknown, ThrowOnError>({ url: '/api/admin/config', ...options });
+
+/**
+ * Patch Config
+ *
+ * Set/clear runtime-policy overrides (one audited transaction). A string
+ * SETS the override, JSON ``null`` CLEARS it (revert to env), an absent key is
+ * unchanged. An unknown/non-editable (e.g. secret) key or an invalid value ⇒
+ * 422 with a per-key message and NOTHING persisted. Changes take effect on the
+ * NEXT job — no restart.
+ */
+export const patchConfigApiAdminConfigPatch = <ThrowOnError extends boolean = false>(options: Options<PatchConfigApiAdminConfigPatchData, ThrowOnError>): RequestResult<PatchConfigApiAdminConfigPatchResponses, PatchConfigApiAdminConfigPatchErrors, ThrowOnError> => (options.client ?? client).patch<PatchConfigApiAdminConfigPatchResponses, PatchConfigApiAdminConfigPatchErrors, ThrowOnError>({
+    url: '/api/admin/config',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * List Invites

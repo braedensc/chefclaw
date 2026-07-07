@@ -90,6 +90,12 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <span aria-hidden="true" className="text-line-bright">
                   ·
                 </span>
+                <Link to="/admin/config" className={HEADER_CONTROL}>
+                  Config
+                </Link>
+                <span aria-hidden="true" className="text-line-bright">
+                  ·
+                </span>
               </>
             )}
             {/* A LINK named "Settings" — the golden selector contract's

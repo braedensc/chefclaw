@@ -7,6 +7,7 @@ import {
 } from '@tanstack/react-router';
 import type { RouterHistory } from '@tanstack/react-router';
 
+import { AdminConfigPage } from './components/admin-config-page';
 import { AdminInvitesPage } from './components/admin-invites-page';
 import { AppShell } from './components/app-shell';
 import { AuthGate } from './components/auth-gate';
@@ -71,6 +72,11 @@ const adminInvitesRoute = createRoute({
   path: '/admin/invites',
   component: AdminInvitesPage,
 });
+const adminConfigRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/admin/config',
+  component: AdminConfigPage,
+});
 
 const routeTree = rootRoute.addChildren([
   loginRoute,
@@ -79,6 +85,7 @@ const routeTree = rootRoute.addChildren([
   recipeDetailRoute,
   settingsRoute,
   adminInvitesRoute,
+  adminConfigRoute,
 ]);
 
 /** Factory so tests can mount the real route tree on a memory history. */
