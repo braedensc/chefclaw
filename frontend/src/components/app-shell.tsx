@@ -21,7 +21,20 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen text-ink">
-      <header className="sticky top-0 z-20 border-b border-line bg-night/95 backdrop-blur">
+      <header className="relative sticky top-0 z-20 border-b border-line bg-night/95 backdrop-blur">
+        {/* always-on neon underglow along the header's bottom edge — a small
+            persistent lit element so the storefront reads as "open" even with
+            no active job; fades to transparent at the corners like a tube. */}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-px opacity-50"
+          style={{
+            background:
+              'linear-gradient(90deg, transparent, color-mix(in srgb, var(--color-cyan) 50%, transparent) 30%, color-mix(in srgb, var(--color-chili) 42%, transparent) 70%, transparent)',
+            boxShadow:
+              '0 1px 12px color-mix(in srgb, var(--color-cyan) 22%, transparent)',
+          }}
+        />
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-4 px-4">
           {/* aria-label keeps the home link's accessible name a stable
               "chefclaw" — the visible wordmark uppercases via CSS. */}

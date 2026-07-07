@@ -90,8 +90,11 @@ export function LibraryPage() {
     [recipesData],
   );
 
+  // A faint always-on cyan hairline keeps the filter row gently lit at rest
+  // (the paste strip, headings, and cards all carry ambient neon — the search
+  // chrome shouldn't read as dead); focus still brightens it to cyan/60.
   const fieldClasses =
-    'rounded-field border border-line bg-panel px-3.5 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-cyan/60 focus:outline-none';
+    'rounded-field border border-cyan/15 bg-panel px-3.5 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-cyan/60 focus:outline-none';
 
   return (
     <div>

@@ -55,7 +55,7 @@ export function RecipeCard({
     <Link
       to="/recipes/$id"
       params={{ id: recipe.id }}
-      className={`block h-full overflow-hidden rounded-card border border-line bg-panel transition duration-300 motion-safe:hover:-translate-y-1 ${accent.cardHover}`}
+      className={`block h-full overflow-hidden rounded-card border bg-panel transition duration-300 motion-safe:hover:-translate-y-1 ${accent.cardRest} ${accent.cardHover}`}
     >
       <div className="relative">
         <CoverImage

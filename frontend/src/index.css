@@ -69,21 +69,24 @@
     color: var(--color-ink);
     font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
-    /* pavement reflections: faint cyan / chili / violet pools on black */
+    /* pavement reflections: cyan / chili / violet pools on black — the resting
+       app's ambient light. Kept wide + low-saturation so the base stays sleek
+       near-black; the violet floor pool rises just enough to lift the grid off
+       the page even with no active job glowing. */
     background:
       radial-gradient(
-        900px 480px at 86% -8%,
-        color-mix(in srgb, var(--color-cyan) 7%, transparent),
+        1000px 540px at 86% -8%,
+        color-mix(in srgb, var(--color-cyan) 11%, transparent),
         transparent 62%
       ),
       radial-gradient(
-        760px 460px at 6% -6%,
-        color-mix(in srgb, var(--color-chili) 8%, transparent),
+        860px 520px at 6% -6%,
+        color-mix(in srgb, var(--color-chili) 12%, transparent),
         transparent 60%
       ),
       radial-gradient(
-        1100px 640px at 50% 110%,
-        color-mix(in srgb, var(--color-violet) 6%, transparent),
+        1200px 700px at 50% 110%,
+        color-mix(in srgb, var(--color-violet) 10%, transparent),
         transparent 62%
       ),
       var(--color-night);
@@ -129,6 +132,27 @@
   box-shadow:
     0 0 18px -2px color-mix(in srgb, var(--color-violet) 45%, transparent),
     inset 0 0 16px color-mix(in srgb, var(--color-violet) 12%, transparent);
+}
+
+/* ---- rest halos ----
+   A far softer, tighter-to-the-border cousin of the glow-* set: the halo a
+   card carries at REST so the library reads as a row of gently lit stalls
+   before you hover. Pair with a low-opacity platform border (see cardRest in
+   platform-accents); hover swaps in the brighter glow-* above. */
+@utility glow-rest-cyan {
+  box-shadow:
+    0 0 22px -12px color-mix(in srgb, var(--color-cyan) 40%, transparent),
+    inset 0 0 24px -14px color-mix(in srgb, var(--color-cyan) 40%, transparent);
+}
+@utility glow-rest-chili {
+  box-shadow:
+    0 0 22px -12px color-mix(in srgb, var(--color-chili) 40%, transparent),
+    inset 0 0 24px -14px color-mix(in srgb, var(--color-chili) 40%, transparent);
+}
+@utility glow-rest-warm {
+  box-shadow:
+    0 0 22px -12px color-mix(in srgb, var(--color-warm) 34%, transparent),
+    inset 0 0 24px -14px color-mix(in srgb, var(--color-warm) 30%, transparent);
 }
 
 @utility glow-text-chili {
