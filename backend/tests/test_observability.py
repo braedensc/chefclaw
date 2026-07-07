@@ -229,10 +229,12 @@ async def test_health_polls_log_at_debug_only(
 
 
 async def test_unauthenticated_request_logs_without_owner(
-    client: AsyncClient, caplog: pytest.LogCaptureFixture
+    unauth_client: AsyncClient, caplog: pytest.LogCaptureFixture
 ) -> None:
+    """M12: a pre-auth request (no session) sets no request.state.owner_id, so
+    the request log records owner_id=None instead of raising."""
     with caplog.at_level(logging.INFO, logger="chefclaw.request"):
-        response = await client.get("/api/jobs")
+        response = await unauth_client.get("/api/jobs")
     assert response.status_code == 401
     (record,) = _request_records(caplog)
     assert record.http_status == 401

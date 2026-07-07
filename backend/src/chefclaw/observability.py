@@ -37,6 +37,7 @@ _SENTRY_DENYLIST = DEFAULT_DENYLIST + [
     "chefclaw_api_token",
     "gemini_api_key",
     "dashscope_api_key",
+    "google_oauth_client_secret",
     "xhs_cookie",
     "bilibili_cookie",
     "db_password",

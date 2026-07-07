@@ -189,6 +189,32 @@ export type JobOut = {
 };
 
 /**
+ * MeOut
+ *
+ * GET /api/me — the authenticated identity. ``id`` is the owner_id the
+ * service scopes on; ``is_admin`` gates admin-UI visibility only (server-
+ * derived, never a writable field — critique M9).
+ */
+export type MeOut = {
+    /**
+     * Email
+     */
+    email: string;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Is Admin
+     */
+    is_admin: boolean;
+    /**
+     * Name
+     */
+    name: string;
+};
+
+/**
  * RecipeDetail
  *
  * Full recipe including the (read-only) document.
@@ -542,6 +568,82 @@ export type ValidationError = {
     type: string;
 };
 
+export type GoogleCallbackApiAuthGoogleCallbackGetData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Code
+         */
+        code?: string;
+        /**
+         * State
+         */
+        state?: string;
+    };
+    url: '/api/auth/google/callback';
+};
+
+export type GoogleCallbackApiAuthGoogleCallbackGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GoogleCallbackApiAuthGoogleCallbackGetError = GoogleCallbackApiAuthGoogleCallbackGetErrors[keyof GoogleCallbackApiAuthGoogleCallbackGetErrors];
+
+export type GoogleCallbackApiAuthGoogleCallbackGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
+export type GoogleLoginApiAuthGoogleLoginGetData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Next
+         */
+        next?: string;
+    };
+    url: '/api/auth/google/login';
+};
+
+export type GoogleLoginApiAuthGoogleLoginGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GoogleLoginApiAuthGoogleLoginGetError = GoogleLoginApiAuthGoogleLoginGetErrors[keyof GoogleLoginApiAuthGoogleLoginGetErrors];
+
+export type GoogleLoginApiAuthGoogleLoginGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
+export type LogoutApiAuthLogoutPostData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/auth/logout';
+};
+
+export type LogoutApiAuthLogoutPostResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type LogoutApiAuthLogoutPostResponse = LogoutApiAuthLogoutPostResponses[keyof LogoutApiAuthLogoutPostResponses];
+
 export type HealthApiHealthGetData = {
     body?: never;
     path?: never;
@@ -623,6 +725,22 @@ export type GetJobApiJobsJobIdGetResponses = {
 };
 
 export type GetJobApiJobsJobIdGetResponse = GetJobApiJobsJobIdGetResponses[keyof GetJobApiJobsJobIdGetResponses];
+
+export type MeApiMeGetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/me';
+};
+
+export type MeApiMeGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: MeOut;
+};
+
+export type MeApiMeGetResponse = MeApiMeGetResponses[keyof MeApiMeGetResponses];
 
 export type ListRecipesApiRecipesGetData = {
     body?: never;

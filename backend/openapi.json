@@ -350,6 +350,36 @@
         "title": "JobOut",
         "type": "object"
       },
+      "MeOut": {
+        "description": "GET /api/me — the authenticated identity. ``id`` is the owner_id the\nservice scopes on; ``is_admin`` gates admin-UI visibility only (server-\nderived, never a writable field — critique M9).",
+        "properties": {
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_admin": {
+            "title": "Is Admin",
+            "type": "boolean"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "email",
+          "is_admin"
+        ],
+        "title": "MeOut",
+        "type": "object"
+      },
       "RecipeDetail": {
         "description": "Full recipe including the (read-only) document.",
         "properties": {
@@ -936,12 +966,6 @@
         "title": "ValidationError",
         "type": "object"
       }
-    },
-    "securitySchemes": {
-      "HTTPBearer": {
-        "scheme": "bearer",
-        "type": "http"
-      }
     }
   },
   "info": {
@@ -950,6 +974,115 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/auth/google/callback": {
+      "get": {
+        "description": "Verify state + the ID token, gate the identity, mint a session. The\noauth_tx cookie is read ONCE and cleared on every response (single-use, M3).",
+        "operationId": "google_callback_api_auth_google_callback_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "code",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "Code",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "state",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "State",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Google Callback",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/google/login": {
+      "get": {
+        "description": "Mint state + PKCE + nonce, stash them in the 5-min single-use oauth_tx\ncookie, and 302 to Google (or the fake provider's loop-back).",
+        "operationId": "google_login_api_auth_google_login_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "next",
+            "required": false,
+            "schema": {
+              "default": "/",
+              "title": "Next",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Google Login",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "description": "Kill the session SERVER-SIDE (row DELETE — instant revocation) and clear\nthe cookie. 204 either way (idempotent).",
+        "operationId": "logout_api_auth_logout_post",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Logout",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
     "/api/health": {
       "get": {
         "description": "Health check. NOT publicly exempt from auth — it exposes spend/cookie\nstate (plan §16 amendment 3).",
@@ -966,11 +1099,6 @@
             "description": "Successful Response"
           }
         },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
         "summary": "Health"
       }
     },
@@ -1018,11 +1146,6 @@
             "description": "Validation Error"
           }
         },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
         "summary": "List Jobs",
         "tags": [
           "jobs"
@@ -1076,14 +1199,31 @@
             "description": "Validation Error"
           }
         },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
         "summary": "Get Job",
         "tags": [
           "jobs"
+        ]
+      }
+    },
+    "/api/me": {
+      "get": {
+        "description": "The authenticated identity (401 if unauthenticated — handled by\nrequire_owner). ``is_admin`` gates admin-UI visibility only; it is\nserver-derived, never a writable field (critique M9).",
+        "operationId": "me_api_me_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Me",
+        "tags": [
+          "auth"
         ]
       }
     },
@@ -1199,11 +1339,6 @@
             "description": "Validation Error"
           }
         },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
         "summary": "List Recipes",
         "tags": [
           "recipes"
@@ -1285,11 +1420,6 @@
             "description": "Service Unavailable"
           }
         },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
         "summary": "Extract Recipe",
         "tags": [
           "extraction"
@@ -1382,11 +1512,6 @@
             "description": "Service Unavailable"
           }
         },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
         "summary": "Upload Recipe Video",
         "tags": [
           "extraction"
@@ -1433,11 +1558,6 @@
             "description": "Validation Error"
           }
         },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
         "summary": "Delete Recipe",
         "tags": [
           "recipes"
@@ -1489,11 +1609,6 @@
             "description": "Validation Error"
           }
         },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
         "summary": "Get Recipe",
         "tags": [
           "recipes"
@@ -1555,11 +1670,6 @@
             "description": "Validation Error"
           }
         },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
         "summary": "Patch Recipe",
         "tags": [
           "recipes"
@@ -1624,11 +1734,6 @@
             "description": "Validation Error"
           }
         },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
         "summary": "Regenerate Illustration",
         "tags": [
           "recipes"
@@ -1679,11 +1784,6 @@
             "description": "Validation Error"
           }
         },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
         "summary": "Get Recipe Image",
         "tags": [
           "recipes"
@@ -1730,11 +1830,6 @@
             "description": "Validation Error"
           }
         },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
         "summary": "Get Spend",
         "tags": [
           "spend"

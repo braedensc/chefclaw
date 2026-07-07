@@ -22,7 +22,29 @@ class Settings(BaseSettings):
 
     # Auth is disabled-closed: an empty token means every request gets a 401
     # telling the operator to set CHEFCLAW_API_TOKEN (see auth.require_owner).
+    # LEGACY: kept through the M2 deploy window; the bearer branch is DELETED at
+    # cutover (hard switch to cookie sessions — no dual bearer-or-session mode).
     chefclaw_api_token: str = ""
+
+    # ── M2 auth (ADR 2026-07-07-m2-accounts-and-invites) ────────────────────
+    # Auth-provider selection, mirroring CHEFCLAW_EXTRACTOR. "fake" is the SAFE
+    # default: the unit tier short-circuits require_owner to chefclaw_fake_owner_id
+    # (no cookie/session read), and the golden tier drives the REAL callback
+    # through a FakeOAuthProvider (the invite gate + session insert run for real).
+    # "google" constructs the real provider, fail-closed on empty creds. Unknown
+    # ⇒ ConfigError at startup (auth.assert_prod_auth_safe).
+    chefclaw_auth_provider: str = "fake"
+    # Google OAuth client (Cloud Console — a DEPLOY human precondition). The
+    # SECRET is a SERVER secret: it must NEVER be a VITE_* var (Hard Rule 4).
+    # Empty creds while chefclaw_auth_provider="google" ⇒ ConfigError.
+    google_oauth_client_id: str = ""
+    google_oauth_client_secret: str = ""
+    google_oauth_redirect_url: str = ""
+    # The owner id the FAKE auth provider resolves to (== tests' OWNER_ID). Only
+    # consulted when chefclaw_auth_provider="fake".
+    chefclaw_fake_owner_id: str = "01890000-0000-7000-8000-000000000001"
+    # Absolute session lifetime for the opaque server-side sessions (720h = 30d).
+    session_ttl_hours: int = 720
 
     db_host: str = "127.0.0.1"
     db_port: int = 5432
@@ -130,6 +152,15 @@ class Settings(BaseSettings):
             f"postgresql+asyncpg://{self.db_user}:{self.db_password}"
             f"@{self.db_host}:{self.db_port}/{self.db_name}"
         )
+
+    @property
+    def session_cookie_secure(self) -> bool:
+        """The ``Secure`` flag for the session + oauth_tx cookies — DERIVED from
+        the deploy env, NEVER a standalone human toggle (critique M8): prod
+        (``sentry_environment == 'vps'``) ⇒ always Secure; local/dev ⇒ not
+        Secure so http://localhost works. Same 'vps' signal the prod auth guard
+        (auth.assert_prod_auth_safe) uses."""
+        return self.sentry_environment == "vps"
 
 
 @lru_cache

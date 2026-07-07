@@ -1,85 +1,156 @@
-"""Bearer-token auth behind ONE swappable FastAPI dependency.
+"""Cookie-session auth behind ONE swappable FastAPI dependency (M2).
 
-Routers depend only on ``require_owner``. Today it validates the single
-``CHEFCLAW_API_TOKEN`` and resolves the seeded owner row; a real identity
-system (sessions/passkeys/OAuth) replaces this one dependency at multi-user
-without touching the service layer.
+Routers depend only on ``require_owner`` — its signature stays ``-> uuid.UUID``
+and it still sets ``request.state.owner_id``; only its INTERNALS changed, from a
+bearer token to an opaque server-side session cookie (ADR
+2026-07-07-m2-accounts-and-invites). ``require_admin`` layers on top for the
+admin surface (critique M9). The old ``_cached_owner_id`` process singleton is
+GONE — it pinned one owner per process, a cross-tenant bug under M2.
 
-Disabled-closed: an empty configured token means every request is rejected
-with an actionable 401 — there is no unauthenticated mode.
+Two-tier posture, mirroring the extractor seam:
+- ``chefclaw_auth_provider="fake"`` (default) — require_owner SHORT-CIRCUITS to
+  ``chefclaw_fake_owner_id`` (no cookie/session read), so the unit tier needs no
+  DB. It refuses to run if a real Google client id is ALSO set (the operator
+  staged creds but forgot to flip the provider — critique M7 guard 2).
+- ``google`` — require_owner reads the ``chefclaw_session`` cookie, hashes it,
+  and resolves the owner via ``fetch_session_owner_id`` (stubbable in tests).
 """
 
-import hmac
 import uuid
-from typing import Annotated
+from typing import Annotated, NamedTuple
 
 from fastapi import Depends, HTTPException, Request, status
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy import select
 
+from chefclaw import db, sessions
 from chefclaw.config import Settings, get_settings
-from chefclaw.db import get_sessionmaker
+from chefclaw.errors import ConfigError
 from chefclaw.models import User
 
-_bearer_scheme = HTTPBearer(auto_error=False)
+SESSION_COOKIE_NAME = "chefclaw_session"
 
-# Per-process cache of the seeded owner id (single-user today; the cache is
-# reset only by process restart, which is when the seed could ever change).
-_cached_owner_id: uuid.UUID | None = None
+_VALID_AUTH_PROVIDERS = ("fake", "google")
 
 
-async def fetch_owner_id() -> uuid.UUID | None:
-    """Look up the seeded owner row (users LIMIT 1). Stubbed in tests."""
-    async with get_sessionmaker()() as session:
-        result = await session.execute(select(User.id).order_by(User.created_at).limit(1))
-        return result.scalars().first()
+class Account(NamedTuple):
+    """The identity slice GET /api/me returns. ``is_admin`` is server-derived —
+    NEVER settable via a user-facing write (critique M9)."""
+
+    id: uuid.UUID
+    name: str
+    email: str
+    is_admin: bool
+
+
+def assert_prod_auth_safe(settings: Settings) -> None:
+    """Fail the boot CLOSED on an unsafe auth config (critique M7 — called from
+    create_app). Three checks:
+
+    1. an unknown provider selector (M7 guard 3);
+    2. the fake provider WITH a real Google client id staged — flip the provider
+       (M7 guard 2, startup form);
+    3. a 'vps' (prod) environment with the fake provider — an unset/typo'd env
+       must never silently authenticate everyone as one owner (M7 guard 1).
+
+    (PR 3 extends this with the email-provider checks.)"""
+    provider = settings.chefclaw_auth_provider
+    if provider not in _VALID_AUTH_PROVIDERS:
+        raise ConfigError(
+            f"Unknown CHEFCLAW_AUTH_PROVIDER {provider!r} — expected 'fake' or 'google'."
+        )
+    if provider == "fake" and settings.google_oauth_client_id:
+        raise ConfigError(
+            "CHEFCLAW_AUTH_PROVIDER=fake but GOOGLE_OAUTH_CLIENT_ID is set — refusing "
+            "to fake-auth with real OAuth creds staged (set CHEFCLAW_AUTH_PROVIDER=google)."
+        )
+    if provider == "fake" and settings.sentry_environment == "vps":
+        raise ConfigError(
+            "CHEFCLAW_AUTH_PROVIDER=fake in a 'vps' (prod) environment — refusing to "
+            "start: fake auth authenticates everyone as one owner. Set "
+            "CHEFCLAW_AUTH_PROVIDER=google."
+        )
+    if provider == "google" and not (
+        settings.google_oauth_client_id and settings.google_oauth_client_secret
+    ):
+        # Fail the boot rather than 500 at the first login (fail-fast; the same
+        # empty-creds rule get_oauth_provider enforces at request time).
+        raise ConfigError(
+            "CHEFCLAW_AUTH_PROVIDER=google but GOOGLE_OAUTH_CLIENT_ID/SECRET is empty "
+            "— no OAuth without explicit credentials (fail-closed)."
+        )
+
+
+async def fetch_session_owner_id(token_hash: str) -> uuid.UUID | None:
+    """Resolve the owner behind a session cookie's sha256. Stubbed in the unit
+    tier (no DB); the real path delegates to sessions.resolve_owner."""
+    return await sessions.resolve_owner(db.get_sessionmaker(), token_hash)
+
+
+async def fetch_account(owner_id: uuid.UUID) -> "Account | None":
+    """The GET /api/me + require_admin identity row. Stubbed in the unit tier."""
+    async with db.get_sessionmaker()() as session:
+        row = (
+            await session.execute(
+                select(User.id, User.name, User.email, User.is_admin).where(User.id == owner_id)
+            )
+        ).first()
+    if row is None:
+        return None
+    return Account(row.id, row.name, row.email, row.is_admin)
+
+
+def _unauthenticated() -> HTTPException:
+    return HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Not authenticated — sign in.",
+    )
 
 
 async def require_owner(
     request: Request,
-    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(_bearer_scheme)],
     settings: Annotated[Settings, Depends(get_settings)],
 ) -> uuid.UUID:
-    """Validate the bearer token and return the owner's user id."""
-    global _cached_owner_id
-
-    configured = settings.chefclaw_api_token
-    if not configured:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=(
-                "Authentication is not configured, so all requests are refused: "
-                "set CHEFCLAW_API_TOKEN in the server environment and restart."
-            ),
-        )
-
-    provided = credentials.credentials if credentials is not None else ""
-    if not provided or not hmac.compare_digest(provided.encode(), configured.encode()):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or missing bearer token.",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    if _cached_owner_id is None:
-        try:
-            owner_id = await fetch_owner_id()
-        except Exception as exc:
-            raise HTTPException(
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail="Database unreachable while resolving the owner account.",
-            ) from exc
-        if owner_id is None:
-            raise HTTPException(
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail=(
-                    "No owner row found — run migrations "
-                    "(uv run alembic upgrade head) to seed the owner."
-                ),
+    """Resolve the authenticated owner id. Contract unchanged: ``-> uuid.UUID``,
+    sets ``request.state.owner_id`` (the request log reads it off the scope)."""
+    if settings.chefclaw_auth_provider == "fake":
+        # Defense in depth (critique M7 guard 2): a real client id + fake
+        # provider is a misconfig — refuse rather than silently fake-auth.
+        if settings.google_oauth_client_id:
+            raise ConfigError(
+                "chefclaw_auth_provider=fake but google_oauth_client_id is set — refusing "
+                "to fake-auth with real OAuth creds staged."
             )
-        _cached_owner_id = owner_id
+        owner_id = uuid.UUID(settings.chefclaw_fake_owner_id)
+        request.state.owner_id = owner_id
+        return owner_id
 
-    # The request log (observability.RequestLogMiddleware) reads this off the
-    # ASGI scope — the owner UUID is scope, not a secret.
-    request.state.owner_id = _cached_owner_id
-    return _cached_owner_id
+    raw = request.cookies.get(SESSION_COOKIE_NAME)
+    if not raw:
+        raise _unauthenticated()
+    try:
+        owner_id = await fetch_session_owner_id(sessions.hash_token(raw))
+    except Exception as exc:  # DB unreachable while resolving the session
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Database unreachable while resolving the session.",
+        ) from exc
+    if owner_id is None:
+        raise _unauthenticated()
+    request.state.owner_id = owner_id
+    return owner_id
+
+
+async def require_admin(
+    owner_id: Annotated[uuid.UUID, Depends(require_owner)],
+) -> uuid.UUID:
+    """Layer on ``require_owner`` for the admin surface (critique M9): the owner
+    must be ``is_admin``, enforced at the TRANSPORT layer (the frontend
+    ``me.is_admin`` gate is cosmetic only). Returns the owner id on success,
+    403 otherwise."""
+    account = await fetch_account(owner_id)
+    if account is None or not account.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required.",
+        )
+    return owner_id

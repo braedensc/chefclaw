@@ -20,6 +20,10 @@ dependencies = [
     "python-multipart>=0.0.32",
     # DSN-gated error tracking (V2-A ADR): no SENTRY_DSN => never initialised.
     "sentry-sdk[fastapi]>=2.0",
+    # M2 OAuth (ADR 2026-07-07-m2-accounts-and-invites): server-side Google
+    # Authorization-Code + PKCE. Used ONLY by GoogleOAuthProvider (imported
+    # lazily) for ID-token JWKS verification — the fake provider needs it never.
+    "authlib>=1.3",
 ]
 
 [dependency-groups]

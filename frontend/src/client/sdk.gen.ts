@@ -2,7 +2,7 @@
 
 import { type Client, type ClientMeta, formDataBodySerializer, type Options as Options2, type RequestResult, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { DeleteRecipeApiRecipesRecipeIdDeleteData, DeleteRecipeApiRecipesRecipeIdDeleteErrors, DeleteRecipeApiRecipesRecipeIdDeleteResponses, ExtractRecipeApiRecipesExtractPostData, ExtractRecipeApiRecipesExtractPostErrors, ExtractRecipeApiRecipesExtractPostResponses, GetJobApiJobsJobIdGetData, GetJobApiJobsJobIdGetErrors, GetJobApiJobsJobIdGetResponses, GetRecipeApiRecipesRecipeIdGetData, GetRecipeApiRecipesRecipeIdGetErrors, GetRecipeApiRecipesRecipeIdGetResponses, GetRecipeImageApiRecipesRecipeIdImageGetData, GetRecipeImageApiRecipesRecipeIdImageGetErrors, GetRecipeImageApiRecipesRecipeIdImageGetResponses, GetSpendApiSpendGetData, GetSpendApiSpendGetErrors, GetSpendApiSpendGetResponses, HealthApiHealthGetData, HealthApiHealthGetResponses, ListJobsApiJobsGetData, ListJobsApiJobsGetErrors, ListJobsApiJobsGetResponses, ListRecipesApiRecipesGetData, ListRecipesApiRecipesGetErrors, ListRecipesApiRecipesGetResponses, PatchRecipeApiRecipesRecipeIdPatchData, PatchRecipeApiRecipesRecipeIdPatchErrors, PatchRecipeApiRecipesRecipeIdPatchResponses, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostData, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostErrors, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostResponses, UploadRecipeVideoApiRecipesUploadPostData, UploadRecipeVideoApiRecipesUploadPostErrors, UploadRecipeVideoApiRecipesUploadPostResponses } from './types.gen';
+import type { DeleteRecipeApiRecipesRecipeIdDeleteData, DeleteRecipeApiRecipesRecipeIdDeleteErrors, DeleteRecipeApiRecipesRecipeIdDeleteResponses, ExtractRecipeApiRecipesExtractPostData, ExtractRecipeApiRecipesExtractPostErrors, ExtractRecipeApiRecipesExtractPostResponses, GetJobApiJobsJobIdGetData, GetJobApiJobsJobIdGetErrors, GetJobApiJobsJobIdGetResponses, GetRecipeApiRecipesRecipeIdGetData, GetRecipeApiRecipesRecipeIdGetErrors, GetRecipeApiRecipesRecipeIdGetResponses, GetRecipeImageApiRecipesRecipeIdImageGetData, GetRecipeImageApiRecipesRecipeIdImageGetErrors, GetRecipeImageApiRecipesRecipeIdImageGetResponses, GetSpendApiSpendGetData, GetSpendApiSpendGetErrors, GetSpendApiSpendGetResponses, GoogleCallbackApiAuthGoogleCallbackGetData, GoogleCallbackApiAuthGoogleCallbackGetErrors, GoogleCallbackApiAuthGoogleCallbackGetResponses, GoogleLoginApiAuthGoogleLoginGetData, GoogleLoginApiAuthGoogleLoginGetErrors, GoogleLoginApiAuthGoogleLoginGetResponses, HealthApiHealthGetData, HealthApiHealthGetResponses, ListJobsApiJobsGetData, ListJobsApiJobsGetErrors, ListJobsApiJobsGetResponses, ListRecipesApiRecipesGetData, ListRecipesApiRecipesGetErrors, ListRecipesApiRecipesGetResponses, LogoutApiAuthLogoutPostData, LogoutApiAuthLogoutPostResponses, MeApiMeGetData, MeApiMeGetResponses, PatchRecipeApiRecipesRecipeIdPatchData, PatchRecipeApiRecipesRecipeIdPatchErrors, PatchRecipeApiRecipesRecipeIdPatchResponses, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostData, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostErrors, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostResponses, UploadRecipeVideoApiRecipesUploadPostData, UploadRecipeVideoApiRecipesUploadPostErrors, UploadRecipeVideoApiRecipesUploadPostResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -19,51 +19,67 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 };
 
 /**
+ * Google Callback
+ *
+ * Verify state + the ID token, gate the identity, mint a session. The
+ * oauth_tx cookie is read ONCE and cleared on every response (single-use, M3).
+ */
+export const googleCallbackApiAuthGoogleCallbackGet = <ThrowOnError extends boolean = false>(options?: Options<GoogleCallbackApiAuthGoogleCallbackGetData, ThrowOnError>): RequestResult<GoogleCallbackApiAuthGoogleCallbackGetResponses, GoogleCallbackApiAuthGoogleCallbackGetErrors, ThrowOnError> => (options?.client ?? client).get<GoogleCallbackApiAuthGoogleCallbackGetResponses, GoogleCallbackApiAuthGoogleCallbackGetErrors, ThrowOnError>({ url: '/api/auth/google/callback', ...options });
+
+/**
+ * Google Login
+ *
+ * Mint state + PKCE + nonce, stash them in the 5-min single-use oauth_tx
+ * cookie, and 302 to Google (or the fake provider's loop-back).
+ */
+export const googleLoginApiAuthGoogleLoginGet = <ThrowOnError extends boolean = false>(options?: Options<GoogleLoginApiAuthGoogleLoginGetData, ThrowOnError>): RequestResult<GoogleLoginApiAuthGoogleLoginGetResponses, GoogleLoginApiAuthGoogleLoginGetErrors, ThrowOnError> => (options?.client ?? client).get<GoogleLoginApiAuthGoogleLoginGetResponses, GoogleLoginApiAuthGoogleLoginGetErrors, ThrowOnError>({ url: '/api/auth/google/login', ...options });
+
+/**
+ * Logout
+ *
+ * Kill the session SERVER-SIDE (row DELETE — instant revocation) and clear
+ * the cookie. 204 either way (idempotent).
+ */
+export const logoutApiAuthLogoutPost = <ThrowOnError extends boolean = false>(options?: Options<LogoutApiAuthLogoutPostData, ThrowOnError>): RequestResult<LogoutApiAuthLogoutPostResponses, unknown, ThrowOnError> => (options?.client ?? client).post<LogoutApiAuthLogoutPostResponses, unknown, ThrowOnError>({ url: '/api/auth/logout', ...options });
+
+/**
  * Health
  *
  * Health check. NOT publicly exempt from auth — it exposes spend/cookie
  * state (plan §16 amendment 3).
  */
-export const healthApiHealthGet = <ThrowOnError extends boolean = false>(options?: Options<HealthApiHealthGetData, ThrowOnError>): RequestResult<HealthApiHealthGetResponses, unknown, ThrowOnError> => (options?.client ?? client).get<HealthApiHealthGetResponses, unknown, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/health',
-    ...options
-});
+export const healthApiHealthGet = <ThrowOnError extends boolean = false>(options?: Options<HealthApiHealthGetData, ThrowOnError>): RequestResult<HealthApiHealthGetResponses, unknown, ThrowOnError> => (options?.client ?? client).get<HealthApiHealthGetResponses, unknown, ThrowOnError>({ url: '/api/health', ...options });
 
 /**
  * List Jobs
  *
  * The jobs drawer (active + recent), newest activity first.
  */
-export const listJobsApiJobsGet = <ThrowOnError extends boolean = false>(options?: Options<ListJobsApiJobsGetData, ThrowOnError>): RequestResult<ListJobsApiJobsGetResponses, ListJobsApiJobsGetErrors, ThrowOnError> => (options?.client ?? client).get<ListJobsApiJobsGetResponses, ListJobsApiJobsGetErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/jobs',
-    ...options
-});
+export const listJobsApiJobsGet = <ThrowOnError extends boolean = false>(options?: Options<ListJobsApiJobsGetData, ThrowOnError>): RequestResult<ListJobsApiJobsGetResponses, ListJobsApiJobsGetErrors, ThrowOnError> => (options?.client ?? client).get<ListJobsApiJobsGetResponses, ListJobsApiJobsGetErrors, ThrowOnError>({ url: '/api/jobs', ...options });
 
 /**
  * Get Job
  */
-export const getJobApiJobsJobIdGet = <ThrowOnError extends boolean = false>(options: Options<GetJobApiJobsJobIdGetData, ThrowOnError>): RequestResult<GetJobApiJobsJobIdGetResponses, GetJobApiJobsJobIdGetErrors, ThrowOnError> => (options.client ?? client).get<GetJobApiJobsJobIdGetResponses, GetJobApiJobsJobIdGetErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/jobs/{job_id}',
-    ...options
-});
+export const getJobApiJobsJobIdGet = <ThrowOnError extends boolean = false>(options: Options<GetJobApiJobsJobIdGetData, ThrowOnError>): RequestResult<GetJobApiJobsJobIdGetResponses, GetJobApiJobsJobIdGetErrors, ThrowOnError> => (options.client ?? client).get<GetJobApiJobsJobIdGetResponses, GetJobApiJobsJobIdGetErrors, ThrowOnError>({ url: '/api/jobs/{job_id}', ...options });
+
+/**
+ * Me
+ *
+ * The authenticated identity (401 if unauthenticated — handled by
+ * require_owner). ``is_admin`` gates admin-UI visibility only; it is
+ * server-derived, never a writable field (critique M9).
+ */
+export const meApiMeGet = <ThrowOnError extends boolean = false>(options?: Options<MeApiMeGetData, ThrowOnError>): RequestResult<MeApiMeGetResponses, unknown, ThrowOnError> => (options?.client ?? client).get<MeApiMeGetResponses, unknown, ThrowOnError>({ url: '/api/me', ...options });
 
 /**
  * List Recipes
  */
-export const listRecipesApiRecipesGet = <ThrowOnError extends boolean = false>(options?: Options<ListRecipesApiRecipesGetData, ThrowOnError>): RequestResult<ListRecipesApiRecipesGetResponses, ListRecipesApiRecipesGetErrors, ThrowOnError> => (options?.client ?? client).get<ListRecipesApiRecipesGetResponses, ListRecipesApiRecipesGetErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/recipes',
-    ...options
-});
+export const listRecipesApiRecipesGet = <ThrowOnError extends boolean = false>(options?: Options<ListRecipesApiRecipesGetData, ThrowOnError>): RequestResult<ListRecipesApiRecipesGetResponses, ListRecipesApiRecipesGetErrors, ThrowOnError> => (options?.client ?? client).get<ListRecipesApiRecipesGetResponses, ListRecipesApiRecipesGetErrors, ThrowOnError>({ url: '/api/recipes', ...options });
 
 /**
  * Extract Recipe
  */
 export const extractRecipeApiRecipesExtractPost = <ThrowOnError extends boolean = false>(options: Options<ExtractRecipeApiRecipesExtractPostData, ThrowOnError>): RequestResult<ExtractRecipeApiRecipesExtractPostResponses, ExtractRecipeApiRecipesExtractPostErrors, ThrowOnError> => (options.client ?? client).post<ExtractRecipeApiRecipesExtractPostResponses, ExtractRecipeApiRecipesExtractPostErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api/recipes/extract',
     ...options,
     headers: {
@@ -81,7 +97,6 @@ export const extractRecipeApiRecipesExtractPost = <ThrowOnError extends boolean 
  */
 export const uploadRecipeVideoApiRecipesUploadPost = <ThrowOnError extends boolean = false>(options: Options<UploadRecipeVideoApiRecipesUploadPostData, ThrowOnError>): RequestResult<UploadRecipeVideoApiRecipesUploadPostResponses, UploadRecipeVideoApiRecipesUploadPostErrors, ThrowOnError> => (options.client ?? client).post<UploadRecipeVideoApiRecipesUploadPostResponses, UploadRecipeVideoApiRecipesUploadPostErrors, ThrowOnError>({
     ...formDataBodySerializer,
-    security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api/recipes/upload',
     ...options,
     headers: {
@@ -93,26 +108,17 @@ export const uploadRecipeVideoApiRecipesUploadPost = <ThrowOnError extends boole
 /**
  * Delete Recipe
  */
-export const deleteRecipeApiRecipesRecipeIdDelete = <ThrowOnError extends boolean = false>(options: Options<DeleteRecipeApiRecipesRecipeIdDeleteData, ThrowOnError>): RequestResult<DeleteRecipeApiRecipesRecipeIdDeleteResponses, DeleteRecipeApiRecipesRecipeIdDeleteErrors, ThrowOnError> => (options.client ?? client).delete<DeleteRecipeApiRecipesRecipeIdDeleteResponses, DeleteRecipeApiRecipesRecipeIdDeleteErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/recipes/{recipe_id}',
-    ...options
-});
+export const deleteRecipeApiRecipesRecipeIdDelete = <ThrowOnError extends boolean = false>(options: Options<DeleteRecipeApiRecipesRecipeIdDeleteData, ThrowOnError>): RequestResult<DeleteRecipeApiRecipesRecipeIdDeleteResponses, DeleteRecipeApiRecipesRecipeIdDeleteErrors, ThrowOnError> => (options.client ?? client).delete<DeleteRecipeApiRecipesRecipeIdDeleteResponses, DeleteRecipeApiRecipesRecipeIdDeleteErrors, ThrowOnError>({ url: '/api/recipes/{recipe_id}', ...options });
 
 /**
  * Get Recipe
  */
-export const getRecipeApiRecipesRecipeIdGet = <ThrowOnError extends boolean = false>(options: Options<GetRecipeApiRecipesRecipeIdGetData, ThrowOnError>): RequestResult<GetRecipeApiRecipesRecipeIdGetResponses, GetRecipeApiRecipesRecipeIdGetErrors, ThrowOnError> => (options.client ?? client).get<GetRecipeApiRecipesRecipeIdGetResponses, GetRecipeApiRecipesRecipeIdGetErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/recipes/{recipe_id}',
-    ...options
-});
+export const getRecipeApiRecipesRecipeIdGet = <ThrowOnError extends boolean = false>(options: Options<GetRecipeApiRecipesRecipeIdGetData, ThrowOnError>): RequestResult<GetRecipeApiRecipesRecipeIdGetResponses, GetRecipeApiRecipesRecipeIdGetErrors, ThrowOnError> => (options.client ?? client).get<GetRecipeApiRecipesRecipeIdGetResponses, GetRecipeApiRecipesRecipeIdGetErrors, ThrowOnError>({ url: '/api/recipes/{recipe_id}', ...options });
 
 /**
  * Patch Recipe
  */
 export const patchRecipeApiRecipesRecipeIdPatch = <ThrowOnError extends boolean = false>(options: Options<PatchRecipeApiRecipesRecipeIdPatchData, ThrowOnError>): RequestResult<PatchRecipeApiRecipesRecipeIdPatchResponses, PatchRecipeApiRecipesRecipeIdPatchErrors, ThrowOnError> => (options.client ?? client).patch<PatchRecipeApiRecipesRecipeIdPatchResponses, PatchRecipeApiRecipesRecipeIdPatchErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api/recipes/{recipe_id}',
     ...options,
     headers: {
@@ -131,11 +137,7 @@ export const patchRecipeApiRecipesRecipeIdPatch = <ThrowOnError extends boolean 
  * 202 when a fresh job was enqueued, 200 when an active illustration job for
  * this recipe already exists (dedupe).
  */
-export const regenerateIllustrationApiRecipesRecipeIdIllustrationPost = <ThrowOnError extends boolean = false>(options: Options<RegenerateIllustrationApiRecipesRecipeIdIllustrationPostData, ThrowOnError>): RequestResult<RegenerateIllustrationApiRecipesRecipeIdIllustrationPostResponses, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostErrors, ThrowOnError> => (options.client ?? client).post<RegenerateIllustrationApiRecipesRecipeIdIllustrationPostResponses, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/recipes/{recipe_id}/illustration',
-    ...options
-});
+export const regenerateIllustrationApiRecipesRecipeIdIllustrationPost = <ThrowOnError extends boolean = false>(options: Options<RegenerateIllustrationApiRecipesRecipeIdIllustrationPostData, ThrowOnError>): RequestResult<RegenerateIllustrationApiRecipesRecipeIdIllustrationPostResponses, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostErrors, ThrowOnError> => (options.client ?? client).post<RegenerateIllustrationApiRecipesRecipeIdIllustrationPostResponses, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostErrors, ThrowOnError>({ url: '/api/recipes/{recipe_id}/illustration', ...options });
 
 /**
  * Get Recipe Image
@@ -143,11 +145,7 @@ export const regenerateIllustrationApiRecipesRecipeIdIllustrationPost = <ThrowOn
  * Stream the generated illustration. One 404 covers every miss — no
  * recipe, no illustration generated yet, file gone from the archive.
  */
-export const getRecipeImageApiRecipesRecipeIdImageGet = <ThrowOnError extends boolean = false>(options: Options<GetRecipeImageApiRecipesRecipeIdImageGetData, ThrowOnError>): RequestResult<GetRecipeImageApiRecipesRecipeIdImageGetResponses, GetRecipeImageApiRecipesRecipeIdImageGetErrors, ThrowOnError> => (options.client ?? client).get<GetRecipeImageApiRecipesRecipeIdImageGetResponses, GetRecipeImageApiRecipesRecipeIdImageGetErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/recipes/{recipe_id}/image',
-    ...options
-});
+export const getRecipeImageApiRecipesRecipeIdImageGet = <ThrowOnError extends boolean = false>(options: Options<GetRecipeImageApiRecipesRecipeIdImageGetData, ThrowOnError>): RequestResult<GetRecipeImageApiRecipesRecipeIdImageGetResponses, GetRecipeImageApiRecipesRecipeIdImageGetErrors, ThrowOnError> => (options.client ?? client).get<GetRecipeImageApiRecipesRecipeIdImageGetResponses, GetRecipeImageApiRecipesRecipeIdImageGetErrors, ThrowOnError>({ url: '/api/recipes/{recipe_id}/image', ...options });
 
 /**
  * Get Spend
@@ -155,8 +153,4 @@ export const getRecipeImageApiRecipesRecipeIdImageGet = <ThrowOnError extends bo
  * Per-day, per-model spend over the last ``days`` UTC days, plus
  * month-to-date and the configured caps (null caps = fail-closed config).
  */
-export const getSpendApiSpendGet = <ThrowOnError extends boolean = false>(options?: Options<GetSpendApiSpendGetData, ThrowOnError>): RequestResult<GetSpendApiSpendGetResponses, GetSpendApiSpendGetErrors, ThrowOnError> => (options?.client ?? client).get<GetSpendApiSpendGetResponses, GetSpendApiSpendGetErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/spend',
-    ...options
-});
+export const getSpendApiSpendGet = <ThrowOnError extends boolean = false>(options?: Options<GetSpendApiSpendGetData, ThrowOnError>): RequestResult<GetSpendApiSpendGetResponses, GetSpendApiSpendGetErrors, ThrowOnError> => (options?.client ?? client).get<GetSpendApiSpendGetResponses, GetSpendApiSpendGetErrors, ThrowOnError>({ url: '/api/spend', ...options });

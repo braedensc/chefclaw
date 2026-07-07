@@ -22,10 +22,11 @@ from pydantic import BaseModel
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from chefclaw import db, observability, spend
-from chefclaw.auth import require_owner
+from chefclaw.auth import assert_prod_auth_safe, require_owner
 from chefclaw.config import Settings, get_settings
 from chefclaw.errors import ConfigError
 from chefclaw.extractors import extractor_model_id
+from chefclaw.routers.auth import router as auth_router
 from chefclaw.routers.extraction import router as extraction_router
 from chefclaw.routers.jobs import router as jobs_router
 from chefclaw.routers.library import router as library_router
@@ -344,6 +345,11 @@ def _is_spa_route(path: str) -> bool:
 
 def create_app() -> FastAPI:
     """Build the application: API routes, then the SPA mount (prod mode)."""
+    # Fail the boot CLOSED on an unsafe auth config (critique M7): a 'vps' env
+    # with fake auth, an unknown provider, or fake-with-real-creds-staged never
+    # starts. Reads the PROCESS settings — unit tests keep the fake defaults, so
+    # this passes there and only bites a real misconfigured deploy.
+    assert_prod_auth_safe(get_settings())
     app = FastAPI(title="chefclaw", version="0.1.0", lifespan=_lifespan)
     # Enforced cap for the tier-2 upload endpoint; the middleware reads it off
     # app.state so tests can lower it without a rebuild.
@@ -357,6 +363,7 @@ def create_app() -> FastAPI:
     # factory must stay side-effect-free for the unit-test tier.
     app.add_middleware(observability.RequestLogMiddleware)
     app.include_router(api_router)
+    app.include_router(auth_router)
     app.include_router(extraction_router)
     app.include_router(jobs_router)
     app.include_router(library_router)
