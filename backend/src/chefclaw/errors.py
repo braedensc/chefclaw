@@ -33,6 +33,18 @@ class UnsupportedUrlError(ChefclawError):
     error_type = "unsupported_url"
 
 
+class ImageNoteUnsupportedError(ChefclawError):
+    """The pasted post is a Rednote image note (图文), not a video. Detected
+    from the sidecar's ``作品类型`` BEFORE any media download or paid model call
+    (ADR 2026-07-07-cross-device-and-extractor-qa, option a): the video
+    extractor would otherwise upload the first still image and either fail typed
+    or hallucinate a recipe from one frame — a paid call for guaranteed garbage.
+    NOT retryable: the post is deterministically an image note; a real
+    multi-image→vision path is a named future decision, not a retry."""
+
+    error_type = "image_note_unsupported"
+
+
 class CookiesExpiredError(ChefclawError):
     """Platform session credentials are stale/invalid (Rednote 2–4wk expiry).
     Actionable: refresh per the runbook; NOT retryable — retrying spends

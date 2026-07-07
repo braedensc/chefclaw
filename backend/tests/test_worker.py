@@ -476,6 +476,24 @@ async def test_cookies_expired_is_terminal_first_attempt(tmp_path: Path) -> None
     assert store.spend_rows == []  # failed before the paid call — nothing ledgered
 
 
+async def test_image_note_is_terminal_without_a_paid_call(tmp_path: Path) -> None:
+    """Image (图文) notes fast-fail in the download stage (V2-C): terminal on
+    the first attempt, the paid extractor NEVER runs, nothing ledgered."""
+    store, source = FakeJobStore(), make_source()
+    settings = make_settings(tmp_path)
+    source.fail_fetch(errors.ImageNoteUnsupportedError("note is an image post (图文)"))
+    extractor = FakeExtractor()
+    worker, _ = make_worker(store, source, settings, extractor)
+
+    await enqueue_extract(store, OWNER_ID, FAKE_URL, [source], settings)
+    job = await claim_and_process(worker, store)
+
+    assert (job.status, job.attempts) == ("failed", 1)  # not retryable — no attempt burn
+    assert job.error_type == "image_note_unsupported"
+    assert extractor.calls == []  # the paid call NEVER happened
+    assert store.spend_rows == []  # and nothing was ledgered
+
+
 async def test_validation_failure_is_terminal_and_spend_recorded(tmp_path: Path) -> None:
     """The model call SUCCEEDED (tokens spent, row written) but produced
     garbage — validation_failed, raw output never repaired."""

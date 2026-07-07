@@ -51,6 +51,12 @@ _SHORT_HOSTS = frozenset({"xhslink.com", "www.xhslink.com"})
 _COOKIE_SIGNALS = ("cookie", "登录", "login", "失效", "无效")
 _RATE_SIGNALS = ("429", "频繁", "rate", "too many")
 
+# XHS-Downloader reports a note's kind in ``作品类型`` — "视频" for videos,
+# "图文" for image (graphic-text) notes. The video extractor only understands
+# videos; an image note is fast-failed here BEFORE any media download or paid
+# model call (ADR 2026-07-07-cross-device-and-extractor-qa, option a).
+_IMAGE_NOTE_MARKER = "图文"
+
 _DETAIL_TIMEOUT = 60.0
 _MEDIA_TIMEOUT = 300.0
 
@@ -144,6 +150,7 @@ class RednoteSource:
         dest_dir.mkdir(parents=True, exist_ok=True)
 
         data = await self._sidecar_detail(base, ref)
+        self._reject_image_note(data, ref)
         media_urls = self._media_urls(data, ref)
 
         paths: list[Path] = []
@@ -237,6 +244,22 @@ class RednoteSource:
         return errors.DownloadFailedError(
             f"rednote fetch failed for {ref.canonical_id}: {detail}"
         )
+
+    @staticmethod
+    def _reject_image_note(data: dict[str, Any], ref: CanonicalRef) -> None:
+        """Fast-fail image (图文) notes BEFORE downloading media or spending a
+        paid model call (ADR 2026-07-07-cross-device-and-extractor-qa). The
+        sidecar's ``作品类型`` is the authoritative signal; an image note's first
+        still image would otherwise become ``video_path`` and reach the video
+        extractor — a paid call for guaranteed garbage. Unknown/absent types are
+        left to proceed (a genuine video whose type string drifts must not be
+        blocked); only an explicit image marker fast-fails."""
+        work_type = str(data.get("作品类型") or "")
+        if _IMAGE_NOTE_MARKER in work_type:
+            raise errors.ImageNoteUnsupportedError(
+                f"rednote note {ref.canonical_id} is an image post (图文), not a video — "
+                "image-note recipes aren't supported yet (paste a cooking VIDEO instead)"
+            )
 
     @staticmethod
     def _media_urls(data: dict[str, Any], ref: CanonicalRef) -> list[str]:
