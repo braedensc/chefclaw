@@ -576,13 +576,19 @@ class Worker:
             await self.store.adopt_recipes(job.id, existing_ids)
             return existing_ids
 
+        # Runtime-policy overlay (ADR 2026-07-07-admin-config-panel): resolve
+        # THIS job's effective settings (env base + any app_config overrides).
+        # The worker is strictly serial and re-reads per job, so an admin's
+        # config change takes effect on the NEXT job — no restart. Budget is
+        # overlaid separately inside store.check_budget's own gate session.
+        effective = await self.store.effective_settings(self._settings)
         # Budget gate FIRST (cheap, no write), immediately before the paid
         # call — retries pass through here again by construction.
         await self.store.check_budget(job.owner_id)
         # Per-user paid tier (M3): a paid-tier owner's extraction (and its ledger
         # attribution) run on GEMINI_PAID_MODEL instead of the global default.
         paid_tier = await self.store.get_paid_tier(job.owner_id)
-        extractor_settings = extractor_settings_for_tier(self._settings, paid_tier=paid_tier)
+        extractor_settings = extractor_settings_for_tier(effective, paid_tier=paid_tier)
         extractor = self._extractor_factory(extractor_settings)  # ConfigError ⇒ terminal
 
         try:
@@ -649,7 +655,7 @@ class Worker:
             "model_id": outcome.usage.model_id,
             "prompt_version": outcome.usage.prompt_version,
             "warnings": list(outcome.warnings),
-            "media_resolution": self._settings.gemini_media_resolution,
+            "media_resolution": effective.gemini_media_resolution,
             "extracted_at": datetime.now(UTC).isoformat(),
             "tokens": {
                 "in": outcome.usage.tokens_in,
@@ -698,9 +704,9 @@ class Worker:
         # generated illustration job (adapter modes). Sprite-only mode does
         # neither — the inline sprite already assigned above IS the cover.
         await self._record_cover_misses(job.owner_id, assignments, recipe_ids)
-        if self._real_covers_active():
+        if self._real_covers_active(effective):
             await self._capture_frames(job, validated, recipe_ids, media)
-        elif self._settings.chefclaw_image_generator in _ILLUSTRATION_MODES:
+        elif effective.chefclaw_image_generator in _ILLUSTRATION_MODES:
             await self._enqueue_illustrations(job, recipe_ids)
         return recipe_ids
 
@@ -771,13 +777,14 @@ class Worker:
             logger.warning("could not record %d cover miss(es) (best-effort)", len(entries),
                            exc_info=True)
 
-    def _real_covers_active(self) -> bool:
+    def _real_covers_active(self, settings: Settings) -> bool:
         """Private real-frame capture runs ONLY in sprite mode with the global
         ``CHEFCLAW_REAL_COVERS`` switch on (the per-user grant additionally gates
-        SERVING). Both default off ⇒ pure sprites, no capture."""
+        SERVING). Both default off ⇒ pure sprites, no capture. ``settings`` is
+        the job's EFFECTIVE settings (env + app_config overrides)."""
         return (
-            self._settings.chefclaw_image_generator == "sprite"
-            and self._settings.chefclaw_real_covers
+            settings.chefclaw_image_generator == "sprite"
+            and settings.chefclaw_real_covers
         )
 
     async def _capture_frames(
@@ -848,6 +855,8 @@ class Worker:
         are swallowed; only a STORE write (set_status/mark_failed) leaks, and
         run_forever survives it (leaving the job for reconcile)."""
         await self.store.set_status(job.id, JobStatus.ILLUSTRATING.value)
+        # Effective image-generator mode for this job (env + app_config overrides).
+        effective = await self.store.effective_settings(self._settings)
         recipe_ids = [uuid.UUID(rid) for rid in job.payload.get("recipe_ids", [])]
         targets = await self.store.load_recipes_for_illustration(job.id, recipe_ids)
         if not targets:
@@ -873,6 +882,7 @@ class Worker:
                 recipe_id=ref.id,
                 prompt=prompt,
                 out_path=out_path,
+                settings=effective,
             )
             if not outcome.ok:
                 failures.append(outcome.reason or "illustration_failed")
@@ -900,6 +910,7 @@ class Worker:
         recipe_id: uuid.UUID,
         prompt: str,
         out_path: Path,
+        settings: Settings,
     ) -> "_IllustrationOutcome":
         """The budget-gate → generate → ledger → persist path for ONE recipe.
         Best-effort: every failure logs and returns an outcome carrying the
@@ -914,7 +925,7 @@ class Worker:
             # daily cap as extraction. Budget/config refusals get their own
             # reason so the job surfaces the right (non-Retry) guidance.
             await self.store.check_budget(owner_id)
-            adapter = self._image_generator_factory(self._settings)  # ConfigError ⇒ skip
+            adapter = self._image_generator_factory(settings)  # ConfigError ⇒ skip
             result = await adapter.generate(prompt)
         except errors.BudgetExceededError:
             logger.info(
@@ -978,9 +989,12 @@ class Worker:
         or grab a private real frame for granted owners whose source video
         survived (sprite + real-covers). Sprite-only mode does neither."""
         await self.backfill_sprites()
-        if self._settings.chefclaw_image_generator in _ILLUSTRATION_MODES:
+        # Effective cover mode (env + app_config overrides) — so a mode flipped
+        # in the panel governs the one-shot startup backfill too.
+        effective = await self.store.effective_settings(self._settings)
+        if effective.chefclaw_image_generator in _ILLUSTRATION_MODES:
             await self.backfill_illustrations()
-        elif self._real_covers_active():
+        elif self._real_covers_active(effective):
             await self.backfill_frames()
 
     async def backfill_sprites(self) -> None:

@@ -32,6 +32,26 @@ def _dish_with(**overrides) -> dict:
     return dish
 
 
+async def test_runtime_override_flips_cover_mode_without_restart(tmp_path: Path) -> None:
+    """ADR admin-config-panel: the worker resolves effective settings PER JOB via
+    store.effective_settings, so an app_config override wins over the boot base
+    with no restart. Base settings say 'sprite' (enqueues no illustration); an
+    override to 'fake' makes the very next job enqueue an illustration job."""
+    store, source = FakeJobStore(), make_source()
+    settings = make_settings(tmp_path, chefclaw_image_generator="sprite")
+    # The runtime override an admin would have set via PATCH /api/admin/config.
+    store.config_overrides = {"chefclaw_image_generator": "fake"}
+    worker, _ = make_worker(store, source, settings, FakeExtractor())
+
+    await enqueue_extract(store, OWNER_ID, FAKE_URL, [source], settings)
+    job = await claim_and_process(worker, store)
+
+    assert job.status == "stored"
+    # Effective mode 'fake' (override) beat base 'sprite': an illustration job
+    # was enqueued for the stored recipe.
+    assert len(illustration_jobs(store)) == 1
+
+
 async def test_sprite_mode_assigns_cover_and_enqueues_no_illustration(tmp_path: Path) -> None:
     store, source = FakeJobStore(), make_source()
     settings = make_settings(tmp_path, chefclaw_image_generator="sprite")

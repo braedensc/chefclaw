@@ -462,3 +462,57 @@ class Session(Base):
     last_seen_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True), nullable=False, server_default=text("now()")
     )
+
+
+class AppConfig(Base):
+    """A runtime-policy config OVERRIDE (ADR 2026-07-07-admin-config-panel). One
+    row per overridden key from the CLOSED allowlist in ``chefclaw.app_config``;
+    its ``value`` string OVERRIDES the corresponding env ``Settings`` field at
+    read time. Row present = override active (the value may be ``""`` — an
+    EXPLICIT empty that shadows the env value; row absent = inherit env).
+
+    Deliberately NO ``owner_id`` — like ``invites``, this is a system/admin
+    artifact, not a user-owned row. It NEVER holds a secret: the allowlist is
+    non-secret only, ``PATCH`` rejects any unregistered key, and the loader
+    ignores a row whose key is not registered."""
+
+    __tablename__ = "app_config"
+
+    key: Mapped[str] = mapped_column(Text, primary_key=True)
+    value: Mapped[str] = mapped_column(Text, nullable=False)
+    updated_by: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP(timezone=True),
+        nullable=False,
+        server_default=text("now()"),
+        onupdate=func.now(),
+    )
+
+
+class ConfigAudit(Base):
+    """Append-only audit of every runtime-policy config change (ADR
+    2026-07-07-admin-config-panel). One row per key that actually changed on a
+    PATCH: ``old_value`` is NULL when there was no override before, ``new_value``
+    is NULL when the override was cleared back to the env default. ``changed_by``
+    records WHICH admin (provenance, not ownership). Values are never secret —
+    only non-secret allowlisted keys are writable. Same append-only lifecycle as
+    ``llm_spend`` / ``request_events``: history outlives any single override
+    row (a soft link, no FK to ``app_config``, whose rows come and go)."""
+
+    __tablename__ = "config_audit"
+    __table_args__ = (Index("ix_config_audit_created_at", "created_at"),)
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, server_default=text("uuidv7()")
+    )
+    key: Mapped[str] = mapped_column(Text, nullable=False)
+    old_value: Mapped[str | None] = mapped_column(Text)
+    new_value: Mapped[str | None] = mapped_column(Text)
+    changed_by: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP(timezone=True), nullable=False, server_default=text("now()")
+    )
