@@ -84,6 +84,28 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:-chefclaw-local-dev}
       DB_NAME: ${DB_NAME:-chefclaw}
       CHEFCLAW_API_TOKEN: ${CHEFCLAW_API_TOKEN:-}
+      # ── M2 accounts & invites (ADR 2026-07-07-m2-accounts-and-invites) ──
+      # Defaults keep the stack on the SAFE fakes; a real deploy sets these in
+      # .env.local and flips the two providers to google/ses. A 'vps'
+      # SENTRY_ENVIRONMENT with either provider still on "fake" fails the boot
+      # (auth.assert_prod_auth_safe) — fail-closed, never a silent auth bypass.
+      CHEFCLAW_AUTH_PROVIDER: ${CHEFCLAW_AUTH_PROVIDER:-fake}
+      # GOOGLE_OAUTH_CLIENT_SECRET is a SERVER secret — never a VITE_* var.
+      GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID:-}
+      GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET:-}
+      GOOGLE_OAUTH_REDIRECT_URL: ${GOOGLE_OAUTH_REDIRECT_URL:-}
+      BOOTSTRAP_ADMIN_EMAIL: ${BOOTSTRAP_ADMIN_EMAIL:-}
+      SESSION_TTL_HOURS: ${SESSION_TTL_HOURS:-720}
+      CHEFCLAW_EMAIL: ${CHEFCLAW_EMAIL:-fake}
+      EMAIL_FROM: ${EMAIL_FROM:-}
+      SES_REGION: ${SES_REGION:-}
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-}
+      INVITE_TTL_HOURS: ${INVITE_TTL_HOURS:-168}
+      # SES creds via the boto3 chain. On a non-AWS VPS these are an IAM user's
+      # keys (key-grade secrets); on EC2 leave them empty and use an instance
+      # role instead. Unused while CHEFCLAW_EMAIL=fake.
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
       MONTHLY_LLM_BUDGET_USD: ${MONTHLY_LLM_BUDGET_USD:-}
       MAX_EXTRACTION_ATTEMPTS_PER_DAY: ${MAX_EXTRACTION_ATTEMPTS_PER_DAY:-}
       MEDIA_RETENTION: ${MEDIA_RETENTION:-keep}
