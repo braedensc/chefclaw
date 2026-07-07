@@ -209,17 +209,19 @@ async def test_login_redirects_and_sets_tx_cookie() -> None:
     assert "max-age=300" in set_cookie.lower()
 
 
-async def test_callback_missing_tx_cookie_is_400() -> None:
+async def test_callback_missing_tx_cookie_redirects_to_login() -> None:
     async with _client(make_app()) as client:
         resp = await client.get(
             "/api/auth/google/callback",
             params={"code": "x", "state": "y"},
             follow_redirects=False,
         )
-    assert resp.status_code == 400
+    # No raw-JSON dead-end: a missing/expired tx bounces to the SPA login page.
+    assert resp.status_code == 302
+    assert resp.headers["location"] == "/login?error=expired"
 
 
-async def test_callback_state_mismatch_is_400() -> None:
+async def test_callback_state_mismatch_redirects_to_login() -> None:
     async with _client(make_app()) as client:
         login = await client.get("/api/auth/google/login", follow_redirects=False)
         # The oauth_tx cookie is now in the jar; supply a WRONG state param.
@@ -229,7 +231,8 @@ async def test_callback_state_mismatch_is_400() -> None:
             follow_redirects=False,
         )
     assert login.status_code == 302
-    assert resp.status_code == 400
+    assert resp.status_code == 302
+    assert resp.headers["location"] == "/login?error=expired"
 
 
 async def _drive_callback(client: AsyncClient):
@@ -258,7 +261,7 @@ async def test_callback_mints_session_for_returning_user(monkeypatch: pytest.Mon
     assert 'oauth_tx=""' in set_cookie or "oauth_tx=;" in set_cookie.lower()
 
 
-async def test_callback_unbound_identity_is_opaque_403(monkeypatch: pytest.MonkeyPatch) -> None:
+async def test_callback_unbound_identity_redirects_opaque(monkeypatch: pytest.MonkeyPatch) -> None:
     async def resolve(identity: VerifiedIdentity) -> None:
         return None  # not a returning user
 
@@ -269,12 +272,15 @@ async def test_callback_unbound_identity_is_opaque_403(monkeypatch: pytest.Monke
     monkeypatch.setattr(auth_router.invites, "activate_identity", no_activation)
     async with _client(make_app()) as client:
         resp = await _drive_callback(client)
-    assert resp.status_code == 403
-    assert resp.json()["error_type"] == "sign_in_denied"
+    # Opaque denial: a 302 to the SAME ?error=denied every reject uses — no
+    # 'no invite' vs 'mismatch' vs 'unverified' oracle (critique M6).
+    assert resp.status_code == 302
+    assert resp.headers["location"] == "/login?error=denied"
 
 
-async def test_callback_unverified_email_is_opaque_403(monkeypatch: pytest.MonkeyPatch) -> None:
-    """M5: an unverified email is rejected before any account match (opaque)."""
+async def test_callback_unverified_email_redirects_opaque(monkeypatch: pytest.MonkeyPatch) -> None:
+    """M5: an unverified email is rejected before any account match, and gets the
+    IDENTICAL opaque redirect as an unbound identity (no distinguishing oracle)."""
     monkeypatch.setattr(
         FakeOAuthProvider,
         "identity",
@@ -284,7 +290,8 @@ async def test_callback_unverified_email_is_opaque_403(monkeypatch: pytest.Monke
     )
     async with _client(make_app()) as client:
         resp = await _drive_callback(client)
-    assert resp.status_code == 403
+    assert resp.status_code == 302
+    assert resp.headers["location"] == "/login?error=denied"
 
 
 # ── logout ────────────────────────────────────────────────────────────────────

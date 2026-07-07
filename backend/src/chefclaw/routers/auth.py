@@ -6,7 +6,9 @@ HttpOnly ``oauth_tx`` cookie (critique M3); ``next`` is same-origin-only (M4);
 the callback mints an opaque server-side session (cookie flags derived from env,
 M8). In PR 2 only a RETURNING user (a bound OAuth identity) is admitted — first
 activation (invite consume + bootstrap-claim) lands in PR 3; until then an
-unbound identity gets ONE opaque 403 (fail closed, M6).
+unbound identity gets ONE opaque denial (fail closed, M6). Every callback
+failure (expired transaction or denied identity) 302-redirects to the SPA login
+page with an opaque ``?error`` code rather than dead-ending on raw JSON.
 """
 
 import base64
@@ -34,6 +36,7 @@ OAUTH_TX_COOKIE = "oauth_tx"
 _OAUTH_TX_MAX_AGE = 300  # 5 min — the login→callback round trip (critique M3)
 _OAUTH_TX_PATH = "/api/auth"
 _SESSION_PATH = "/"
+_LOGIN_PATH = "/login"  # SPA route the callback bounces to on any sign-in failure
 
 
 # ── helpers ──────────────────────────────────────────────────────────────────
@@ -96,26 +99,22 @@ def _set_session_cookie(resp: Response, raw_token: str, settings: Settings) -> N
     )
 
 
-def _bad_request(detail: str) -> JSONResponse:
-    """A malformed sign-in request (missing/invalid tx or state). Clears the
-    single-use tx cookie. Distinct from the opaque 403 (which is about WHO may
-    sign in — this is about a broken request)."""
-    resp = JSONResponse(status_code=400, content={"error_type": "bad_request", "detail": detail})
-    _clear_tx_cookie(resp)
-    return resp
+def _sign_in_error(code: str) -> RedirectResponse:
+    """Bounce a failed sign-in back to the SPA login page instead of dead-ending
+    on raw JSON — the callback is only ever reached by a top-level browser
+    navigation (Google → callback), so a 302 to ``/login?error=<code>`` lands the
+    user on a friendly banner with a retry button.
 
+    ``code`` is one of:
+    - ``"expired"`` — a malformed/expired sign-in transaction (missing or invalid
+      tx cookie, or a state mismatch); almost always benign: a >5-min round trip,
+      a page reload, or a back-button replay of the single-use callback.
+    - ``"denied"`` — the ONE opaque outcome for EVERY who-may-sign-in rejection
+      (critique M6): no users row, no session, and no 'no invite' vs 'email
+      mismatch' vs 'unverified' oracle — every reason maps to this identical code.
 
-def _opaque_denied() -> JSONResponse:
-    """ONE opaque 403 for EVERY callback rejection (critique M6): no users row,
-    no session, and no 'no invite' vs 'email mismatch' vs 'unverified' oracle.
-    Clears the single-use tx cookie."""
-    resp = JSONResponse(
-        status_code=403,
-        content={
-            "error_type": "sign_in_denied",
-            "detail": "Sign-in is not permitted for this account.",
-        },
-    )
+    Clears the single-use tx cookie on the way out (M3)."""
+    resp = RedirectResponse(f"{_LOGIN_PATH}?error={code}", status_code=302)
     _clear_tx_cookie(resp)
     return resp
 
@@ -180,7 +179,7 @@ async def google_callback(
     oauth_tx cookie is read ONCE and cleared on every response (single-use, M3)."""
     raw_tx = request.cookies.get(OAUTH_TX_COOKIE)
     if not raw_tx:  # M3: reject if absent
-        return _bad_request("missing or expired sign-in transaction")
+        return _sign_in_error("expired")
     try:
         tx = _decode_tx(raw_tx)
         expected_state = tx["state"]
@@ -188,10 +187,10 @@ async def google_callback(
         verifier = tx["verifier"]
         next_path = safe_next(tx["next"])
     except Exception:
-        return _bad_request("invalid sign-in transaction")
+        return _sign_in_error("expired")
     # State (CSRF) — constant-time compare against the stashed value (M3).
     if not code or not state or not hmac.compare_digest(state, expected_state):
-        return _bad_request("invalid sign-in state")
+        return _sign_in_error("expired")
 
     provider = get_oauth_provider(settings)
     try:
@@ -203,10 +202,10 @@ async def google_callback(
         )
     except ConfigError:
         # Token exchange / ID-token verification failed — opaque (no oracle).
-        return _opaque_denied()
+        return _sign_in_error("denied")
     # M5: a verified email is required before any account match.
     if not identity.email_verified:
-        return _opaque_denied()
+        return _sign_in_error("denied")
 
     owner_id = await resolve_owner_by_identity(identity)
     if owner_id is None:
@@ -215,7 +214,7 @@ async def google_callback(
         # Still None ⇒ ONE opaque 403 (no invite vs mismatch oracle — M6).
         owner_id = await invites.activate_identity(db.get_sessionmaker(), settings, identity)
     if owner_id is None:
-        return _opaque_denied()
+        return _sign_in_error("denied")
 
     raw_session = await sessions.create_session(
         db.get_sessionmaker(), owner_id, ttl_hours=settings.session_ttl_hours
