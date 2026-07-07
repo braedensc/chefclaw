@@ -176,8 +176,10 @@ async def test_enqueue_duplicate_returns_active_job(tmp_path: Path) -> None:
 
 async def test_enqueue_duplicate_returns_completed_job_with_recipes(tmp_path: Path) -> None:
     store, source = FakeJobStore(), make_source()
-    done = store.seed_job(status="stored", canonical_id="BVtest00001-p1")
-    store.seed_recipe(canonical_id="BVtest00001-p1")
+    # Seed the completed job + its recipe under the SAME owner that pastes below
+    # — dedupe is owner-scoped (M2), so a different owner's rows would not match.
+    done = store.seed_job(owner_id=OWNER_ID, status="stored", canonical_id="BVtest00001-p1")
+    store.seed_recipe(owner_id=OWNER_ID, canonical_id="BVtest00001-p1")
     job, existing = await enqueue_extract(
         store, OWNER_ID, FAKE_URL, [source], make_settings(tmp_path)
     )
@@ -362,7 +364,9 @@ async def test_idempotent_paid_stage_adopts_orphaned_recipes(tmp_path: Path) -> 
     never re-spend."""
     store, source = FakeJobStore(), make_source()
     settings = make_settings(tmp_path)
-    orphan = store.seed_recipe(canonical_id="BVtest00001-p1")
+    # The orphan recipe must belong to the pasting owner — the idempotent-adopt
+    # lookup (find_recipe_ids) is owner-scoped (M2).
+    orphan = store.seed_recipe(owner_id=OWNER_ID, canonical_id="BVtest00001-p1")
     extractor = FakeExtractor()
     worker, _ = make_worker(store, source, settings, extractor)
 
@@ -862,7 +866,7 @@ async def test_media_retention_keep_moves_into_archive(tmp_path: Path) -> None:
     await enqueue_extract(store, OWNER_ID, FAKE_URL, [source], settings)
     job = await claim_and_process(worker, store)
 
-    archive_dir = tmp_path / "media" / "bilibili" / "BVtest00001-p1"
+    archive_dir = tmp_path / "media" / str(OWNER_ID) / "bilibili" / "BVtest00001-p1"
     videos = [path for path in archive_dir.iterdir() if path.suffix == ".mp4"]
     assert len(videos) == 1
     meta = store.recipes[0].extraction_meta
@@ -900,7 +904,7 @@ async def test_illustration_job_persists_image_and_ledgers(tmp_path: Path) -> No
     processed = await drain_jobs(worker, store)
     [illustration_job] = [j for j in processed if j.type == "illustration"]
     assert illustration_job.status == "stored"
-    archive_dir = tmp_path / "media" / "bilibili" / "BVtest00001-p1"
+    archive_dir = tmp_path / "media" / str(OWNER_ID) / "bilibili" / "BVtest00001-p1"
     expected = archive_dir / "illustration-0.jpg"
     assert store.recipes[0].image_url == str(expected)
     assert store.recipes[0].image_style_version == "cartoon-v1"
@@ -1165,7 +1169,7 @@ async def test_multi_dish_illustration_jobs_distinct_paths(tmp_path: Path) -> No
     assert all(len(j.payload["recipe_ids"]) == 1 for j in jobs)
 
     await drain_jobs(worker, store)
-    archive_dir = tmp_path / "media" / "bilibili" / "BVtest00001-p1"
+    archive_dir = tmp_path / "media" / str(OWNER_ID) / "bilibili" / "BVtest00001-p1"
     assert [r.image_url for r in store.recipes] == [
         str(archive_dir / "illustration-0.jpg"),
         str(archive_dir / "illustration-1.jpg"),
@@ -1187,7 +1191,14 @@ async def test_illustration_job_for_upload_recipe_lands_under_local(tmp_path: Pa
     assert upload_job.status == "stored"
 
     await drain_jobs(worker, store)
-    expected = tmp_path / "media" / "local" / upload_job.canonical_id / "illustration-0.jpg"
+    expected = (
+        tmp_path
+        / "media"
+        / str(OWNER_ID)
+        / "local"
+        / upload_job.canonical_id
+        / "illustration-0.jpg"
+    )
     assert store.recipes[0].image_url == str(expected)
 
 
@@ -1249,7 +1260,14 @@ async def test_backfill_enqueues_illustration_jobs_for_missing_images(tmp_path: 
 
     # Draining the enqueued job generates + persists the image:
     await drain_jobs(worker, store)
-    expected = tmp_path / "media" / "bilibili" / "BVfake000-p1" / "illustration-0.jpg"
+    expected = (
+        tmp_path
+        / "media"
+        / str(recipe.owner_id)
+        / "bilibili"
+        / "BVfake000-p1"
+        / "illustration-0.jpg"
+    )
     assert recipe.image_url == str(expected)
     assert recipe.image_style_version == "cartoon-v1"
     assert len(image_spend_rows(store)) == 1
@@ -1341,7 +1359,14 @@ async def test_run_forever_backfills_once_when_enabled(tmp_path: Path) -> None:
             if recipe.image_url is not None:
                 break
             await asyncio.sleep(0)
-        expected = tmp_path / "media" / "bilibili" / "BVfake000-p1" / "illustration-0.jpg"
+        expected = (
+        tmp_path
+        / "media"
+        / str(recipe.owner_id)
+        / "bilibili"
+        / "BVfake000-p1"
+        / "illustration-0.jpg"
+    )
         assert recipe.image_url == str(expected)
         assert len(images.calls) == 1  # one-shot, not per idle loop
         assert worker.backfill_task is not None  # the handle is exposed

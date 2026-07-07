@@ -163,12 +163,16 @@ async def _dedupe_or_insert(
     payload: dict[str, Any],
 ) -> tuple[Job, bool]:
     """Shared dedupe: an ACTIVE job for this canonical identity wins; else a
-    completed job whose recipes still exist wins; else insert pending.
-    Returns ``(job, existing)``."""
-    active = await store.find_active_job(ref.platform, ref.canonical_id)
+    completed job whose recipes still exist wins; else insert pending. Dedupe is
+    scoped to this OWNER (M2) — a job/recipe for the same canonical video under a
+    DIFFERENT owner must never satisfy this owner's paste. Returns
+    ``(job, existing)``."""
+    active = await store.find_active_job(owner_id, ref.platform, ref.canonical_id)
     if active is not None:
         return active, True
-    completed = await store.find_completed_job_with_recipes(ref.platform, ref.canonical_id)
+    completed = await store.find_completed_job_with_recipes(
+        owner_id, ref.platform, ref.canonical_id
+    )
     if completed is not None:
         return completed, True
     job = await store.insert_job(
@@ -540,8 +544,11 @@ class Worker:
         )
 
         # IDEMPOTENT PAID STAGE (§4): a crash between store and flip left
-        # recipes behind — adopt them, never re-spend.
-        existing_ids = await self.store.find_recipe_ids(job.platform, job.canonical_id)
+        # recipes behind — adopt them, never re-spend. Scoped to this owner (M2)
+        # so a different owner's rows for the same canonical id never adopt here.
+        existing_ids = await self.store.find_recipe_ids(
+            job.owner_id, job.platform, job.canonical_id
+        )
         if existing_ids:
             logger.info("job %s adopting %d pre-existing recipe(s)", job.id, len(existing_ids))
             await self.store.adopt_recipes(job.id, existing_ids)
@@ -633,9 +640,13 @@ class Worker:
             job, documents, estimates, tags, extraction_meta=extraction_meta
         )
         if recipe_ids is None:
-            # UNIQUE(platform, canonical_id, dish_index) fired: a raced
-            # duplicate landed first — adopt its rows, never error (§16.2).
-            recipe_ids = await self.store.find_recipe_ids(job.platform, job.canonical_id)
+            # UNIQUE(owner_id, platform, canonical_id, dish_index) fired: a raced
+            # duplicate landed first FOR THIS OWNER — adopt its rows, never error
+            # (§16.2). A different owner's rows can't trip this (M2): the
+            # constraint is owner-scoped, so this only fires on a same-owner race.
+            recipe_ids = await self.store.find_recipe_ids(
+                job.owner_id, job.platform, job.canonical_id
+            )
             if not recipe_ids:
                 err = errors.ExtractionFailedError(
                     "store hit a duplicate-key conflict but no recipes exist for "
@@ -728,7 +739,7 @@ class Worker:
         for ref in targets:
             prompt = build_illustration_prompt(ref.document)
             out_path = illustration_path(
-                media_root, ref.platform, ref.canonical_id, ref.dish_index
+                media_root, ref.owner_id, ref.platform, ref.canonical_id, ref.dish_index
             )
             outcome = await self._generate_and_persist_illustration(
                 job_id=job.id,
@@ -868,9 +879,12 @@ class Worker:
 
     def _retain_media(self, job: Job, media: FetchedMedia) -> tuple[list[str], list[str]]:
         """keep ⇒ move the fetched file(s) into the retained archive
-        ({media_dir}/{platform}/{canonical_id}/); discard ⇒ leave them for
-        scratch cleanup. Failures are WARNINGS, never job failures (the
-        recipes matter more than the archive copy)."""
+        ({media_dir}/{owner_id}/{platform}/{canonical_id}/); discard ⇒ leave
+        them for scratch cleanup. Failures are WARNINGS, never job failures (the
+        recipes matter more than the archive copy). The ``owner_id`` segment is
+        M2 cross-tenant isolation — same collision the illustration path closes
+        (critique M2): two owners retaining the same canonical video must not
+        overwrite each other's archive."""
         if self._settings.media_retention != "keep":
             return [], []
         candidates: list[Path] = [media.video_path]
@@ -878,7 +892,9 @@ class Worker:
             path = Path(extra_path)
             if path not in candidates:
                 candidates.append(path)
-        target_dir = Path(self._settings.media_dir) / job.platform / job.canonical_id
+        target_dir = (
+            Path(self._settings.media_dir) / str(job.owner_id) / job.platform / job.canonical_id
+        )
         retained: list[str] = []
         warnings: list[str] = []
         try:

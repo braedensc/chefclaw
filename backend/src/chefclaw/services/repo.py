@@ -104,10 +104,12 @@ _CLAIM_SQL = text(
 class JobStore(Protocol):
     """What the worker and the enqueue path need from persistence."""
 
-    async def find_active_job(self, platform: str, canonical_id: str) -> Job | None: ...
+    async def find_active_job(
+        self, owner_id: uuid.UUID, platform: str, canonical_id: str
+    ) -> Job | None: ...
 
     async def find_completed_job_with_recipes(
-        self, platform: str, canonical_id: str
+        self, owner_id: uuid.UUID, platform: str, canonical_id: str
     ) -> Job | None: ...
 
     async def insert_job(
@@ -138,7 +140,9 @@ class JobStore(Protocol):
 
     async def mark_failed(self, job_id: uuid.UUID, error_type: str, error_detail: str) -> None: ...
 
-    async def find_recipe_ids(self, platform: str, canonical_id: str) -> list[uuid.UUID]: ...
+    async def find_recipe_ids(
+        self, owner_id: uuid.UUID, platform: str, canonical_id: str
+    ) -> list[uuid.UUID]: ...
 
     async def adopt_recipes(self, job_id: uuid.UUID, recipe_ids: list[uuid.UUID]) -> None: ...
 
@@ -181,10 +185,13 @@ class PostgresJobStore:
 
     # ── dedupe lookups (§16.1: canonical identity, never raw URL) ───────────
 
-    async def find_active_job(self, platform: str, canonical_id: str) -> Job | None:
+    async def find_active_job(
+        self, owner_id: uuid.UUID, platform: str, canonical_id: str
+    ) -> Job | None:
         stmt = (
             select(Job)
             .where(
+                Job.owner_id == owner_id,
                 Job.platform == platform,
                 Job.canonical_id == canonical_id,
                 Job.status.in_(ACTIVE_STATUSES),
@@ -196,14 +203,21 @@ class PostgresJobStore:
             return (await session.execute(stmt)).scalars().first()
 
     async def find_completed_job_with_recipes(
-        self, platform: str, canonical_id: str
+        self, owner_id: uuid.UUID, platform: str, canonical_id: str
     ) -> Job | None:
-        """The latest stored job for this canonical identity — but only while
-        its recipes still exist (hard delete re-opens extraction)."""
+        """The latest stored job for this owner's canonical identity — but only
+        while its recipes still exist (hard delete re-opens extraction). BOTH
+        the recipe probe AND the job select are owner-scoped (M2): a different
+        owner's recipes/job for the same canonical id must never satisfy this
+        owner's dedupe (critique M2)."""
         async with self._sessionmaker() as session:
             has_recipes = await session.scalar(
                 select(Recipe.id)
-                .where(Recipe.platform == platform, Recipe.canonical_id == canonical_id)
+                .where(
+                    Recipe.owner_id == owner_id,
+                    Recipe.platform == platform,
+                    Recipe.canonical_id == canonical_id,
+                )
                 .limit(1)
             )
             if has_recipes is None:
@@ -211,6 +225,7 @@ class PostgresJobStore:
             stmt = (
                 select(Job)
                 .where(
+                    Job.owner_id == owner_id,
                     Job.platform == platform,
                     Job.canonical_id == canonical_id,
                     Job.status == JobStatus.STORED.value,
@@ -354,10 +369,16 @@ class PostgresJobStore:
 
     # ── recipes / atomic store (§16.4) ──────────────────────────────────────
 
-    async def find_recipe_ids(self, platform: str, canonical_id: str) -> list[uuid.UUID]:
+    async def find_recipe_ids(
+        self, owner_id: uuid.UUID, platform: str, canonical_id: str
+    ) -> list[uuid.UUID]:
         stmt = (
             select(Recipe.id)
-            .where(Recipe.platform == platform, Recipe.canonical_id == canonical_id)
+            .where(
+                Recipe.owner_id == owner_id,
+                Recipe.platform == platform,
+                Recipe.canonical_id == canonical_id,
+            )
             .order_by(Recipe.dish_index)
         )
         async with self._sessionmaker() as session:

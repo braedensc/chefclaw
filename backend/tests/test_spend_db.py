@@ -58,7 +58,7 @@ async def sessionmaker(engine):
 @pytest.fixture
 async def owner_id(sessionmaker) -> uuid.UUID:
     async with sessionmaker() as session:
-        user = User(name="owner")
+        user = User(name="owner", email="owner@localhost")
         session.add(user)
         await session.commit()
         await session.refresh(user)

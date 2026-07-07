@@ -9,12 +9,15 @@ stays about orchestration (budget → generate → persist → ledger).
 Unlike the old ffmpeg cover path, illustrations do NOT depend on a retained
 source video — they are generated from text — so nothing here touches the
 video archive. One illustration per recipe (dish_index), written under
-``{media_dir}/{platform}/{canonical_id}/illustration-{dish_index}.jpg``.
+``{media_dir}/{owner_id}/{platform}/{canonical_id}/illustration-{dish_index}.jpg``.
+The ``owner_id`` segment is load-bearing (M2 cross-tenant isolation): two owners
+who extract the SAME canonical video must never write — or read — the same file.
 """
 
 from __future__ import annotations
 
 import logging
+import uuid
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -24,10 +27,19 @@ __all__ = ["illustration_path", "write_illustration"]
 _ILLUSTRATION_SUFFIX = ".jpg"
 
 
-def illustration_path(media_root: Path, platform: str, canonical_id: str, dish_index: int) -> Path:
-    """The on-disk path for one recipe's illustration (one per dish_index)."""
+def illustration_path(
+    media_root: Path,
+    owner_id: uuid.UUID,
+    platform: str,
+    canonical_id: str,
+    dish_index: int,
+) -> Path:
+    """The on-disk path for one recipe's illustration (one per dish_index),
+    OWNER-SCOPED (M2): the ``owner_id`` segment keeps two owners who extracted
+    the same canonical video from colliding on one file."""
     return (
         media_root
+        / str(owner_id)
         / platform
         / canonical_id
         / f"illustration-{dish_index}{_ILLUSTRATION_SUFFIX}"
