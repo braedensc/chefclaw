@@ -60,72 +60,92 @@ export function JobsDrawer({ onClose }: JobsDrawerProps) {
   });
 
   return (
-    <aside
-      aria-label="Jobs"
-      className="fixed inset-y-0 right-0 z-30 flex w-full max-w-md flex-col border-l border-line bg-panel shadow-2xl shadow-black"
-    >
-      {/* neon strip light along the top of the stall (B's paste-bar ::before) */}
-      <div
+    <>
+      {/* Tap-scrim — mobile only (the ≥sm right rail keeps its scrim-less look).
+          Dismisses the sheet on a tap outside it. */}
+      <button
+        type="button"
         aria-hidden="true"
-        className="h-px shrink-0 opacity-80"
-        style={{ background: STRIP_LIGHT }}
+        tabIndex={-1}
+        onClick={onClose}
+        className="scrim-in fixed inset-0 z-30 bg-night/70 backdrop-blur-sm sm:hidden"
       />
-      <div className="flex items-center justify-between border-b border-line px-4 py-3">
-        <span className="flex items-baseline gap-2">
-          <h2 className="font-display text-[15px] font-bold tracking-[0.24em] text-warm uppercase glow-text-warm">
-            Jobs
-          </h2>
-          <span lang="zh" className="text-xs font-medium text-gold">
-            订单
-          </span>
-        </span>
+      <aside
+        aria-label="Jobs"
+        className="jobs-enter fixed inset-x-0 bottom-0 top-auto z-40 flex max-h-[85vh] flex-col rounded-t-card border-t border-line bg-panel shadow-2xl shadow-black sm:inset-y-0 sm:right-0 sm:left-auto sm:max-h-none sm:w-full sm:max-w-md sm:rounded-t-none sm:border-t-0 sm:border-l"
+      >
+        {/* neon strip light along the top of the stall (B's paste-bar ::before) */}
+        <div
+          aria-hidden="true"
+          className="h-px shrink-0 rounded-t-card opacity-80 sm:rounded-none"
+          style={{ background: STRIP_LIGHT }}
+        />
+        {/* bottom-sheet grab handle — mobile only; a second tap-to-close target
+            in thumb reach at the top of the sheet. */}
         <button
           type="button"
+          aria-hidden="true"
+          tabIndex={-1}
           onClick={onClose}
-          className="rounded-field border border-line-bright px-3 py-1 font-display text-[11px] font-semibold tracking-[0.16em] text-ink-dim uppercase transition hover:border-cyan/55 hover:text-cyan"
-        >
-          Close
-        </button>
-      </div>
-
-      <div className="flex-1 overflow-y-auto p-4">
-        {(retry.isError || retryIllustration.isError) && (
-          <p
-            role="alert"
-            className="mb-3 rounded-field border border-chili/40 bg-chili/5 p-2.5 text-xs text-chili-bright"
+          className="mx-auto mt-2 h-1.5 w-10 shrink-0 rounded-full bg-line-bright sm:hidden"
+        />
+        <div className="flex items-center justify-between border-b border-line px-4 py-3">
+          <span className="flex items-baseline gap-2">
+            <h2 className="font-display text-[15px] font-bold tracking-[0.24em] text-warm uppercase glow-text-warm">
+              Jobs
+            </h2>
+            <span lang="zh" className="text-xs font-medium text-gold">
+              订单
+            </span>
+          </span>
+          <button
+            type="button"
+            onClick={onClose}
+            className="tap-target rounded-field border border-line-bright px-3 py-1 font-display text-[11px] font-semibold tracking-[0.16em] text-ink-dim uppercase transition hover:border-cyan/55 hover:text-cyan"
           >
-            Retry failed —{' '}
-            {apiErrorMessage(retry.error ?? retryIllustration.error)}
-          </p>
-        )}
-        {jobs.isPending && (
-          <p className="text-sm text-ink-dim">Loading jobs…</p>
-        )}
-        {jobs.isError && (
-          <p role="alert" className="text-sm text-chili-bright">
-            Could not load jobs.
-          </p>
-        )}
-        {jobs.isSuccess && sorted.length === 0 && (
-          <p className="text-sm text-ink-faint">No jobs yet.</p>
-        )}
-        {sorted.length > 0 && (
-          <ul className="space-y-3">
-            {sorted.map((job) => (
-              <JobRow
-                key={job.id}
-                job={job}
-                retryPending={retry.isPending || retryIllustration.isPending}
-                onRetry={(url) => retry.mutate({ body: { url } })}
-                onRetryIllustration={(recipeId) =>
-                  retryIllustration.mutate({ path: { recipe_id: recipeId } })
-                }
-              />
-            ))}
-          </ul>
-        )}
-      </div>
-    </aside>
+            Close
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto overscroll-contain p-4">
+          {(retry.isError || retryIllustration.isError) && (
+            <p
+              role="alert"
+              className="mb-3 rounded-field border border-chili/40 bg-chili/5 p-2.5 text-xs text-chili-bright"
+            >
+              Retry failed —{' '}
+              {apiErrorMessage(retry.error ?? retryIllustration.error)}
+            </p>
+          )}
+          {jobs.isPending && (
+            <p className="text-sm text-ink-dim">Loading jobs…</p>
+          )}
+          {jobs.isError && (
+            <p role="alert" className="text-sm text-chili-bright">
+              Could not load jobs.
+            </p>
+          )}
+          {jobs.isSuccess && sorted.length === 0 && (
+            <p className="text-sm text-ink-faint">No jobs yet.</p>
+          )}
+          {sorted.length > 0 && (
+            <ul className="space-y-3">
+              {sorted.map((job) => (
+                <JobRow
+                  key={job.id}
+                  job={job}
+                  retryPending={retry.isPending || retryIllustration.isPending}
+                  onRetry={(url) => retry.mutate({ body: { url } })}
+                  onRetryIllustration={(recipeId) =>
+                    retryIllustration.mutate({ path: { recipe_id: recipeId } })
+                  }
+                />
+              ))}
+            </ul>
+          )}
+        </div>
+      </aside>
+    </>
   );
 }
 
@@ -244,7 +264,7 @@ function JobErrorAction({
           onClick={() => {
             if (recipeId != null) onRetryIllustration(recipeId);
           }}
-          className="mt-2 rounded-field border border-cyan/60 bg-cyan/10 px-3.5 py-1.5 font-display text-[11px] font-bold tracking-[0.16em] text-cyan uppercase glow-cyan transition hover:bg-cyan/20 disabled:cursor-not-allowed disabled:opacity-50"
+          className="tap-target mt-2 rounded-field border border-cyan/60 bg-cyan/10 px-3.5 py-1.5 font-display text-[11px] font-bold tracking-[0.16em] text-cyan uppercase glow-cyan transition hover:bg-cyan/20 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Retry
         </button>
@@ -270,7 +290,7 @@ function JobErrorAction({
         onClick={() => {
           if (job.url != null) onRetry(job.url);
         }}
-        className="mt-2 rounded-field border border-cyan/60 bg-cyan/10 px-3.5 py-1.5 font-display text-[11px] font-bold tracking-[0.16em] text-cyan uppercase glow-cyan transition hover:bg-cyan/20 disabled:cursor-not-allowed disabled:opacity-50"
+        className="tap-target mt-2 rounded-field border border-cyan/60 bg-cyan/10 px-3.5 py-1.5 font-display text-[11px] font-bold tracking-[0.16em] text-cyan uppercase glow-cyan transition hover:bg-cyan/20 disabled:cursor-not-allowed disabled:opacity-50"
       >
         Retry
       </button>

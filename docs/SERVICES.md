@@ -143,30 +143,50 @@ server secret at birth: never a `VITE_*` var, never in the frontend bundle.
   round-trip — record in `docs/RUNBOOK.md`). launchd agent **not yet loaded**
   (human step); health reports `not_configured` until scheduled backups run.
 
-## 7. M-Deploy — VPS + Tailscale (prep landed; provisioning pending)
+## 7. M-Deploy — VPS (public TLS at M4; prep landed; provisioning pending)
 
-- **Posture** (ADR `docs/adr/2026-07-06-m-deploy-vps-and-rednote-escalation.md`):
-  Hetzner-class VPS, Ubuntu LTS, **Tailscale-first, zero public exposure** —
-  ports stay `127.0.0.1`-bound, `tailscale serve` fronts the tailnet. Turn-key
-  procedure: `docs/RUNBOOK.md` §4; Rednote escalation playbook: §5.
+- **Posture** (ADR `docs/adr/2026-07-06-m-deploy-vps-and-rednote-escalation.md`,
+  incl. its **M4 amendment**): ≥2 GB Ubuntu LTS x86 VPS, ports stay
+  `127.0.0.1`-bound. **M4 = public TLS** — a Caddy reverse proxy terminates HTTPS
+  on a real domain in front of `127.0.0.1:8000` (80/443 public, 8000/5432
+  loopback); **auth is the boundary** (Google OAuth + sessions, M2). This
+  **supersedes the V2-B Tailscale-private endgame** for the product;
+  `tailscale serve` stays the interim/dev/personal path. Ordered human steps +
+  go/no-go gates: `docs/DEPLOY_CHECKLIST.md`. Turn-key procedure: `docs/RUNBOOK.md`
+  §4; Rednote escalation playbook (self-host/interim only): §5.
+- **Domain + DNS (public path)** *(you, at a registrar)*: register a domain, add
+  an A (and AAAA if IPv6) record → the VPS public IP, propagated before Caddy's
+  first cert issuance. Record domain + registrar here.
+- **Google OAuth client (M2/M4)** *(you, Google Cloud Console)*: OAuth 2.0 Web
+  client with authorized redirect `https://<domain>/api/auth/google/callback`.
+  Client id → `.env.local`; the **secret is server-only** (never `VITE_*`).
+- **Transactional email — AWS SES (or Resend)** *(you, dashboards)*: verified
+  sender, out of the SES sandbox for external invitees; `EMAIL_FROM` + `SES_REGION`
+  → `.env.local`; SES send creds via the instance IAM role.
 - **VPS (Hetzner-class)** *(you, in dashboards)*: Hetzner Cloud → CX-class
   server, Ubuntu LTS, SSH-key-only auth. The server's
   `/opt/chefclaw/.env.local` is the deployed host-env store (human-only, same
   as locally; exact var list in RUNBOOK §4 step 5 — `CHEFCLAW_API_TOKEN` gets
   a **fresh** token, never the local dev one).
-- **Tailscale** *(you, in dashboards)*: create/sign in to the tailnet, approve
+- **Caddy (public path)** *(you, on the VPS)*: host-service reverse proxy,
+  auto-renewed Let's Encrypt cert (RUNBOOK §4 step 7 Option A). **Tailscale
+  (interim path)** *(you, in dashboards)*: create/sign in to the tailnet, approve
   the VPS from `tailscale up`'s auth URL, enable HTTPS certificates when
   `tailscale serve` asks, install the phone app on the same tailnet.
 - **Backups on the VPS:** scheduled via the systemd units
   (`ops/chefclaw-backup.service.example` + `.timer.example`);
   `CHEFCLAW_BACKUP_DIR` must point **off-VPS** (tailnet copy home or object
   storage — decide at provisioning; the artifacts are gpg-encrypted at rest).
-- **Provisioning record:** 2026-07-06 — prep landed (fetch-proxy knob, systemd
-  unit examples, RUNBOOK §4/§5, ADR). **VPS: pending provisioning** (record
-  date, server type, region here when created). **Tailscale: pending tailnet**
-  (record date + tailnet name here). **Off-VPS backup destination: pending**
-  (record choice here). First rednote-from-datacenter test result: **pending
-  deploy day** (record pass/degraded + any ladder rung taken here).
+- **Provisioning record:** 2026-07-06 — VPS/Tailscale prep landed (fetch-proxy
+  knob, systemd unit examples, RUNBOOK §4/§5, ADR). 2026-07-07 — **M4 public-TLS
+  prep landed** (RUNBOOK §4 Caddy path + multi-arch note, `docs/DEPLOY_CHECKLIST.md`,
+  session-aware `prod-smoke.sh`, `.env.example` auth block, ADR M4 amendment).
+  **All account/secret provisioning pending** (record dates/choices here when
+  done): **VPS** (server type, region), **domain + registrar**, **Google OAuth
+  client**, **SES sender + region + sandbox status**, **off-VPS backup
+  destination**, **Tailscale tailnet** (if using the interim path). First
+  rednote-from-datacenter test result: **pending deploy day** (self-host/interim
+  only — the public product is upload-only).
 
 ## 8. Sentry (error tracking — V2-A, DSN-gated)
 

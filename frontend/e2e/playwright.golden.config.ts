@@ -38,5 +38,13 @@ export default defineConfig({
     locale: 'en-US',
     timezoneId: 'UTC',
   },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  // Desktop + a phone viewport (Pixel 5 — touch, coarse pointer, isMobile) so
+  // the same paste→card spec proves the V2-C responsive pass (bottom-sheet jobs
+  // drawer, touch targets, mobile layout) end-to-end on both. Still workers: 1,
+  // so the two projects run sequentially and the per-spec wipe keeps them
+  // isolated. LOCAL-ONLY, like the whole golden suite — never runs in CI.
+  projects: [
+    { name: 'desktop', use: { ...devices['Desktop Chrome'] } },
+    { name: 'mobile', use: { ...devices['Pixel 5'] } },
+  ],
 });
