@@ -65,10 +65,7 @@ deploy as a committed post-MVP milestone.
 
 ## Personal use & ToS
 
-Plainly: automated downloading of videos violates Bilibili's and Xiaohongshu's terms
-of service. This project's posture is **strictly personal use** — a single user,
-low volume with built-in delays, anonymous access where quality permits, and **no
-redistribution** of extracted content. Original-language data is preserved and every
+Plainly: Original-language data is preserved and every
 recipe keeps attribution and a link to its source. Platform cookies are session
 credentials to real accounts and are treated as key-grade secrets: never committed,
 guarded by every layer of the repo's secret-scanning stack. The repo ships code, not
