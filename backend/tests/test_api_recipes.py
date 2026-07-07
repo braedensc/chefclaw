@@ -46,6 +46,21 @@ def build_app(
     return app
 
 
+def build_session_app(settings: Settings | None = None) -> FastAPI:
+    """GOOGLE (session) auth mode: with no session cookie, require_owner 401s
+    before any body parsing — for the M2 auth-required tests."""
+    app = create_app()
+    app.dependency_overrides[get_settings] = lambda: settings or Settings(
+        chefclaw_auth_provider="google"
+    )
+    app.dependency_overrides[get_job_store] = lambda: FakeJobStore()
+    app.dependency_overrides[get_source_adapters] = lambda: [
+        FakeSource(platform="bilibili", canonical_id="BVtest00001-p1")
+    ]
+    app.dependency_overrides[db.get_session] = lambda: None
+    return app
+
+
 def client_for(app: FastAPI) -> AsyncClient:
     return AsyncClient(transport=ASGITransport(app=app), base_url="http://test")
 
@@ -143,7 +158,7 @@ async def test_extract_rednote_without_sidecar_503_typed() -> None:
 
 
 async def test_extract_requires_auth() -> None:
-    async with client_for(build_app()) as client:
+    async with client_for(build_session_app()) as client:
         response = await client.post("/api/recipes/extract", json={"url": FAKE_URL})
     assert response.status_code == 401
 
@@ -701,17 +716,17 @@ async def test_delete_recipe_204_and_404(monkeypatch: pytest.MonkeyPatch) -> Non
         ("DELETE", f"/api/recipes/{uuid.uuid4()}"),
     ],
 )
-async def test_all_routes_require_bearer_token(method: str, path: str) -> None:
-    async with client_for(build_app()) as client:
+async def test_all_routes_require_session(method: str, path: str) -> None:
+    async with client_for(build_session_app()) as client:
         response = await client.request(method, path, json={} if method == "PATCH" else None)
     assert response.status_code == 401
 
 
 async def test_upload_requires_auth(tmp_path: Path) -> None:
-    """The upload route must 401 without a token — and must do so even when a
+    """The upload route must 401 without a session — and must do so even when a
     file body is present (auth must not be short-circuited by body parsing)."""
-    settings = Settings(chefclaw_api_token=TEST_TOKEN, scratch_dir=str(tmp_path))
-    async with client_for(build_app(settings=settings)) as client:
+    settings = Settings(chefclaw_auth_provider="google", scratch_dir=str(tmp_path))
+    async with client_for(build_session_app(settings=settings)) as client:
         bare = await client.post("/api/recipes/upload")
         with_body = await client.post(
             "/api/recipes/upload",

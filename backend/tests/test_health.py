@@ -8,30 +8,21 @@ from httpx import ASGITransport, AsyncClient
 
 from chefclaw.app import _backup_status, create_app
 from chefclaw.config import Settings, get_settings
-from tests.conftest import OWNER_ID, TEST_TOKEN, bearer
+from tests.conftest import TEST_TOKEN, bearer
 
 
-async def test_health_401_without_token(client: AsyncClient, ping_ok: None) -> None:
-    response = await client.get("/api/health")
+async def test_health_401_without_session(unauth_client: AsyncClient, ping_ok: None) -> None:
+    """No session cookie ⇒ 401 (cookie-session auth, M2)."""
+    response = await unauth_client.get("/api/health")
     assert response.status_code == 401
-    assert response.json()["detail"] == "Invalid or missing bearer token."
 
 
-async def test_health_401_with_wrong_token(client: AsyncClient, ping_ok: None) -> None:
-    response = await client.get("/api/health", headers=bearer("wrong-token"))
+async def test_health_401_with_invalid_session(unauth_client: AsyncClient, ping_ok: None) -> None:
+    """A cookie that resolves to no live session ⇒ 401 (fetch_session_owner_id
+    is stubbed to None for unauth_client)."""
+    unauth_client.cookies.set("chefclaw_session", "not-a-real-session")
+    response = await unauth_client.get("/api/health")
     assert response.status_code == 401
-    assert response.json()["detail"] == "Invalid or missing bearer token."
-
-
-async def test_health_401_when_no_token_configured(
-    client_no_token: AsyncClient, ping_ok: None
-) -> None:
-    """Disabled-closed: empty configured token 401s EVERY request, even one
-    presenting a token, with an actionable detail."""
-    for headers in ({}, bearer("anything")):
-        response = await client_no_token.get("/api/health", headers=headers)
-        assert response.status_code == 401
-        assert "CHEFCLAW_API_TOKEN" in response.json()["detail"]
 
 
 async def test_health_200_full_shape(client: AsyncClient, ping_ok: None) -> None:
@@ -258,10 +249,10 @@ async def test_health_unparseable_set_date_still_surfaces(ping_ok: None) -> None
     assert body["cookie_set_date"] == "not-a-date"
 
 
-async def test_owner_id_is_cached_seeded_owner(client: AsyncClient, ping_ok: None) -> None:
-    """require_owner resolves (and caches) the stubbed seeded owner id."""
-    from chefclaw import auth
-
+async def test_health_owner_scoped_readouts_resolve(client: AsyncClient, ping_ok: None) -> None:
+    """require_owner (fake mode) resolves the owner so the owner-scoped health
+    readouts render — the M2 replacement for the deleted _cached_owner_id path
+    (the require_owner session path is covered in test_auth.py)."""
     response = await client.get("/api/health", headers=bearer(TEST_TOKEN))
     assert response.status_code == 200
-    assert auth._cached_owner_id == OWNER_ID
+    assert response.json()["status"] == "ok"

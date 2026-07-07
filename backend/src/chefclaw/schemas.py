@@ -21,6 +21,7 @@ __all__ = [
     "ExtractRequest",
     "JobOut",
     "RecipeDetail",
+    "MeOut",
     "RecipePage",
     "RecipePatch",
     "RecipeSummary",
@@ -28,6 +29,17 @@ __all__ = [
     "SpendModelSlice",
     "SpendSummaryOut",
 ]
+
+
+class MeOut(BaseModel):
+    """GET /api/me — the authenticated identity. ``id`` is the owner_id the
+    service scopes on; ``is_admin`` gates admin-UI visibility only (server-
+    derived, never a writable field — critique M9)."""
+
+    id: uuid.UUID
+    name: str
+    email: str
+    is_admin: bool
 
 
 class ErrorBody(BaseModel):

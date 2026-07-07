@@ -15,7 +15,7 @@ from httpx import ASGITransport, AsyncClient
 
 from chefclaw.routers.deps import get_spend_reader
 from chefclaw.spend import DailyModelSpend, SpendSummary
-from tests.conftest import TEST_TOKEN, bearer, make_app
+from tests.conftest import TEST_TOKEN, bearer, make_app, make_session_app
 
 
 def make_summary(**overrides) -> SpendSummary:
@@ -65,9 +65,13 @@ async def spend_client() -> AsyncIterator[tuple[AsyncClient, FakeSpendReader]]:
         yield http_client, reader
 
 
-async def test_spend_401_without_token(spend_client) -> None:
-    http_client, _ = spend_client
-    response = await http_client.get("/api/spend")
+async def test_spend_401_without_session() -> None:
+    """Session (google) auth mode with no cookie ⇒ 401 (M2)."""
+    app = make_session_app()
+    app.dependency_overrides[get_spend_reader] = lambda: FakeSpendReader(make_summary())
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as http_client:
+        response = await http_client.get("/api/spend")
     assert response.status_code == 401
 
 

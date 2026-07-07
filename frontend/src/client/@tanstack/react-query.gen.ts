@@ -3,8 +3,8 @@
 import { type DefaultError, type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { deleteRecipeApiRecipesRecipeIdDelete, extractRecipeApiRecipesExtractPost, getJobApiJobsJobIdGet, getRecipeApiRecipesRecipeIdGet, getRecipeImageApiRecipesRecipeIdImageGet, getSpendApiSpendGet, healthApiHealthGet, listJobsApiJobsGet, listRecipesApiRecipesGet, type Options, patchRecipeApiRecipesRecipeIdPatch, regenerateIllustrationApiRecipesRecipeIdIllustrationPost, uploadRecipeVideoApiRecipesUploadPost } from '../sdk.gen';
-import type { DeleteRecipeApiRecipesRecipeIdDeleteData, DeleteRecipeApiRecipesRecipeIdDeleteError, DeleteRecipeApiRecipesRecipeIdDeleteResponse, ExtractRecipeApiRecipesExtractPostData, ExtractRecipeApiRecipesExtractPostError, ExtractRecipeApiRecipesExtractPostResponse, GetJobApiJobsJobIdGetData, GetJobApiJobsJobIdGetError, GetJobApiJobsJobIdGetResponse, GetRecipeApiRecipesRecipeIdGetData, GetRecipeApiRecipesRecipeIdGetError, GetRecipeApiRecipesRecipeIdGetResponse, GetRecipeImageApiRecipesRecipeIdImageGetData, GetRecipeImageApiRecipesRecipeIdImageGetError, GetSpendApiSpendGetData, GetSpendApiSpendGetError, GetSpendApiSpendGetResponse, HealthApiHealthGetData, HealthApiHealthGetResponse, ListJobsApiJobsGetData, ListJobsApiJobsGetError, ListJobsApiJobsGetResponse, ListRecipesApiRecipesGetData, ListRecipesApiRecipesGetError, ListRecipesApiRecipesGetResponse, PatchRecipeApiRecipesRecipeIdPatchData, PatchRecipeApiRecipesRecipeIdPatchError, PatchRecipeApiRecipesRecipeIdPatchResponse, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostData, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostError, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostResponse, UploadRecipeVideoApiRecipesUploadPostData, UploadRecipeVideoApiRecipesUploadPostError, UploadRecipeVideoApiRecipesUploadPostResponse } from '../types.gen';
+import { deleteRecipeApiRecipesRecipeIdDelete, extractRecipeApiRecipesExtractPost, getJobApiJobsJobIdGet, getRecipeApiRecipesRecipeIdGet, getRecipeImageApiRecipesRecipeIdImageGet, getSpendApiSpendGet, googleCallbackApiAuthGoogleCallbackGet, googleLoginApiAuthGoogleLoginGet, healthApiHealthGet, listJobsApiJobsGet, listRecipesApiRecipesGet, logoutApiAuthLogoutPost, meApiMeGet, type Options, patchRecipeApiRecipesRecipeIdPatch, regenerateIllustrationApiRecipesRecipeIdIllustrationPost, uploadRecipeVideoApiRecipesUploadPost } from '../sdk.gen';
+import type { DeleteRecipeApiRecipesRecipeIdDeleteData, DeleteRecipeApiRecipesRecipeIdDeleteError, DeleteRecipeApiRecipesRecipeIdDeleteResponse, ExtractRecipeApiRecipesExtractPostData, ExtractRecipeApiRecipesExtractPostError, ExtractRecipeApiRecipesExtractPostResponse, GetJobApiJobsJobIdGetData, GetJobApiJobsJobIdGetError, GetJobApiJobsJobIdGetResponse, GetRecipeApiRecipesRecipeIdGetData, GetRecipeApiRecipesRecipeIdGetError, GetRecipeApiRecipesRecipeIdGetResponse, GetRecipeImageApiRecipesRecipeIdImageGetData, GetRecipeImageApiRecipesRecipeIdImageGetError, GetSpendApiSpendGetData, GetSpendApiSpendGetError, GetSpendApiSpendGetResponse, GoogleCallbackApiAuthGoogleCallbackGetData, GoogleCallbackApiAuthGoogleCallbackGetError, GoogleLoginApiAuthGoogleLoginGetData, GoogleLoginApiAuthGoogleLoginGetError, HealthApiHealthGetData, HealthApiHealthGetResponse, ListJobsApiJobsGetData, ListJobsApiJobsGetError, ListJobsApiJobsGetResponse, ListRecipesApiRecipesGetData, ListRecipesApiRecipesGetError, ListRecipesApiRecipesGetResponse, LogoutApiAuthLogoutPostData, LogoutApiAuthLogoutPostResponse, MeApiMeGetData, MeApiMeGetResponse, PatchRecipeApiRecipesRecipeIdPatchData, PatchRecipeApiRecipesRecipeIdPatchError, PatchRecipeApiRecipesRecipeIdPatchResponse, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostData, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostError, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostResponse, UploadRecipeVideoApiRecipesUploadPostData, UploadRecipeVideoApiRecipesUploadPostError, UploadRecipeVideoApiRecipesUploadPostResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -37,6 +37,68 @@ const createQueryKey = <TOptions extends Options>(id: string, options?: TOptions
         params.query = options.query;
     }
     return [params];
+};
+
+export const googleCallbackApiAuthGoogleCallbackGetQueryKey = (options?: Options<GoogleCallbackApiAuthGoogleCallbackGetData>) => createQueryKey('googleCallbackApiAuthGoogleCallbackGet', options);
+
+/**
+ * Google Callback
+ *
+ * Verify state + the ID token, gate the identity, mint a session. The
+ * oauth_tx cookie is read ONCE and cleared on every response (single-use, M3).
+ */
+export const googleCallbackApiAuthGoogleCallbackGetOptions = (options?: Options<GoogleCallbackApiAuthGoogleCallbackGetData>) => queryOptions<unknown, GoogleCallbackApiAuthGoogleCallbackGetError, unknown, ReturnType<typeof googleCallbackApiAuthGoogleCallbackGetQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await googleCallbackApiAuthGoogleCallbackGet({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: googleCallbackApiAuthGoogleCallbackGetQueryKey(options)
+});
+
+export const googleLoginApiAuthGoogleLoginGetQueryKey = (options?: Options<GoogleLoginApiAuthGoogleLoginGetData>) => createQueryKey('googleLoginApiAuthGoogleLoginGet', options);
+
+/**
+ * Google Login
+ *
+ * Mint state + PKCE + nonce, stash them in the 5-min single-use oauth_tx
+ * cookie, and 302 to Google (or the fake provider's loop-back).
+ */
+export const googleLoginApiAuthGoogleLoginGetOptions = (options?: Options<GoogleLoginApiAuthGoogleLoginGetData>) => queryOptions<unknown, GoogleLoginApiAuthGoogleLoginGetError, unknown, ReturnType<typeof googleLoginApiAuthGoogleLoginGetQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await googleLoginApiAuthGoogleLoginGet({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: googleLoginApiAuthGoogleLoginGetQueryKey(options)
+});
+
+/**
+ * Logout
+ *
+ * Kill the session SERVER-SIDE (row DELETE — instant revocation) and clear
+ * the cookie. 204 either way (idempotent).
+ */
+export const logoutApiAuthLogoutPostMutation = (options?: Partial<Options<LogoutApiAuthLogoutPostData>>): UseMutationOptions<LogoutApiAuthLogoutPostResponse, DefaultError, Options<LogoutApiAuthLogoutPostData>> => {
+    const mutationOptions: UseMutationOptions<LogoutApiAuthLogoutPostResponse, DefaultError, Options<LogoutApiAuthLogoutPostData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await logoutApiAuthLogoutPost({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
 };
 
 export const healthApiHealthGetQueryKey = (options?: Options<HealthApiHealthGetData>) => createQueryKey('healthApiHealthGet', options);
@@ -96,6 +158,28 @@ export const getJobApiJobsJobIdGetOptions = (options: Options<GetJobApiJobsJobId
         return data;
     },
     queryKey: getJobApiJobsJobIdGetQueryKey(options)
+});
+
+export const meApiMeGetQueryKey = (options?: Options<MeApiMeGetData>) => createQueryKey('meApiMeGet', options);
+
+/**
+ * Me
+ *
+ * The authenticated identity (401 if unauthenticated — handled by
+ * require_owner). ``is_admin`` gates admin-UI visibility only; it is
+ * server-derived, never a writable field (critique M9).
+ */
+export const meApiMeGetOptions = (options?: Options<MeApiMeGetData>) => queryOptions<MeApiMeGetResponse, DefaultError, MeApiMeGetResponse, ReturnType<typeof meApiMeGetQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await meApiMeGet({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: meApiMeGetQueryKey(options)
 });
 
 export const listRecipesApiRecipesGetQueryKey = (options?: Options<ListRecipesApiRecipesGetData>) => createQueryKey('listRecipesApiRecipesGet', options);
