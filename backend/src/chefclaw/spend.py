@@ -277,33 +277,67 @@ async def alert_budget_progress(
     owner_id: uuid.UUID,
     attempt_cost: Decimal,
 ) -> None:
-    """After a ledger write: warn (log + Sentry) when the month's spend
-    crosses 80% / 100% of MONTHLY_LLM_BUDGET_USD. Best-effort by design —
-    alerting must NEVER break the ledger write it follows, so every failure
-    path here degrades to a debug log."""
+    """After a ledger write: crossing-edge alerts (log + Sentry) for THIS owner
+    — the monthly $ budget at 80%/100%, and the daily attempt cap when it is
+    reached — each measured against the owner's EFFECTIVE cap (the per-user
+    override when set, else the global env cap; M3). Best-effort by design:
+    alerting must NEVER break the ledger write it follows, so every failure path
+    degrades to a debug log."""
     try:
-        monthly_budget, _ = parse_budget(settings)
+        global_monthly, global_daily = parse_budget(settings)
     except ConfigError:
         return  # fail-closed config ⇒ no paid calls happen; nothing to alert on
+    try:
+        user_monthly, user_daily = await read_user_caps(session, owner_id)
+    except Exception:
+        logger.debug("budget-alert per-user cap read failed", exc_info=True)
+        user_monthly, user_daily = None, None
+    monthly_budget = user_monthly if user_monthly is not None else global_monthly
+    daily_cap = user_daily if user_daily is not None else global_daily
+    monthly_src = "per-user cap" if user_monthly is not None else "MONTHLY_LLM_BUDGET_USD"
+
+    # ── monthly $ budget: 80% / 100% crossings ──
     try:
         after = await month_to_date_usd(session, owner_id)
     except Exception:
         logger.debug("budget-alert ledger read failed", exc_info=True)
-        return
-    for pct in thresholds_crossed(after - attempt_cost, after, monthly_budget):
+        after = None
+    if after is not None:
+        for pct in thresholds_crossed(after - attempt_cost, after, monthly_budget):
+            message = (
+                f"LLM spend crossed {pct}% of the monthly budget: "
+                f"${after} of ${monthly_budget} ({monthly_src})"
+            )
+            logger.warning(
+                message,
+                extra={
+                    "budget_pct": pct,
+                    "spend_month_usd": float(after),
+                    "budget_monthly_usd": float(monthly_budget),
+                    "owner_id": str(owner_id),
+                },
+            )
+            observability.capture_budget_alert(message, pct)
+
+    # ── daily attempt cap: fire once on the attempt that REACHES it ──
+    # record_spend writes exactly one row per call, so attempts_today rises by
+    # one each time — the cap is crossed exactly when the count equals it.
+    try:
+        attempts = await attempts_today(session, owner_id)
+    except Exception:
+        logger.debug("daily-cap-alert ledger read failed", exc_info=True)
+        attempts = None
+    if attempts is not None and attempts == daily_cap:
+        daily_src = "per-user cap" if user_daily is not None else "MAX_EXTRACTION_ATTEMPTS_PER_DAY"
         message = (
-            f"LLM spend crossed {pct}% of the monthly budget: "
-            f"${after} of ${monthly_budget} (MONTHLY_LLM_BUDGET_USD)"
+            f"daily extraction attempt cap reached: {attempts} of {daily_cap} "
+            f"({daily_src}) — no more paid calls today"
         )
         logger.warning(
             message,
-            extra={
-                "budget_pct": pct,
-                "spend_month_usd": float(after),
-                "budget_monthly_usd": float(monthly_budget),
-            },
+            extra={"daily_attempts": attempts, "daily_cap": daily_cap, "owner_id": str(owner_id)},
         )
-        observability.capture_budget_alert(message, pct)
+        observability.capture_budget_alert(message, 100)
 
 
 # ─── Spend history (GET /api/spend — V2-A ADR) ───────────────────────────────
@@ -391,4 +425,110 @@ async def spend_summary(
         budget_monthly_usd=budget,
         daily_attempt_cap=daily_cap,
         rows=await spend_by_day_and_model(session, owner_id, days=days),
+    )
+
+
+# ─── Admin cross-user rollup (GET /api/admin/spend — M3) ─────────────────────
+
+
+@dataclass(frozen=True)
+class UserSpend:
+    """One user's month-to-date spend + effective caps for the admin rollup.
+    ``budget_monthly_usd``/``daily_attempt_cap`` are the EFFECTIVE caps (the
+    per-user override when set, else the global env default; None under
+    fail-closed config); ``cap_is_personal`` marks a per-user monthly override."""
+
+    id: uuid.UUID
+    email: str
+    paid_tier: bool
+    month_to_date_usd: Decimal
+    attempts_today: int
+    budget_monthly_usd: Decimal | None
+    daily_attempt_cap: int | None
+    cap_is_personal: bool
+
+
+@dataclass(frozen=True)
+class AdminSpendSummary:
+    """Whole-tenant spend rollup (admin only): every user's month-to-date spend
+    and effective caps, plus tenant totals and the global env defaults."""
+
+    total_month_to_date_usd: Decimal
+    total_attempts_today: int
+    global_budget_monthly_usd: Decimal | None
+    global_daily_attempt_cap: int | None
+    users: list[UserSpend]
+
+
+async def admin_spend_summary(session: AsyncSession, settings: "Settings") -> AdminSpendSummary:
+    """Aggregate month-to-date spend + today's attempts PER user across the
+    whole tenant (owner-scoped ledger sums grouped by owner), joined to each
+    user's effective caps. Friends-scale — a handful of users and two small
+    GROUP BYs; no per-day history (that stays the per-owner /api/spend)."""
+    try:
+        global_monthly, global_daily = parse_budget(settings)
+    except ConfigError:
+        global_monthly, global_daily = None, None
+
+    now = datetime.now(UTC)
+    mtd_by_owner: dict[uuid.UUID, Decimal] = dict(
+        (
+            await session.execute(
+                select(LlmSpend.owner_id, func.coalesce(func.sum(LlmSpend.cost_usd), 0))
+                .where(LlmSpend.created_at >= month_start(now))
+                .group_by(LlmSpend.owner_id)
+            )
+        ).all()
+    )
+    attempts_by_owner: dict[uuid.UUID, int] = dict(
+        (
+            await session.execute(
+                select(LlmSpend.owner_id, func.count(LlmSpend.id))
+                .where(LlmSpend.created_at >= day_start(now))
+                .group_by(LlmSpend.owner_id)
+            )
+        ).all()
+    )
+    user_rows = (
+        await session.execute(
+            select(
+                User.id,
+                User.email,
+                User.paid_tier,
+                User.monthly_budget_usd,
+                User.max_attempts_per_day,
+            ).order_by(User.email)
+        )
+    ).all()
+
+    users: list[UserSpend] = []
+    total_mtd = Decimal(0)
+    total_attempts = 0
+    for u in user_rows:
+        mtd = Decimal(mtd_by_owner.get(u.id, 0))
+        attempts = int(attempts_by_owner.get(u.id, 0))
+        total_mtd += mtd
+        total_attempts += attempts
+        users.append(
+            UserSpend(
+                id=u.id,
+                email=u.email,
+                paid_tier=u.paid_tier,
+                month_to_date_usd=mtd,
+                attempts_today=attempts,
+                budget_monthly_usd=(
+                    u.monthly_budget_usd if u.monthly_budget_usd is not None else global_monthly
+                ),
+                daily_attempt_cap=(
+                    u.max_attempts_per_day if u.max_attempts_per_day is not None else global_daily
+                ),
+                cap_is_personal=u.monthly_budget_usd is not None,
+            )
+        )
+    return AdminSpendSummary(
+        total_month_to_date_usd=total_mtd,
+        total_attempts_today=total_attempts,
+        global_budget_monthly_usd=global_monthly,
+        global_daily_attempt_cap=global_daily,
+        users=users,
     )

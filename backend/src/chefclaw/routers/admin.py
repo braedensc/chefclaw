@@ -18,8 +18,10 @@ from chefclaw.auth import require_admin
 from chefclaw.config import Settings, get_settings
 from chefclaw.emailer import get_email_adapter
 from chefclaw.errors import ConfigError, EmailSendError
-from chefclaw.routers.deps import error_response
+from chefclaw.routers.deps import error_response, get_admin_spend_reader
 from chefclaw.schemas import (
+    AdminSpendOut,
+    AdminUserSpend,
     ErrorBody,
     InviteCreate,
     InviteList,
@@ -29,6 +31,7 @@ from chefclaw.schemas import (
     UserBudgetPatch,
 )
 from chefclaw.services import invites, users
+from chefclaw.services.repo import AdminSpendReader
 
 router = APIRouter(prefix="/api", tags=["invites"])
 
@@ -147,6 +150,43 @@ async def update_user_budget(
         ),
         max_attempts_per_day=row.max_attempts_per_day,
         paid_tier=row.paid_tier,
+    )
+
+
+@router.get("/admin/spend", response_model=AdminSpendOut)
+async def admin_spend(
+    owner_id: Annotated[uuid.UUID, Depends(require_admin)],
+    reader: Annotated[AdminSpendReader, Depends(get_admin_spend_reader)],
+) -> AdminSpendOut:
+    """Whole-tenant spend rollup (admin only): each user's month-to-date spend +
+    effective caps + paid tier, plus tenant totals and the global env defaults.
+    The per-owner history stays at GET /api/spend; this is the cross-user view
+    the per-user caps (M3) made necessary."""
+    summary = await reader.summary()
+    return AdminSpendOut(
+        total_month_to_date_usd=float(summary.total_month_to_date_usd),
+        total_attempts_today=summary.total_attempts_today,
+        budget_monthly_usd=(
+            float(summary.global_budget_monthly_usd)
+            if summary.global_budget_monthly_usd is not None
+            else None
+        ),
+        daily_attempt_cap=summary.global_daily_attempt_cap,
+        users=[
+            AdminUserSpend(
+                id=u.id,
+                email=u.email,
+                paid_tier=u.paid_tier,
+                month_to_date_usd=float(u.month_to_date_usd),
+                attempts_today=u.attempts_today,
+                budget_monthly_usd=(
+                    float(u.budget_monthly_usd) if u.budget_monthly_usd is not None else None
+                ),
+                daily_attempt_cap=u.daily_attempt_cap,
+                cap_is_personal=u.cap_is_personal,
+            )
+            for u in summary.users
+        ],
     )
 
 

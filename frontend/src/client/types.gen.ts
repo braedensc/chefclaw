@@ -5,6 +5,78 @@ export type ClientOptions = {
 };
 
 /**
+ * AdminSpendOut
+ *
+ * GET /api/admin/spend (admin only): month-to-date spend + effective caps
+ * per user, plus tenant totals and the global env defaults (null when the
+ * budget config is fail-closed).
+ */
+export type AdminSpendOut = {
+    /**
+     * Budget Monthly Usd
+     */
+    budget_monthly_usd?: number | null;
+    /**
+     * Daily Attempt Cap
+     */
+    daily_attempt_cap?: number | null;
+    /**
+     * Total Attempts Today
+     */
+    total_attempts_today: number;
+    /**
+     * Total Month To Date Usd
+     */
+    total_month_to_date_usd: number;
+    /**
+     * Users
+     */
+    users: Array<AdminUserSpend>;
+};
+
+/**
+ * AdminUserSpend
+ *
+ * One user's row in the admin cross-user spend rollup. Caps are the
+ * EFFECTIVE ones (per-user override, else the global default; null under
+ * fail-closed config); ``cap_is_personal`` flags a per-user monthly override.
+ */
+export type AdminUserSpend = {
+    /**
+     * Attempts Today
+     */
+    attempts_today: number;
+    /**
+     * Budget Monthly Usd
+     */
+    budget_monthly_usd?: number | null;
+    /**
+     * Cap Is Personal
+     */
+    cap_is_personal?: boolean;
+    /**
+     * Daily Attempt Cap
+     */
+    daily_attempt_cap?: number | null;
+    /**
+     * Email
+     */
+    email: string;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Month To Date Usd
+     */
+    month_to_date_usd: number;
+    /**
+     * Paid Tier
+     */
+    paid_tier: boolean;
+};
+
+/**
  * Body_upload_recipe_video_api_recipes_upload_post
  */
 export type BodyUploadRecipeVideoApiRecipesUploadPost = {
@@ -819,6 +891,22 @@ export type RevokeInviteApiAdminInvitesInviteIdRevokePostResponses = {
      */
     200: unknown;
 };
+
+export type AdminSpendApiAdminSpendGetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/admin/spend';
+};
+
+export type AdminSpendApiAdminSpendGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: AdminSpendOut;
+};
+
+export type AdminSpendApiAdminSpendGetResponse = AdminSpendApiAdminSpendGetResponses[keyof AdminSpendApiAdminSpendGetResponses];
 
 export type UpdateUserBudgetApiAdminUsersUserIdBudgetPatchData = {
     body: UserBudgetPatch;

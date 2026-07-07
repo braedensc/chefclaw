@@ -312,17 +312,40 @@ def test_thresholds_crossed_edges() -> None:
     assert crossed(Decimal("0"), Decimal("7.99"), budget) == []
 
 
-async def test_alert_budget_progress_logs_and_captures(
-    monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
-) -> None:
-    async def fake_month(session, owner_id):
-        return Decimal("8.10")  # after this attempt's 0.20: before was 7.90
-
+def _patch_alert_reads(
+    monkeypatch: pytest.MonkeyPatch,
+    *,
+    spent: Decimal,
+    attempts: int = 0,
+    user_monthly: Decimal | None = None,
+    user_daily: int | None = None,
+) -> list[tuple[str, int]]:
+    """Patch the alert path's three reads + capture. Returns the capture list."""
     captured: list[tuple[str, int]] = []
+
+    async def fake_month(session, owner_id):
+        return spent
+
+    async def fake_attempts(session, owner_id):
+        return attempts
+
+    async def fake_caps(session, owner_id):
+        return user_monthly, user_daily
+
     monkeypatch.setattr(spend, "month_to_date_usd", fake_month)
+    monkeypatch.setattr(spend, "attempts_today", fake_attempts)
+    monkeypatch.setattr(spend, "read_user_caps", fake_caps)
     monkeypatch.setattr(
         spend.observability, "capture_budget_alert", lambda msg, pct: captured.append((msg, pct))
     )
+    return captured
+
+
+async def test_alert_budget_progress_logs_and_captures(
+    monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
+) -> None:
+    # after this attempt's 0.20 the month is 8.10; before was 7.90 (crosses 80%).
+    captured = _patch_alert_reads(monkeypatch, spent=Decimal("8.10"), attempts=1)
 
     import logging
 
@@ -334,6 +357,42 @@ async def test_alert_budget_progress_logs_and_captures(
     ((message, pct),) = captured
     assert pct == 80
     assert "80%" in message
+
+
+async def test_alert_measures_against_per_user_monthly_cap(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The 80% crossing is measured against the per-user cap ($2), so it fires
+    at $1.60 — the global $10 budget would not have crossed anything."""
+    captured = _patch_alert_reads(
+        monkeypatch, spent=Decimal("1.60"), attempts=1, user_monthly=Decimal("2.00")
+    )
+    await spend.alert_budget_progress(None, make_settings("10", "25"), OWNER_ID, Decimal("0.10"))
+    ((message, pct),) = captured
+    assert pct == 80
+    assert "per-user cap" in message
+
+
+async def test_alert_daily_cap_reached_fires_once(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Reaching the per-user daily cap (5) alerts; the monthly $ is well under."""
+    captured = _patch_alert_reads(
+        monkeypatch, spent=Decimal("0.05"), attempts=5, user_daily=5
+    )
+    await spend.alert_budget_progress(None, make_settings("10", "25"), OWNER_ID, Decimal("0.01"))
+    ((message, pct),) = captured
+    assert pct == 100
+    assert "daily extraction attempt cap reached" in message
+    assert "per-user cap" in message
+
+
+async def test_alert_daily_cap_not_yet_reached_is_silent(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    captured = _patch_alert_reads(
+        monkeypatch, spent=Decimal("0.05"), attempts=4, user_daily=5
+    )
+    await spend.alert_budget_progress(None, make_settings("10", "25"), OWNER_ID, Decimal("0.01"))
+    assert captured == []
 
 
 async def test_alert_budget_progress_failclosed_config_is_silent(

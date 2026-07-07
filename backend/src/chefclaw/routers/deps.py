@@ -10,11 +10,19 @@ from chefclaw.config import Settings, get_settings
 from chefclaw.errors import ChefclawError
 from chefclaw.schemas import ErrorBody
 from chefclaw.services.jobs import default_source_adapters
-from chefclaw.services.repo import JobStore, PostgresJobStore, PostgresSpendReader, SpendReader
+from chefclaw.services.repo import (
+    AdminSpendReader,
+    JobStore,
+    PostgresAdminSpendReader,
+    PostgresJobStore,
+    PostgresSpendReader,
+    SpendReader,
+)
 from chefclaw.sources import SourceAdapter
 
 __all__ = [
     "error_response",
+    "get_admin_spend_reader",
     "get_job_store",
     "get_source_adapters",
     "get_spend_reader",
@@ -61,3 +69,10 @@ def get_source_adapters(
 def get_spend_reader(settings: Annotated[Settings, Depends(get_settings)]) -> SpendReader:
     """The real ledger reader; tests override this dependency with a fake."""
     return PostgresSpendReader(db.get_sessionmaker(), settings)
+
+
+def get_admin_spend_reader(
+    settings: Annotated[Settings, Depends(get_settings)],
+) -> AdminSpendReader:
+    """The real cross-user rollup reader; tests override with a fake."""
+    return PostgresAdminSpendReader(db.get_sessionmaker(), settings)

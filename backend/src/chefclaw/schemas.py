@@ -17,6 +17,8 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 __all__ = [
+    "AdminSpendOut",
+    "AdminUserSpend",
     "ErrorBody",
     "ExtractRequest",
     "InviteCreate",
@@ -118,6 +120,33 @@ class UserBudgetOut(BaseModel):
     monthly_budget_usd: float | None = None
     max_attempts_per_day: int | None = None
     paid_tier: bool = False
+
+
+class AdminUserSpend(BaseModel):
+    """One user's row in the admin cross-user spend rollup. Caps are the
+    EFFECTIVE ones (per-user override, else the global default; null under
+    fail-closed config); ``cap_is_personal`` flags a per-user monthly override."""
+
+    id: uuid.UUID
+    email: str
+    paid_tier: bool
+    month_to_date_usd: float
+    attempts_today: int
+    budget_monthly_usd: float | None = None
+    daily_attempt_cap: int | None = None
+    cap_is_personal: bool = False
+
+
+class AdminSpendOut(BaseModel):
+    """GET /api/admin/spend (admin only): month-to-date spend + effective caps
+    per user, plus tenant totals and the global env defaults (null when the
+    budget config is fail-closed)."""
+
+    total_month_to_date_usd: float
+    total_attempts_today: int
+    budget_monthly_usd: float | None = None
+    daily_attempt_cap: int | None = None
+    users: list[AdminUserSpend]
 
 
 class ErrorBody(BaseModel):

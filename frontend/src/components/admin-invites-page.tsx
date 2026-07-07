@@ -5,11 +5,13 @@ import type { FormEvent } from 'react';
 import { ApiError } from '../api-error';
 import { useAuth } from '../auth-context';
 import {
+  adminSpendApiAdminSpendGetOptions,
   createInviteApiAdminInvitesPostMutation,
   listInvitesApiAdminInvitesGetOptions,
   listInvitesApiAdminInvitesGetQueryKey,
   revokeInviteApiAdminInvitesInviteIdRevokePostMutation,
 } from '../client/@tanstack/react-query.gen';
+import type { AdminUserSpend } from '../client/types.gen';
 import { CHILI_BTN, CYAN_BTN } from '../lib/button-styles';
 
 const STATUS_CLASS: Record<string, string> = {
@@ -189,6 +191,90 @@ export function AdminInvitesPage() {
           </ul>
         )}
       </section>
+
+      <AdminSpendSection />
     </div>
+  );
+}
+
+/**
+ * Cross-user spend rollup (GET /api/admin/spend) — the admin view the per-user
+ * caps (M3) made necessary: every member's month-to-date spend against their
+ * EFFECTIVE cap, plus tenant totals. Near-cap rows are highlighted.
+ */
+function AdminSpendSection() {
+  const spend = useQuery(adminSpendApiAdminSpendGetOptions());
+  return (
+    <section
+      aria-label="Spend"
+      className="rounded-card border-line bg-panel mt-4 border p-5"
+    >
+      <h2 className="text-ink-faint font-display text-[11px] font-bold tracking-[0.28em] uppercase">
+        Spend (all users)
+      </h2>
+      {spend.isPending && (
+        <p className="text-ink-dim mt-3 text-sm">Loading spend…</p>
+      )}
+      {spend.isError && (
+        <p className="text-ink-dim mt-3 text-sm">
+          Could not load spend (are you signed in as an admin?).
+        </p>
+      )}
+      {spend.isSuccess && (
+        <>
+          <p className="text-ink-dim mt-3 text-sm">
+            Tenant month-to-date:{' '}
+            <span className="text-ink font-medium">
+              ${spend.data.total_month_to_date_usd.toFixed(2)}
+            </span>
+            <span className="text-ink-faint">
+              {' '}
+              · {spend.data.total_attempts_today} attempt
+              {spend.data.total_attempts_today === 1 ? '' : 's'} today
+            </span>
+          </p>
+          <ul className="mt-3 space-y-2 text-sm">
+            {spend.data.users.map((user) => (
+              <SpendRow key={user.id} user={user} />
+            ))}
+          </ul>
+        </>
+      )}
+    </section>
+  );
+}
+
+function SpendRow({ user }: { user: AdminUserSpend }) {
+  const budget = user.budget_monthly_usd ?? null;
+  const fraction =
+    budget !== null && budget > 0 ? user.month_to_date_usd / budget : 0;
+  const spendClass =
+    fraction >= 1
+      ? 'text-chili-bright'
+      : fraction >= 0.8
+        ? 'text-gold'
+        : 'text-ink';
+  return (
+    <li className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+      <span className="text-ink flex items-center gap-2">
+        {user.email}
+        {user.paid_tier && (
+          <span className="text-gold text-xs font-medium">paid</span>
+        )}
+      </span>
+      <span className="flex items-baseline gap-2">
+        <span className={`font-medium ${spendClass}`}>
+          ${user.month_to_date_usd.toFixed(2)}
+        </span>
+        <span className="text-ink-faint text-xs">
+          of {budget !== null ? `$${budget.toFixed(2)}` : 'no cap'}
+          {user.cap_is_personal && ' (personal)'}
+          {' · '}
+          {user.attempts_today}
+          {user.daily_attempt_cap !== null && `/${user.daily_attempt_cap}`}{' '}
+          today
+        </span>
+      </span>
+    </li>
   );
 }

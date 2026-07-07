@@ -53,11 +53,20 @@ async def sm():
 
 
 async def _add_user(
-    sm, *, email: str, monthly: Decimal | None = None, daily: int | None = None
+    sm,
+    *,
+    email: str,
+    monthly: Decimal | None = None,
+    daily: int | None = None,
+    paid: bool = False,
 ) -> uuid.UUID:
     async with sm() as s:
         user = User(
-            name=email, email=email, monthly_budget_usd=monthly, max_attempts_per_day=daily
+            name=email,
+            email=email,
+            monthly_budget_usd=monthly,
+            max_attempts_per_day=daily,
+            paid_tier=paid,
         )
         s.add(user)
         await s.commit()
@@ -192,3 +201,33 @@ async def test_set_paid_tier_round_trips(sm) -> None:
     async with sm() as s:
         assert await users.read_paid_tier(s, uid) is False
         assert await spend.read_user_caps(s, uid) == (None, 5)
+
+
+# ── admin cross-user rollup ──────────────────────────────────────────────────
+
+
+async def test_admin_spend_summary_rolls_up_per_user(sm) -> None:
+    """Two users with different caps/spend; the rollup reports each user's
+    month-to-date + effective caps and correct tenant totals, ordered by email."""
+    alice = await _add_user(sm, email="alice@x.com", monthly=Decimal("2.00"))  # per-user cap
+    bob = await _add_user(sm, email="bob@x.com", paid=True)  # global cap, paid tier
+    await _ledger(sm, alice, cost="1.50")
+    await _ledger(sm, bob, cost="0.75", rows=2)
+
+    async with sm() as s:
+        summary = await spend.admin_spend_summary(s, _settings())
+
+    assert [u.email for u in summary.users] == ["alice@x.com", "bob@x.com"]
+    a, b = summary.users
+    assert a.month_to_date_usd == Decimal("1.50")
+    assert a.attempts_today == 1
+    assert a.budget_monthly_usd == Decimal("2.00")  # per-user override
+    assert a.cap_is_personal is True
+    assert b.month_to_date_usd == Decimal("1.50")  # 2 × 0.75
+    assert b.attempts_today == 2
+    assert b.paid_tier is True
+    assert b.budget_monthly_usd == Decimal("10")  # global default
+    assert b.cap_is_personal is False
+    assert summary.total_month_to_date_usd == Decimal("3.00")
+    assert summary.total_attempts_today == 3
+    assert summary.global_budget_monthly_usd == Decimal("10")

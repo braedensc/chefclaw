@@ -16,6 +16,7 @@ import { vi } from 'vitest';
 import type { Mock } from 'vitest';
 
 import type {
+  AdminSpendOut,
   HealthResponse,
   InviteOut,
   InvitePublicOut,
@@ -26,6 +27,7 @@ import type {
   SpendSummaryOut,
 } from '../client/types.gen';
 import {
+  adminSpendSummary,
   healthResponse,
   invitePublic,
   meOut,
@@ -64,6 +66,10 @@ interface GenState {
   spend: SpendSummaryOut;
   /** When set, the spend queryFn throws it instead. */
   spendError: Error | null;
+  /** GET /api/admin/spend — the cross-user rollup (admin page). */
+  adminSpend: AdminSpendOut;
+  /** When set, the admin-spend queryFn throws it instead. */
+  adminSpendError: Error | null;
   extract: MutationMock;
   upload: MutationMock;
   patch: MutationMock;
@@ -96,6 +102,8 @@ export const genState: GenState = {
   healthError: null,
   spend: spendSummary(),
   spendError: null,
+  adminSpend: adminSpendSummary(),
+  adminSpendError: null,
   extract: mutationMock(),
   upload: mutationMock(),
   patch: mutationMock(),
@@ -122,6 +130,8 @@ export function resetGenState(): void {
   genState.healthError = null;
   genState.spend = spendSummary();
   genState.spendError = null;
+  genState.adminSpend = adminSpendSummary();
+  genState.adminSpendError = null;
   genState.extract = mutationMock();
   genState.upload = mutationMock();
   genState.patch = mutationMock();
@@ -265,6 +275,15 @@ export function genMockModule() {
       queryFn: async () => {
         if (genState.spendError) throw genState.spendError;
         return genState.spend;
+      },
+    }),
+
+    // admin-invites-page.tsx spend rollup — genState.adminSpendError fails it.
+    adminSpendApiAdminSpendGetOptions: () => ({
+      queryKey: [{ _id: 'adminSpendApiAdminSpendGet' }],
+      queryFn: async () => {
+        if (genState.adminSpendError) throw genState.adminSpendError;
+        return genState.adminSpend;
       },
     }),
   };

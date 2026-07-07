@@ -12,7 +12,9 @@ from httpx import ASGITransport, AsyncClient
 from chefclaw import auth
 from chefclaw.app import create_app
 from chefclaw.config import Settings, get_settings
+from chefclaw.routers.deps import get_admin_spend_reader
 from chefclaw.services import users as users_service
+from chefclaw.spend import AdminSpendSummary, UserSpend
 from tests.conftest import OWNER_ID
 
 USER_ID = uuid.uuid4()
@@ -188,3 +190,89 @@ async def test_invalid_body_is_422(monkeypatch: pytest.MonkeyPatch, body: dict) 
         resp = await client.patch(f"/api/admin/users/{USER_ID}/budget", json=body)
     assert resp.status_code == 422
     assert called["n"] == 0  # validation rejects before the service runs
+
+
+# ── GET /api/admin/spend (cross-user rollup) ─────────────────────────────────
+
+
+class _FakeAdminSpendReader:
+    def __init__(self, summary: AdminSpendSummary) -> None:
+        self._summary = summary
+
+    async def summary(self) -> AdminSpendSummary:
+        return self._summary
+
+
+def _admin_spend_app(summary: AdminSpendSummary) -> FastAPI:
+    app = _admin_app()
+    app.dependency_overrides[get_admin_spend_reader] = lambda: _FakeAdminSpendReader(summary)
+    return app
+
+
+def _summary(**overrides: object) -> AdminSpendSummary:
+    fields: dict[str, object] = dict(
+        total_month_to_date_usd=Decimal("3.50"),
+        total_attempts_today=7,
+        global_budget_monthly_usd=Decimal("25"),
+        global_daily_attempt_cap=20,
+        users=[
+            UserSpend(
+                id=OWNER_ID,
+                email="owner@localhost",
+                paid_tier=True,
+                month_to_date_usd=Decimal("3.00"),
+                attempts_today=6,
+                budget_monthly_usd=Decimal("25"),  # global default
+                daily_attempt_cap=20,
+                cap_is_personal=False,
+            ),
+            UserSpend(
+                id=uuid.uuid4(),
+                email="friend@x.com",
+                paid_tier=False,
+                month_to_date_usd=Decimal("0.50"),
+                attempts_today=1,
+                budget_monthly_usd=Decimal("2"),  # per-user override
+                daily_attempt_cap=5,
+                cap_is_personal=True,
+            ),
+        ],
+    )
+    fields.update(overrides)
+    return AdminSpendSummary(**fields)
+
+
+async def test_admin_spend_returns_rollup(monkeypatch: pytest.MonkeyPatch) -> None:
+    async with _client(_admin_spend_app(_summary())) as client:
+        resp = await client.get("/api/admin/spend")
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["total_month_to_date_usd"] == 3.5
+    assert body["total_attempts_today"] == 7
+    assert body["budget_monthly_usd"] == 25.0
+    assert [u["email"] for u in body["users"]] == ["owner@localhost", "friend@x.com"]
+    owner, friend = body["users"]
+    assert owner["paid_tier"] is True
+    assert owner["month_to_date_usd"] == 3.0
+    assert owner["cap_is_personal"] is False
+    assert friend["budget_monthly_usd"] == 2.0
+    assert friend["cap_is_personal"] is True
+
+
+async def test_admin_spend_requires_admin(monkeypatch: pytest.MonkeyPatch) -> None:
+    async def non_admin(owner_id: uuid.UUID) -> auth.Account:
+        return auth.Account(id=OWNER_ID, name="friend", email="f@x", is_admin=False)
+
+    monkeypatch.setattr(auth, "fetch_account", non_admin)
+    async with _client(_admin_spend_app(_summary())) as client:
+        resp = await client.get("/api/admin/spend")
+    assert resp.status_code == 403
+
+
+async def test_admin_spend_failclosed_caps_null(monkeypatch: pytest.MonkeyPatch) -> None:
+    summary = _summary(global_budget_monthly_usd=None, global_daily_attempt_cap=None)
+    async with _client(_admin_spend_app(summary)) as client:
+        resp = await client.get("/api/admin/spend")
+    body = resp.json()
+    assert body["budget_monthly_usd"] is None
+    assert body["daily_attempt_cap"] is None
