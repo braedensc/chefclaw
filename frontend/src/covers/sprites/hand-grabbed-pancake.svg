@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="hgBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="hgbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="hgpan" cx="50%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#1a1620"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <radialGradient id="hgcake" cx="44%" cy="34%" r="78%">
+      <stop offset="0%" stop-color="#f7e0a4"/><stop offset="52%" stop-color="#e1b165"/><stop offset="100%" stop-color="#b17f2f"/>
+    </radialGradient>
+    <linearGradient id="hgegg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff3c8"/><stop offset="60%" stop-color="#ffd45a"/><stop offset="100%" stop-color="#f6a41f"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#hgbg)"/>
+  <!-- steam -->
+  <path d="M118 52 C108 34 128 26 118 6" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#hgBlur3)"/>
+  <path d="M200 50 C192 34 210 26 202 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#hgBlur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="186" rx="152" ry="22" fill="#000" opacity=".5"/>
+  <!-- SKILLET: dark round pan with a handle to the right -->
+  <rect x="252" y="120" width="66" height="14" rx="7" fill="#161119"/>
+  <rect x="252" y="120" width="66" height="14" rx="7" fill="none" stroke="#2c2136" stroke-width="2"/>
+  <ellipse cx="158" cy="126" rx="132" ry="52" fill="url(#hgpan)"/>
+  <ellipse cx="158" cy="126" rx="132" ry="52" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="158" cy="126" rx="116" ry="43" fill="#0d0c11"/>
+  <!-- neon steam arc (warm) -->
+  <path d="M50 112 Q102 80 166 78" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".45" stroke-linecap="round"/>
+  <!-- FLAKY SPIRAL PANCAKE: round, crinkled, showing the coiled shou-zhua layers -->
+  <!-- browned underside shadow -->
+  <ellipse cx="158" cy="122" rx="92" ry="42" fill="#8a5c22" opacity=".55"/>
+  <!-- main flaky disc, crinkled edge -->
+  <path d="M70 118 C72 100 100 86 158 84 C216 86 244 100 246 118 C244 138 210 152 158 152 C106 152 72 138 70 118 Z" fill="url(#hgcake)" stroke="#8a5c22" stroke-width="1.4"/>
+  <!-- concentric SPIRAL LAYERS (the signature coil of hand-grabbed pancake) -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M84 118 C86 104 116 94 158 93 C200 94 230 104 232 118 C230 132 202 142 158 142 C114 142 86 132 84 118" stroke="#a9741f" stroke-width="2" opacity=".7"/>
+    <path d="M100 118 C102 108 128 100 158 99 C188 100 214 108 216 118 C214 128 190 136 158 136 C126 136 102 128 100 118" stroke="#c99742" stroke-width="1.8" opacity=".6"/>
+    <path d="M116 118 C118 111 138 106 158 105 C178 106 198 111 200 118 C198 125 180 130 158 130 C136 130 118 125 116 118" stroke="#a9741f" stroke-width="1.6" opacity=".65"/>
+    <path d="M132 118 C133 113 146 110 158 110 C170 110 183 113 184 118 C183 123 172 126 158 126 C144 126 133 123 132 118" stroke="#c99742" stroke-width="1.4" opacity=".55"/>
+  </g>
+  <!-- crispy flaky highlight ridges catching light -->
+  <path d="M92 106 C118 96 200 96 224 106" stroke="#fff0cf" stroke-width="1.6" fill="none" opacity=".45"/>
+  <path d="M104 132 C132 140 186 140 214 132" stroke="#fff0cf" stroke-width="1.3" fill="none" opacity=".3"/>
+  <!-- crispy toasted flecks -->
+  <circle cx="118" cy="104" r="1.4" fill="#7a4c14" opacity=".7"/>
+  <circle cx="186" cy="106" r="1.5" fill="#7a4c14" opacity=".7"/>
+  <circle cx="146" cy="136" r="1.3" fill="#7a4c14" opacity=".6"/>
+  <circle cx="200" cy="128" r="1.3" fill="#7a4c14" opacity=".6"/>
+  <!-- FRIED EGG cracked on top, sunny yolk -->
+  <path d="M150 92 C138 90 130 98 134 108 C128 116 138 124 150 122 C160 128 176 124 178 114 C188 110 186 96 174 94 C168 86 156 86 150 92 Z" fill="#fff6e0" opacity=".95" stroke="#e8d8b0" stroke-width="1"/>
+  <circle cx="156" cy="106" r="10" fill="url(#hgegg)"/>
+  <ellipse cx="152" cy="102" rx="4" ry="2.4" fill="#fff3c8" opacity=".85"/>
+  <!-- scallion + a little chili sauce garnish -->
+  <rect x="120" y="120" width="7" height="2.6" rx="1.3" fill="#5ecb4e" transform="rotate(-16 123 121)"/>
+  <rect x="188" y="118" width="7" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(14 191 119)"/>
+  <rect x="138" y="128" width="6" height="2.4" rx="1.2" fill="#58c14a" transform="rotate(24 141 129)"/>
+  <path d="M170 128 C182 126 194 128 202 132" stroke="#c14a1e" stroke-width="1.8" fill="none" opacity=".45" stroke-linecap="round"/>
+  <!-- gloss dots -->
+  <circle cx="130" cy="100" r="1.5" fill="#fff" opacity=".6"/>
+  <circle cx="204" cy="112" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="150" cy="132" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

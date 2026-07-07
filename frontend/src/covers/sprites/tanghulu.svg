@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="thBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="thbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#3a1120"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <radialGradient id="thberry" cx="36%" cy="28%" r="82%">
+      <stop offset="0%" stop-color="#ff6a53"/><stop offset="45%" stop-color="#e42a1c"/><stop offset="100%" stop-color="#9c0f0a"/>
+    </radialGradient>
+    <linearGradient id="thstick" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#d9b878"/><stop offset="100%" stop-color="#a67a40"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#thbg)"/>
+  <!-- cold-candy sparkle wisps (no steam for a cold dessert) -->
+  <g fill="#fff">
+    <path d="M96 44 l1.4 5 l5 1.4 l-5 1.4 l-1.4 5 l-1.4 -5 l-5 -1.4 l5 -1.4 Z" opacity=".55"/>
+    <path d="M222 38 l1.1 4 l4 1.1 l-4 1.1 l-1.1 4 l-1.1 -4 l-4 -1.1 l4 -1.1 Z" opacity=".45"/>
+    <path d="M188 60 l.9 3.2 l3.2 .9 l-3.2 .9 l-.9 3.2 l-.9 -3.2 l-3.2 -.9 l3.2 -.9 Z" opacity=".4"/>
+  </g>
+  <ellipse cx="160" cy="186" rx="120" ry="20" fill="#000" opacity=".5"/>
+  <!-- neon accent arc (rose family) -->
+  <path d="M70 96 Q120 62 178 62" stroke="#ff4d6d" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- a little vendor board it rests on -->
+  <ellipse cx="160" cy="176" rx="86" ry="14" fill="#1a1420"/>
+  <ellipse cx="160" cy="176" rx="86" ry="14" fill="none" stroke="#2c2136" stroke-width="2.5"/>
+  <ellipse cx="160" cy="174" rx="70" ry="10" fill="#0d0d10"/>
+  <!-- BAMBOO STICK running up through the skewer -->
+  <rect x="156.5" y="40" width="7" height="132" rx="3.5" fill="url(#thstick)"/>
+  <rect x="158" y="42" width="2" height="126" rx="1" fill="#f0d9a8" opacity=".6"/>
+  <!-- candied hawthorn berries threaded on the stick, small at top -> large at bottom -->
+  <!-- berry 1 (top, smallest) -->
+  <g transform="translate(160 58)">
+    <circle r="16" fill="url(#thberry)" stroke="#7a0c08" stroke-width="1.2"/>
+    <path d="M-15 8 Q0 18 15 8" stroke="#ffb59c" stroke-width="2" fill="none" opacity=".55" stroke-linecap="round"/>
+    <ellipse cx="-6" cy="-6" rx="6" ry="4" fill="#ffd0b8" opacity=".8"/>
+    <circle cx="-7" cy="-7" r="2" fill="#fff" opacity=".85"/>
+    <circle cx="0" cy="-15" r="2" fill="#8a0c07"/>
+  </g>
+  <!-- berry 2 -->
+  <g transform="translate(160 88)">
+    <circle r="19" fill="url(#thberry)" stroke="#7a0c08" stroke-width="1.2"/>
+    <path d="M-18 9 Q0 21 18 9" stroke="#ffb59c" stroke-width="2.2" fill="none" opacity=".55" stroke-linecap="round"/>
+    <ellipse cx="-7" cy="-7" rx="7" ry="4.5" fill="#ffd0b8" opacity=".8"/>
+    <circle cx="-8" cy="-8" r="2.4" fill="#fff" opacity=".85"/>
+  </g>
+  <!-- berry 3 -->
+  <g transform="translate(160 120)">
+    <circle r="21" fill="url(#thberry)" stroke="#7a0c08" stroke-width="1.2"/>
+    <path d="M-20 10 Q0 23 20 10" stroke="#ffb59c" stroke-width="2.4" fill="none" opacity=".55" stroke-linecap="round"/>
+    <ellipse cx="-8" cy="-8" rx="8" ry="5" fill="#ffd0b8" opacity=".8"/>
+    <circle cx="-9" cy="-9" r="2.6" fill="#fff" opacity=".9"/>
+  </g>
+  <!-- berry 4 (bottom, largest, brightest) -->
+  <g transform="translate(160 153)">
+    <circle r="23" fill="url(#thberry)" stroke="#7a0c08" stroke-width="1.3"/>
+    <!-- hardened sugar-syrup drip tail off the bottom berry -->
+    <path d="M-4 20 C-6 30 2 34 4 42 C6 34 10 30 6 20 Z" fill="#ff8a6f" opacity=".85" stroke="#c9452f" stroke-width="1" stroke-linecap="round"/>
+    <path d="M-21 11 Q0 25 21 11" stroke="#ffb59c" stroke-width="2.6" fill="none" opacity=".55" stroke-linecap="round"/>
+    <ellipse cx="-9" cy="-9" rx="9" ry="5.5" fill="#ffd8c2" opacity=".85"/>
+    <circle cx="-10" cy="-10" r="3" fill="#fff" opacity=".95"/>
+  </g>
+  <!-- crackly candy-shell glints across the berries -->
+  <g fill="#fff">
+    <circle cx="150" cy="70" r="1" opacity=".7"/><circle cx="172" cy="96" r="1.1" opacity=".7"/>
+    <circle cx="148" cy="128" r="1.2" opacity=".75"/><circle cx="176" cy="146" r="1.3" opacity=".8"/>
+    <circle cx="166" cy="112" r="1" opacity=".65"/>
+  </g>
+</svg>

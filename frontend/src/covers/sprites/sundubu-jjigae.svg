@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="sdBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="sdbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#3a1120"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <radialGradient id="sdpot" cx="50%" cy="30%" r="82%">
+      <stop offset="0%" stop-color="#3a2018"/><stop offset="100%" stop-color="#1a0d08"/>
+    </radialGradient>
+    <radialGradient id="sdbroth" cx="46%" cy="34%" r="78%">
+      <stop offset="0%" stop-color="#ef5520"/><stop offset="55%" stop-color="#c22e0c"/><stop offset="100%" stop-color="#7a1305"/>
+    </radialGradient>
+    <radialGradient id="sdtofu" cx="42%" cy="32%" r="80%">
+      <stop offset="0%" stop-color="#fbf5e6"/><stop offset="60%" stop-color="#f4ead0"/><stop offset="100%" stop-color="#e3cda4"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#sdbg)"/>
+  <!-- rising steam wisps (hot stew) -->
+  <path d="M124 50 C114 32 134 24 124 6" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#sdBlur3)"/>
+  <path d="M198 52 C190 34 208 26 200 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#sdBlur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="188" rx="132" ry="22" fill="#000" opacity=".5"/>
+  <!-- neon steam arc (rose family) -->
+  <path d="M50 100 Q104 66 166 66" stroke="#ff4d6d" stroke-width="2.5" fill="none" opacity=".44" stroke-linecap="round"/>
+  <!-- earthenware clay pot: deep curved-wall silhouette -->
+  <path d="M64 108 C64 88 100 78 160 78 C220 78 256 88 256 108 L250 148 C246 172 208 184 160 184 C112 184 74 172 70 148 Z" fill="url(#sdpot)"/>
+  <path d="M64 108 C64 88 100 78 160 78 C220 78 256 88 256 108 L250 148 C246 172 208 184 160 184 C112 184 74 172 70 148 Z" fill="none" stroke="#0f0704" stroke-width="2.5" opacity=".8"/>
+  <!-- pot rim ellipse -->
+  <ellipse cx="160" cy="108" rx="96" ry="30" fill="#2a1610"/>
+  <ellipse cx="160" cy="108" rx="96" ry="30" fill="none" stroke="#4a2c1e" stroke-width="2.5"/>
+  <!-- little clay handles -->
+  <ellipse cx="60" cy="118" rx="10" ry="7" fill="#3a2018"/>
+  <ellipse cx="260" cy="118" rx="10" ry="7" fill="#3a2018"/>
+  <!-- bubbling spicy red broth -->
+  <ellipse cx="160" cy="108" rx="88" ry="26" fill="url(#sdbroth)"/>
+  <!-- chili-oil sheen ring + bubbles -->
+  <path d="M92 104 C120 92 200 92 228 104" stroke="#ff7a3c" stroke-width="2" fill="none" opacity=".5" stroke-linecap="round"/>
+  <g fill="#ff8a4a" opacity=".7">
+    <circle cx="108" cy="112" r="3"/>
+    <circle cx="204" cy="110" r="3.4"/>
+    <circle cx="150" cy="118" r="2.6"/>
+    <circle cx="182" cy="102" r="2.4"/>
+  </g>
+  <g fill="#7a1305" opacity=".7">
+    <circle cx="126" cy="100" r="2"/>
+    <circle cx="196" cy="118" r="2.2"/>
+  </g>
+  <!-- soft tofu chunks bobbing (glossy pale cubes) -->
+  <g stroke="#c9ad7c" stroke-width="1.2" opacity="1">
+    <path d="M110 96 C106 90 116 86 124 88 C132 86 138 92 134 98 C138 104 128 108 120 106 C112 108 106 102 110 96 Z" fill="url(#sdtofu)"/>
+    <path d="M164 92 C160 86 170 82 178 84 C186 82 192 88 188 94 C192 100 182 104 174 102 C166 104 160 98 164 92 Z" fill="url(#sdtofu)"/>
+    <path d="M138 110 C134 104 144 100 152 102 C160 100 166 106 162 112 C166 118 156 122 148 120 C140 122 134 116 138 110 Z" fill="url(#sdtofu)"/>
+    <path d="M196 106 C192 100 202 98 208 100 C214 100 218 106 214 110 C216 116 208 118 202 116 C196 116 192 110 196 106 Z" fill="url(#sdtofu)"/>
+  </g>
+  <!-- tofu highlights -->
+  <ellipse cx="120" cy="92" rx="6" ry="2.4" fill="#fff" opacity=".45"/>
+  <ellipse cx="174" cy="88" rx="6" ry="2.4" fill="#fff" opacity=".45"/>
+  <ellipse cx="148" cy="106" rx="5" ry="2" fill="#fff" opacity=".4"/>
+  <!-- cracked egg yolk floating (signature) -->
+  <circle cx="160" cy="112" r="9" fill="#f6ac25"/>
+  <circle cx="160" cy="112" r="9" fill="none" stroke="#d98a17" stroke-width="1.2"/>
+  <ellipse cx="156" cy="108" rx="3.4" ry="2" fill="#ffd76a" opacity=".9"/>
+  <!-- scallion + red chili flecks floating on top -->
+  <rect x="132" y="98" width="7" height="2.6" rx="1.3" fill="#5ecb4e" transform="rotate(-18 135 99)"/>
+  <rect x="178" y="116" width="7" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(16 181 117)"/>
+  <rect x="148" y="120" width="6" height="2.4" rx="1.2" fill="#58c14a" transform="rotate(24 151 121)"/>
+  <circle cx="118" cy="104" r="2" fill="#e0341f"/>
+  <circle cx="206" cy="112" r="2" fill="#e0341f"/>
+  <circle cx="168" cy="100" r="1.8" fill="#e0341f"/>
+  <!-- oily gloss dots -->
+  <circle cx="130" cy="100" r="1.5" fill="#fff" opacity=".6"/>
+  <circle cx="190" cy="98" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="152" cy="116" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

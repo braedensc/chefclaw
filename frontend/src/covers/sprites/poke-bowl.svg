@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="pk1Blur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="pk1bg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#3a1120"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <radialGradient id="pk1bowl" cx="50%" cy="30%" r="82%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <radialGradient id="pk1rice" cx="48%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#fbf6ea"/><stop offset="60%" stop-color="#ece2d0"/><stop offset="100%" stop-color="#d3c6ae"/>
+    </radialGradient>
+    <linearGradient id="pk1tuna" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ff6a5a"/><stop offset="100%" stop-color="#d3382e"/>
+    </linearGradient>
+    <linearGradient id="pk1salmon" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffa367"/><stop offset="100%" stop-color="#eb7a3c"/>
+    </linearGradient>
+    <radialGradient id="pk1avo" cx="45%" cy="35%" r="80%">
+      <stop offset="0%" stop-color="#c3d879"/><stop offset="100%" stop-color="#7fa143"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#pk1bg)"/>
+  <!-- cool condensation wisp (raw/cold, faint) -->
+  <path d="M126 58 C120 44 134 38 128 22" stroke="#fff" stroke-width="7" fill="none" opacity=".07" filter="url(#pk1Blur3)"/>
+  <path d="M196 60 C190 46 202 40 197 26" stroke="#fff" stroke-width="6" fill="none" opacity=".06" filter="url(#pk1Blur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="186" rx="132" ry="20" fill="#000" opacity=".5"/>
+  <!-- DONBURI: deep stone bowl, straighter walls -->
+  <path d="M70 114 C70 106 250 106 250 114 C248 154 216 180 160 180 C104 180 72 154 70 114 Z" fill="url(#pk1bowl)"/>
+  <path d="M70 114 C70 106 250 106 250 114 C248 154 216 180 160 180 C104 180 72 154 70 114 Z" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="114" rx="90" ry="27" fill="#0f0d13"/>
+  <ellipse cx="160" cy="114" rx="90" ry="27" fill="none" stroke="#26262e" stroke-width="2"/>
+  <!-- white rice base filling the bowl -->
+  <path d="M76 114 C76 98 244 98 244 114 C242 130 210 138 160 138 C110 138 78 130 76 114 Z" fill="url(#pk1rice)"/>
+  <g stroke-linecap="round" fill="none" opacity=".8">
+    <path d="M100 112 l6 -2" stroke="#ffffff" stroke-width="2.2"/>
+    <path d="M128 118 l6 2" stroke="#d8cdb6" stroke-width="2.2"/>
+    <path d="M206 112 l6 -2" stroke="#ffffff" stroke-width="2.2"/>
+    <path d="M188 120 l-6 2" stroke="#d8cdb6" stroke-width="2.2"/>
+  </g>
+  <!-- POKE TOPPINGS: sectors of ingredients ON the rice -->
+  <!-- diced tuna cubes (left) -->
+  <g>
+    <rect x="88" y="98" width="18" height="16" rx="2.5" fill="url(#pk1tuna)" transform="rotate(-8 97 106)"/>
+    <rect x="90" y="100" width="14" height="4" rx="2" fill="#ff9080" opacity=".7" transform="rotate(-8 97 102)"/>
+    <rect x="104" y="110" width="17" height="15" rx="2.5" fill="url(#pk1tuna)" transform="rotate(10 112 117)"/>
+    <rect x="106" y="112" width="13" height="4" rx="2" fill="#ff9080" opacity=".7" transform="rotate(10 112 114)"/>
+    <rect x="96" y="118" width="16" height="14" rx="2.5" fill="url(#pk1tuna)" transform="rotate(-4 104 125)"/>
+  </g>
+  <!-- diced salmon cubes (right) -->
+  <g>
+    <rect x="196" y="98" width="18" height="16" rx="2.5" fill="url(#pk1salmon)" transform="rotate(6 205 106)"/>
+    <path d="M198 100 h14 M198 105 h14 M198 110 h14" stroke="#fff" stroke-width="1" opacity=".55" transform="rotate(6 205 106)"/>
+    <rect x="182" y="112" width="17" height="15" rx="2.5" fill="url(#pk1salmon)" transform="rotate(-9 190 119)"/>
+    <path d="M184 115 h13 M184 120 h13" stroke="#fff" stroke-width="1" opacity=".55" transform="rotate(-9 190 119)"/>
+    <rect x="204" y="116" width="16" height="14" rx="2.5" fill="url(#pk1salmon)" transform="rotate(5 212 123)"/>
+  </g>
+  <!-- avocado fan (top center) -->
+  <g transform="translate(160 104)">
+    <path d="M-22 4 C-16 -8 16 -8 22 4 C14 2 -14 2 -22 4 Z" fill="url(#pk1avo)"/>
+    <path d="M-22 4 C-16 -8 16 -8 22 4" fill="none" stroke="#5f7d34" stroke-width="1.2" opacity=".7"/>
+    <path d="M-11 -2 l0 6 M0 -3 l0 7 M11 -2 l0 6" stroke="#e9f0c2" stroke-width="1.2" opacity=".5"/>
+  </g>
+  <!-- edamame beans + cucumber + sesame -->
+  <circle cx="140" cy="128" r="4" fill="#6fae3e"/><circle cx="139" cy="126" r="1.3" fill="#c3e07a" opacity=".8"/>
+  <circle cx="180" cy="130" r="4" fill="#6fae3e"/><circle cx="179" cy="128" r="1.3" fill="#c3e07a" opacity=".8"/>
+  <rect x="150" y="126" width="9" height="6" rx="2" fill="#8fd3a8" transform="rotate(-12 154 129)"/>
+  <rect x="168" y="122" width="9" height="6" rx="2" fill="#8fd3a8" transform="rotate(14 172 125)"/>
+  <!-- nori strip + scallion + sesame -->
+  <rect x="126" y="110" width="10" height="5" rx="1.5" fill="#20342a" transform="rotate(-16 131 112)"/>
+  <rect x="158" y="120" width="7" height="2.6" rx="1.3" fill="#5ecb4e" transform="rotate(-18 161 121)"/>
+  <rect x="192" y="126" width="7" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(20 195 127)"/>
+  <circle cx="118" cy="120" r="1.1" fill="#f8eed6"/><circle cx="150" cy="114" r="1.1" fill="#f8eed6"/><circle cx="210" cy="120" r="1.1" fill="#f8eed6"/>
+  <!-- cold-sparkle gloss dots -->
+  <circle cx="100" cy="104" r="1.4" fill="#fff" opacity=".7"/>
+  <circle cx="160" cy="98" r="1.3" fill="#fff" opacity=".6"/>
+  <circle cx="206" cy="102" r="1.3" fill="#fff" opacity=".6"/>
+</svg>

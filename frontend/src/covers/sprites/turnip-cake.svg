@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="tcBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="tcbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#123138"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <radialGradient id="tcpan" cx="50%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <linearGradient id="tccake" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f4e6c4"/><stop offset="55%" stop-color="#e6cf9d"/><stop offset="100%" stop-color="#cdb078"/>
+    </linearGradient>
+    <linearGradient id="tccrust" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d89a4a"/><stop offset="100%" stop-color="#9c5f1e"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#tcbg)"/>
+  <!-- steam -->
+  <path d="M118 54 C108 36 128 28 118 8" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#tcBlur3)"/>
+  <path d="M200 52 C192 36 210 28 202 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#tcBlur3)"/>
+  <ellipse cx="160" cy="188" rx="156" ry="22" fill="#000" opacity=".5"/>
+  <!-- neon steam arc (cyan/teal family) -->
+  <path d="M48 116 Q100 84 164 82" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- skillet handle poking to the left -->
+  <rect x="6" y="126" width="52" height="12" rx="6" fill="#151118"/>
+  <rect x="6" y="126" width="52" height="12" rx="6" fill="none" stroke="#2c2136" stroke-width="2"/>
+  <!-- skillet body -->
+  <ellipse cx="168" cy="132" rx="140" ry="48" fill="url(#tcpan)"/>
+  <ellipse cx="168" cy="132" rx="140" ry="48" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="168" cy="132" rx="124" ry="40" fill="#0d0d10"/>
+  <!-- glistening oil sheen in the pan -->
+  <ellipse cx="150" cy="126" rx="60" ry="16" fill="#241a10" opacity=".7"/>
+  <!-- PAN-FRIED TURNIP-CAKE SQUARES: golden-brown crusted blocks -->
+  <!-- back row -->
+  <g transform="translate(96 100) rotate(-6)">
+    <rect width="46" height="30" rx="3" fill="url(#tccake)" stroke="#a9843c" stroke-width="1.3"/>
+    <rect y="20" width="46" height="10" rx="2" fill="url(#tccrust)"/>
+    <rect y="26" width="46" height="4" rx="2" fill="#7a4514"/>
+    <circle cx="14" cy="10" r="1.6" fill="#e0f0e0" opacity=".8"/><circle cx="30" cy="14" r="1.4" fill="#d8c090" opacity=".7"/>
+    <ellipse cx="18" cy="6" rx="12" ry="3" fill="#fff6da" opacity=".5"/>
+  </g>
+  <g transform="translate(158 96) rotate(5)">
+    <rect width="48" height="32" rx="3" fill="url(#tccake)" stroke="#a9843c" stroke-width="1.3"/>
+    <rect y="21" width="48" height="11" rx="2" fill="url(#tccrust)"/>
+    <rect y="27" width="48" height="5" rx="2" fill="#7a4514"/>
+    <circle cx="16" cy="10" r="1.6" fill="#e0f0e0" opacity=".8"/><circle cx="34" cy="14" r="1.5" fill="#d8c090" opacity=".7"/>
+    <ellipse cx="20" cy="6" rx="13" ry="3" fill="#fff6da" opacity=".5"/>
+  </g>
+  <!-- front row (larger, brighter) -->
+  <g transform="translate(122 122) rotate(3)">
+    <rect width="54" height="34" rx="3.5" fill="url(#tccake)" stroke="#a9843c" stroke-width="1.4"/>
+    <rect y="22" width="54" height="12" rx="2.5" fill="url(#tccrust)"/>
+    <rect y="29" width="54" height="5" rx="2.5" fill="#7a4514"/>
+    <circle cx="16" cy="11" r="1.8" fill="#e0f0e0" opacity=".85"/><circle cx="36" cy="9" r="1.6" fill="#d8c090" opacity=".75"/><circle cx="26" cy="16" r="1.5" fill="#c8e0c8" opacity=".7"/>
+    <ellipse cx="22" cy="7" rx="15" ry="3.5" fill="#fff8e0" opacity=".55"/>
+  </g>
+  <!-- scallion + shallot garnish -->
+  <rect x="120" y="118" width="8" height="2.8" rx="1.4" fill="#5ecb4e" transform="rotate(-20 124 119)"/>
+  <rect x="180" y="120" width="8" height="2.8" rx="1.4" fill="#3f9c37" transform="rotate(16 184 121)"/>
+  <rect x="150" y="146" width="7" height="2.6" rx="1.3" fill="#58c14a" transform="rotate(-8 153 147)"/>
+  <circle cx="140" cy="130" r="1.8" fill="#6b5420"/><circle cx="196" cy="134" r="1.6" fill="#4d3b17"/>
+  <!-- gloss dots -->
+  <circle cx="110" cy="106" r="1.5" fill="#fff" opacity=".6"/>
+  <circle cx="176" cy="102" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="146" cy="128" r="1.4" fill="#fff" opacity=".55"/>
+</svg>

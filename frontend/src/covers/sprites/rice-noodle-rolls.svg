@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="rnrBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="rnrbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#113036"/><stop offset="45%" stop-color="#0b090b"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <linearGradient id="rnrroll" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fdfaf3"/><stop offset="48%" stop-color="#f2ecdd"/><stop offset="100%" stop-color="#dccfb4"/>
+    </linearGradient>
+    <linearGradient id="rnrsheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity=".9"/><stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="rnrsoy" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4a2a12"/><stop offset="100%" stop-color="#23120a"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#rnrbg)"/>
+  <!-- steam (hot steamed dish) -->
+  <path d="M120 52 C112 36 128 28 120 8" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#rnrBlur3)"/>
+  <path d="M198 50 C190 34 206 26 198 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#rnrBlur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="188" rx="150" ry="21" fill="#000" opacity=".5"/>
+  <!-- oval plate -->
+  <ellipse cx="160" cy="134" rx="140" ry="44" fill="#141018"/>
+  <ellipse cx="160" cy="134" rx="140" ry="44" fill="none" stroke="#26262e" stroke-width="3"/>
+  <ellipse cx="160" cy="134" rx="126" ry="37" fill="#0f0d12"/>
+  <!-- neon steam arc (cyan) -->
+  <path d="M50 118 Q104 86 168 84" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- pooled soy sauce under the rolls -->
+  <ellipse cx="160" cy="140" rx="104" ry="26" fill="url(#rnrsoy)" opacity=".85"/>
+  <ellipse cx="160" cy="140" rx="104" ry="26" fill="none" stroke="#12070a" stroke-width="1.2" opacity=".5"/>
+  <!-- THREE glossy rice-noodle rolls lying side by side, cut ends facing us -->
+  <!-- back roll -->
+  <g transform="translate(0 -6)">
+    <path d="M70 118 C70 106 96 100 160 100 C224 100 250 106 250 118 C250 130 224 136 160 136 C96 136 70 130 70 118 Z" fill="url(#rnrroll)"/>
+    <path d="M74 112 C90 104 230 104 246 112 C230 118 90 118 74 112 Z" fill="url(#rnrsheen)" opacity=".55"/>
+    <path d="M70 118 C70 106 96 100 160 100 C224 100 250 106 250 118 C250 130 224 136 160 136 C96 136 70 130 70 118 Z" fill="none" stroke="#c7b78f" stroke-width="1.3" opacity=".5"/>
+    <!-- fold seams along the roll -->
+    <path d="M108 104 C110 116 110 122 108 132" stroke="#d8cbae" stroke-width="1.4" fill="none" opacity=".6"/>
+    <path d="M160 102 C162 114 162 122 160 134" stroke="#d8cbae" stroke-width="1.4" fill="none" opacity=".55"/>
+    <path d="M212 104 C214 116 214 122 212 132" stroke="#d8cbae" stroke-width="1.4" fill="none" opacity=".6"/>
+    <!-- prawn/pork filling glowing through translucent skin (pink savory) -->
+    <ellipse cx="134" cy="118" rx="16" ry="6" fill="#e79a86" opacity=".35"/>
+    <ellipse cx="186" cy="118" rx="16" ry="6" fill="#e79a86" opacity=".3"/>
+  </g>
+  <!-- front roll (larger, brighter) -->
+  <g>
+    <path d="M62 138 C62 124 92 117 160 117 C228 117 258 124 258 138 C258 152 228 159 160 159 C92 159 62 152 62 138 Z" fill="url(#rnrroll)"/>
+    <path d="M66 131 C84 122 236 122 254 131 C236 138 84 138 66 131 Z" fill="url(#rnrsheen)" opacity=".65"/>
+    <path d="M62 138 C62 124 92 117 160 117 C228 117 258 124 258 138 C258 152 228 159 160 159 C92 159 62 152 62 138 Z" fill="none" stroke="#c7b78f" stroke-width="1.4" opacity=".55"/>
+    <!-- fold seams -->
+    <path d="M104 120 C106 134 106 142 104 156" stroke="#d8cbae" stroke-width="1.5" fill="none" opacity=".6"/>
+    <path d="M160 118 C162 132 162 142 160 158" stroke="#d8cbae" stroke-width="1.5" fill="none" opacity=".55"/>
+    <path d="M216 120 C218 134 218 142 216 156" stroke="#d8cbae" stroke-width="1.5" fill="none" opacity=".6"/>
+    <!-- filling glow through skin -->
+    <ellipse cx="132" cy="138" rx="18" ry="7" fill="#e79a86" opacity=".4"/>
+    <ellipse cx="188" cy="138" rx="18" ry="7" fill="#e79a86" opacity=".35"/>
+  </g>
+  <!-- soy drizzle laps + shine on top of rolls -->
+  <path d="M90 128 C120 134 200 134 232 128" stroke="#3a2010" stroke-width="2.2" fill="none" opacity=".55" stroke-linecap="round"/>
+  <path d="M100 148 C130 154 196 154 224 148" stroke="#3a2010" stroke-width="2" fill="none" opacity=".5" stroke-linecap="round"/>
+  <!-- scallion + toasted sesame garnish -->
+  <rect x="128" y="112" width="7" height="2.6" rx="1.3" fill="#5ecb4e" transform="rotate(-16 131 113)"/>
+  <rect x="176" y="124" width="7" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(14 179 125)"/>
+  <rect x="150" y="146" width="6" height="2.4" rx="1.2" fill="#58c14a" transform="rotate(-22 153 147)"/>
+  <rect x="200" y="140" width="6" height="2.4" rx="1.2" fill="#3f9c37" transform="rotate(18 203 141)"/>
+  <circle cx="118" cy="132" r="1.5" fill="#f8eed6"/>
+  <circle cx="168" cy="130" r="1.5" fill="#f8eed6"/>
+  <circle cx="210" cy="146" r="1.4" fill="#f8eed6"/>
+  <!-- gloss dots -->
+  <circle cx="112" cy="122" r="1.5" fill="#fff" opacity=".65"/>
+  <circle cx="178" cy="132" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="146" cy="142" r="1.3" fill="#fff" opacity=".5"/>
+</svg>

@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <radialGradient id="ltbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <linearGradient id="ltmilk" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f3e6d2"/><stop offset="45%" stop-color="#e2c9a4"/><stop offset="100%" stop-color="#cbaa78"/>
+    </linearGradient>
+    <linearGradient id="ltespresso" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7a4a24"/><stop offset="55%" stop-color="#502c12"/><stop offset="100%" stop-color="#341a09"/>
+    </linearGradient>
+    <linearGradient id="ltglass" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity=".04"/><stop offset="20%" stop-color="#ffffff" stop-opacity=".16"/><stop offset="50%" stop-color="#ffffff" stop-opacity=".03"/><stop offset="80%" stop-color="#ffffff" stop-opacity=".10"/><stop offset="100%" stop-color="#ffffff" stop-opacity=".02"/>
+    </linearGradient>
+    <radialGradient id="ltfoam" cx="42%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#fdf4e6"/><stop offset="60%" stop-color="#f0e0c8"/><stop offset="100%" stop-color="#e0c8a4"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#ltbg)"/>
+  <!-- warm steam wisps (hot drink) -->
+  <path d="M144 42 C136 26 152 20 144 4" stroke="#fff" stroke-width="7" fill="none" opacity=".10" filter="url(#ltBlur3)"/>
+  <path d="M180 44 C174 28 188 22 182 6" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#ltBlur3)"/>
+  <filter id="ltBlur3" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3"/></filter>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="184" rx="108" ry="17" fill="#000" opacity=".5"/>
+  <!-- saucer -->
+  <ellipse cx="160" cy="170" rx="112" ry="20" fill="#141018"/>
+  <ellipse cx="160" cy="170" rx="112" ry="20" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="168" rx="96" ry="14" fill="#0f0d13"/>
+  <!-- clear glass latte mug body (slightly tapered) -->
+  <path d="M112 78 L208 78 L200 158 C194 164 126 164 120 158 Z" fill="#100e14"/>
+  <!-- espresso base layer -->
+  <path d="M116 128 L204 128 L200 156 C195 161 125 161 120 156 Z" fill="url(#ltespresso)"/>
+  <!-- steamed-milk middle layer -->
+  <path d="M114 96 L206 96 L204 130 L116 130 Z" fill="url(#ltmilk)"/>
+  <!-- soft blend line between milk and espresso -->
+  <path d="M116 128 C140 124 180 124 204 128" stroke="#a87c4c" stroke-width="2" opacity=".4" fill="none"/>
+  <!-- crema / microfoam cap -->
+  <path d="M114 96 C114 86 138 80 160 80 C182 80 206 86 206 96 C182 102 138 102 114 96 Z" fill="url(#ltfoam)"/>
+  <ellipse cx="160" cy="90" rx="46" ry="9" fill="#fdf6ea"/>
+  <!-- latte-art rosetta leaf poured in the foam -->
+  <g stroke="#a06a38" stroke-width="1.6" fill="none" opacity=".8" stroke-linecap="round">
+    <path d="M160 82 L160 98"/>
+    <path d="M160 85 C154 85 150 87 148 90 C152 90 156 89 160 88"/>
+    <path d="M160 88 C154 88 150 90 148 93 C152 93 156 92 160 91"/>
+    <path d="M160 91 C154 91 150 93 148 96 C152 96 156 95 160 94"/>
+    <path d="M160 85 C166 85 170 87 172 90 C168 90 164 89 160 88"/>
+    <path d="M160 88 C166 88 170 90 172 93 C168 93 164 92 160 91"/>
+    <path d="M160 91 C166 91 170 93 172 96 C168 96 164 95 160 94"/>
+  </g>
+  <ellipse cx="146" cy="86" rx="14" ry="3.4" fill="#fff" opacity=".45"/>
+  <!-- curved mug handle on the right -->
+  <path d="M208 100 C232 100 232 138 206 140" fill="none" stroke="#1a1622" stroke-width="8" stroke-linecap="round"/>
+  <path d="M208 102 C228 102 228 136 206 138" fill="none" stroke="#3a3048" stroke-width="2" stroke-linecap="round" opacity=".7"/>
+  <!-- glass overlay sheen + vertical highlights -->
+  <path d="M112 78 L208 78 L200 158 C194 164 126 164 120 158 Z" fill="url(#ltglass)"/>
+  <path d="M112 78 L208 78 L200 158 C194 164 126 164 120 158 Z" fill="none" stroke="#d8c9b0" stroke-width="1.4" opacity=".28"/>
+  <path d="M124 84 L122 152" stroke="#ffffff" stroke-width="3" opacity=".22" stroke-linecap="round"/>
+  <path d="M196 84 L198 150" stroke="#ffffff" stroke-width="2" opacity=".14" stroke-linecap="round"/>
+  <!-- coffee bean garnish on the saucer -->
+  <g transform="translate(96 164) rotate(-20)">
+    <ellipse cx="0" cy="0" rx="6" ry="4" fill="#3a1e0c"/>
+    <path d="M0 -4 C-1.5 -1 -1.5 1 0 4" stroke="#1c0d05" stroke-width="1.2" fill="none"/>
+  </g>
+  <!-- gloss dots -->
+  <circle cx="140" cy="112" r="1.4" fill="#fff" opacity=".5"/>
+  <circle cx="184" cy="120" r="1.2" fill="#fff" opacity=".4"/>
+</svg>

@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="ds1Blur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="ds1bg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#123138"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <radialGradient id="ds1sauce" cx="46%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#6b4a1e"/><stop offset="55%" stop-color="#472e0f"/><stop offset="100%" stop-color="#2a1a08"/>
+    </radialGradient>
+    <linearGradient id="ds1pot" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f6cf6a"/><stop offset="55%" stop-color="#e2a838"/><stop offset="100%" stop-color="#b4761d"/>
+    </linearGradient>
+    <linearGradient id="ds1egg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7a4a68"/><stop offset="50%" stop-color="#4e2846"/><stop offset="100%" stop-color="#2e1530"/>
+    </linearGradient>
+    <linearGradient id="ds1pep" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7ed957"/><stop offset="50%" stop-color="#4faa33"/><stop offset="100%" stop-color="#2f7d2b"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#ds1bg)"/>
+  <!-- steam -->
+  <path d="M120 52 C110 34 130 28 120 8" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#ds1Blur3)"/>
+  <path d="M198 50 C190 34 208 28 200 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#ds1Blur3)"/>
+  <ellipse cx="160" cy="188" rx="152" ry="22" fill="#000" opacity=".5"/>
+  <!-- oval plate -->
+  <ellipse cx="160" cy="130" rx="140" ry="46" fill="#141018"/>
+  <ellipse cx="160" cy="130" rx="140" ry="46" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="130" rx="126" ry="38" fill="#0f0d13"/>
+  <!-- neon steam arc (cyan) -->
+  <path d="M48 114 Q102 82 166 80" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- glossy soy glaze pool -->
+  <path d="M60 128 C66 110 108 98 160 98 C212 98 254 110 260 128 C234 150 200 156 160 156 C120 156 86 150 60 128 Z" fill="url(#ds1sauce)"/>
+  <path d="M66 122 C74 110 110 102 160 102 C210 102 246 110 254 122" fill="none" stroke="#a07a3a" stroke-width="1.4" opacity=".35"/>
+  <!-- POTATO WEDGES (golden) — left cluster -->
+  <g stroke="#8a5a16" stroke-width="1.3" stroke-linejoin="round">
+    <path d="M74 112 L100 106 L108 122 L86 130 Z" fill="url(#ds1pot)"/>
+    <path d="M96 128 L122 122 L128 138 L104 144 Z" fill="url(#ds1pot)"/>
+    <path d="M84 96 L108 92 L112 106 L90 110 Z" fill="url(#ds1pot)"/>
+  </g>
+  <ellipse cx="90" cy="112" rx="7" ry="3" fill="#ffe6a0" opacity=".6"/>
+  <ellipse cx="112" cy="128" rx="6" ry="2.6" fill="#ffe6a0" opacity=".55"/>
+  <!-- EGGPLANT CHUNKS (dark glossy purple) — center cluster -->
+  <g stroke="#20102a" stroke-width="1.3" stroke-linejoin="round">
+    <path d="M126 108 q10 -8 22 -3 q8 8 0 18 q-12 6 -22 -2 q-6 -8 0 -13 Z" fill="url(#ds1egg)"/>
+    <path d="M150 126 q10 -8 22 -3 q8 8 0 18 q-12 6 -22 -2 q-6 -8 0 -13 Z" fill="url(#ds1egg)"/>
+    <path d="M158 100 q9 -7 19 -2 q7 7 0 16 q-10 5 -19 -2 q-5 -7 0 -12 Z" fill="url(#ds1egg)"/>
+  </g>
+  <ellipse cx="136" cy="112" rx="6" ry="2.6" fill="#a06890" opacity=".55"/>
+  <ellipse cx="162" cy="130" rx="6" ry="2.6" fill="#a06890" opacity=".5"/>
+  <ellipse cx="167" cy="104" rx="5" ry="2.2" fill="#a06890" opacity=".5"/>
+  <!-- GREEN PEPPER PIECES — right cluster -->
+  <g stroke="#255b1f" stroke-width="1.2" stroke-linejoin="round">
+    <path d="M182 106 q14 -6 28 0 q4 8 -2 16 q-14 5 -26 -2 q-4 -8 0 -14 Z" fill="url(#ds1pep)"/>
+    <path d="M196 126 q12 -5 24 0 q3 7 -2 14 q-12 4 -22 -2 q-3 -7 0 -12 Z" fill="url(#ds1pep)"/>
+    <path d="M172 128 q11 -5 22 0 q3 6 -2 12 q-11 4 -20 -2 q-3 -6 0 -10 Z" fill="url(#ds1pep)"/>
+  </g>
+  <ellipse cx="196" cy="112" rx="6" ry="2.4" fill="#bff09a" opacity=".55"/>
+  <ellipse cx="208" cy="132" rx="5" ry="2.2" fill="#bff09a" opacity=".5"/>
+  <!-- garnish: garlic + scallion -->
+  <circle cx="120" cy="120" r="1.6" fill="#f2ddb0"/>
+  <circle cx="150" cy="118" r="1.5" fill="#f2ddb0"/>
+  <circle cx="180" cy="122" r="1.4" fill="#f2ddb0"/>
+  <rect x="134" y="140" width="7" height="2.6" rx="1.3" fill="#5ecb4e" transform="rotate(-12 137 141)"/>
+  <rect x="188" y="142" width="6" height="2.4" rx="1.2" fill="#3f9c37" transform="rotate(18 191 143)"/>
+  <!-- oil gloss dots -->
+  <circle cx="98" cy="108" r="1.5" fill="#fff" opacity=".6"/>
+  <circle cx="152" cy="112" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="200" cy="118" r="1.3" fill="#fff" opacity=".5"/>
+</svg>

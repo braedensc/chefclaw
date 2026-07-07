@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="tkBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="tkbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="tkball" cx="40%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#e0a457"/><stop offset="52%" stop-color="#b6742e"/><stop offset="100%" stop-color="#7f4818"/>
+    </radialGradient>
+    <linearGradient id="tkboat" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e9d6a6"/><stop offset="100%" stop-color="#c3a86e"/>
+    </linearGradient>
+    <linearGradient id="tksauce" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6b3312"/><stop offset="100%" stop-color="#3f1808"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#tkbg)"/>
+  <!-- steam -->
+  <path d="M118 50 C108 32 128 24 118 4" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#tkBlur3)"/>
+  <path d="M196 48 C188 32 206 24 198 4" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#tkBlur3)"/>
+  <ellipse cx="160" cy="188" rx="150" ry="22" fill="#000" opacity=".5"/>
+  <!-- neon steam arc (warm) -->
+  <path d="M52 108 Q104 78 168 74" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".45" stroke-linecap="round"/>
+  <!-- paper serving boat / tray -->
+  <path d="M44 132 Q160 116 276 132 L262 168 Q160 184 58 168 Z" fill="url(#tkboat)"/>
+  <path d="M44 132 Q160 116 276 132 L262 168 Q160 184 58 168 Z" fill="none" stroke="#9c8450" stroke-width="1.6" opacity=".7"/>
+  <path d="M60 138 Q160 126 260 138" stroke="#fff4d8" stroke-width="1.6" fill="none" opacity=".4"/>
+  <!-- interior shadow trough -->
+  <path d="M64 140 Q160 130 256 140 L246 160 Q160 172 74 160 Z" fill="#b39a62" opacity=".55"/>
+  <!-- takoyaki balls: 6 browned spheres in two rows -->
+  <g>
+    <!-- back row (smaller) -->
+    <g>
+      <circle cx="106" cy="118" r="19" fill="url(#tkball)"/>
+      <circle cx="106" cy="118" r="19" fill="none" stroke="#5e340f" stroke-width="1.4" opacity=".5"/>
+      <ellipse cx="99" cy="110" rx="7" ry="4" fill="#f2c982" opacity=".7"/>
+      <circle cx="120" cy="126" r="2.2" fill="#5a3010" opacity=".7"/>
+      <circle cx="98" cy="126" r="1.8" fill="#6a3a14" opacity=".7"/>
+    </g>
+    <g>
+      <circle cx="160" cy="114" r="19" fill="url(#tkball)"/>
+      <circle cx="160" cy="114" r="19" fill="none" stroke="#5e340f" stroke-width="1.4" opacity=".5"/>
+      <ellipse cx="153" cy="106" rx="7" ry="4" fill="#f2c982" opacity=".7"/>
+      <circle cx="172" cy="122" r="2.2" fill="#5a3010" opacity=".7"/>
+      <circle cx="150" cy="122" r="1.8" fill="#6a3a14" opacity=".7"/>
+    </g>
+    <g>
+      <circle cx="214" cy="118" r="19" fill="url(#tkball)"/>
+      <circle cx="214" cy="118" r="19" fill="none" stroke="#5e340f" stroke-width="1.4" opacity=".5"/>
+      <ellipse cx="207" cy="110" rx="7" ry="4" fill="#f2c982" opacity=".7"/>
+      <circle cx="228" cy="126" r="2.2" fill="#5a3010" opacity=".7"/>
+      <circle cx="206" cy="126" r="1.8" fill="#6a3a14" opacity=".7"/>
+    </g>
+    <!-- front row (larger, on top) -->
+    <g>
+      <circle cx="132" cy="138" r="22" fill="url(#tkball)"/>
+      <circle cx="132" cy="138" r="22" fill="none" stroke="#5e340f" stroke-width="1.5" opacity=".55"/>
+      <ellipse cx="124" cy="129" rx="8" ry="4.5" fill="#f2c982" opacity=".7"/>
+      <circle cx="148" cy="147" r="2.4" fill="#5a3010" opacity=".7"/>
+      <circle cx="123" cy="148" r="2" fill="#6a3a14" opacity=".7"/>
+    </g>
+    <g>
+      <circle cx="188" cy="138" r="22" fill="url(#tkball)"/>
+      <circle cx="188" cy="138" r="22" fill="none" stroke="#5e340f" stroke-width="1.5" opacity=".55"/>
+      <ellipse cx="180" cy="129" rx="8" ry="4.5" fill="#f2c982" opacity=".7"/>
+      <circle cx="204" cy="147" r="2.4" fill="#5a3010" opacity=".7"/>
+      <circle cx="179" cy="148" r="2" fill="#6a3a14" opacity=".7"/>
+    </g>
+  </g>
+  <!-- brown okonomi sauce drizzle across the balls -->
+  <path d="M90 132 Q116 120 140 130 Q166 140 190 128 Q214 118 238 130" stroke="url(#tksauce)" stroke-width="4" fill="none" stroke-linecap="round" opacity=".9"/>
+  <path d="M100 146 Q130 156 158 146 Q186 138 216 148" stroke="url(#tksauce)" stroke-width="3.6" fill="none" stroke-linecap="round" opacity=".85"/>
+  <!-- white kewpie-mayo drizzle -->
+  <path d="M96 128 Q120 118 144 126 Q168 134 192 124 Q214 116 236 126" stroke="#fbf3e0" stroke-width="2" fill="none" stroke-linecap="round" opacity=".9"/>
+  <path d="M104 148 Q134 158 160 148 Q188 140 214 150" stroke="#fbf3e0" stroke-width="1.8" fill="none" stroke-linecap="round" opacity=".9"/>
+  <!-- dancing bonito flakes on top -->
+  <g fill="#e9cfa4" opacity=".9">
+    <path d="M128 98 C134 92 144 94 146 102 C140 104 132 104 128 98 Z"/>
+    <path d="M162 94 C168 88 178 91 180 98 C174 101 166 100 162 94 Z"/>
+    <path d="M190 102 C196 97 205 100 206 107 C200 109 193 107 190 102 Z"/>
+    <path d="M148 108 C154 104 162 106 163 112 C157 114 151 112 148 108 Z"/>
+  </g>
+  <!-- aonori green flecks + scallion -->
+  <rect x="120" y="130" width="6" height="2.4" rx="1.2" fill="#3f9c37" transform="rotate(-16 123 131)"/>
+  <rect x="176" y="132" width="6" height="2.4" rx="1.2" fill="#58c14a" transform="rotate(18 179 133)"/>
+  <rect x="152" y="126" width="6" height="2.4" rx="1.2" fill="#3f9c37" transform="rotate(-8 155 127)"/>
+  <circle cx="140" cy="126" r="1.4" fill="#2f7d2b"/>
+  <circle cx="200" cy="130" r="1.4" fill="#5ecb4e"/>
+  <!-- pink beni shoga sliver -->
+  <rect x="164" y="150" width="8" height="2.4" rx="1.2" fill="#e0546f" transform="rotate(22 168 151)"/>
+  <rect x="112" y="142" width="7" height="2.2" rx="1.1" fill="#e0546f" transform="rotate(-24 115 143)"/>
+  <!-- gloss dots -->
+  <circle cx="124" cy="130" r="1.5" fill="#fff" opacity=".6"/>
+  <circle cx="180" cy="130" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="160" cy="108" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

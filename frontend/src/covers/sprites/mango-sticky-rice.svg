@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <radialGradient id="msrbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="msrrice" cx="42%" cy="30%" r="82%">
+      <stop offset="0%" stop-color="#fffdf3"/><stop offset="58%" stop-color="#f4ecd6"/><stop offset="100%" stop-color="#ddcfac"/>
+    </radialGradient>
+    <linearGradient id="msrmango" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffd23d"/><stop offset="50%" stop-color="#ffab1e"/><stop offset="100%" stop-color="#f08606"/>
+    </linearGradient>
+    <linearGradient id="msrcream" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fffdf6"/><stop offset="100%" stop-color="#f0e6d0"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#msrbg)"/>
+  <ellipse cx="160" cy="186" rx="150" ry="22" fill="#000" opacity=".5"/>
+  <!-- condensation sparkle (cold dessert, no steam arc) -->
+  <circle cx="96" cy="60" r="1.6" fill="#fff" opacity=".5"/>
+  <circle cx="112" cy="48" r="1" fill="#fff" opacity=".4"/>
+  <circle cx="216" cy="56" r="1.4" fill="#fff" opacity=".45"/>
+  <circle cx="230" cy="70" r="1" fill="#fff" opacity=".35"/>
+  <!-- round white dessert plate -->
+  <ellipse cx="160" cy="132" rx="140" ry="46" fill="#17131c"/>
+  <ellipse cx="160" cy="132" rx="140" ry="46" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="132" rx="122" ry="37" fill="#efe9e0"/>
+  <ellipse cx="160" cy="130" rx="122" ry="35" fill="#f7f2ea"/>
+  <!-- sticky rice dome on the left -->
+  <path d="M64 138 C64 116 84 100 110 100 C136 100 156 116 156 138 C144 148 126 152 110 152 C94 152 76 148 64 138 Z" fill="#c9b98f" opacity=".6"/>
+  <path d="M66 134 C66 112 86 96 110 96 C134 96 154 112 154 134 C142 146 126 150 110 150 C94 150 78 146 66 134 Z" fill="url(#msrrice)"/>
+  <path d="M66 134 C66 112 86 96 110 96 C134 96 154 112 154 134" fill="none" stroke="#fffdf3" stroke-width="1.4" opacity=".5"/>
+  <!-- sticky-rice grain glints -->
+  <g stroke-linecap="round" fill="none">
+    <path d="M84 118 l5 -2" stroke="#fffdf3" stroke-width="2.2"/>
+    <path d="M100 110 l5 2" stroke="#e6d9b8" stroke-width="2.2"/>
+    <path d="M116 116 l-5 2" stroke="#fffdf3" stroke-width="2.2"/>
+    <path d="M132 122 l5 -2" stroke="#e6d9b8" stroke-width="2.2"/>
+    <path d="M94 130 l5 2" stroke="#fffdf3" stroke-width="2.2"/>
+    <path d="M120 132 l-5 2" stroke="#e6d9b8" stroke-width="2.2"/>
+    <path d="M140 128 l-5 -2" stroke="#fffdf3" stroke-width="2"/>
+    <path d="M108 126 l5 -2" stroke="#e6d9b8" stroke-width="2"/>
+  </g>
+  <!-- coconut cream pooled + drizzled over rice -->
+  <path d="M70 132 C86 128 132 128 150 133 C142 141 128 145 110 145 C92 145 78 141 70 132 Z" fill="url(#msrcream)" opacity=".85"/>
+  <path d="M78 120 C96 116 128 118 144 122" stroke="#fffdf6" stroke-width="2.4" fill="none" opacity=".7" stroke-linecap="round"/>
+  <!-- fanned ripe mango slices on the right -->
+  <g stroke-linejoin="round">
+    <path d="M172 96 C196 92 224 100 236 116 C224 122 198 122 178 116 C170 108 168 100 172 96 Z" fill="url(#msrmango)" stroke="#d9760a" stroke-width="1.3"/>
+    <path d="M176 112 C200 108 230 116 244 130 C230 137 202 137 182 130 C174 122 172 116 176 112 Z" fill="url(#msrmango)" stroke="#d9760a" stroke-width="1.3"/>
+    <path d="M170 128 C194 124 226 132 240 144 C224 150 198 150 178 144 C170 138 166 132 170 128 Z" fill="url(#msrmango)" stroke="#d9760a" stroke-width="1.3"/>
+    <!-- gloss on mango -->
+    <ellipse cx="200" cy="104" rx="14" ry="4" fill="#ffe79a" opacity=".7"/>
+    <ellipse cx="206" cy="120" rx="14" ry="4" fill="#ffe79a" opacity=".65"/>
+    <ellipse cx="200" cy="136" rx="13" ry="3.6" fill="#ffe79a" opacity=".6"/>
+  </g>
+  <!-- toasted mung-bean / sesame sprinkle -->
+  <circle cx="98" cy="112" r="1.4" fill="#e6c34a"/>
+  <circle cx="126" cy="108" r="1.4" fill="#f4e6cc"/>
+  <circle cx="112" cy="126" r="1.2" fill="#e6c34a"/>
+  <circle cx="88" cy="126" r="1.2" fill="#f4e6cc"/>
+  <!-- gloss dots -->
+  <circle cx="106" cy="108" r="1.4" fill="#fff" opacity=".6"/>
+  <circle cx="196" cy="112" r="1.3" fill="#fff" opacity=".55"/>
+  <circle cx="140" cy="130" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

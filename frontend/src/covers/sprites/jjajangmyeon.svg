@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="jjmBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="jjmbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="jjmplate" cx="50%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <radialGradient id="jjmnest" cx="46%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#f3e0ac"/><stop offset="60%" stop-color="#e0c485"/><stop offset="100%" stop-color="#c6a45f"/>
+    </radialGradient>
+    <radialGradient id="jjmsauce" cx="46%" cy="30%" r="78%">
+      <stop offset="0%" stop-color="#3d2f28"/><stop offset="52%" stop-color="#241a15"/><stop offset="100%" stop-color="#120b08"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#jjmbg)"/>
+  <!-- rising steam wisps -->
+  <path d="M126 52 C118 36 134 28 126 8" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#jjmBlur3)"/>
+  <path d="M198 50 C190 34 206 26 198 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#jjmBlur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="188" rx="150" ry="22" fill="#000" opacity=".5"/>
+  <!-- oval plate -->
+  <ellipse cx="160" cy="132" rx="142" ry="46" fill="url(#jjmplate)"/>
+  <ellipse cx="160" cy="132" rx="142" ry="46" fill="none" stroke="#26262e" stroke-width="3"/>
+  <ellipse cx="160" cy="132" rx="128" ry="38" fill="#0e0d11"/>
+  <!-- neon steam arc (warm) -->
+  <path d="M52 116 Q104 84 168 82" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- pale noodle nest (mound of strands) -->
+  <path d="M66 128 C72 100 108 90 160 90 C212 90 248 100 254 128 C228 148 196 154 160 154 C124 154 92 148 66 128 Z" fill="url(#jjmnest)"/>
+  <g stroke-linecap="round" fill="none">
+    <path d="M74 128 C104 112 150 110 186 118" stroke="#8a5a1e" stroke-width="6" opacity=".55"/>
+    <path d="M78 124 C110 108 154 106 196 114" stroke="#e6cf9d" stroke-width="6"/>
+    <path d="M84 134 C118 122 160 120 208 126" stroke="#d9bd85" stroke-width="6"/>
+    <path d="M92 118 C122 104 162 102 202 108" stroke="#f3e2b0" stroke-width="5"/>
+    <path d="M100 138 C132 128 172 128 214 132" stroke="#cdb078" stroke-width="6"/>
+    <path d="M86 124 C116 110 156 108 194 114" stroke="#fff1c9" stroke-width="2" opacity=".8"/>
+    <path d="M96 132 C128 122 166 120 206 126" stroke="#fff1c9" stroke-width="2" opacity=".6"/>
+  </g>
+  <!-- glossy black-bean sauce pooled/draped ON TOP of the noodles -->
+  <path d="M96 108 C90 96 118 90 140 92 C164 88 196 92 210 104 C224 116 214 132 190 138 C162 144 128 142 108 132 C92 124 90 116 96 108 Z" fill="url(#jjmsauce)"/>
+  <path d="M96 108 C90 96 118 90 140 92 C164 88 196 92 210 104 C224 116 214 132 190 138 C162 144 128 142 108 132 C92 124 90 116 96 108 Z" fill="none" stroke="#0a0605" stroke-width="1.4" opacity=".6"/>
+  <!-- glossy sauce highlights -->
+  <ellipse cx="132" cy="106" rx="18" ry="6" fill="#5a463a" opacity=".55"/>
+  <ellipse cx="182" cy="112" rx="14" ry="5" fill="#4a382d" opacity=".5"/>
+  <ellipse cx="150" cy="124" rx="16" ry="5" fill="#3a2c23" opacity=".5"/>
+  <!-- diced pork + onion chunks in the sauce -->
+  <rect x="118" y="104" width="9" height="8" rx="2.4" fill="#5e2410" transform="rotate(-12 122 108)"/>
+  <rect x="150" y="100" width="9" height="8" rx="2.4" fill="#6b2f16" transform="rotate(10 154 104)"/>
+  <rect x="184" y="108" width="8" height="7" rx="2.2" fill="#5e2410" transform="rotate(-8 188 111)"/>
+  <rect x="132" y="122" width="8" height="7" rx="2.2" fill="#7c3a20" transform="rotate(16 136 125)"/>
+  <rect x="170" y="124" width="8" height="7" rx="2.2" fill="#5e2410" transform="rotate(-14 174 127)"/>
+  <!-- translucent onion dice highlights -->
+  <rect x="140" y="112" width="7" height="6" rx="2" fill="#e7d8bf" opacity=".45" transform="rotate(8 143 115)"/>
+  <rect x="164" y="106" width="7" height="6" rx="2" fill="#e7d8bf" opacity=".4" transform="rotate(-10 167 109)"/>
+  <!-- cucumber julienne garnish on top (signature) -->
+  <rect x="146" y="94" width="30" height="4" rx="2" fill="#5ecb4e" transform="rotate(-6 161 96)"/>
+  <rect x="150" y="98" width="26" height="3.4" rx="1.7" fill="#3f9c37" transform="rotate(-6 163 100)"/>
+  <rect x="152" y="90" width="24" height="3.4" rx="1.7" fill="#6abf5a" transform="rotate(-4 164 92)"/>
+  <!-- chopsticks resting across the plate, upper-right -->
+  <g stroke-linecap="round">
+    <path d="M214 66 L152 128" stroke="#b98a4e" stroke-width="5"/>
+    <path d="M226 74 L164 134" stroke="#a67a40" stroke-width="5"/>
+    <path d="M214 66 L152 128" stroke="#d8b47f" stroke-width="1.4" opacity=".5"/>
+  </g>
+  <!-- a couple noodle strands lifted by the chopsticks -->
+  <path d="M158 124 C160 138 150 146 156 152" stroke="#e6cf9d" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M164 128 C166 140 158 148 162 154" stroke="#3d2f28" stroke-width="3" fill="none" stroke-linecap="round" opacity=".8"/>
+  <!-- oil gloss dots -->
+  <circle cx="138" cy="102" r="1.5" fill="#fff" opacity=".55"/>
+  <circle cx="188" cy="106" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="158" cy="120" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

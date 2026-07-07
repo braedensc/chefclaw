@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="bb1Blur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="bb1bg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#123138"/><stop offset="45%" stop-color="#0b090b"/><stop offset="100%" stop-color="#060507"/>
+    </radialGradient>
+    <radialGradient id="bb1bowl" cx="50%" cy="30%" r="82%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <radialGradient id="bb1grain" cx="45%" cy="35%" r="80%">
+      <stop offset="0%" stop-color="#e7cf9c"/><stop offset="100%" stop-color="#bd9a5c"/>
+    </radialGradient>
+    <linearGradient id="bb1squash" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ff9d3c"/><stop offset="100%" stop-color="#dd6f1c"/>
+    </linearGradient>
+    <linearGradient id="bb1beet" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#c23a5e"/><stop offset="100%" stop-color="#8a1f3e"/>
+    </linearGradient>
+    <radialGradient id="bb1avo" cx="45%" cy="35%" r="80%">
+      <stop offset="0%" stop-color="#c3d879"/><stop offset="100%" stop-color="#7fa143"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#bb1bg)"/>
+  <!-- fresh-air wisp (room temp, very faint) -->
+  <path d="M120 66 C114 52 128 46 122 32" stroke="#fff" stroke-width="7" fill="none" opacity=".06" filter="url(#bb1Blur3)"/>
+  <path d="M200 66 C194 52 206 46 201 34" stroke="#fff" stroke-width="6" fill="none" opacity=".05" filter="url(#bb1Blur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="184" rx="150" ry="21" fill="#000" opacity=".5"/>
+  <!-- WIDE SHALLOW bowl -->
+  <ellipse cx="160" cy="120" rx="148" ry="52" fill="url(#bb1bowl)"/>
+  <ellipse cx="160" cy="120" rx="148" ry="52" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="120" rx="130" ry="44" fill="#0f0d13"/>
+  <ellipse cx="160" cy="120" rx="130" ry="44" fill="none" stroke="#26262e" stroke-width="1.5"/>
+  <!-- COMPOSED SECTIONS radiating from center — each a wedge of a distinct food -->
+  <!-- section 1: grain base (top-left wedge) -->
+  <path d="M160 120 L44 108 C48 92 90 82 130 84 L160 120 Z" fill="url(#bb1grain)"/>
+  <g stroke-linecap="round" fill="none" opacity=".8">
+    <path d="M76 100 l6 -2" stroke="#fff2d2" stroke-width="2"/>
+    <path d="M100 96 l6 2" stroke="#a98544" stroke-width="2"/>
+    <path d="M120 100 l-6 2" stroke="#fff2d2" stroke-width="2"/>
+    <path d="M90 108 l6 -2" stroke="#a98544" stroke-width="2"/>
+  </g>
+  <!-- section 2: roasted squash cubes (top-right wedge) -->
+  <path d="M160 120 L190 82 C230 84 268 96 276 112 L160 120 Z" fill="#1a1622" opacity=".35"/>
+  <rect x="198" y="90" width="16" height="14" rx="2.5" fill="url(#bb1squash)" transform="rotate(-6 206 97)"/>
+  <rect x="216" y="94" width="16" height="14" rx="2.5" fill="url(#bb1squash)" transform="rotate(8 224 101)"/>
+  <rect x="204" y="104" width="15" height="13" rx="2.5" fill="url(#bb1squash)" transform="rotate(4 211 110)"/>
+  <rect x="200" y="92" width="12" height="3.5" rx="1.7" fill="#ffc57a" opacity=".7" transform="rotate(-6 206 93)"/>
+  <!-- section 3: beetroot wedges (bottom-right) -->
+  <path d="M160 120 L276 128 C268 144 232 154 196 152 L160 120 Z" fill="#1a1622" opacity=".3"/>
+  <path d="M206 128 l18 6 -10 12 Z" fill="url(#bb1beet)"/>
+  <path d="M226 130 l16 8 -12 10 Z" fill="url(#bb1beet)"/>
+  <path d="M210 130 l14 5" stroke="#e878a0" stroke-width="1.2" opacity=".6"/>
+  <!-- section 4: avocado fan (bottom-left) -->
+  <path d="M160 120 L130 156 C90 154 52 142 44 128 L160 120 Z" fill="#1a1622" opacity=".3"/>
+  <g transform="translate(96 138)">
+    <path d="M-20 3 C-14 -7 14 -7 20 3 C12 1 -12 1 -20 3 Z" fill="url(#bb1avo)"/>
+    <path d="M-20 3 C-14 -7 14 -7 20 3" fill="none" stroke="#5f7d34" stroke-width="1.2" opacity=".7"/>
+    <path d="M-9 -2 l0 5 M2 -3 l0 6 M11 -2 l0 5" stroke="#e9f0c2" stroke-width="1.1" opacity=".5"/>
+  </g>
+  <!-- center: chickpeas / hummus dollop -->
+  <circle cx="160" cy="120" r="14" fill="#ead6a2"/>
+  <circle cx="160" cy="120" r="14" fill="none" stroke="#c4a85e" stroke-width="1.2" opacity=".6"/>
+  <circle cx="153" cy="116" r="4" fill="#e2c684"/><circle cx="152" cy="115" r="1.3" fill="#f6e6bc" opacity=".8"/>
+  <circle cx="166" cy="122" r="4" fill="#e2c684"/><circle cx="165" cy="121" r="1.3" fill="#f6e6bc" opacity=".8"/>
+  <circle cx="159" cy="126" r="3.6" fill="#e2c684"/>
+  <!-- microgreens + sesame garnish sprinkle -->
+  <rect x="128" y="106" width="7" height="2.6" rx="1.3" fill="#5ecb4e" transform="rotate(-22 131 107)"/>
+  <rect x="176" y="110" width="7" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(18 179 111)"/>
+  <rect x="150" y="132" width="6" height="2.4" rx="1.2" fill="#58c14a" transform="rotate(-10 153 133)"/>
+  <circle cx="140" cy="118" r="1.1" fill="#f8eed6"/><circle cx="182" cy="124" r="1.1" fill="#f8eed6"/><circle cx="118" cy="112" r="1.1" fill="#f8eed6"/>
+  <!-- cold-sparkle gloss dots -->
+  <circle cx="90" cy="98" r="1.4" fill="#fff" opacity=".65"/>
+  <circle cx="212" cy="98" r="1.4" fill="#fff" opacity=".6"/>
+  <circle cx="160" cy="112" r="1.2" fill="#fff" opacity=".55"/>
+</svg>

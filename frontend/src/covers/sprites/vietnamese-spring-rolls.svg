@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="vsBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="vsbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#3a1120"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <linearGradient id="vswrap" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f4ede0" stop-opacity=".92"/><stop offset="100%" stop-color="#dccfba" stop-opacity=".85"/>
+    </linearGradient>
+    <linearGradient id="vssheen" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity=".05"/><stop offset="30%" stop-color="#ffffff" stop-opacity=".22"/><stop offset="60%" stop-color="#ffffff" stop-opacity=".04"/><stop offset="100%" stop-color="#ffffff" stop-opacity=".12"/>
+    </linearGradient>
+    <radialGradient id="vsdip" cx="42%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#c9541e"/><stop offset="100%" stop-color="#7c2a0c"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#vsbg)"/>
+  <ellipse cx="160" cy="184" rx="150" ry="21" fill="#000" opacity=".5"/>
+  <!-- wooden serving board -->
+  <ellipse cx="160" cy="140" rx="142" ry="42" fill="#171017"/>
+  <ellipse cx="160" cy="140" rx="142" ry="42" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="140" rx="128" ry="34" fill="#0f0b10"/>
+  <!-- two translucent rice-paper rolls lying side by side (standing on end, angled) -->
+  <!-- back roll -->
+  <g transform="rotate(-9 138 118)">
+    <rect x="106" y="70" width="64" height="86" rx="30" fill="url(#vswrap)"/>
+    <!-- fillings visible through the wrapper -->
+    <!-- pink shrimp halves (signature) -->
+    <path d="M120 96 C114 90 118 82 128 82 C138 82 144 90 140 98 C136 104 124 104 120 96 Z" fill="#ff8a6a"/>
+    <path d="M120 96 C114 90 118 82 128 82 C138 82 144 90 140 98" fill="none" stroke="#e2542a" stroke-width="1.4"/>
+    <path d="M122 90 q6 -2 12 1" stroke="#c31f12" stroke-width="1.2" fill="none" opacity=".7"/>
+    <path d="M120 118 C114 112 118 104 128 104 C138 104 144 112 140 120 C136 126 124 126 120 118 Z" fill="#ff8a6a"/>
+    <path d="M122 112 q6 -2 12 1" stroke="#c31f12" stroke-width="1.2" fill="none" opacity=".7"/>
+    <!-- green herbs (mint/chive) -->
+    <path d="M114 132 q10 -4 20 0" stroke="#3f9c37" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <path d="M116 140 q10 -3 18 0" stroke="#58c14a" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <ellipse cx="148" cy="128" rx="5" ry="9" fill="#4ba53f" opacity=".8"/>
+    <!-- vermicelli hints (pale strands) -->
+    <path d="M114 146 h40 M116 150 h36" stroke="#f6efe0" stroke-width="1.6" opacity=".6" stroke-linecap="round"/>
+    <!-- wrapper outline + sheen -->
+    <rect x="106" y="70" width="64" height="86" rx="30" fill="url(#vssheen)"/>
+    <rect x="106" y="70" width="64" height="86" rx="30" fill="none" stroke="#efe6d4" stroke-width="1.4" opacity=".45"/>
+    <path d="M116 80 L112 148" stroke="#ffffff" stroke-width="3" opacity=".28" stroke-linecap="round"/>
+  </g>
+  <!-- front roll (larger, overlapping) -->
+  <g transform="rotate(7 190 116)">
+    <rect x="158" y="64" width="70" height="94" rx="33" fill="url(#vswrap)"/>
+    <path d="M176 92 C170 86 174 78 184 78 C194 78 200 86 196 94 C192 100 180 100 176 92 Z" fill="#ff8a6a"/>
+    <path d="M176 92 C170 86 174 78 184 78 C194 78 200 86 196 94" fill="none" stroke="#e2542a" stroke-width="1.4"/>
+    <path d="M178 86 q6 -2 12 1" stroke="#c31f12" stroke-width="1.2" fill="none" opacity=".7"/>
+    <path d="M176 116 C170 110 174 102 184 102 C194 102 200 110 196 118 C192 124 180 124 176 116 Z" fill="#ff8a6a"/>
+    <path d="M178 110 q6 -2 12 1" stroke="#c31f12" stroke-width="1.2" fill="none" opacity=".7"/>
+    <path d="M170 134 q12 -4 24 0" stroke="#3f9c37" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+    <path d="M172 142 q12 -3 22 0" stroke="#58c14a" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <ellipse cx="206" cy="128" rx="5.5" ry="10" fill="#4ba53f" opacity=".85"/>
+    <path d="M170 150 h44 M172 154 h40" stroke="#f6efe0" stroke-width="1.6" opacity=".6" stroke-linecap="round"/>
+    <rect x="158" y="64" width="70" height="94" rx="33" fill="url(#vssheen)"/>
+    <rect x="158" y="64" width="70" height="94" rx="33" fill="none" stroke="#efe6d4" stroke-width="1.5" opacity=".5"/>
+    <path d="M170 74 L165 150" stroke="#ffffff" stroke-width="3.4" opacity=".3" stroke-linecap="round"/>
+  </g>
+  <!-- dipping sauce dish (peanut/hoisin) front-right -->
+  <ellipse cx="266" cy="150" rx="30" ry="13" fill="#141018"/>
+  <ellipse cx="266" cy="150" rx="30" ry="13" fill="none" stroke="#3a1122" stroke-width="2"/>
+  <ellipse cx="266" cy="149" rx="22" ry="9" fill="url(#vsdip)"/>
+  <ellipse cx="260" cy="146" rx="8" ry="3" fill="#e08a52" opacity=".5"/>
+  <!-- crushed peanut fleck + chili in the sauce -->
+  <circle cx="272" cy="150" r="1.6" fill="#e6c48a"/><circle cx="264" cy="152" r="1.4" fill="#c31f12"/>
+  <!-- condensation sparkle (cold dish, no steam arc) -->
+  <circle cx="96" cy="76" r="1.8" fill="#ffd0da" opacity=".8"/>
+  <path d="M94 76 h4 M96 74 v4" stroke="#ffd0da" stroke-width=".8" opacity=".6"/>
+  <circle cx="240" cy="70" r="1.4" fill="#fff" opacity=".65"/>
+  <path d="M238.5 70 h3 M240 68.5 v3" stroke="#fff" stroke-width=".7" opacity=".5"/>
+  <!-- gloss dots on wrappers -->
+  <circle cx="130" cy="86" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="188" cy="82" r="1.4" fill="#fff" opacity=".55"/>
+</svg>

@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="faBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="fabg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="faplate" cx="50%" cy="32%" r="82%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <radialGradient id="famound" cx="46%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#fdf3d8"/><stop offset="58%" stop-color="#f2e0b4"/><stop offset="100%" stop-color="#d9bd85"/>
+    </radialGradient>
+    <linearGradient id="fastrand" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fbeecb"/><stop offset="100%" stop-color="#e6cf9d"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#fabg)"/>
+  <!-- steam -->
+  <path d="M124 52 C114 34 134 26 124 6" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#faBlur3)"/>
+  <path d="M198 54 C190 38 208 30 200 10" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#faBlur3)"/>
+  <ellipse cx="160" cy="188" rx="152" ry="22" fill="#000" opacity=".5"/>
+  <!-- wide round pasta plate -->
+  <ellipse cx="160" cy="130" rx="150" ry="52" fill="url(#faplate)"/>
+  <ellipse cx="160" cy="130" rx="150" ry="52" fill="none" stroke="#26262e" stroke-width="3"/>
+  <ellipse cx="160" cy="130" rx="134" ry="43" fill="#0f0d13"/>
+  <!-- neon steam arc (warm) -->
+  <path d="M52 112 Q106 78 168 76" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".45" stroke-linecap="round"/>
+  <!-- creamy alfredo pool under the nest -->
+  <ellipse cx="160" cy="128" rx="108" ry="34" fill="#f0e2bf" opacity=".35"/>
+  <!-- PALE STRAND NEST (the hero) — flat wide fettuccine ribbons twirled -->
+  <path d="M64 128 C72 100 110 88 160 88 C210 88 248 100 256 128 C232 148 196 154 160 154 C124 154 88 148 64 128 Z" fill="#c8ac72" opacity=".55"/>
+  <path d="M68 126 C76 98 112 86 160 86 C208 86 244 98 252 126 C230 144 196 150 160 150 C124 150 90 144 68 126 Z" fill="url(#famound)"/>
+  <!-- flat ribbon strands twirled across the nest -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M80 122 C104 104 140 100 176 106 C210 112 232 118 246 122" stroke="url(#fastrand)" stroke-width="7"/>
+    <path d="M78 132 C104 118 148 116 188 122 C216 126 234 128 246 130" stroke="#e0c891" stroke-width="7"/>
+    <path d="M84 114 C110 100 150 98 190 102 C218 105 234 110 244 114" stroke="#fbeecb" stroke-width="6"/>
+    <path d="M90 138 C118 128 156 128 194 132 C218 134 232 136 240 138" stroke="#dcc48a" stroke-width="6.5"/>
+    <path d="M96 106 C124 94 160 92 196 96" stroke="#f6e4bd" stroke-width="5.5"/>
+    <path d="M100 146 C130 140 168 140 202 144" stroke="#d3b87e" stroke-width="6"/>
+    <!-- highlight strands -->
+    <path d="M86 120 C112 104 148 100 184 106" stroke="#fff6dc" stroke-width="2" opacity=".8"/>
+    <path d="M92 134 C120 124 158 124 194 128" stroke="#fff6dc" stroke-width="1.8" opacity=".6"/>
+    <!-- shadow strands for depth -->
+    <path d="M96 128 C122 116 160 116 196 120" stroke="#8a5a1e" stroke-width="2.2" opacity=".45"/>
+    <path d="M104 142 C132 134 166 134 198 138" stroke="#7a4c14" stroke-width="2" opacity=".4"/>
+  </g>
+  <!-- creamy sauce pooling / clinging to strands -->
+  <ellipse cx="150" cy="118" rx="26" ry="8" fill="#fbf1d6" opacity=".5"/>
+  <ellipse cx="192" cy="126" rx="18" ry="6" fill="#fbf1d6" opacity=".42"/>
+  <path d="M110 124 C130 120 152 122 172 118" stroke="#fffaf0" stroke-width="2.4" fill="none" opacity=".55" stroke-linecap="round"/>
+  <!-- fork twirled into the nest (right side) -->
+  <g transform="translate(214 92) rotate(28)" stroke="#c9ccd6" stroke-linecap="round">
+    <rect x="-3" y="0" width="6" height="58" rx="3" fill="#c9ccd6" stroke="none"/>
+    <path d="M-8 0 L-8 -18 M-3 0 L-3 -20 M3 0 L3 -20 M8 0 L8 -18" stroke-width="2.4" fill="none"/>
+    <path d="M-8 -2 C-2 4 2 4 8 -2" stroke-width="2.4" fill="none"/>
+  </g>
+  <!-- cracked black pepper + parmesan flecks + parsley garnish -->
+  <circle cx="132" cy="110" r="1.4" fill="#260903"/>
+  <circle cx="168" cy="116" r="1.3" fill="#260903"/>
+  <circle cx="150" cy="124" r="1.4" fill="#260903"/>
+  <circle cx="190" cy="112" r="1.2" fill="#260903"/>
+  <rect x="140" y="100" width="6" height="2.4" rx="1.2" fill="#3f9c37" transform="rotate(-16 143 101)"/>
+  <rect x="176" y="122" width="6" height="2.4" rx="1.2" fill="#5ecb4e" transform="rotate(18 179 123)"/>
+  <rect x="122" y="118" width="5" height="2.2" rx="1.1" fill="#f2eed8" transform="rotate(24 124 119)"/>
+  <rect x="200" y="122" width="5" height="2.2" rx="1.1" fill="#f8f2dc" transform="rotate(-20 202 123)"/>
+  <!-- oil/cream gloss dots -->
+  <circle cx="128" cy="108" r="1.5" fill="#fff" opacity=".6"/>
+  <circle cx="178" cy="106" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="156" cy="132" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="msmBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="msmbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="msmpot" cx="50%" cy="26%" r="88%">
+      <stop offset="0%" stop-color="#6b4029"/><stop offset="55%" stop-color="#3d2113"/><stop offset="100%" stop-color="#1c0d06"/>
+    </radialGradient>
+    <radialGradient id="msmcurry" cx="44%" cy="32%" r="76%">
+      <stop offset="0%" stop-color="#d98a3c"/><stop offset="52%" stop-color="#b0611e"/><stop offset="100%" stop-color="#7a3d10"/>
+    </radialGradient>
+    <linearGradient id="msmbeef" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7c3a20"/><stop offset="100%" stop-color="#4a1c0e"/>
+    </linearGradient>
+    <linearGradient id="msmpotato" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f0d488"/><stop offset="100%" stop-color="#cfa64f"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#msmbg)"/>
+  <!-- rising steam wisps -->
+  <path d="M128 48 C120 32 136 24 128 6" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#msmBlur3)"/>
+  <path d="M196 46 C188 30 204 22 196 4" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#msmBlur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="186" rx="140" ry="22" fill="#000" opacity=".5"/>
+  <!-- neon steam arc (warm/amber) -->
+  <path d="M58 106 Q108 72 172 72" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- curved clay pot silhouette with two small side handles -->
+  <path d="M54 100 C50 92 58 88 66 90 C60 98 62 104 68 106 Z" fill="url(#msmpot)"/>
+  <path d="M266 100 C270 92 262 88 254 90 C260 98 258 104 252 106 Z" fill="url(#msmpot)"/>
+  <path d="M60 104 C60 92 260 92 260 104 C256 156 218 176 160 176 C102 176 64 156 60 104 Z" fill="url(#msmpot)"/>
+  <path d="M60 104 C60 92 260 92 260 104 C256 156 218 176 160 176 C102 176 64 156 60 104 Z" fill="none" stroke="#271b12" stroke-width="3"/>
+  <!-- pot rim highlight -->
+  <path d="M64 104 C64 96 256 96 256 104" fill="none" stroke="#8a5a34" stroke-width="1.6" opacity=".5"/>
+  <!-- glossy curry surface -->
+  <ellipse cx="160" cy="104" rx="98" ry="28" fill="url(#msmcurry)"/>
+  <ellipse cx="160" cy="104" rx="98" ry="28" fill="none" stroke="#6e2f0d" stroke-width="1.6" opacity=".7"/>
+  <!-- coconut-oil sheen slicks on the curry -->
+  <ellipse cx="130" cy="96" rx="28" ry="7" fill="#f0b56a" opacity=".4"/>
+  <ellipse cx="190" cy="108" rx="24" ry="6" fill="#8a4d1a" opacity=".45"/>
+  <!-- glossy irregular beef chunks (hero, back layer smaller) -->
+  <g transform="translate(196 100) scale(.85)">
+    <path d="M-16 -6 C-20 -16 -4 -20 8 -16 C20 -12 20 2 8 6 C-4 10 -14 4 -16 -6 Z" fill="url(#msmbeef)"/>
+    <path d="M-16 -6 C-20 -16 -4 -20 8 -16 C20 -12 20 2 8 6" fill="none" stroke="#240a03" stroke-width="1.4" opacity=".5"/>
+    <ellipse cx="-2" cy="-11" rx="9" ry="3.4" fill="#a85a34" opacity=".55"/>
+  </g>
+  <g transform="translate(132 106) rotate(-8)">
+    <path d="M-18 -6 C-22 -18 -2 -22 12 -17 C24 -12 24 4 10 8 C-4 12 -16 6 -18 -6 Z" fill="url(#msmbeef)"/>
+    <path d="M-18 -6 C-22 -18 -2 -22 12 -17 C24 -12 24 4 10 8" fill="none" stroke="#240a03" stroke-width="1.4" opacity=".5"/>
+    <ellipse cx="-2" cy="-12" rx="11" ry="4" fill="#c17232" opacity=".55"/>
+    <path d="M-8 2 C-2 -2 6 -2 10 2" stroke="#3d1608" stroke-width="1.2" fill="none" opacity=".6"/>
+  </g>
+  <g transform="translate(168 116) rotate(10)">
+    <path d="M-16 -5 C-20 -16 -2 -19 10 -15 C22 -11 22 3 9 7 C-3 11 -14 4 -16 -5 Z" fill="url(#msmbeef)"/>
+    <path d="M-16 -5 C-20 -16 -2 -19 10 -15 C22 -11 22 3 9 7" fill="none" stroke="#240a03" stroke-width="1.4" opacity=".5"/>
+    <ellipse cx="-1" cy="-10" rx="10" ry="3.6" fill="#c17232" opacity=".55"/>
+  </g>
+  <!-- golden potato chunks -->
+  <path d="M104 100 C100 92 112 88 120 92 C126 96 124 106 116 108 C108 110 104 106 104 100 Z" fill="url(#msmpotato)" stroke="#a87e34" stroke-width="1.2"/>
+  <ellipse cx="112" cy="96" rx="7" ry="2.8" fill="#fbeec0" opacity=".7"/>
+  <path d="M150 92 C146 86 156 82 164 86 C170 90 168 98 160 100 C152 102 150 96 150 92 Z" fill="url(#msmpotato)" stroke="#a87e34" stroke-width="1.2"/>
+  <ellipse cx="158" cy="88" rx="6" ry="2.4" fill="#fbeec0" opacity=".65"/>
+  <!-- roasted peanuts scattered (signature) -->
+  <g fill="#e6c078" stroke="#a87a3a" stroke-width="0.8">
+    <ellipse cx="120" cy="112" rx="5" ry="3.4" transform="rotate(20 120 112)"/>
+    <ellipse cx="182" cy="94" rx="5" ry="3.4" transform="rotate(-18 182 94)"/>
+    <ellipse cx="146" cy="116" rx="4.6" ry="3.2" transform="rotate(8 146 116)"/>
+    <ellipse cx="204" cy="112" rx="4.6" ry="3.2" transform="rotate(-30 204 112)"/>
+    <ellipse cx="108" cy="112" rx="4.4" ry="3" transform="rotate(40 108 112)"/>
+  </g>
+  <!-- cinnamon stick + star anise on the surface -->
+  <rect x="176" y="86" width="26" height="5" rx="2.5" fill="#7c4a1e" transform="rotate(-12 189 88)"/>
+  <rect x="176" y="86" width="26" height="1.6" rx="0.8" fill="#a06a34" transform="rotate(-12 189 88)" opacity=".6"/>
+  <g transform="translate(128 90)" fill="#5a3312">
+    <path d="M0 -6 L1.6 -1.6 L6 0 L1.6 1.6 L0 6 L-1.6 1.6 L-6 0 L-1.6 -1.6 Z"/>
+  </g>
+  <!-- cilantro + fried shallot garnish -->
+  <rect x="150" y="108" width="7" height="2.6" rx="1.3" fill="#5ecb4e" transform="rotate(-14 153 109)"/>
+  <rect x="188" y="118" width="6" height="2.4" rx="1.2" fill="#3f9c37" transform="rotate(18 191 119)"/>
+  <circle cx="140" cy="104" r="1.8" fill="#6b5420"/>
+  <circle cx="176" cy="110" r="1.8" fill="#4d3b17"/>
+  <!-- oil gloss dots -->
+  <circle cx="134" cy="96" r="1.5" fill="#fff" opacity=".55"/>
+  <circle cx="192" cy="98" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="164" cy="110" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

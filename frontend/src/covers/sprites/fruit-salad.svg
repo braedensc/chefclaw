@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="fs1Blur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="fs1bg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#3a1120"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <radialGradient id="fs1bowl" cx="50%" cy="30%" r="82%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <linearGradient id="fs1melon" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ff8fa8"/><stop offset="100%" stop-color="#f0576f"/>
+    </linearGradient>
+    <linearGradient id="fs1orange" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffb454"/><stop offset="100%" stop-color="#f5872a"/>
+    </linearGradient>
+    <linearGradient id="fs1kiwi" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#9fd25a"/><stop offset="100%" stop-color="#6fa832"/>
+    </linearGradient>
+    <linearGradient id="fs1grape" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8a5fbf"/><stop offset="100%" stop-color="#5a3688"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#fs1bg)"/>
+  <!-- fresh cold sparkle wisp (chilled fruit, faint) -->
+  <path d="M124 62 C118 48 132 42 126 28" stroke="#fff" stroke-width="7" fill="none" opacity=".06" filter="url(#fs1Blur3)"/>
+  <path d="M198 62 C192 48 204 42 199 30" stroke="#fff" stroke-width="6" fill="none" opacity=".05" filter="url(#fs1Blur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="184" rx="146" ry="21" fill="#000" opacity=".5"/>
+  <!-- WIDE SHALLOW bowl (glass-like) -->
+  <ellipse cx="160" cy="120" rx="146" ry="52" fill="url(#fs1bowl)"/>
+  <ellipse cx="160" cy="120" rx="146" ry="52" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="120" rx="128" ry="44" fill="#0f0d13"/>
+  <ellipse cx="160" cy="120" rx="128" ry="44" fill="none" stroke="#26262e" stroke-width="1.5"/>
+  <!-- back-layer fruit chunks (smaller, dimmer) -->
+  <g opacity=".9">
+    <path d="M78 104 l16 -3 5 14 -14 5 Z" fill="url(#fs1orange)" transform="rotate(-6 86 108)"/>
+    <circle cx="238" cy="106" r="9" fill="url(#fs1grape)"/><circle cx="235" cy="102" r="2.4" fill="#c8a8e8" opacity=".7"/>
+    <path d="M196 100 l14 -2 4 13 -13 4 Z" fill="url(#fs1kiwi)" transform="rotate(8 203 104)"/>
+  </g>
+  <!-- FRONT fruit chunks — a piled, tossed mix of distinct colors/shapes -->
+  <!-- watermelon triangles -->
+  <g>
+    <path d="M100 108 l22 -4 3 20 -20 4 Z" fill="url(#fs1melon)" transform="rotate(-8 110 116)"/>
+    <path d="M100 108 l22 -4" stroke="#e9f0c2" stroke-width="2" opacity=".7" transform="rotate(-8 110 116)"/>
+    <circle cx="112" cy="114" r="1.2" fill="#2a1220"/><circle cx="116" cy="118" r="1.2" fill="#2a1220"/>
+    <path d="M168 116 l20 -3 3 18 -18 4 Z" fill="url(#fs1melon)" transform="rotate(10 176 124)"/>
+    <circle cx="178" cy="122" r="1.2" fill="#2a1220"/><circle cx="182" cy="126" r="1.2" fill="#2a1220"/>
+  </g>
+  <!-- orange / cantaloupe cubes -->
+  <rect x="128" y="110" width="20" height="18" rx="3" fill="url(#fs1orange)" transform="rotate(-4 138 119)"/>
+  <rect x="130" y="112" width="15" height="4.5" rx="2.2" fill="#ffd79a" opacity=".7" transform="rotate(-4 137 114)"/>
+  <rect x="206" y="118" width="19" height="17" rx="3" fill="url(#fs1orange)" transform="rotate(9 215 126)"/>
+  <rect x="208" y="120" width="14" height="4.5" rx="2.2" fill="#ffd79a" opacity=".7" transform="rotate(9 215 122)"/>
+  <!-- kiwi slice (with radial seeds) -->
+  <g transform="translate(160 108)">
+    <circle r="13" fill="url(#fs1kiwi)"/>
+    <circle r="6" fill="#f4f0d0"/>
+    <g fill="#22331a">
+      <circle cx="0" cy="-9" r="1"/><circle cx="6" cy="-6" r="1"/><circle cx="9" cy="0" r="1"/><circle cx="6" cy="6" r="1"/><circle cx="0" cy="9" r="1"/><circle cx="-6" cy="6" r="1"/><circle cx="-9" cy="0" r="1"/><circle cx="-6" cy="-6" r="1"/>
+    </g>
+  </g>
+  <!-- purple grapes (spheres) -->
+  <g>
+    <circle cx="112" cy="132" r="9" fill="url(#fs1grape)"/><circle cx="109" cy="128" r="2.6" fill="#c8a8e8" opacity=".75"/>
+    <circle cx="194" cy="134" r="9" fill="url(#fs1grape)"/><circle cx="191" cy="130" r="2.6" fill="#c8a8e8" opacity=".75"/>
+    <circle cx="150" cy="130" r="7" fill="url(#fs1grape)"/><circle cx="148" cy="127" r="2" fill="#c8a8e8" opacity=".75"/>
+  </g>
+  <!-- strawberry half front-center -->
+  <g transform="translate(174 130)">
+    <path d="M-10 -2 C-10 -11 10 -11 10 -2 C10 7 0 13 0 13 C0 13 -10 7 -10 -2 Z" fill="#e83a4a"/>
+    <path d="M-10 -2 C-5 -6 5 -6 10 -2" fill="none" stroke="#ffd9c8" stroke-width="1.4" opacity=".6"/>
+    <circle cx="-3" cy="2" r="1" fill="#ffe0a0"/><circle cx="3" cy="4" r="1" fill="#ffe0a0"/><circle cx="0" cy="8" r="1" fill="#ffe0a0"/>
+  </g>
+  <!-- blueberries scattered -->
+  <circle cx="138" cy="128" r="4" fill="#3a4a8a"/><circle cx="136" cy="126" r="1.2" fill="#7a8ac8" opacity=".8"/>
+  <circle cx="180" cy="108" r="4" fill="#3a4a8a"/><circle cx="178" cy="106" r="1.2" fill="#7a8ac8" opacity=".8"/>
+  <!-- mint sprig garnish -->
+  <path d="M158 96 C154 90 148 90 146 96 C150 100 156 100 158 96 Z" fill="#3f9c37"/>
+  <path d="M158 96 C162 90 168 90 170 96 C166 100 160 100 158 96 Z" fill="#58c14a"/>
+  <path d="M158 96 l0 -6" stroke="#3f9c37" stroke-width="1.4"/>
+  <!-- juicy cold-sparkle gloss dots -->
+  <circle cx="108" cy="110" r="1.5" fill="#fff" opacity=".75"/>
+  <circle cx="160" cy="102" r="1.4" fill="#fff" opacity=".7"/>
+  <circle cx="212" cy="120" r="1.4" fill="#fff" opacity=".65"/>
+  <circle cx="138" cy="116" r="1.2" fill="#fff" opacity=".6"/>
+  <circle cx="188" cy="128" r="1.2" fill="#fff" opacity=".6"/>
+</svg>

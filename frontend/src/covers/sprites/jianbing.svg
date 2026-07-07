@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="jbBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="jbbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <linearGradient id="jbcrepe" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f4dfa8"/><stop offset="55%" stop-color="#e3c079"/><stop offset="100%" stop-color="#c69a51"/>
+    </linearGradient>
+    <linearGradient id="jbegg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffe38a"/><stop offset="60%" stop-color="#f6b52c"/><stop offset="100%" stop-color="#dd8c14"/>
+    </linearGradient>
+    <linearGradient id="jbcrisp" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f0c877"/><stop offset="55%" stop-color="#cf9a40"/><stop offset="100%" stop-color="#9c6a1e"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#jbbg)"/>
+  <!-- steam -->
+  <path d="M120 52 C110 34 130 26 120 6" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#jbBlur3)"/>
+  <path d="M198 50 C190 34 208 26 200 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#jbBlur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="184" rx="150" ry="22" fill="#000" opacity=".5"/>
+  <!-- neon steam arc (warm/local) -->
+  <path d="M52 116 Q104 84 168 82" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".45" stroke-linecap="round"/>
+  <!-- brown paper wrapper it's served in -->
+  <g transform="rotate(-6 160 138)">
+    <path d="M40 138 L150 116 L280 140 L262 178 C210 190 110 190 58 178 Z" fill="#7a5a34" opacity=".85"/>
+    <path d="M44 138 L150 118 L274 140 L258 172 C208 183 112 183 62 172 Z" fill="#8f6b3f"/>
+    <path d="M60 150 L250 150" stroke="#6b4f2c" stroke-width="1.4" opacity=".5"/>
+  </g>
+  <!-- FOLDED JIANBING: the crepe folded into a fat rectangular parcel, one corner peeled to show egg+crisp -->
+  <!-- back crepe fold (darker) -->
+  <path d="M74 128 L214 112 C228 116 236 126 232 140 L226 158 C170 168 108 168 68 156 Z" fill="#b8934e" opacity=".9"/>
+  <!-- main crepe body, egg-glazed thin pancake wrapped -->
+  <path d="M70 122 C86 106 200 100 214 104 C228 108 238 120 232 136 L224 158 C168 170 104 170 64 156 C58 142 60 130 70 122 Z" fill="url(#jbcrepe)" stroke="#9c6a1e" stroke-width="1.4"/>
+  <!-- speckled egg-batter texture (dark sesame + scallion cooked into surface) -->
+  <circle cx="96" cy="128" r="1.6" fill="#2f1c08" opacity=".7"/>
+  <circle cx="126" cy="122" r="1.4" fill="#2f1c08" opacity=".6"/>
+  <circle cx="158" cy="120" r="1.6" fill="#2f1c08" opacity=".7"/>
+  <circle cx="190" cy="124" r="1.4" fill="#2f1c08" opacity=".6"/>
+  <circle cx="110" cy="142" r="1.4" fill="#2f1c08" opacity=".6"/>
+  <circle cx="176" cy="140" r="1.5" fill="#2f1c08" opacity=".65"/>
+  <rect x="140" y="128" width="6" height="2.4" rx="1.2" fill="#4d8a3a" opacity=".8" transform="rotate(18 143 129)"/>
+  <rect x="112" y="132" width="5" height="2.2" rx="1.1" fill="#4d8a3a" opacity=".8" transform="rotate(-12 114 133)"/>
+  <rect x="196" y="136" width="5" height="2.2" rx="1.1" fill="#4d8a3a" opacity=".8" transform="rotate(22 198 137)"/>
+  <!-- top fold-flap edge (highlight ridge) -->
+  <path d="M70 122 C86 106 200 100 214 104" fill="none" stroke="#fff0cf" stroke-width="1.5" opacity=".45"/>
+  <!-- OPEN LEFT END: peeled corner revealing the fillings -->
+  <path d="M64 156 C58 142 60 130 70 122 C76 130 76 148 78 160 C72 160 68 158 64 156 Z" fill="#d8b06a"/>
+  <!-- egg layer inside -->
+  <path d="M72 132 C82 128 96 130 102 138 C96 146 82 148 74 146 C70 142 70 136 72 132 Z" fill="url(#jbegg)"/>
+  <ellipse cx="84" cy="135" rx="7" ry="2.6" fill="#ffe8a0" opacity=".8"/>
+  <!-- crispy cracker (bao cui / youtiao) sticking out of the open end -->
+  <g transform="rotate(-8 78 140)">
+    <path d="M46 132 L84 138 L82 152 L44 148 C40 144 40 136 46 132 Z" fill="url(#jbcrisp)" stroke="#7a5216" stroke-width="1.2"/>
+    <path d="M50 138 L80 143" stroke="#e6bd6f" stroke-width="1.6" opacity=".7"/>
+    <path d="M50 144 L78 148" stroke="#8f6222" stroke-width="1.2" opacity=".6"/>
+    <!-- bubbly fried texture -->
+    <circle cx="56" cy="140" r="1.6" fill="#fff0cf" opacity=".6"/>
+    <circle cx="66" cy="142" r="1.4" fill="#fff0cf" opacity=".5"/>
+    <circle cx="74" cy="139" r="1.3" fill="#8f6222" opacity=".5"/>
+  </g>
+  <!-- cilantro + scallion garnish poking from the open end -->
+  <rect x="70" y="150" width="8" height="2.6" rx="1.3" fill="#5ecb4e" transform="rotate(-24 74 151)"/>
+  <rect x="82" y="152" width="7" height="2.4" rx="1.2" fill="#3f9c37" transform="rotate(-8 85 153)"/>
+  <!-- sauce sheen brushed on top (tianmianjiang / chili) -->
+  <path d="M110 118 C140 114 180 114 206 120" stroke="#8a2e12" stroke-width="2.4" fill="none" opacity=".5" stroke-linecap="round"/>
+  <path d="M120 126 C150 123 178 124 198 128" stroke="#c14a1e" stroke-width="1.8" fill="none" opacity=".45" stroke-linecap="round"/>
+  <!-- gloss dots -->
+  <circle cx="150" cy="116" r="1.5" fill="#fff" opacity=".6"/>
+  <circle cx="188" cy="126" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="94" cy="140" r="1.2" fill="#fff" opacity=".55"/>
+</svg>

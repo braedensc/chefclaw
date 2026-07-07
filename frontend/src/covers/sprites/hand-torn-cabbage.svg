@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="htcBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="htcbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#123138"/><stop offset="45%" stop-color="#0b090b"/><stop offset="100%" stop-color="#060507"/>
+    </radialGradient>
+    <radialGradient id="htcplate" cx="50%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <!-- leaf blade: pale yellow-green tapering into fresh green -->
+    <linearGradient id="htcleaf" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#eef3d6"/><stop offset="50%" stop-color="#d3e4a8"/><stop offset="100%" stop-color="#a8c67c"/>
+    </linearGradient>
+    <linearGradient id="htcleaf2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e2edc4"/><stop offset="60%" stop-color="#bcd493"/><stop offset="100%" stop-color="#94b56e"/>
+    </linearGradient>
+    <!-- crisp white leaf-rib / stalk section -->
+    <linearGradient id="htcrib" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fbfdf2"/><stop offset="100%" stop-color="#e2ecca"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#htcbg)"/>
+  <!-- steam -->
+  <path d="M116 52 C106 36 126 28 116 8" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#htcBlur3)"/>
+  <path d="M200 50 C192 34 210 26 202 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#htcBlur3)"/>
+  <ellipse cx="160" cy="188" rx="152" ry="22" fill="#000" opacity=".5"/>
+  <!-- oval plate -->
+  <ellipse cx="160" cy="132" rx="140" ry="46" fill="url(#htcplate)"/>
+  <ellipse cx="160" cy="132" rx="140" ry="46" fill="none" stroke="#26262e" stroke-width="3"/>
+  <ellipse cx="160" cy="132" rx="126" ry="38" fill="#0c0c0f"/>
+  <!-- neon steam arc (cyan/savory) -->
+  <path d="M48 116 Q100 82 166 82" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+
+  <!-- HAND-TORN CABBAGE: flat, thin, ruffled leaf sheets with jagged torn edges, tossed at varied angles.
+       Each piece = a flattish shard with a wavy/serrated perimeter, a curled corner, a pale rib,
+       and fold shading — NOT a rounded ball. Deliberately asymmetric to read as a tossed pile. -->
+
+  <!-- back-layer torn shards (smaller, dimmer, tucked behind) -->
+  <g transform="translate(64 128) rotate(-22) scale(.9)" opacity=".85">
+    <path d="M0 10 L14 2 L22 8 L34 -1 L46 6 L58 1 L66 9 L60 17 L48 13 L38 20 L26 15 L15 21 L6 16 Z"
+          fill="url(#htcleaf2)" stroke="#7ea45a" stroke-width="1.1" stroke-linejoin="round"/>
+    <path d="M10 10 C26 5 44 6 60 10" stroke="#9cbb72" stroke-width="1.2" fill="none" opacity=".55"/>
+  </g>
+  <g transform="translate(200 122) rotate(20) scale(.88)" opacity=".85">
+    <path d="M0 9 L12 3 L22 9 L32 1 L44 7 L56 2 L64 10 L56 16 L46 12 L36 19 L24 14 L14 20 L4 15 Z"
+          fill="url(#htcleaf2)" stroke="#7ea45a" stroke-width="1.1" stroke-linejoin="round"/>
+    <path d="M10 10 C26 5 44 6 58 10" stroke="#9cbb72" stroke-width="1.2" fill="none" opacity=".55"/>
+  </g>
+
+  <!-- front-layer torn shards (larger, brighter, curled corner + pale rib + fold) -->
+  <!-- piece 1: left, tilted up, curled top-right corner -->
+  <g transform="translate(70 120) rotate(-12)">
+    <path d="M0 14 L16 4 L26 11 L40 1 L54 8 L66 2 L72 11 L64 18
+             C70 12 76 12 78 18 C76 25 68 25 64 20
+             L66 26 L52 22 L42 30 L30 24 L18 30 L8 24 Z"
+          fill="url(#htcleaf)" stroke="#88ad63" stroke-width="1.4" stroke-linejoin="round"/>
+    <!-- pale crunchy rib along the torn base -->
+    <path d="M6 18 C22 12 44 12 60 16 C46 20 24 20 6 18 Z" fill="url(#htcrib)" opacity=".9"/>
+    <!-- fold / vein lines -->
+    <path d="M14 10 C32 3 52 4 68 9" stroke="#a9c47e" stroke-width="1.4" fill="none" opacity=".65"/>
+    <path d="M20 22 C34 16 52 16 64 20" stroke="#9cbb72" stroke-width="1.2" fill="none" opacity=".5"/>
+    <!-- ragged torn highlight edge -->
+    <path d="M4 12 L16 4 L26 11 L40 1 L54 8 L66 2" stroke="#f9fce9" stroke-width="1.4" fill="none" opacity=".5" stroke-linejoin="round"/>
+  </g>
+  <!-- piece 2: center-front, biggest, big curled-over corner -->
+  <g transform="translate(112 116) rotate(7)">
+    <path d="M2 16 L18 5 L30 13 L46 2 L62 10 L76 3 L84 13 L74 20
+             C82 12 92 13 94 21 C91 30 80 30 76 22
+             L78 30 L62 25 L50 34 L36 27 L22 33 L10 26 Z"
+          fill="url(#htcleaf)" stroke="#88ad63" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M8 20 C26 13 54 13 72 18 C54 24 26 24 8 20 Z" fill="url(#htcrib)" opacity=".9"/>
+    <path d="M18 11 C40 3 62 4 80 10" stroke="#a9c47e" stroke-width="1.5" fill="none" opacity=".65"/>
+    <path d="M24 25 C42 18 62 18 76 22" stroke="#9cbb72" stroke-width="1.3" fill="none" opacity=".5"/>
+    <path d="M6 14 L18 5 L30 13 L46 2 L62 10 L76 3" stroke="#f9fce9" stroke-width="1.5" fill="none" opacity=".5" stroke-linejoin="round"/>
+  </g>
+  <!-- piece 3: right, tilted down, ruffled -->
+  <g transform="translate(174 116) rotate(15)">
+    <path d="M0 12 L14 3 L26 10 L40 0 L54 7 L66 1 L72 10 L64 16
+             L66 22 L52 18 L42 26 L30 20 L18 26 L8 20 Z"
+          fill="url(#htcleaf)" stroke="#88ad63" stroke-width="1.4" stroke-linejoin="round"/>
+    <path d="M6 15 C22 9 44 9 60 13 C44 17 24 17 6 15 Z" fill="url(#htcrib)" opacity=".85"/>
+    <path d="M12 9 C30 2 50 3 66 8" stroke="#a9c47e" stroke-width="1.4" fill="none" opacity=".65"/>
+    <path d="M16 19 C32 13 50 13 62 17" stroke="#9cbb72" stroke-width="1.2" fill="none" opacity=".5"/>
+    <path d="M4 10 L14 3 L26 10 L40 0 L54 7 L66 1" stroke="#f9fce9" stroke-width="1.4" fill="none" opacity=".5" stroke-linejoin="round"/>
+  </g>
+  <!-- piece 4: small curled shard perched on the pile, top center -->
+  <g transform="translate(138 104) rotate(-20) scale(.82)">
+    <path d="M0 10 L12 2 L24 9 L38 0 L50 7 L58 2 L62 10
+             C68 6 74 8 74 14 C72 20 64 20 60 15
+             L54 20 L42 15 L30 22 L18 16 L8 21 Z"
+          fill="url(#htcleaf)" stroke="#88ad63" stroke-width="1.4" stroke-linejoin="round"/>
+    <path d="M12 9 C30 2 48 4 60 10" stroke="#a9c47e" stroke-width="1.3" fill="none" opacity=".6"/>
+    <path d="M4 8 L12 2 L24 9 L38 0 L50 7" stroke="#f9fce9" stroke-width="1.4" fill="none" opacity=".5" stroke-linejoin="round"/>
+  </g>
+
+  <!-- dried red chili SEGMENTS tossed through (short curled pods, hollow cut ends) -->
+  <g transform="translate(92 136) rotate(20)">
+    <path d="M0 0 C10 -4 22 -3 28 2 C22 6 10 6 0 3 Z" fill="#c31f12"/>
+    <path d="M28 2 C32 1 35 3 37 6" stroke="#7a1305" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(206 138) rotate(-22)">
+    <path d="M0 0 C9 -3 20 -3 26 2 C20 5 9 5 0 3 Z" fill="#d8341c"/>
+    <path d="M26 2 C30 1 33 3 34 6" stroke="#7a1305" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(150 148) rotate(8)">
+    <path d="M0 0 C8 -3 18 -2 23 2 C18 5 8 5 0 3 Z" fill="#c31f12"/>
+    <ellipse cx="2" cy="1.5" rx="1.4" ry="1.6" fill="#7a1305"/>
+  </g>
+
+  <!-- garlic slices/bits scattered -->
+  <ellipse cx="126" cy="132" rx="4.4" ry="2.6" fill="#f2ddb0" transform="rotate(-14 126 132)"/>
+  <ellipse cx="126" cy="132" rx="1.6" ry="1" fill="#e3cda4" transform="rotate(-14 126 132)"/>
+  <ellipse cx="192" cy="126" rx="4" ry="2.4" fill="#f2ddb0" transform="rotate(20 192 126)"/>
+  <ellipse cx="166" cy="142" rx="3.6" ry="2.2" fill="#f2ddb0" transform="rotate(8 166 142)"/>
+
+  <!-- Sichuan peppercorn husks (small, off to the sides — never paired on a leaf) + oily gloss dots -->
+  <circle cx="106" cy="142" r="1.3" fill="#260903"/>
+  <circle cx="182" cy="146" r="1.2" fill="#260903"/>
+  <circle cx="120" cy="150" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="158" cy="140" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="214" cy="132" r="1.2" fill="#fff" opacity=".5"/>
+  <circle cx="90" cy="128" r="1.1" fill="#fff" opacity=".5"/>
+</svg>

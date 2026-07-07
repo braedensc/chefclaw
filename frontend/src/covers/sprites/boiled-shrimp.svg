@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="bs1Blur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="bs1bg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#123138"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <linearGradient id="bs1shrimp" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffb08a"/><stop offset="45%" stop-color="#ff7a4a"/><stop offset="100%" stop-color="#e04a20"/>
+    </linearGradient>
+    <radialGradient id="bs1plate" cx="50%" cy="34%" r="82%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <radialGradient id="bs1dip" cx="46%" cy="34%" r="78%">
+      <stop offset="0%" stop-color="#7a4a1e"/><stop offset="100%" stop-color="#3a2410"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#bs1bg)"/>
+  <!-- gentle steam (freshly poached, hot but light) -->
+  <path d="M120 52 C112 36 126 30 120 12" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#bs1Blur3)"/>
+  <path d="M198 54 C192 38 204 32 200 14" stroke="#fff" stroke-width="5" fill="none" opacity=".06" filter="url(#bs1Blur3)"/>
+  <ellipse cx="160" cy="188" rx="152" ry="22" fill="#000" opacity=".5"/>
+  <!-- wide shallow plate -->
+  <ellipse cx="160" cy="130" rx="140" ry="50" fill="url(#bs1plate)"/>
+  <ellipse cx="160" cy="130" rx="140" ry="50" fill="none" stroke="#26262e" stroke-width="3"/>
+  <ellipse cx="160" cy="130" rx="124" ry="41" fill="#0e0e12"/>
+  <!-- neon steam arc (cyan) -->
+  <path d="M52 112 Q106 82 170 78" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- small dipping-sauce bowl at center-back -->
+  <ellipse cx="160" cy="112" rx="22" ry="9" fill="#141018"/>
+  <ellipse cx="160" cy="112" rx="22" ry="9" fill="none" stroke="#2c2136" stroke-width="1.6"/>
+  <ellipse cx="160" cy="111" rx="17" ry="6.5" fill="url(#bs1dip)"/>
+  <circle cx="156" cy="110" r="1.6" fill="#e0341f"/>
+  <circle cx="164" cy="111" r="1.4" fill="#5ecb4e"/>
+  <ellipse cx="157" cy="109" rx="5" ry="2" fill="#a06a34" opacity=".6"/>
+  <!-- POACHED SHRIMP arranged in a ring around the dip -->
+  <!-- each shrimp: curled comma body, banded segments, tail fan, whiskers -->
+  <!-- front-bottom shrimp -->
+  <g transform="translate(122 148) rotate(-8)">
+    <path d="M0 0 C-14 -2 -24 8 -22 22 C-20 34 -8 40 4 36 C0 28 -2 20 4 14 C10 8 8 2 0 0 Z" fill="url(#bs1shrimp)" stroke="#b23414" stroke-width="1.3"/>
+    <g stroke="#c93314" stroke-width="1.4" opacity=".7" fill="none"><path d="M-16 6 C-20 12 -20 18 -16 24"/><path d="M-12 2 C-16 10 -16 20 -10 28"/></g>
+    <path d="M0 0 C6 -8 16 -8 20 -2 C14 -2 8 2 4 6 Z" fill="url(#bs1shrimp)" stroke="#b23414" stroke-width="1.1"/>
+    <path d="M2 -2 C6 -10 2 -18 -4 -22 M6 -1 C12 -8 12 -18 8 -24" stroke="#e07a52" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+    <circle cx="-2" cy="4" r="1.6" fill="#3a1508"/>
+    <ellipse cx="-10" cy="14" rx="5" ry="2.4" fill="#ffcbaa" opacity=".7"/>
+  </g>
+  <!-- left shrimp -->
+  <g transform="translate(96 116) rotate(-52)">
+    <path d="M0 0 C-14 -2 -24 8 -22 22 C-20 34 -8 40 4 36 C0 28 -2 20 4 14 C10 8 8 2 0 0 Z" fill="url(#bs1shrimp)" stroke="#b23414" stroke-width="1.3"/>
+    <g stroke="#c93314" stroke-width="1.4" opacity=".7" fill="none"><path d="M-16 6 C-20 12 -20 18 -16 24"/><path d="M-12 2 C-16 10 -16 20 -10 28"/></g>
+    <path d="M0 0 C6 -8 16 -8 20 -2 C14 -2 8 2 4 6 Z" fill="url(#bs1shrimp)" stroke="#b23414" stroke-width="1.1"/>
+    <path d="M2 -2 C6 -10 2 -18 -4 -22" stroke="#e07a52" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+    <circle cx="-2" cy="4" r="1.6" fill="#3a1508"/>
+    <ellipse cx="-10" cy="14" rx="5" ry="2.4" fill="#ffcbaa" opacity=".7"/>
+  </g>
+  <!-- right shrimp -->
+  <g transform="translate(224 116) rotate(52) scale(-1 1)">
+    <path d="M0 0 C-14 -2 -24 8 -22 22 C-20 34 -8 40 4 36 C0 28 -2 20 4 14 C10 8 8 2 0 0 Z" fill="url(#bs1shrimp)" stroke="#b23414" stroke-width="1.3"/>
+    <g stroke="#c93314" stroke-width="1.4" opacity=".7" fill="none"><path d="M-16 6 C-20 12 -20 18 -16 24"/><path d="M-12 2 C-16 10 -16 20 -10 28"/></g>
+    <path d="M0 0 C6 -8 16 -8 20 -2 C14 -2 8 2 4 6 Z" fill="url(#bs1shrimp)" stroke="#b23414" stroke-width="1.1"/>
+    <path d="M2 -2 C6 -10 2 -18 -4 -22" stroke="#e07a52" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+    <circle cx="-2" cy="4" r="1.6" fill="#3a1508"/>
+    <ellipse cx="-10" cy="14" rx="5" ry="2.4" fill="#ffcbaa" opacity=".7"/>
+  </g>
+  <!-- back-left shrimp (smaller/dimmer) -->
+  <g transform="translate(120 96) rotate(-96) scale(.82)" opacity=".92">
+    <path d="M0 0 C-14 -2 -24 8 -22 22 C-20 34 -8 40 4 36 C0 28 -2 20 4 14 C10 8 8 2 0 0 Z" fill="url(#bs1shrimp)" stroke="#b23414" stroke-width="1.3"/>
+    <g stroke="#c93314" stroke-width="1.4" opacity=".7" fill="none"><path d="M-16 6 C-20 12 -20 18 -16 24"/><path d="M-12 2 C-16 10 -16 20 -10 28"/></g>
+    <path d="M0 0 C6 -8 16 -8 20 -2 C14 -2 8 2 4 6 Z" fill="url(#bs1shrimp)" stroke="#b23414" stroke-width="1.1"/>
+    <circle cx="-2" cy="4" r="1.6" fill="#3a1508"/>
+  </g>
+  <!-- back-right shrimp (smaller/dimmer) -->
+  <g transform="translate(200 96) rotate(96) scale(.82 -.82)" opacity=".92">
+    <path d="M0 0 C-14 -2 -24 8 -22 22 C-20 34 -8 40 4 36 C0 28 -2 20 4 14 C10 8 8 2 0 0 Z" fill="url(#bs1shrimp)" stroke="#b23414" stroke-width="1.3"/>
+    <g stroke="#c93314" stroke-width="1.4" opacity=".7" fill="none"><path d="M-16 6 C-20 12 -20 18 -16 24"/><path d="M-12 2 C-16 10 -16 20 -10 28"/></g>
+    <path d="M0 0 C6 -8 16 -8 20 -2 C14 -2 8 2 4 6 Z" fill="url(#bs1shrimp)" stroke="#b23414" stroke-width="1.1"/>
+    <circle cx="-2" cy="4" r="1.6" fill="#3a1508"/>
+  </g>
+  <!-- fresh garnish: coriander sprig + scallion -->
+  <rect x="140" y="146" width="7" height="2.6" rx="1.3" fill="#5ecb4e" transform="rotate(16 143 147)"/>
+  <rect x="176" y="144" width="7" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(-18 179 145)"/>
+  <circle cx="160" cy="150" r="2" fill="#6abf5a"/>
+  <!-- water/condensation gloss dots (light, poached) -->
+  <circle cx="118" cy="132" r="1.5" fill="#fff" opacity=".6"/>
+  <circle cx="204" cy="132" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="146" cy="140" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="184" cy="126" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

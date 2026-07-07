@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <radialGradient id="cetbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#102e35"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <radialGradient id="cetbowl" cx="50%" cy="30%" r="82%">
+      <stop offset="0%" stop-color="#1c1622"/><stop offset="100%" stop-color="#0c0c0f"/>
+    </radialGradient>
+    <linearGradient id="cettofu" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fbf5e6"/><stop offset="55%" stop-color="#f2ead2"/><stop offset="100%" stop-color="#dfd0ac"/>
+    </linearGradient>
+    <radialGradient id="cetegg" cx="42%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#5a5a2e"/><stop offset="45%" stop-color="#3a3a1e"/><stop offset="100%" stop-color="#1e1e10"/>
+    </radialGradient>
+    <radialGradient id="cetyolk" cx="42%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#6b7a3a"/><stop offset="55%" stop-color="#4a5226"/><stop offset="100%" stop-color="#2c3016"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#cetbg)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="186" rx="146" ry="22" fill="#000" opacity=".5"/>
+  <!-- condensation sparkle (cold dish, no steam) -->
+  <g fill="#bfe9ff" opacity=".5">
+    <path d="M96 60 l1.6 4 l4 1.6 l-4 1.6 l-1.6 4 l-1.6 -4 l-4 -1.6 l4 -1.6 Z"/>
+    <path d="M214 52 l1.3 3.2 l3.2 1.3 l-3.2 1.3 l-1.3 3.2 l-1.3 -3.2 l-3.2 -1.3 l3.2 -1.3 Z"/>
+  </g>
+  <circle cx="150" cy="48" r="1.6" fill="#dff4ff" opacity=".6"/>
+  <!-- wide shallow cold-dish bowl -->
+  <ellipse cx="160" cy="128" rx="146" ry="50" fill="url(#cetbowl)"/>
+  <ellipse cx="160" cy="128" rx="146" ry="50" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="126" rx="128" ry="41" fill="#111017"/>
+  <ellipse cx="160" cy="126" rx="128" ry="41" fill="none" stroke="#1e1a28" stroke-width="1.5"/>
+  <!-- silken tofu blocks (cool white cubes) laid across the bowl -->
+  <g stroke="#c9bf9a" stroke-width="1.3">
+    <g transform="translate(78 104) rotate(-6)">
+      <path d="M0 8 L34 0 L46 6 L12 15 Z" fill="#eee6cf"/>
+      <path d="M0 8 L12 15 L12 30 L0 23 Z" fill="#d8ccab"/>
+      <path d="M12 15 L46 6 L46 21 L12 30 Z" fill="url(#cettofu)"/>
+    </g>
+    <g transform="translate(150 110) rotate(4)">
+      <path d="M0 8 L34 0 L46 6 L12 15 Z" fill="#eee6cf"/>
+      <path d="M0 8 L12 15 L12 30 L0 23 Z" fill="#d8ccab"/>
+      <path d="M12 15 L46 6 L46 21 L12 30 Z" fill="url(#cettofu)"/>
+    </g>
+    <g transform="translate(118 130) rotate(-3)">
+      <path d="M0 8 L34 0 L46 6 L12 15 Z" fill="#eee6cf"/>
+      <path d="M0 8 L12 15 L12 30 L0 23 Z" fill="#d8ccab"/>
+      <path d="M12 15 L46 6 L46 21 L12 30 Z" fill="url(#cettofu)"/>
+    </g>
+    <g transform="translate(196 128) rotate(8)">
+      <path d="M0 8 L28 0 L38 6 L10 14 Z" fill="#eee6cf"/>
+      <path d="M0 8 L10 14 L10 27 L0 21 Z" fill="#d8ccab"/>
+      <path d="M10 14 L38 6 L38 19 L10 27 Z" fill="url(#cettofu)"/>
+    </g>
+  </g>
+  <!-- CENTURY-EGG WEDGES (dark amber-brown white, olive-green yolk) on top -->
+  <g stroke="#14140a" stroke-width="1.2">
+    <path d="M108 96 C104 88 116 82 126 86 C134 84 140 92 136 100 C138 108 124 112 114 108 C106 108 104 102 108 96 Z" fill="url(#cetegg)"/>
+    <ellipse cx="122" cy="97" rx="8" ry="6.5" fill="url(#cetyolk)"/>
+    <ellipse cx="119" cy="94" rx="2.6" ry="2" fill="#8a9a4a" opacity=".7"/>
+  </g>
+  <g stroke="#14140a" stroke-width="1.2">
+    <path d="M168 100 C164 92 176 86 186 90 C194 88 200 96 196 104 C198 112 184 116 174 112 C166 112 164 106 168 100 Z" fill="url(#cetegg)"/>
+    <ellipse cx="182" cy="101" rx="8" ry="6.5" fill="url(#cetyolk)"/>
+    <ellipse cx="179" cy="98" rx="2.6" ry="2" fill="#8a9a4a" opacity=".7"/>
+  </g>
+  <g stroke="#14140a" stroke-width="1.2">
+    <path d="M136 122 C132 114 144 108 154 112 C162 110 168 118 164 126 C166 134 152 138 142 134 C134 134 132 128 136 122 Z" fill="url(#cetegg)"/>
+    <ellipse cx="150" cy="123" rx="7.5" ry="6" fill="url(#cetyolk)"/>
+    <ellipse cx="147" cy="120" rx="2.4" ry="1.8" fill="#8a9a4a" opacity=".7"/>
+  </g>
+  <!-- translucent "pine-flower" crackle marks on egg white -->
+  <g stroke="#6a6a3a" stroke-width=".8" fill="none" opacity=".6">
+    <path d="M110 92 l4 3 l-2 4"/><path d="M132 102 l-3 3"/>
+    <path d="M172 96 l4 3 l-2 4"/><path d="M192 106 l-3 3"/>
+    <path d="M140 118 l3 3 l-2 3"/>
+  </g>
+  <!-- soy-sauce drizzle pooling + scallion + cilantro garnish -->
+  <path d="M92 132 C110 128 130 134 150 130 C170 126 190 132 208 128" stroke="#3a1808" stroke-width="2.2" fill="none" opacity=".55" stroke-linecap="round"/>
+  <ellipse cx="128" cy="140" rx="16" ry="4" fill="#2c1206" opacity=".4"/>
+  <rect x="120" y="100" width="7" height="2.6" rx="1.3" fill="#5ecb4e" transform="rotate(-18 123 101)"/>
+  <rect x="176" y="94" width="7" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(16 179 95)"/>
+  <rect x="152" y="118" width="6" height="2.4" rx="1.2" fill="#58c14a" transform="rotate(24 155 119)"/>
+  <rect x="100" y="118" width="6" height="2.4" rx="1.2" fill="#3f9c37" transform="rotate(-12 103 119)"/>
+  <rect x="200" y="112" width="6" height="2.4" rx="1.2" fill="#5ecb4e" transform="rotate(10 203 113)"/>
+  <!-- diced red chili + sesame -->
+  <circle cx="134" cy="112" r="1.8" fill="#e0341f"/>
+  <circle cx="188" cy="118" r="1.8" fill="#e0341f"/>
+  <circle cx="114" cy="128" r="1.6" fill="#e0341f"/>
+  <ellipse cx="160" cy="106" rx="2" ry="1.2" fill="#f8eed6"/>
+  <ellipse cx="126" cy="120" rx="2" ry="1.2" fill="#f8eed6"/>
+  <!-- cool gloss dots (glistening cold, moist) -->
+  <circle cx="118" cy="98" r="1.4" fill="#fff" opacity=".6"/>
+  <circle cx="182" cy="102" r="1.3" fill="#fff" opacity=".55"/>
+  <circle cx="150" cy="124" r="1.2" fill="#fff" opacity=".5"/>
+  <circle cx="204" cy="130" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

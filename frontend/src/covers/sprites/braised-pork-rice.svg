@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="bprBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="bprbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#123138"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <radialGradient id="bprbowl" cx="50%" cy="30%" r="82%">
+      <stop offset="0%" stop-color="#1c1622"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <radialGradient id="bprrice" cx="46%" cy="34%" r="78%">
+      <stop offset="0%" stop-color="#fdf7e8"/><stop offset="60%" stop-color="#f0e6cf"/><stop offset="100%" stop-color="#d8c9a8"/>
+    </radialGradient>
+    <linearGradient id="bprpork" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#cf5226"/><stop offset="50%" stop-color="#8a2c11"/><stop offset="100%" stop-color="#521705"/>
+    </linearGradient>
+    <linearGradient id="bprfat" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f6ddb2"/><stop offset="100%" stop-color="#d8b47f"/>
+    </linearGradient>
+    <linearGradient id="bpregg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e9d7a8"/><stop offset="100%" stop-color="#c9ab6a"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#bprbg)"/>
+  <!-- steam -->
+  <path d="M124 50 C114 32 134 24 124 4" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#bprBlur3)"/>
+  <path d="M196 48 C188 32 206 24 198 6" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#bprBlur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="188" rx="132" ry="20" fill="#000" opacity=".5"/>
+  <!-- neon steam arc (cyan savory) -->
+  <path d="M56 108 Q108 76 170 76" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- DONBURI / clay rice bowl: deep rounded bowl -->
+  <path d="M72 116 C72 108 88 104 160 104 C232 104 248 108 248 116 C248 152 214 182 160 182 C106 182 72 152 72 116 Z" fill="url(#bprbowl)"/>
+  <path d="M72 116 C72 108 88 104 160 104 C232 104 248 108 248 116 C248 152 214 182 160 182 C106 182 72 152 72 116 Z" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <!-- bowl rim ellipse -->
+  <ellipse cx="160" cy="114" rx="88" ry="20" fill="#141018"/>
+  <ellipse cx="160" cy="114" rx="88" ry="20" fill="none" stroke="#2c2136" stroke-width="2.5"/>
+  <!-- decorative clay stripe near the foot -->
+  <path d="M92 156 C112 172 208 172 228 156" stroke="#35414a" stroke-width="2.5" fill="none" opacity=".5"/>
+  <!-- WHITE RICE mounded in the bowl -->
+  <ellipse cx="160" cy="112" rx="80" ry="17" fill="url(#bprrice)"/>
+  <path d="M82 110 C90 96 120 90 160 90 C200 90 230 96 238 110 C230 122 200 128 160 128 C120 128 90 122 82 110 Z" fill="url(#bprrice)"/>
+  <!-- rice-grain flecks -->
+  <g stroke-linecap="round" fill="none" opacity=".8">
+    <path d="M100 108 l6 -2" stroke="#fffdf4" stroke-width="2.2"/>
+    <path d="M122 100 l5 2" stroke="#e2d3b4" stroke-width="2.2"/>
+    <path d="M198 104 l6 -2" stroke="#fffdf4" stroke-width="2.2"/>
+    <path d="M216 110 l-5 2" stroke="#e2d3b4" stroke-width="2.2"/>
+    <path d="M112 116 l5 2" stroke="#fffdf4" stroke-width="2"/>
+    <path d="M206 118 l-5 2" stroke="#e2d3b4" stroke-width="2"/>
+  </g>
+  <!-- BRAISED PORK: glossy irregular red-brown chunks piled center, glistening -->
+  <g stroke="#3b0f05" stroke-width="1.3">
+    <!-- back chunk -->
+    <g transform="translate(0 -2)">
+      <path d="M118 96 C114 88 128 84 140 86 C152 82 164 88 162 96 C168 104 156 112 142 110 C128 112 118 104 118 96 Z" fill="url(#bprpork)"/>
+      <path d="M124 92 C130 88 150 88 156 92" stroke="#f6ddb2" stroke-width="2.4" opacity=".8" fill="none"/>
+      <ellipse cx="134" cy="90" rx="7" ry="2.4" fill="#ff8a4a" opacity=".55" stroke="none"/>
+    </g>
+    <!-- front-left chunk with fat strata -->
+    <g transform="translate(0 2)">
+      <path d="M104 108 C100 100 114 96 128 98 C140 94 152 100 150 110 C156 118 142 126 126 124 C112 126 104 116 104 108 Z" fill="url(#bprpork)"/>
+      <path d="M110 106 C120 102 138 102 146 106" stroke="url(#bprfat)" stroke-width="3" opacity=".9" fill="none"/>
+      <ellipse cx="120" cy="103" rx="8" ry="2.6" fill="#ff8a4a" opacity=".55" stroke="none"/>
+    </g>
+    <!-- front-right chunk -->
+    <g transform="translate(0 2)">
+      <path d="M168 106 C164 98 178 94 192 96 C204 92 216 98 214 108 C220 116 206 124 190 122 C176 124 168 114 168 106 Z" fill="url(#bprpork)"/>
+      <path d="M174 104 C184 100 202 100 210 104" stroke="url(#bprfat)" stroke-width="3" opacity=".9" fill="none"/>
+      <ellipse cx="184" cy="101" rx="8" ry="2.6" fill="#ff8a4a" opacity=".55" stroke="none"/>
+    </g>
+    <!-- center top chunk -->
+    <path d="M144 100 C140 92 154 88 166 90 C178 86 190 92 188 100 C194 108 180 116 166 114 C152 116 144 108 144 100 Z" fill="url(#bprpork)"/>
+    <path d="M150 96 C160 92 176 92 184 96" stroke="#f6ddb2" stroke-width="2.4" opacity=".8" fill="none"/>
+  </g>
+  <!-- glossy braising-liquid sheen pooling over the pork -->
+  <path d="M110 116 C140 124 190 124 210 114" stroke="#7a1305" stroke-width="3" fill="none" opacity=".45" stroke-linecap="round"/>
+  <!-- HALF BRAISED EGG tucked at the right (soy-stained) -->
+  <g transform="translate(0 2)">
+    <path d="M206 104 C202 96 214 92 224 94 C234 96 238 106 232 114 C224 120 210 118 206 112 Z" fill="#8a5a24"/>
+    <ellipse cx="220" cy="106" rx="12" ry="9" fill="#ecdcb0"/>
+    <ellipse cx="220" cy="107" rx="6.5" ry="5.5" fill="url(#bpregg)"/>
+    <ellipse cx="217" cy="104" rx="2.4" ry="1.6" fill="#f6ecc8" opacity=".8"/>
+  </g>
+  <!-- pickled greens / scallion garnish -->
+  <rect x="128" y="94" width="8" height="2.8" rx="1.4" fill="#5ecb4e" transform="rotate(-18 132 95)"/>
+  <rect x="158" y="90" width="8" height="2.8" rx="1.4" fill="#3f9c37" transform="rotate(14 162 91)"/>
+  <rect x="180" y="98" width="7" height="2.6" rx="1.3" fill="#58c14a" transform="rotate(-8 183 99)"/>
+  <rect x="146" y="112" width="7" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(22 149 113)"/>
+  <!-- diced chili fleck -->
+  <circle cx="170" cy="108" r="1.8" fill="#e0341f"/>
+  <!-- gloss dots (oily braise shine) -->
+  <circle cx="132" cy="100" r="1.5" fill="#fff" opacity=".6"/>
+  <circle cx="180" cy="98" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="196" cy="112" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

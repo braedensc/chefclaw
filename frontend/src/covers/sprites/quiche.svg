@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="quBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="qubg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="quplate" cx="50%" cy="32%" r="82%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <radialGradient id="qucustard" cx="46%" cy="34%" r="76%">
+      <stop offset="0%" stop-color="#ffe9a8"/><stop offset="55%" stop-color="#f6cf6a"/><stop offset="100%" stop-color="#e0a838"/>
+    </radialGradient>
+    <linearGradient id="qucrust" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d8a154"/><stop offset="100%" stop-color="#9c6524"/>
+    </linearGradient>
+    <linearGradient id="quslice" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffe9a8"/><stop offset="100%" stop-color="#e6b64c"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#qubg)"/>
+  <!-- steam -->
+  <path d="M118 50 C108 32 128 24 118 4" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#quBlur3)"/>
+  <path d="M198 52 C190 36 208 28 200 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#quBlur3)"/>
+  <ellipse cx="160" cy="188" rx="150" ry="22" fill="#000" opacity=".5"/>
+  <!-- serving plate -->
+  <ellipse cx="160" cy="134" rx="140" ry="46" fill="url(#quplate)"/>
+  <ellipse cx="160" cy="134" rx="140" ry="46" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="134" rx="126" ry="38" fill="#0f0d13"/>
+  <!-- neon steam arc (amber/warm) -->
+  <path d="M52 118 Q106 84 168 82" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- round quiche seen slightly from above: fluted crust ring -->
+  <ellipse cx="152" cy="122" rx="96" ry="40" fill="url(#qucrust)"/>
+  <ellipse cx="152" cy="122" rx="96" ry="40" fill="none" stroke="#7c4c18" stroke-width="1.6" opacity=".7"/>
+  <!-- fluted crimped edge (scalloped ticks around the rim) -->
+  <g stroke="#8a5416" stroke-width="2" opacity=".6" stroke-linecap="round">
+    <path d="M64 118 l-8 -3"/><path d="M74 134 l-8 4"/><path d="M96 148 l-4 7"/><path d="M124 156 l-2 8"/>
+    <path d="M152 158 l0 8"/><path d="M182 156 l2 8"/><path d="M210 148 l4 7"/><path d="M232 134 l8 4"/>
+    <path d="M242 118 l8 -3"/><path d="M232 104 l8 -4"/><path d="M96 100 l-6 -6"/><path d="M124 92 l-2 -7"/>
+    <path d="M152 90 l0 -7"/><path d="M182 92 l2 -7"/><path d="M210 100 l6 -6"/>
+  </g>
+  <!-- golden egg custard face (inside the crust ring) -->
+  <ellipse cx="152" cy="120" rx="80" ry="32" fill="url(#qucustard)"/>
+  <ellipse cx="130" cy="110" rx="34" ry="10" fill="#fff3c8" opacity=".4"/>
+  <!-- bacon lardons + browned custard flecks embedded in the top -->
+  <g>
+    <rect x="108" y="112" width="10" height="5" rx="2" fill="#c04a2a" transform="rotate(-12 113 114)"/>
+    <rect x="150" y="106" width="11" height="5" rx="2" fill="#a83a20" transform="rotate(18 155 108)"/>
+    <rect x="180" y="120" width="10" height="5" rx="2" fill="#c04a2a" transform="rotate(-8 185 122)"/>
+    <rect x="126" y="128" width="10" height="5" rx="2" fill="#a83a20" transform="rotate(24 131 130)"/>
+    <rect x="168" y="132" width="9" height="4.6" rx="2" fill="#c04a2a" transform="rotate(-16 172 134)"/>
+    <rect x="200" y="112" width="9" height="4.6" rx="2" fill="#a83a20" transform="rotate(14 204 114)"/>
+  </g>
+  <!-- browned toasty spots + chive fleck -->
+  <circle cx="140" cy="120" r="2.4" fill="#c98a3a" opacity=".7"/>
+  <circle cx="188" cy="128" r="2.2" fill="#b8791f" opacity=".7"/>
+  <rect x="146" y="124" width="7" height="2.2" rx="1.1" fill="#3f9c37" transform="rotate(-20 149 125)"/>
+  <rect x="176" y="112" width="7" height="2.2" rx="1.1" fill="#5ecb4e" transform="rotate(16 179 113)"/>
+  <!-- a cut wedge pulled out front-right, showing the custard cross-section -->
+  <g transform="translate(6 4)">
+    <path d="M214 148 L266 140 L250 168 Z" fill="url(#quslice)"/>
+    <path d="M214 148 L266 140 L250 168 Z" fill="none" stroke="#7c4c18" stroke-width="1.4"/>
+    <!-- crust base of the wedge -->
+    <path d="M214 148 L250 168 L250 174 L214 154 Z" fill="url(#qucrust)"/>
+    <!-- filling speckle in the slice -->
+    <rect x="228" y="150" width="7" height="3.4" rx="1.6" fill="#c04a2a" transform="rotate(-10 231 151)"/>
+    <circle cx="244" cy="152" r="1.8" fill="#c98a3a"/>
+  </g>
+  <!-- gloss dots -->
+  <circle cx="128" cy="106" r="1.5" fill="#fff" opacity=".6"/>
+  <circle cx="176" cy="116" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="158" cy="128" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

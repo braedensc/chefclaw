@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="lz1Blur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="lz1bg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="lz1broth" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#c98e3e"/><stop offset="55%" stop-color="#a86c22"/><stop offset="100%" stop-color="#7c4a13"/>
+    </radialGradient>
+    <radialGradient id="lz1bowl" cx="50%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#1c1622"/><stop offset="100%" stop-color="#0c0c10"/>
+    </radialGradient>
+    <linearGradient id="lz1beef" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7c3a20"/><stop offset="50%" stop-color="#5e2410"/><stop offset="100%" stop-color="#3b1508"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#lz1bg)"/>
+  <!-- rising steam -->
+  <path d="M126 50 C116 32 136 26 126 6" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#lz1Blur3)"/>
+  <path d="M196 52 C188 36 206 28 198 10" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#lz1Blur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="188" rx="140" ry="22" fill="#000" opacity=".5"/>
+  <!-- DEEP soup bowl (tall walls) -->
+  <path d="M40 118 C40 108 60 100 160 100 C260 100 280 108 280 118 C280 118 262 178 244 184 C214 194 106 194 76 184 C58 178 40 118 40 118 Z" fill="url(#lz1bowl)"/>
+  <ellipse cx="160" cy="118" rx="120" ry="30" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <!-- broth surface -->
+  <ellipse cx="160" cy="118" rx="116" ry="28" fill="url(#lz1broth)"/>
+  <!-- chili-oil sheen ring floating on broth -->
+  <ellipse cx="160" cy="116" rx="100" ry="22" fill="none" stroke="#ef5520" stroke-width="2" opacity=".4"/>
+  <ellipse cx="132" cy="114" rx="10" ry="4" fill="#ef5520" opacity=".45"/>
+  <ellipse cx="196" cy="120" rx="8" ry="3.4" fill="#ef5520" opacity=".4"/>
+  <!-- neon steam arc (cyan) -->
+  <path d="M52 104 Q104 76 168 74" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- pale hand-pulled noodle strands surfacing through the broth -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M96 112 C120 104 150 106 178 112" stroke="#8a5a1e" stroke-width="6" opacity=".9"/>
+    <path d="M100 118 C126 110 156 112 186 118" stroke="#e6cf9d" stroke-width="6"/>
+    <path d="M108 124 C132 118 162 118 190 122" stroke="#d9bd85" stroke-width="6"/>
+    <path d="M116 108 C138 102 166 104 192 110" stroke="#e6cf9d" stroke-width="6"/>
+    <path d="M104 118 C130 111 158 113 188 118" stroke="#fff1c9" stroke-width="2" opacity=".8"/>
+    <path d="M100 112 C122 106 148 107 174 112" stroke="#fff1c9" stroke-width="1.8" opacity=".7"/>
+  </g>
+  <!-- sliced beef pieces (thin braised slices, front-right) -->
+  <g>
+    <path d="M182 104 C176 100 186 96 198 98 C210 96 216 102 212 108 C214 114 202 118 190 114 C182 116 178 110 182 104 Z" fill="url(#lz1beef)" stroke="#240a03" stroke-width="1.2" opacity=".95"/>
+    <path d="M186 102 C194 100 204 102 210 106" stroke="#a3502e" stroke-width="1.2" fill="none" opacity=".6"/>
+    <ellipse cx="192" cy="102" rx="6" ry="2.4" fill="#fff" opacity=".2"/>
+  </g>
+  <g>
+    <path d="M150 100 C144 96 154 92 166 94 C178 92 184 98 180 104 C182 110 170 114 158 110 C150 112 146 106 150 100 Z" fill="url(#lz1beef)" stroke="#240a03" stroke-width="1.2"/>
+    <path d="M154 98 C162 96 172 98 178 102" stroke="#a3502e" stroke-width="1.2" fill="none" opacity=".6"/>
+    <ellipse cx="160" cy="98" rx="6" ry="2.4" fill="#fff" opacity=".2"/>
+  </g>
+  <!-- white radish slices (兰州 signature) -->
+  <circle cx="118" cy="106" r="8" fill="#f4efe2"/>
+  <circle cx="118" cy="106" r="4" fill="#e7ddc4" opacity=".7"/>
+  <circle cx="204" cy="122" r="6.5" fill="#f4efe2"/>
+  <circle cx="204" cy="122" r="3.2" fill="#e7ddc4" opacity=".7"/>
+  <!-- cilantro + scallion garnish scattered on top -->
+  <rect x="130" y="108" width="7" height="2.6" rx="1.3" fill="#5ecb4e" transform="rotate(-20 133 109)"/>
+  <rect x="166" y="106" width="7" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(14 169 107)"/>
+  <rect x="146" y="120" width="6" height="2.4" rx="1.2" fill="#58c14a" transform="rotate(26 149 121)"/>
+  <rect x="188" y="110" width="6" height="2.4" rx="1.2" fill="#5ecb4e" transform="rotate(-12 191 111)"/>
+  <circle cx="140" cy="116" r="1.8" fill="#e0341f"/>
+  <circle cx="176" cy="118" r="1.8" fill="#e0341f"/>
+  <!-- oil gloss dots -->
+  <circle cx="128" cy="110" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="170" cy="112" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="150" cy="116" r="1.2" fill="#fff" opacity=".45"/>
+</svg>

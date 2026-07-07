@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="et-Blur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="et-bg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="et-plate" cx="50%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <radialGradient id="et-custard" cx="42%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#ffe9a8"/><stop offset="52%" stop-color="#f6c948"/><stop offset="100%" stop-color="#e19a1e"/>
+    </radialGradient>
+    <linearGradient id="et-crust" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e8bd7c"/><stop offset="55%" stop-color="#cf9a52"/><stop offset="100%" stop-color="#a06c2e"/>
+    </linearGradient>
+    <radialGradient id="et-caramel" cx="55%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#a85a1a" stop-opacity="0"/><stop offset="70%" stop-color="#8a4410" stop-opacity=".55"/><stop offset="100%" stop-color="#5e2c08" stop-opacity=".8"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#et-bg)"/>
+  <!-- warm steam wisps (fresh from oven) -->
+  <path d="M136 52 C126 34 146 26 136 8" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#et-Blur3)"/>
+  <path d="M192 50 C184 34 202 26 194 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#et-Blur3)"/>
+  <ellipse cx="160" cy="188" rx="150" ry="22" fill="#000" opacity=".5"/>
+  <!-- small round plate -->
+  <ellipse cx="160" cy="132" rx="120" ry="42" fill="url(#et-plate)"/>
+  <ellipse cx="160" cy="132" rx="120" ry="42" fill="none" stroke="#26262e" stroke-width="3"/>
+  <ellipse cx="160" cy="132" rx="104" ry="34" fill="#0c0c0f"/>
+  <!-- neon warm steam arc -->
+  <path d="M62 116 Q112 84 172 82" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- HERO egg tart: round flaky shell, glossy custard dome, caramel spots -->
+  <!-- tart shell outer ring (fluted pastry) -->
+  <ellipse cx="160" cy="122" rx="70" ry="40" fill="url(#et-crust)"/>
+  <ellipse cx="160" cy="122" rx="70" ry="40" fill="none" stroke="#7a4c1a" stroke-width="1.4" opacity=".7"/>
+  <!-- fluted rim ticks -->
+  <g stroke="#8a5a24" stroke-width="1.6" opacity=".6" stroke-linecap="round">
+    <path d="M96 118 l7 2"/><path d="M104 104 l6 4"/><path d="M118 94 l4 5"/>
+    <path d="M136 88 l3 6"/><path d="M160 86 l0 6"/><path d="M184 88 l-3 6"/>
+    <path d="M202 94 l-4 5"/><path d="M216 104 l-6 4"/><path d="M224 118 l-7 2"/>
+    <path d="M110 132 l6 3"/><path d="M210 132 l-6 3"/>
+  </g>
+  <!-- rim highlight -->
+  <path d="M100 116 C112 98 136 90 160 90 C184 90 208 98 220 116" fill="none" stroke="#f2d9a4" stroke-width="2" opacity=".55" stroke-linecap="round"/>
+  <!-- custard dome (glossy, slightly raised, egg-yellow) -->
+  <ellipse cx="160" cy="118" rx="56" ry="30" fill="url(#et-custard)"/>
+  <!-- caramel scorch spots (dim sum egg tart signature) -->
+  <ellipse cx="146" cy="112" rx="16" ry="9" fill="url(#et-caramel)"/>
+  <ellipse cx="178" cy="122" rx="13" ry="8" fill="url(#et-caramel)"/>
+  <ellipse cx="160" cy="130" rx="10" ry="6" fill="url(#et-caramel)"/>
+  <!-- custard glossy rim + sheen -->
+  <ellipse cx="160" cy="118" rx="56" ry="30" fill="none" stroke="#c98a24" stroke-width="1.2" opacity=".5"/>
+  <ellipse cx="146" cy="106" rx="20" ry="7" fill="#fff4c8" opacity=".55"/>
+  <path d="M120 116 C132 104 156 100 176 104" stroke="#fff4c8" stroke-width="2" fill="none" opacity=".45" stroke-linecap="round"/>
+  <!-- oily gloss highlight dots -->
+  <circle cx="138" cy="104" r="2.4" fill="#fff" opacity=".7"/>
+  <circle cx="172" cy="112" r="1.8" fill="#fff" opacity=".6"/>
+  <circle cx="158" cy="124" r="1.4" fill="#fff" opacity=".5"/>
+</svg>

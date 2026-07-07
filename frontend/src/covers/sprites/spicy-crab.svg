@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="scbBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="scbbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#123138"/><stop offset="45%" stop-color="#0b090b"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <radialGradient id="scbshell" cx="46%" cy="30%" r="85%">
+      <stop offset="0%" stop-color="#ff7a3d"/><stop offset="50%" stop-color="#e2451a"/><stop offset="100%" stop-color="#a8250b"/>
+    </radialGradient>
+    <linearGradient id="scbclaw" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ff8a4d"/><stop offset="55%" stop-color="#df4118"/><stop offset="100%" stop-color="#951f09"/>
+    </linearGradient>
+    <radialGradient id="scboil" cx="50%" cy="42%" r="70%">
+      <stop offset="0%" stop-color="#c73914" stop-opacity=".55"/><stop offset="100%" stop-color="#7a1305" stop-opacity=".25"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#scbbg)"/>
+  <!-- steam -->
+  <path d="M116 50 C106 32 126 26 116 6" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#scbBlur3)"/>
+  <path d="M202 52 C194 36 212 28 204 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#scbBlur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="188" rx="152" ry="22" fill="#000" opacity=".5"/>
+  <!-- oval plate -->
+  <ellipse cx="160" cy="132" rx="146" ry="47" fill="#141018"/>
+  <ellipse cx="160" cy="132" rx="146" ry="47" fill="none" stroke="#26262e" stroke-width="3"/>
+  <ellipse cx="160" cy="132" rx="132" ry="39" fill="#0f0d13"/>
+  <!-- neon steam arc (cyan) -->
+  <path d="M48 116 Q104 82 170 80" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- glossy chili-oil pool the crab sits in -->
+  <ellipse cx="160" cy="132" rx="118" ry="32" fill="url(#scboil)"/>
+  <!-- CRAB: legs first (back), then claws, then body carapace -->
+  <g stroke="#7a1305" stroke-width="1.3" stroke-linecap="round" fill="none">
+    <!-- left walking legs -->
+    <path d="M124 122 C104 120 88 128 74 140" stroke="url(#scbclaw)" stroke-width="7"/>
+    <path d="M126 130 C108 132 92 142 80 152" stroke="url(#scbclaw)" stroke-width="6.5"/>
+    <path d="M128 138 C114 144 102 152 92 160" stroke="url(#scbclaw)" stroke-width="6"/>
+    <!-- right walking legs -->
+    <path d="M196 122 C216 120 232 128 246 140" stroke="url(#scbclaw)" stroke-width="7"/>
+    <path d="M194 130 C212 132 228 142 240 152" stroke="url(#scbclaw)" stroke-width="6.5"/>
+    <path d="M192 138 C206 144 218 152 228 160" stroke="url(#scbclaw)" stroke-width="6"/>
+  </g>
+  <!-- big claws (pincers), left and right -->
+  <g>
+    <!-- left claw -->
+    <g transform="translate(84 108) rotate(-18)">
+      <path d="M0 0 C-18 -4 -30 4 -30 14 C-30 24 -18 30 -4 26 C6 22 8 10 0 0 Z" fill="url(#scbclaw)" stroke="#7a1305" stroke-width="1.3"/>
+      <!-- pincer tips -->
+      <path d="M-26 6 C-40 2 -46 -6 -42 -12 C-38 -8 -32 -4 -26 -2 Z" fill="url(#scbclaw)" stroke="#7a1305" stroke-width="1.2"/>
+      <path d="M-27 18 C-42 20 -50 16 -50 8 C-44 12 -36 14 -27 14 Z" fill="url(#scbclaw)" stroke="#7a1305" stroke-width="1.2"/>
+      <ellipse cx="-12" cy="8" rx="7" ry="4" fill="#ff9d6a" opacity=".55"/>
+    </g>
+    <!-- right claw (bigger, hero) -->
+    <g transform="translate(236 106) rotate(18)">
+      <path d="M0 0 C18 -5 32 4 32 15 C32 26 18 32 3 28 C-8 23 -9 10 0 0 Z" fill="url(#scbclaw)" stroke="#7a1305" stroke-width="1.4"/>
+      <path d="M28 6 C44 1 52 -8 47 -15 C42 -10 35 -6 28 -3 Z" fill="url(#scbclaw)" stroke="#7a1305" stroke-width="1.3"/>
+      <path d="M29 19 C46 22 55 17 55 8 C48 13 39 15 29 15 Z" fill="url(#scbclaw)" stroke="#7a1305" stroke-width="1.3"/>
+      <ellipse cx="14" cy="9" rx="8" ry="4.5" fill="#ffa876" opacity=".55"/>
+    </g>
+  </g>
+  <!-- crab body carapace (hero, front-center) -->
+  <g transform="translate(160 122)">
+    <path d="M-46 4 C-46 -18 -24 -30 0 -30 C24 -30 46 -18 46 4 C46 20 24 30 0 30 C-24 30 -46 20 -46 4 Z" fill="url(#scbshell)" stroke="#7a1305" stroke-width="1.6"/>
+    <!-- shell ridges + segmentation -->
+    <path d="M-40 -2 C-24 -8 24 -8 40 -2" stroke="#a8250b" stroke-width="1.4" fill="none" opacity=".7"/>
+    <path d="M-34 8 C-18 14 18 14 34 8" stroke="#8f1e08" stroke-width="1.4" fill="none" opacity=".6"/>
+    <path d="M-20 -20 L-14 -8 M0 -24 L0 -10 M20 -20 L14 -8" stroke="#a8250b" stroke-width="1.2" opacity=".55"/>
+    <!-- eyes -->
+    <circle cx="-12" cy="-24" r="3" fill="#2a0a04"/>
+    <circle cx="12" cy="-24" r="3" fill="#2a0a04"/>
+    <circle cx="-13" cy="-25" r="1" fill="#ff9d6a"/>
+    <circle cx="11" cy="-25" r="1" fill="#ff9d6a"/>
+    <!-- glossy carapace highlight -->
+    <ellipse cx="-10" cy="-10" rx="16" ry="7" fill="#ff9d6a" opacity=".5"/>
+    <ellipse cx="16" cy="0" rx="8" ry="4" fill="#ff7a3d" opacity=".45"/>
+  </g>
+  <!-- Sichuan dried chilis scattered on top -->
+  <g>
+    <path d="M108 118 C118 114 128 116 132 122 C124 122 116 122 108 120 Z" fill="#c31f12" stroke="#7a1305" stroke-width="1"/>
+    <path d="M198 116 C208 112 220 114 224 120 C214 120 206 120 198 118 Z" fill="#d0271a" stroke="#7a1305" stroke-width="1"/>
+    <path d="M146 148 C156 144 166 146 170 152 C160 152 152 152 146 150 Z" fill="#c31f12" stroke="#7a1305" stroke-width="1"/>
+    <path d="M184 150 C192 148 200 150 202 154 C196 154 190 154 184 152 Z" fill="#d0271a" stroke="#7a1305" stroke-width="1"/>
+  </g>
+  <!-- peppercorns + garlic flecks -->
+  <circle cx="126" cy="140" r="2" fill="#260903"/>
+  <circle cx="196" cy="142" r="2" fill="#260903"/>
+  <circle cx="150" cy="118" r="1.8" fill="#260903"/>
+  <circle cx="118" cy="150" r="1.8" fill="#f2ddb0"/>
+  <circle cx="210" cy="148" r="1.8" fill="#f2ddb0"/>
+  <!-- scallion + cilantro -->
+  <rect x="140" y="150" width="7" height="2.6" rx="1.3" fill="#5ecb4e" transform="rotate(-16 143 151)"/>
+  <rect x="172" y="118" width="7" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(20 175 119)"/>
+  <!-- gloss dots -->
+  <circle cx="146" cy="106" r="1.5" fill="#fff" opacity=".55"/>
+  <circle cx="176" cy="114" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="160" cy="128" r="1.3" fill="#fff" opacity=".5"/>
+</svg>

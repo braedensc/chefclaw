@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="shkBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="shkbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#3a1120"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <radialGradient id="shksauce" cx="46%" cy="38%" r="70%">
+      <stop offset="0%" stop-color="#e2451f"/><stop offset="55%" stop-color="#c31f12"/><stop offset="100%" stop-color="#8a1608"/>
+    </radialGradient>
+    <radialGradient id="shkpan" cx="50%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#1a1620"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <radialGradient id="shkyolk" cx="40%" cy="34%" r="72%">
+      <stop offset="0%" stop-color="#ffdf6a"/><stop offset="55%" stop-color="#f6ac25"/><stop offset="100%" stop-color="#e07f12"/>
+    </radialGradient>
+    <radialGradient id="shkwhite" cx="46%" cy="40%" r="72%">
+      <stop offset="0%" stop-color="#fff6e2"/><stop offset="70%" stop-color="#fbeccb"/><stop offset="100%" stop-color="#eed9ad"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#shkbg)"/>
+  <!-- rising steam wisps -->
+  <path d="M120 52 C112 36 128 28 120 8" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#shkBlur3)"/>
+  <path d="M198 50 C190 34 206 26 198 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#shkBlur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="188" rx="150" ry="22" fill="#000" opacity=".5"/>
+  <!-- skillet handle (right) -->
+  <rect x="278" y="120" width="42" height="13" rx="6" fill="#151319"/>
+  <rect x="278" y="120" width="42" height="13" rx="6" fill="none" stroke="#2c2136" stroke-width="2"/>
+  <!-- cast-iron skillet body -->
+  <ellipse cx="158" cy="128" rx="128" ry="54" fill="url(#shkpan)"/>
+  <ellipse cx="158" cy="128" rx="128" ry="54" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="158" cy="128" rx="114" ry="46" fill="#0d0c10"/>
+  <!-- neon steam arc (rose) -->
+  <path d="M52 112 Q104 80 168 78" stroke="#ff4d6d" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- bubbling tomato sauce pool -->
+  <ellipse cx="158" cy="126" rx="106" ry="40" fill="url(#shksauce)"/>
+  <path d="M64 118 C92 100 224 100 252 118" stroke="#ff7350" stroke-width="2" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- diced pepper / onion flecks in the sauce -->
+  <rect x="96" y="140" width="7" height="5" rx="2" fill="#e0341f" transform="rotate(18 99 142)"/>
+  <rect x="212" y="138" width="7" height="5" rx="2" fill="#cf3a12" transform="rotate(-14 215 140)"/>
+  <rect x="132" y="150" width="6" height="4.4" rx="2" fill="#f2b840" transform="rotate(10 135 152)"/>
+  <rect x="188" y="150" width="6" height="4.4" rx="2" fill="#e0341f" transform="rotate(-22 191 152)"/>
+  <ellipse cx="118" cy="112" rx="5" ry="3" fill="#8a1608" opacity=".6"/>
+  <ellipse cx="200" cy="110" rx="5" ry="3" fill="#8a1608" opacity=".6"/>
+  <!-- poached egg 1 (left) -->
+  <g>
+    <ellipse cx="118" cy="122" rx="30" ry="21" fill="url(#shkwhite)"/>
+    <ellipse cx="118" cy="122" rx="30" ry="21" fill="none" stroke="#e5cf9e" stroke-width="1.2" opacity=".7"/>
+    <circle cx="120" cy="120" r="12" fill="url(#shkyolk)"/>
+    <ellipse cx="115" cy="115" rx="4" ry="2.4" fill="#fff2c0" opacity=".85"/>
+  </g>
+  <!-- poached egg 2 (right) -->
+  <g>
+    <ellipse cx="200" cy="128" rx="31" ry="22" fill="url(#shkwhite)"/>
+    <ellipse cx="200" cy="128" rx="31" ry="22" fill="none" stroke="#e5cf9e" stroke-width="1.2" opacity=".7"/>
+    <circle cx="202" cy="126" r="12.5" fill="url(#shkyolk)"/>
+    <ellipse cx="197" cy="120" rx="4.4" ry="2.6" fill="#fff2c0" opacity=".85"/>
+  </g>
+  <!-- garnish: fresh cilantro / parsley flecks scattered on top -->
+  <rect x="150" y="102" width="8" height="3" rx="1.5" fill="#5ecb4e" transform="rotate(-24 154 103)"/>
+  <rect x="136" y="118" width="7" height="2.8" rx="1.4" fill="#3f9c37" transform="rotate(14 139 119)"/>
+  <rect x="172" y="112" width="8" height="3" rx="1.5" fill="#58c14a" transform="rotate(30 176 113)"/>
+  <rect x="160" y="146" width="7" height="2.8" rx="1.4" fill="#3f9c37" transform="rotate(-12 163 147)"/>
+  <rect x="90" y="130" width="6" height="2.6" rx="1.3" fill="#5ecb4e" transform="rotate(22 93 131)"/>
+  <rect x="228" y="132" width="6" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(-18 231 133)"/>
+  <!-- oil / sauce gloss dots -->
+  <circle cx="112" cy="114" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="196" cy="120" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="152" cy="138" r="1.3" fill="#ffd9a2" opacity=".5"/>
+  <circle cx="170" cy="150" r="1.1" fill="#fff" opacity=".45"/>
+</svg>

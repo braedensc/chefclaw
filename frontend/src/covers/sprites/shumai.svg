@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="smBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="smbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#113036"/><stop offset="45%" stop-color="#0b090b"/><stop offset="100%" stop-color="#060507"/>
+    </radialGradient>
+    <radialGradient id="smsteamer" cx="50%" cy="34%" r="78%">
+      <stop offset="0%" stop-color="#b8894a"/><stop offset="60%" stop-color="#8f6432"/><stop offset="100%" stop-color="#5f411f"/>
+    </radialGradient>
+    <radialGradient id="smwrap" cx="42%" cy="30%" r="82%">
+      <stop offset="0%" stop-color="#ffeaa6"/><stop offset="55%" stop-color="#f6c94a"/><stop offset="100%" stop-color="#dca022"/>
+    </radialGradient>
+    <radialGradient id="smfill" cx="42%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#ff9d7d"/><stop offset="58%" stop-color="#e86a4c"/><stop offset="100%" stop-color="#c14330"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#smbg)"/>
+  <!-- rising steam wisps (steamed dish) -->
+  <path d="M120 46 C110 28 130 22 120 2" stroke="#fff" stroke-width="7" fill="none" opacity=".11" filter="url(#smBlur3)"/>
+  <path d="M160 42 C152 26 170 18 162 -2" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#smBlur3)"/>
+  <path d="M200 46 C192 30 210 22 202 2" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#smBlur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="188" rx="140" ry="22" fill="#000" opacity=".5"/>
+  <!-- neon steam arc (cyan, savory) -->
+  <path d="M52 108 Q104 78 170 78" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- round bamboo steamer basket -->
+  <ellipse cx="160" cy="134" rx="128" ry="52" fill="url(#smsteamer)"/>
+  <!-- woven-slat bamboo ring -->
+  <g opacity=".9">
+    <ellipse cx="160" cy="134" rx="128" ry="52" fill="none" stroke="#3d2913" stroke-width="2.5"/>
+    <ellipse cx="160" cy="130" rx="128" ry="52" fill="none" stroke="#caa05c" stroke-width="4"/>
+    <ellipse cx="160" cy="126" rx="128" ry="52" fill="none" stroke="#8f6432" stroke-width="3"/>
+    <ellipse cx="160" cy="122" rx="128" ry="52" fill="none" stroke="#caa05c" stroke-width="4"/>
+  </g>
+  <!-- vertical slat ticks on the rim -->
+  <g stroke="#5f411f" stroke-width="1.4" opacity=".55">
+    <path d="M44 128 l0 8"/><path d="M70 138 l0 8"/><path d="M104 146 l0 8"/><path d="M160 150 l0 8"/><path d="M216 146 l0 8"/><path d="M250 138 l0 8"/><path d="M276 128 l0 8"/>
+  </g>
+  <!-- steamer interior (parchment / dark liner) -->
+  <ellipse cx="160" cy="122" rx="112" ry="42" fill="#e8d3a4"/>
+  <ellipse cx="160" cy="122" rx="112" ry="42" fill="none" stroke="#b89a62" stroke-width="1.5" opacity=".6"/>
+  <ellipse cx="160" cy="122" rx="100" ry="36" fill="#d9bf88" opacity=".7"/>
+  <!-- SHUMAI: open-topped dumplings, ruffled wrapper + pink filling + roe crown -->
+  <!-- back-left -->
+  <g transform="translate(114 106) scale(.86)">
+    <ellipse cx="0" cy="18" rx="26" ry="12" fill="#c99a2e" opacity=".5"/>
+    <path d="M-26 8 C-26 -8 -14 -18 0 -18 C14 -18 26 -8 26 8 C26 22 14 30 0 30 C-14 30 -26 22 -26 8 Z" fill="url(#smwrap)" stroke="#c98e1e" stroke-width="1.3"/>
+    <!-- ruffle pleats -->
+    <path d="M-24 2 C-20 -8 -14 -14 -6 -16 M-14 -2 C-12 -12 -6 -18 2 -18 M-2 -4 C0 -14 6 -18 14 -16 M10 -4 C14 -12 20 -12 24 -4 M18 2 C22 -4 26 0 26 8" stroke="#e0a82a" stroke-width="1.4" fill="none" opacity=".8"/>
+    <!-- pink pork-shrimp filling in the open top -->
+    <ellipse cx="0" cy="-6" rx="18" ry="9" fill="url(#smfill)"/>
+    <ellipse cx="-5" cy="-9" rx="8" ry="3.5" fill="#ffb79c" opacity=".7"/>
+    <!-- roe/carrot crown dot -->
+    <circle cx="0" cy="-6" r="3.4" fill="#ff7a2e"/>
+    <circle cx="-1.2" cy="-7.2" r="1.2" fill="#ffd08a" opacity=".8"/>
+  </g>
+  <!-- back-right -->
+  <g transform="translate(206 106) scale(.86)">
+    <ellipse cx="0" cy="18" rx="26" ry="12" fill="#c99a2e" opacity=".5"/>
+    <path d="M-26 8 C-26 -8 -14 -18 0 -18 C14 -18 26 -8 26 8 C26 22 14 30 0 30 C-14 30 -26 22 -26 8 Z" fill="url(#smwrap)" stroke="#c98e1e" stroke-width="1.3"/>
+    <path d="M-24 2 C-20 -8 -14 -14 -6 -16 M-14 -2 C-12 -12 -6 -18 2 -18 M-2 -4 C0 -14 6 -18 14 -16 M10 -4 C14 -12 20 -12 24 -4 M18 2 C22 -4 26 0 26 8" stroke="#e0a82a" stroke-width="1.4" fill="none" opacity=".8"/>
+    <ellipse cx="0" cy="-6" rx="18" ry="9" fill="url(#smfill)"/>
+    <ellipse cx="-5" cy="-9" rx="8" ry="3.5" fill="#ffb79c" opacity=".7"/>
+    <circle cx="0" cy="-6" r="3.4" fill="#ff7a2e"/>
+    <circle cx="-1.2" cy="-7.2" r="1.2" fill="#ffd08a" opacity=".8"/>
+  </g>
+  <!-- front-center (biggest, in front) -->
+  <g transform="translate(160 130)">
+    <ellipse cx="0" cy="22" rx="32" ry="14" fill="#b8862a" opacity=".55"/>
+    <path d="M-31 10 C-31 -10 -17 -22 0 -22 C17 -22 31 -10 31 10 C31 26 17 36 0 36 C-17 36 -31 26 -31 10 Z" fill="url(#smwrap)" stroke="#c98e1e" stroke-width="1.5"/>
+    <!-- ruffle pleats -->
+    <path d="M-29 2 C-24 -10 -17 -18 -7 -20 M-17 -3 C-14 -15 -7 -22 3 -22 M-3 -5 C0 -17 8 -22 17 -20 M12 -4 C17 -14 24 -14 29 -4 M22 2 C27 -4 31 1 31 10" stroke="#e0a82a" stroke-width="1.5" fill="none" opacity=".85"/>
+    <path d="M-24 12 C-24 22 -12 30 0 30 C12 30 24 22 24 12" stroke="#c98e1e" stroke-width="1.2" fill="none" opacity=".5"/>
+    <!-- pink filling in the open top -->
+    <ellipse cx="0" cy="-7" rx="22" ry="11" fill="url(#smfill)"/>
+    <ellipse cx="-6" cy="-11" rx="10" ry="4.5" fill="#ffb79c" opacity=".75"/>
+    <!-- flecks of shrimp/pork texture -->
+    <circle cx="7" cy="-4" r="1.6" fill="#ff8560"/>
+    <circle cx="-9" cy="-3" r="1.4" fill="#d4553a"/>
+    <!-- orange roe crown -->
+    <circle cx="0" cy="-7" r="4.2" fill="#ff7a2e"/>
+    <circle cx="-1.5" cy="-9" r="1.6" fill="#ffd08a" opacity=".85"/>
+  </g>
+  <!-- garnish: tiny green pea + scallion fleck on the crowns -->
+  <circle cx="160" cy="122" r="2.2" fill="#5ecb4e"/>
+  <rect x="112" y="99" width="5" height="2.2" rx="1.1" fill="#3f9c37" transform="rotate(-16 114 100)"/>
+  <rect x="204" y="99" width="5" height="2.2" rx="1.1" fill="#5ecb4e" transform="rotate(14 206 100)"/>
+  <!-- gloss dots -->
+  <circle cx="150" cy="120" r="1.5" fill="#fff" opacity=".55"/>
+  <circle cx="122" cy="100" r="1.3" fill="#fff" opacity=".45"/>
+  <circle cx="200" cy="100" r="1.3" fill="#fff" opacity=".45"/>
+</svg>

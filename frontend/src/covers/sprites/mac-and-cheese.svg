@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="mccBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="mccbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="mccsauce" cx="46%" cy="32%" r="80%">
+      <stop offset="0%" stop-color="#ffd766"/><stop offset="55%" stop-color="#f6b32e"/><stop offset="100%" stop-color="#dd8a15"/>
+    </radialGradient>
+    <linearGradient id="mccdish" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e04b2a"/><stop offset="100%" stop-color="#8a220e"/>
+    </linearGradient>
+    <radialGradient id="mccmac" cx="42%" cy="32%" r="80%">
+      <stop offset="0%" stop-color="#ffe9a8"/><stop offset="55%" stop-color="#f5c452"/><stop offset="100%" stop-color="#e09a24"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#mccbg)"/>
+  <!-- steam -->
+  <path d="M120 50 C110 34 128 26 118 6" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#mccBlur3)"/>
+  <path d="M198 52 C190 36 206 28 198 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#mccBlur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="188" rx="146" ry="22" fill="#000" opacity=".5"/>
+  <!-- red baking dish (rounded rectangle ramekin) -->
+  <path d="M52 100 L268 100 C272 100 274 104 272 108 L262 158 C260 168 250 174 238 174 L82 174 C70 174 60 168 58 158 L48 108 C46 104 48 100 52 100 Z" fill="url(#mccdish)"/>
+  <path d="M52 100 L268 100 C272 100 274 104 272 108 L262 158 C260 168 250 174 238 174 L82 174 C70 174 60 168 58 158 L48 108 C46 104 48 100 52 100 Z" fill="none" stroke="#5a1508" stroke-width="2.5" opacity=".7"/>
+  <!-- dish rim handles -->
+  <ellipse cx="44" cy="104" rx="8" ry="6" fill="url(#mccdish)" stroke="#5a1508" stroke-width="2"/>
+  <ellipse cx="276" cy="104" rx="8" ry="6" fill="url(#mccdish)" stroke="#5a1508" stroke-width="2"/>
+  <!-- cheese sauce inner well -->
+  <path d="M62 104 L258 104 L250 150 C248 158 240 162 230 162 L90 162 C80 162 72 158 70 150 Z" fill="url(#mccsauce)"/>
+  <!-- neon steam arc (warm/local) -->
+  <path d="M56 96 Q108 66 172 68" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- elbow macaroni pieces, packed -->
+  <g stroke="#c9871a" stroke-width="1.2" stroke-linecap="round">
+    <path d="M78 116 C78 110 84 108 88 110 C92 108 96 112 94 118" fill="none" stroke="#f7d97e" stroke-width="6"/>
+    <path d="M100 112 C100 106 108 105 112 108 C116 106 120 110 118 116" fill="none" stroke="#f5cf62" stroke-width="6"/>
+    <path d="M126 118 C126 112 133 110 138 113 C142 111 146 116 144 122" fill="none" stroke="#f7d97e" stroke-width="6"/>
+    <path d="M152 112 C152 106 159 105 164 108 C168 106 172 111 170 117" fill="none" stroke="#f5cf62" stroke-width="6"/>
+    <path d="M178 118 C178 112 185 110 190 113 C194 111 198 116 196 122" fill="none" stroke="#f7d97e" stroke-width="6"/>
+    <path d="M204 112 C204 106 211 105 216 108 C220 106 224 111 222 117" fill="none" stroke="#f5cf62" stroke-width="6"/>
+    <path d="M228 118 C228 112 234 111 238 113 C242 112 244 116 242 121" fill="none" stroke="#f7d97e" stroke-width="6"/>
+    <path d="M88 132 C88 126 95 124 100 127 C104 125 108 130 106 136" fill="none" stroke="#f5cf62" stroke-width="6"/>
+    <path d="M116 136 C116 130 123 128 128 131 C132 129 136 134 134 140" fill="none" stroke="#f7d97e" stroke-width="6"/>
+    <path d="M144 134 C144 128 151 126 156 129 C160 127 164 132 162 138" fill="none" stroke="#f5cf62" stroke-width="6"/>
+    <path d="M172 138 C172 132 179 130 184 133 C188 131 192 136 190 142" fill="none" stroke="#f7d97e" stroke-width="6"/>
+    <path d="M200 134 C200 128 207 126 212 129 C216 127 220 132 218 138" fill="none" stroke="#f5cf62" stroke-width="6"/>
+    <path d="M226 136 C226 130 232 129 236 131 C240 130 242 135 240 140" fill="none" stroke="#f7d97e" stroke-width="6"/>
+    <path d="M104 148 C104 143 110 142 114 144 C118 143 120 147 118 151" fill="none" stroke="#f5cf62" stroke-width="5.4"/>
+    <path d="M138 150 C138 145 144 144 148 146 C152 145 154 149 152 153" fill="none" stroke="#f7d97e" stroke-width="5.4"/>
+    <path d="M176 150 C176 145 182 144 186 146 C190 145 192 149 190 153" fill="none" stroke="#f5cf62" stroke-width="5.4"/>
+    <path d="M208 148 C208 143 214 142 218 144 C222 143 224 147 222 151" fill="none" stroke="#f7d97e" stroke-width="5.4"/>
+  </g>
+  <!-- macaroni highlight sheen -->
+  <g fill="#fff1c9" opacity=".55">
+    <ellipse cx="90" cy="112" rx="4" ry="1.6"/>
+    <ellipse cx="140" cy="115" rx="4" ry="1.6"/>
+    <ellipse cx="190" cy="115" rx="4" ry="1.6"/>
+    <ellipse cx="126" cy="133" rx="4" ry="1.6"/>
+    <ellipse cx="182" cy="135" rx="4" ry="1.6"/>
+  </g>
+  <!-- toasted breadcrumb / broiled cheese specks -->
+  <g fill="#a5651a">
+    <circle cx="112" cy="120" r="2"/><circle cx="166" cy="124" r="2.2"/><circle cx="214" cy="118" r="2"/>
+    <circle cx="132" cy="142" r="2"/><circle cx="198" cy="140" r="2.2"/><circle cx="150" cy="128" r="1.8"/>
+  </g>
+  <!-- parsley flecks + gloss -->
+  <rect x="120" y="126" width="6" height="2.4" rx="1.2" fill="#3f9c37" transform="rotate(-16 123 127)"/>
+  <rect x="184" y="130" width="6" height="2.4" rx="1.2" fill="#58c14a" transform="rotate(18 187 131)"/>
+  <rect x="156" y="146" width="5.5" height="2.2" rx="1.1" fill="#5ecb4e" transform="rotate(-8 159 147)"/>
+  <circle cx="118" cy="114" r="1.4" fill="#fff" opacity=".6"/>
+  <circle cx="176" cy="120" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="222" cy="128" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

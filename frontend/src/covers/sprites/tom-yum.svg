@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="tymBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="tymbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#3a1120"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <radialGradient id="tymbowl" cx="50%" cy="30%" r="82%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <radialGradient id="tymbroth" cx="46%" cy="34%" r="72%">
+      <stop offset="0%" stop-color="#ef6a2e"/><stop offset="52%" stop-color="#c8380f"/><stop offset="100%" stop-color="#8a1f08"/>
+    </radialGradient>
+    <linearGradient id="tymshrimp" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ff8a5a"/><stop offset="100%" stop-color="#e0491f"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#tymbg)"/>
+  <!-- rising steam wisps (hot soup) -->
+  <path d="M126 50 C116 32 136 24 126 4" stroke="#fff" stroke-width="7" fill="none" opacity=".11" filter="url(#tymBlur3)"/>
+  <path d="M196 48 C188 30 206 22 198 4" stroke="#fff" stroke-width="6" fill="none" opacity=".09" filter="url(#tymBlur3)"/>
+  <path d="M160 44 C152 26 170 18 162 2" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#tymBlur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="186" rx="140" ry="22" fill="#000" opacity=".5"/>
+  <!-- neon steam arc (rose/hot family) -->
+  <path d="M60 108 Q108 74 172 74" stroke="#ff4d6d" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- deep bowl silhouette -->
+  <path d="M56 108 C56 96 264 96 264 108 C260 158 220 178 160 178 C100 178 60 158 56 108 Z" fill="url(#tymbowl)"/>
+  <path d="M56 108 C56 96 264 96 264 108 C260 158 220 178 160 178 C100 178 60 158 56 108 Z" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <!-- broth surface (upper ellipse rim) -->
+  <ellipse cx="160" cy="108" rx="104" ry="30" fill="url(#tymbroth)"/>
+  <ellipse cx="160" cy="108" rx="104" ry="30" fill="none" stroke="#7a1a06" stroke-width="1.6" opacity=".7"/>
+  <!-- chili-oil sheen film on the broth -->
+  <ellipse cx="134" cy="100" rx="30" ry="8" fill="#ff8a3a" opacity=".35"/>
+  <ellipse cx="190" cy="112" rx="26" ry="7" fill="#b02408" opacity=".4"/>
+  <!-- lime slice floating -->
+  <g transform="translate(112 96)">
+    <ellipse cx="0" cy="0" rx="12" ry="9" fill="#c7e04a"/>
+    <ellipse cx="0" cy="0" rx="12" ry="9" fill="none" stroke="#3f7d1f" stroke-width="1.4"/>
+    <ellipse cx="0" cy="0" rx="7" ry="5.5" fill="#e8f4a8" opacity=".85"/>
+    <path d="M0 -5 L0 5 M-6 -3 L6 3 M-6 3 L6 -3" stroke="#a9c94a" stroke-width="1"/>
+  </g>
+  <!-- lemongrass stalk + kaffir lime leaves -->
+  <path d="M176 88 L226 74" stroke="#8fbf4a" stroke-width="4" stroke-linecap="round"/>
+  <path d="M176 88 L226 74" stroke="#c7e07a" stroke-width="1.4" opacity=".6"/>
+  <path d="M150 90 C158 82 166 84 170 90 C164 94 156 94 150 90 Z" fill="#2f7d2b"/>
+  <path d="M198 100 C206 92 214 94 218 100 C212 104 204 104 198 100 Z" fill="#3f9c37"/>
+  <!-- prawns curled on top (hero) -->
+  <g transform="translate(150 112) rotate(-8)">
+    <path d="M-20 0 C-24 -14 -6 -22 8 -16 C22 -12 24 4 12 8 C6 -2 -6 -4 -12 2 C-16 6 -18 4 -20 0 Z" fill="url(#tymshrimp)"/>
+    <path d="M-20 0 C-24 -14 -6 -22 8 -16 C22 -12 24 4 12 8" fill="none" stroke="#b0350e" stroke-width="1.4" opacity=".6"/>
+    <path d="M-12 -10 L-6 -10 M-4 -14 L2 -13 M6 -14 L11 -11" stroke="#8a1f08" stroke-width="1.2" opacity=".7"/>
+    <ellipse cx="2" cy="-12" rx="8" ry="3" fill="#ffb98a" opacity=".6"/>
+    <circle cx="15" cy="-8" r="1.6" fill="#1c0d06"/>
+  </g>
+  <g transform="translate(198 118) rotate(150)">
+    <path d="M-18 0 C-22 -12 -6 -20 6 -14 C18 -10 20 4 10 7 C5 -1 -5 -3 -10 2 C-14 6 -16 4 -18 0 Z" fill="url(#tymshrimp)"/>
+    <path d="M-18 0 C-22 -12 -6 -20 6 -14 C18 -10 20 4 10 7" fill="none" stroke="#b0350e" stroke-width="1.4" opacity=".6"/>
+    <path d="M-10 -9 L-4 -9 M-2 -12 L4 -11" stroke="#8a1f08" stroke-width="1.2" opacity=".7"/>
+    <ellipse cx="0" cy="-10" rx="7" ry="3" fill="#ffb98a" opacity=".55"/>
+  </g>
+  <!-- straw/oyster mushrooms + tomato wedge -->
+  <ellipse cx="168" cy="98" rx="9" ry="6" fill="#e8dcc4"/>
+  <ellipse cx="168" cy="98" rx="9" ry="6" fill="none" stroke="#b89b6a" stroke-width="1"/>
+  <path d="M132 118 C138 110 150 110 154 118 C150 124 138 124 132 118 Z" fill="#dd3320"/>
+  <path d="M132 118 C138 110 150 110 154 118" fill="none" stroke="#c31f12" stroke-width="1" opacity=".7"/>
+  <!-- red chili rings + cilantro floating -->
+  <circle cx="122" cy="116" r="3" fill="#e0341f"/><circle cx="122" cy="116" r="1.2" fill="#ffb98a"/>
+  <circle cx="182" cy="104" r="2.6" fill="#e0341f"/><circle cx="182" cy="104" r="1" fill="#ffb98a"/>
+  <circle cx="146" cy="102" r="2.6" fill="#e0341f"/><circle cx="146" cy="102" r="1" fill="#ffb98a"/>
+  <rect x="158" y="120" width="7" height="2.6" rx="1.3" fill="#5ecb4e" transform="rotate(-16 161 121)"/>
+  <rect x="204" y="106" width="6" height="2.4" rx="1.2" fill="#3f9c37" transform="rotate(20 207 107)"/>
+  <rect x="128" y="106" width="6" height="2.4" rx="1.2" fill="#58c14a" transform="rotate(10 131 107)"/>
+  <!-- oil gloss dots -->
+  <circle cx="140" cy="98" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="190" cy="110" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="164" cy="116" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

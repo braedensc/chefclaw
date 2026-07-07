@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="stfBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="stfbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#123138"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <radialGradient id="stfplate" cx="50%" cy="30%" r="82%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <linearGradient id="stftofu" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4a4030"/><stop offset="45%" stop-color="#2e2718"/><stop offset="100%" stop-color="#171208"/>
+    </linearGradient>
+    <linearGradient id="stfface" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f5e6cf"/><stop offset="60%" stop-color="#e3cda4"/><stop offset="100%" stop-color="#caa878"/>
+    </linearGradient>
+    <linearGradient id="stfsauce" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ef5520"/><stop offset="55%" stop-color="#b02408"/><stop offset="100%" stop-color="#7a1305"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#stfbg)"/>
+  <!-- rising steam wisps (fried hot street food) -->
+  <path d="M120 52 C110 34 130 26 120 8" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#stfBlur3)"/>
+  <path d="M200 50 C192 34 210 26 202 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#stfBlur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="188" rx="150" ry="22" fill="#000" opacity=".5"/>
+  <!-- neon steam arc (cyan) -->
+  <path d="M50 116 Q102 84 166 82" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- skillet / cast-iron pan with handle (street-food fry pan) -->
+  <rect x="266" y="128" width="46" height="9" rx="4.5" fill="#141018" transform="rotate(-6 289 132)"/>
+  <rect x="266" y="128" width="46" height="9" rx="4.5" fill="none" stroke="#2c2136" stroke-width="1.6" transform="rotate(-6 289 132)"/>
+  <ellipse cx="158" cy="130" rx="126" ry="48" fill="url(#stfplate)"/>
+  <ellipse cx="158" cy="130" rx="126" ry="48" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="158" cy="130" rx="110" ry="40" fill="#0c0c0f"/>
+  <!-- chili-oil sauce pool at the base -->
+  <ellipse cx="158" cy="138" rx="96" ry="28" fill="url(#stfsauce)" opacity=".9"/>
+  <ellipse cx="158" cy="138" rx="96" ry="28" fill="none" stroke="#6a1204" stroke-width="1.2" opacity=".6"/>
+  <path d="M78 132 C104 124 150 124 178 130" stroke="#ff8a52" stroke-width="2" fill="none" opacity=".45" stroke-linecap="round"/>
+  <!-- fried stinky-tofu cubes: dark craggy fried exterior, pale interior on cut faces -->
+  <g stroke-linejoin="round">
+    <!-- back cubes (smaller/darker) -->
+    <g transform="translate(96 96) rotate(-8) scale(.86)">
+      <path d="M0 6 L18 0 L36 6 L36 26 L18 32 L0 26 Z" fill="url(#stftofu)" stroke="#0c0803" stroke-width="1.4"/>
+      <path d="M0 6 L18 0 L36 6 L18 12 Z" fill="url(#stfface)"/>
+      <path d="M0 6 L18 12 L18 32 L0 26 Z" fill="#3a3120"/>
+      <circle cx="9" cy="6" r="1.3" fill="#1a1409"/><circle cx="26" cy="7" r="1.4" fill="#1a1409"/><circle cx="9" cy="19" r="1.2" fill="#241a0c"/>
+      <ellipse cx="14" cy="6" rx="4" ry="1.6" fill="#fff5db" opacity=".5"/>
+    </g>
+    <g transform="translate(178 92) rotate(10) scale(.86)">
+      <path d="M0 6 L18 0 L36 6 L36 26 L18 32 L0 26 Z" fill="url(#stftofu)" stroke="#0c0803" stroke-width="1.4"/>
+      <path d="M0 6 L18 0 L36 6 L18 12 Z" fill="url(#stfface)"/>
+      <path d="M0 6 L18 12 L18 32 L0 26 Z" fill="#3a3120"/>
+      <circle cx="9" cy="6" r="1.3" fill="#1a1409"/><circle cx="26" cy="7" r="1.4" fill="#1a1409"/><circle cx="27" cy="19" r="1.2" fill="#241a0c"/>
+      <ellipse cx="14" cy="6" rx="4" ry="1.6" fill="#fff5db" opacity=".5"/>
+    </g>
+    <!-- front cubes (larger/brighter) -->
+    <g transform="translate(112 116) rotate(-4)">
+      <path d="M0 7 L21 0 L42 7 L42 30 L21 37 L0 30 Z" fill="url(#stftofu)" stroke="#0c0803" stroke-width="1.5"/>
+      <path d="M0 7 L21 0 L42 7 L21 14 Z" fill="url(#stfface)"/>
+      <path d="M0 7 L21 14 L21 37 L0 30 Z" fill="#3f3522"/>
+      <circle cx="10" cy="7" r="1.5" fill="#1a1409"/><circle cx="31" cy="8" r="1.6" fill="#1a1409"/><circle cx="10" cy="22" r="1.4" fill="#241a0c"/><circle cx="6" cy="26" r="1.2" fill="#241a0c"/>
+      <ellipse cx="16" cy="7" rx="5" ry="2" fill="#fff5db" opacity=".55"/>
+      <circle cx="12" cy="5" r="1.2" fill="#fff" opacity=".55"/>
+    </g>
+    <g transform="translate(172 118) rotate(6)">
+      <path d="M0 7 L21 0 L42 7 L42 30 L21 37 L0 30 Z" fill="url(#stftofu)" stroke="#0c0803" stroke-width="1.5"/>
+      <path d="M0 7 L21 0 L42 7 L21 14 Z" fill="url(#stfface)"/>
+      <path d="M0 7 L21 14 L21 37 L0 30 Z" fill="#3f3522"/>
+      <circle cx="10" cy="7" r="1.5" fill="#1a1409"/><circle cx="31" cy="8" r="1.6" fill="#1a1409"/><circle cx="33" cy="22" r="1.4" fill="#241a0c"/>
+      <ellipse cx="16" cy="7" rx="5" ry="2" fill="#fff5db" opacity=".55"/>
+      <circle cx="12" cy="5" r="1.2" fill="#fff" opacity=".55"/>
+    </g>
+    <g transform="translate(146 106) rotate(-1) scale(.94)">
+      <path d="M0 7 L21 0 L42 7 L42 30 L21 37 L0 30 Z" fill="url(#stftofu)" stroke="#0c0803" stroke-width="1.4"/>
+      <path d="M0 7 L21 0 L42 7 L21 14 Z" fill="url(#stfface)"/>
+      <path d="M0 7 L21 14 L21 37 L0 30 Z" fill="#3f3522"/>
+      <circle cx="10" cy="7" r="1.4" fill="#1a1409"/><circle cx="31" cy="8" r="1.5" fill="#1a1409"/>
+      <ellipse cx="16" cy="7" rx="5" ry="2" fill="#fff5db" opacity=".55"/>
+    </g>
+  </g>
+  <!-- garnish: chopped scallion, cilantro, chili flakes, sesame + pickled greens -->
+  <rect x="122" y="104" width="7" height="2.6" rx="1.3" fill="#5ecb4e" transform="rotate(-18 125 105)"/>
+  <rect x="182" y="110" width="7" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(16 185 111)"/>
+  <rect x="104" y="126" width="6" height="2.4" rx="1.2" fill="#58c14a" transform="rotate(24 107 127)"/>
+  <rect x="204" y="128" width="6" height="2.4" rx="1.2" fill="#3f9c37" transform="rotate(-14 207 129)"/>
+  <rect x="150" y="128" width="6" height="2.4" rx="1.2" fill="#6abf5a" transform="rotate(8 153 129)"/>
+  <circle cx="134" cy="120" r="1.6" fill="#e0341f"/>
+  <circle cx="190" cy="126" r="1.6" fill="#e0341f"/>
+  <circle cx="160" cy="118" r="1.4" fill="#e0341f"/>
+  <circle cx="118" cy="132" r="1.2" fill="#f8eed6"/>
+  <circle cx="176" cy="134" r="1.2" fill="#f8eed6"/>
+  <!-- oil gloss dots -->
+  <circle cx="128" cy="112" r="1.4" fill="#fff" opacity=".6"/>
+  <circle cx="186" cy="118" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="158" cy="128" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

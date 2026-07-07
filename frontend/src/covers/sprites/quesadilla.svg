@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="qdBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="qdbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <linearGradient id="qdtort" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f4d791"/><stop offset="52%" stop-color="#e5bd66"/><stop offset="100%" stop-color="#c99741"/>
+    </linearGradient>
+    <linearGradient id="qdtortlo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d9b158"/><stop offset="100%" stop-color="#a97b2c"/>
+    </linearGradient>
+    <radialGradient id="qdcheese" cx="42%" cy="32%" r="82%">
+      <stop offset="0%" stop-color="#ffe9a6"/><stop offset="55%" stop-color="#ffce58"/><stop offset="100%" stop-color="#f4a828"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#qdbg)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="172" rx="130" ry="20" fill="#000" opacity=".5"/>
+  <!-- rising steam wisps -->
+  <path d="M132 54 C124 38 140 30 132 10" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#qdBlur3)"/>
+  <path d="M196 56 C188 40 204 32 196 12" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#qdBlur3)"/>
+  <!-- wooden board -->
+  <ellipse cx="160" cy="150" rx="134" ry="32" fill="#2a1c10"/>
+  <ellipse cx="160" cy="150" rx="134" ry="32" fill="none" stroke="#3d2a17" stroke-width="3"/>
+  <ellipse cx="160" cy="148" rx="116" ry="25" fill="#22160c"/>
+  <path d="M56 148 L264 148" stroke="#3a2614" stroke-width="1" opacity=".5"/>
+  <!-- neon steam arc (warm) -->
+  <path d="M56 116 Q108 84 172 82" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- QUESADILLA: folded half-moon, cut into 3 wedges fanned open -->
+  <!-- back full half-round (the fold) as base -->
+  <g stroke-linejoin="round">
+    <!-- WEDGE 1 (left) -->
+    <g transform="translate(-6 4) rotate(-6 160 130)">
+      <path d="M160 138 L96 118 A78 78 0 0 1 132 88 Z" fill="url(#qdtort)" stroke="#9a6a20" stroke-width="1.4"/>
+      <path d="M160 138 L96 118 A78 78 0 0 1 132 88 Z" fill="url(#qdcheese)" opacity=".0"/>
+    </g>
+    <!-- WEDGE 3 (right) -->
+    <g transform="translate(6 4) rotate(6 160 130)">
+      <path d="M160 138 L224 118 A78 78 0 0 0 188 88 Z" fill="url(#qdtort)" stroke="#9a6a20" stroke-width="1.4"/>
+    </g>
+    <!-- WEDGE 2 (center, front, tallest — cheese-oozing cut faces) -->
+    <path d="M160 140 L132 90 A78 78 0 0 1 188 90 Z" fill="url(#qdtort)" stroke="#9a6a20" stroke-width="1.5"/>
+  </g>
+  <!-- toasted grill-mark stripes on the tortilla faces -->
+  <g stroke="#a97b2c" stroke-width="3" opacity=".5" stroke-linecap="round">
+    <path d="M116 104 L140 96 M124 116 L150 106 M108 116 L128 110"/>
+    <path d="M180 96 L204 104 M170 106 L196 116 M192 110 L212 116"/>
+    <path d="M148 100 L152 118 M168 100 L164 118"/>
+  </g>
+  <!-- toasted blister char spots -->
+  <g fill="#8a5a1e" opacity=".55">
+    <circle cx="120" cy="110" r="2.6"/><circle cx="200" cy="110" r="2.6"/><circle cx="158" cy="106" r="2.4"/><circle cx="140" cy="122" r="2.2"/><circle cx="182" cy="122" r="2.2"/>
+  </g>
+  <!-- MOLTEN CHEESE oozing from the cut edges of the center wedge -->
+  <path d="M140 138 C138 130 148 128 152 134 C158 130 168 132 166 140 C160 146 146 146 140 138 Z" fill="url(#qdcheese)"/>
+  <path d="M150 138 C152 132 160 132 162 138" stroke="#f4a828" stroke-width="1.2" fill="none" opacity=".6"/>
+  <!-- cheese pull strand between two wedges -->
+  <path d="M146 134 C142 128 140 124 143 120" stroke="#ffdf8c" stroke-width="2.4" fill="none" opacity=".85" stroke-linecap="round"/>
+  <path d="M168 134 C172 128 174 124 171 120" stroke="#ffce58" stroke-width="2.2" fill="none" opacity=".8" stroke-linecap="round"/>
+  <!-- dollop of guacamole + salsa on the board (front) -->
+  <ellipse cx="120" cy="150" rx="14" ry="7" fill="#4e8a34"/>
+  <ellipse cx="118" cy="147" rx="7" ry="3.4" fill="#6aa845" opacity=".8"/>
+  <ellipse cx="204" cy="150" rx="13" ry="6.5" fill="#c8351b"/>
+  <ellipse cx="206" cy="147" rx="6" ry="3" fill="#e0501f" opacity=".8"/>
+  <!-- cilantro flecks -->
+  <rect x="150" y="128" width="6" height="2.4" rx="1.2" fill="#58c14a" transform="rotate(-18 153 129)"/>
+  <rect x="176" y="130" width="6" height="2.4" rx="1.2" fill="#3f9c37" transform="rotate(16 179 131)"/>
+  <g fill="#2f7d2b" opacity=".8">
+    <circle cx="132" cy="118" r="1.2"/><circle cx="190" cy="116" r="1.2"/><circle cx="160" cy="126" r="1.1"/>
+  </g>
+  <!-- gloss dots -->
+  <circle cx="130" cy="102" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="196" cy="104" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="154" cy="132" r="1.2" fill="#fff" opacity=".55"/>
+</svg>

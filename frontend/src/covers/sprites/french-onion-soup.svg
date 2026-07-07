@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="fosBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="fosbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="foscrock" cx="50%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#211a26"/><stop offset="100%" stop-color="#0d0d10"/>
+    </radialGradient>
+    <radialGradient id="foscheese" cx="46%" cy="30%" r="82%">
+      <stop offset="0%" stop-color="#fbe6a8"/><stop offset="55%" stop-color="#f3c866"/><stop offset="100%" stop-color="#d89a34"/>
+    </radialGradient>
+    <radialGradient id="fosbroth" cx="44%" cy="40%" r="80%">
+      <stop offset="0%" stop-color="#7a4418"/><stop offset="55%" stop-color="#4e2a0e"/><stop offset="100%" stop-color="#2c1706"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#fosbg)"/>
+  <!-- rising steam wisps (hot bubbling soup) -->
+  <path d="M126 50 C116 32 136 24 126 4" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#fosBlur3)"/>
+  <path d="M196 48 C188 32 206 24 198 4" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#fosBlur3)"/>
+  <ellipse cx="160" cy="188" rx="130" ry="20" fill="#000" opacity=".5"/>
+  <!-- oven crock with side handles (deep glazed ramekin) -->
+  <path d="M62 96 C62 88 92 84 160 84 C228 84 258 88 258 96 C258 150 216 176 160 176 C104 176 62 150 62 96 Z" fill="url(#foscrock)"/>
+  <path d="M62 96 C62 88 92 84 160 84 C228 84 258 88 258 96 C258 150 216 176 160 176 C104 176 62 150 62 96 Z" fill="none" stroke="#3a2f22" stroke-width="3"/>
+  <!-- crock side handles (little ears) -->
+  <path d="M60 106 C46 106 46 124 60 124" fill="none" stroke="#2c2318" stroke-width="7" stroke-linecap="round"/>
+  <path d="M260 106 C274 106 274 124 260 124" fill="none" stroke="#2c2318" stroke-width="7" stroke-linecap="round"/>
+  <!-- neon steam arc (warm white) -->
+  <path d="M70 90 Q116 62 176 62" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- dark caramelized-onion broth peeking at the rim -->
+  <ellipse cx="160" cy="98" rx="94" ry="24" fill="url(#fosbroth)"/>
+  <path d="M78 96 C108 90 212 90 242 96" stroke="#3a2410" stroke-width="2" fill="none" opacity=".6"/>
+  <!-- caramelized onion strands showing in the broth at the edge -->
+  <g stroke-linecap="round" fill="none" opacity=".8">
+    <path d="M88 100 C104 96 120 100 132 96" stroke="#8a5a24" stroke-width="2.4"/>
+    <path d="M196 98 C210 94 224 98 234 94" stroke="#7a4c1e" stroke-width="2.4"/>
+    <path d="M104 106 C118 102 132 106 146 102" stroke="#9c6a2e" stroke-width="2.2"/>
+  </g>
+  <!-- molten broiled cheese cap: irregular gooey blob draped over the toast -->
+  <path d="M76 104 C74 90 104 80 160 80 C216 80 246 90 244 104 C246 116 232 126 216 122 C214 132 196 134 188 126 C180 134 160 134 152 126 C144 134 126 132 124 122 C108 128 74 118 76 104 Z" fill="url(#foscheese)"/>
+  <path d="M78 102 C78 92 106 84 160 84 C214 84 242 92 242 102" fill="none" stroke="#fff1c8" stroke-width="1.4" opacity=".4"/>
+  <!-- cheese pull strand + gooey drips -->
+  <path d="M132 122 C130 132 134 140 138 146" stroke="#f3c866" stroke-width="3" fill="none" opacity=".8" stroke-linecap="round"/>
+  <path d="M196 124 C198 132 196 140 192 146" stroke="#f0bf58" stroke-width="3" fill="none" opacity=".75" stroke-linecap="round"/>
+  <!-- toasted baguette slice edge just visible under the cheese -->
+  <path d="M118 118 C130 122 190 122 202 118 C198 128 176 130 160 130 C144 130 122 128 118 118 Z" fill="#c88a44" opacity=".55"/>
+  <!-- golden broiled bubbles / browned spots on the cheese -->
+  <ellipse cx="118" cy="98" rx="10" ry="6" fill="#c98a3a" opacity=".55"/>
+  <ellipse cx="196" cy="100" rx="11" ry="6" fill="#bd7f30" opacity=".5"/>
+  <ellipse cx="150" cy="94" rx="8" ry="5" fill="#d89a44" opacity=".5"/>
+  <circle cx="132" cy="92" r="3" fill="#8a5216" opacity=".6"/>
+  <circle cx="176" cy="96" r="3.4" fill="#7a481a" opacity=".6"/>
+  <circle cx="160" cy="104" r="2.6" fill="#8a5216" opacity=".55"/>
+  <circle cx="204" cy="94" r="2.4" fill="#7a481a" opacity=".55"/>
+  <!-- fresh thyme sprig + gloss -->
+  <path d="M140 90 l14 -6" stroke="#3f8c2f" stroke-width="1.4" stroke-linecap="round"/>
+  <path d="M144 89 l-2 -3 M148 87 l-2 -3 M152 85 l-2 -3" stroke="#4f9c37" stroke-width="1.2" stroke-linecap="round"/>
+  <!-- glossy melt highlights -->
+  <ellipse cx="140" cy="90" rx="14" ry="4" fill="#fff3cc" opacity=".35"/>
+  <circle cx="126" cy="88" r="1.5" fill="#fff" opacity=".65"/>
+  <circle cx="190" cy="90" r="1.4" fill="#fff" opacity=".6"/>
+  <circle cx="160" cy="100" r="1.3" fill="#fff" opacity=".55"/>
+</svg>

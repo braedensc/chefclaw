@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="ob1Blur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="ob1bg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="ob1bowl" cx="50%" cy="30%" r="82%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <radialGradient id="ob1oat" cx="46%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#f3e6c8"/><stop offset="55%" stop-color="#e2cea2"/><stop offset="100%" stop-color="#cbaf7c"/>
+    </radialGradient>
+    <linearGradient id="ob1berry" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7a2f66"/><stop offset="100%" stop-color="#45163c"/>
+    </linearGradient>
+    <linearGradient id="ob1banana" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffe9a6"/><stop offset="100%" stop-color="#e8c368"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#ob1bg)"/>
+  <!-- soft warm aroma wisp (warm oatmeal, gentle) -->
+  <path d="M132 60 C124 44 140 38 132 20" stroke="#fff" stroke-width="7" fill="none" opacity=".09" filter="url(#ob1Blur3)"/>
+  <path d="M188 62 C182 46 196 40 190 24" stroke="#fff" stroke-width="6" fill="none" opacity=".07" filter="url(#ob1Blur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="186" rx="128" ry="20" fill="#000" opacity=".5"/>
+  <!-- DEEP breakfast bowl: tall rounded profile -->
+  <path d="M74 116 C74 108 246 108 246 116 C244 156 214 182 160 182 C106 182 76 156 74 116 Z" fill="url(#ob1bowl)"/>
+  <path d="M74 116 C74 108 246 108 246 116 C244 156 214 182 160 182 C106 182 76 156 74 116 Z" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <!-- bowl inner rim ellipse -->
+  <ellipse cx="160" cy="116" rx="86" ry="26" fill="#0f0d13"/>
+  <ellipse cx="160" cy="116" rx="86" ry="26" fill="none" stroke="#26262e" stroke-width="2"/>
+  <!-- creamy oat mound filling the bowl (slightly domed) -->
+  <path d="M80 116 C80 100 240 100 240 116 C238 132 210 140 160 140 C110 140 82 132 80 116 Z" fill="url(#ob1oat)"/>
+  <ellipse cx="160" cy="112" rx="78" ry="20" fill="#f5ead0" opacity=".55"/>
+  <!-- porridge texture: soft oat-flake dabs -->
+  <g stroke-linecap="round" fill="none" opacity=".85">
+    <path d="M104 110 l7 -2" stroke="#fff6e2" stroke-width="2.6"/>
+    <path d="M124 118 l6 2" stroke="#d8bd8c" stroke-width="2.6"/>
+    <path d="M146 106 l7 -2" stroke="#fff6e2" stroke-width="2.6"/>
+    <path d="M182 108 l-6 2" stroke="#d8bd8c" stroke-width="2.6"/>
+    <path d="M204 116 l7 -2" stroke="#fff6e2" stroke-width="2.6"/>
+    <path d="M118 124 l6 2" stroke="#d8bd8c" stroke-width="2.4"/>
+    <path d="M170 122 l-6 2" stroke="#fff6e2" stroke-width="2.4"/>
+    <path d="M198 124 l6 -2" stroke="#d8bd8c" stroke-width="2.4"/>
+  </g>
+  <!-- honey drizzle glisten -->
+  <path d="M112 114 C130 108 150 120 170 112 C186 106 202 116 214 110" stroke="#ffd77a" stroke-width="2.2" fill="none" opacity=".6" stroke-linecap="round"/>
+  <!-- FRUIT TOPPING ON TOP: blueberries -->
+  <g>
+    <circle cx="118" cy="106" r="8" fill="url(#ob1berry)"/>
+    <circle cx="115" cy="103" r="2.4" fill="#b070a0" opacity=".7"/>
+    <circle cx="200" cy="108" r="8" fill="url(#ob1berry)"/>
+    <circle cx="197" cy="105" r="2.4" fill="#b070a0" opacity=".7"/>
+    <circle cx="146" cy="112" r="7" fill="url(#ob1berry)"/>
+    <circle cx="143" cy="109" r="2" fill="#b070a0" opacity=".7"/>
+  </g>
+  <!-- strawberry half -->
+  <g transform="translate(160 100)">
+    <path d="M-11 -2 C-11 -12 11 -12 11 -2 C11 8 0 14 0 14 C0 14 -11 8 -11 -2 Z" fill="#e23a3a"/>
+    <path d="M-11 -2 C-11 -12 11 -12 11 -2 C11 8 0 14 0 14 C0 14 -11 8 -11 -2 Z" fill="none" stroke="#a51f1f" stroke-width="1.2" opacity=".6"/>
+    <path d="M-11 -2 C-6 -7 6 -7 11 -2" fill="none" stroke="#ffd9c8" stroke-width="1.6" opacity=".6"/>
+    <circle cx="-4" cy="2" r="1" fill="#ffe0a0"/><circle cx="3" cy="4" r="1" fill="#ffe0a0"/><circle cx="-1" cy="8" r="1" fill="#ffe0a0"/>
+  </g>
+  <!-- banana slices -->
+  <g>
+    <ellipse cx="132" cy="120" rx="7.5" ry="4.5" fill="url(#ob1banana)"/>
+    <ellipse cx="132" cy="120" rx="7.5" ry="4.5" fill="none" stroke="#caa64e" stroke-width="1" opacity=".7"/>
+    <circle cx="132" cy="120" r="1.4" fill="#c99b3e"/>
+    <ellipse cx="186" cy="122" rx="7.5" ry="4.5" fill="url(#ob1banana)"/>
+    <ellipse cx="186" cy="122" rx="7.5" ry="4.5" fill="none" stroke="#caa64e" stroke-width="1" opacity=".7"/>
+    <circle cx="186" cy="122" r="1.4" fill="#c99b3e"/>
+  </g>
+  <!-- scattered chia/oat seeds + mint -->
+  <rect x="150" y="118" width="6" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(-20 153 119)"/>
+  <rect x="176" y="116" width="6" height="2.6" rx="1.3" fill="#58c14a" transform="rotate(18 179 117)"/>
+  <circle cx="128" cy="112" r="1.2" fill="#2a1a10"/><circle cx="168" cy="118" r="1.2" fill="#2a1a10"/><circle cx="208" cy="118" r="1.2" fill="#2a1a10"/>
+  <!-- cold-sparkle gloss dots -->
+  <circle cx="120" cy="102" r="1.4" fill="#fff" opacity=".7"/>
+  <circle cx="162" cy="96" r="1.3" fill="#fff" opacity=".65"/>
+  <circle cx="198" cy="104" r="1.3" fill="#fff" opacity=".6"/>
+  <circle cx="146" cy="110" r="1.1" fill="#fff" opacity=".5"/>
+</svg>

@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <radialGradient id="sunbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#3a1120"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <linearGradient id="sunglass" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity=".04"/><stop offset="20%" stop-color="#ffffff" stop-opacity=".16"/><stop offset="50%" stop-color="#ffffff" stop-opacity=".03"/><stop offset="80%" stop-color="#ffffff" stop-opacity=".11"/><stop offset="100%" stop-color="#ffffff" stop-opacity=".02"/>
+    </linearGradient>
+    <radialGradient id="sunvanilla" cx="40%" cy="32%" r="76%">
+      <stop offset="0%" stop-color="#fff6e2"/><stop offset="60%" stop-color="#f6e4c0"/><stop offset="100%" stop-color="#e2c894"/>
+    </radialGradient>
+    <radialGradient id="sunchoc" cx="40%" cy="32%" r="76%">
+      <stop offset="0%" stop-color="#7a4a2a"/><stop offset="58%" stop-color="#4f2c15"/><stop offset="100%" stop-color="#301708"/>
+    </radialGradient>
+    <radialGradient id="sunstraw" cx="40%" cy="32%" r="76%">
+      <stop offset="0%" stop-color="#ffb6c4"/><stop offset="58%" stop-color="#f27a94"/><stop offset="100%" stop-color="#d24866"/>
+    </radialGradient>
+    <linearGradient id="sunsauce" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6b3a1c"/><stop offset="100%" stop-color="#3a1c0c"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#sunbg)"/>
+  <!-- cold-dish sparkle + condensation (no steam) -->
+  <path d="M104 46 l2.4 6 6 2.4 -6 2.4 -2.4 6 -2.4 -6 -6 -2.4 6 -2.4 Z" fill="#ffd0da" opacity=".5"/>
+  <path d="M212 40 l1.8 4.6 4.6 1.8 -4.6 1.8 -1.8 4.6 -1.8 -4.6 -4.6 -1.8 4.6 -1.8 Z" fill="#ffe4ea" opacity=".45"/>
+  <circle cx="190" cy="34" r="1.6" fill="#fff" opacity=".6"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="188" rx="104" ry="17" fill="#000" opacity=".5"/>
+  <!-- neon accent arc (rose) -->
+  <path d="M96 70 Q134 46 178 48" stroke="#ff4d6d" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- dark base ring under the glass -->
+  <ellipse cx="160" cy="180" rx="46" ry="10" fill="#141018"/>
+  <ellipse cx="160" cy="180" rx="46" ry="10" fill="none" stroke="#2c2136" stroke-width="2.5"/>
+  <!-- footed sundae glass: bowl + stem + foot -->
+  <path d="M156 148 L164 148 L164 170 L172 176 L148 176 L156 170 Z" fill="#12101a"/>
+  <ellipse cx="160" cy="176" rx="20" ry="5" fill="#15121c"/>
+  <ellipse cx="160" cy="176" rx="20" ry="5" fill="none" stroke="#2c2136" stroke-width="1.6"/>
+  <!-- tulip glass bowl -->
+  <path d="M116 108 C116 138 138 150 160 150 C182 150 204 138 204 108 Z" fill="#0f0d15"/>
+  <path d="M120 108 C122 134 140 146 160 146 C180 146 198 134 200 108 Z" fill="#161320" opacity=".9"/>
+  <!-- chocolate sauce pooled in the glass -->
+  <path d="M124 112 C132 128 148 138 160 138 C172 138 188 128 196 112 C176 118 144 118 124 112 Z" fill="url(#sunsauce)" opacity=".85"/>
+  <!-- SCOOPS mounded above the rim -->
+  <!-- chocolate scoop (back left) -->
+  <g transform="translate(138 92)">
+    <circle r="22" fill="url(#sunchoc)"/>
+    <ellipse cx="-7" cy="-8" rx="7" ry="4.4" fill="#9a6238" opacity=".55"/>
+  </g>
+  <!-- strawberry scoop (back right) -->
+  <g transform="translate(184 94)">
+    <circle r="21" fill="url(#sunstraw)"/>
+    <ellipse cx="-6" cy="-8" rx="6.5" ry="4" fill="#ffd0da" opacity=".6"/>
+  </g>
+  <!-- vanilla scoop (front, largest, brightest) -->
+  <g transform="translate(160 84)">
+    <circle r="25" fill="url(#sunvanilla)"/>
+    <ellipse cx="-8" cy="-9" rx="8" ry="5" fill="#fffdf4" opacity=".7"/>
+  </g>
+  <!-- chocolate drizzle running down the scoops -->
+  <path d="M148 66 C144 78 152 88 148 100 C146 110 152 116 150 126" stroke="url(#sunsauce)" stroke-width="4" fill="none" opacity=".8" stroke-linecap="round"/>
+  <path d="M172 68 C176 80 168 90 174 102 C178 112 172 118 176 128" stroke="url(#sunsauce)" stroke-width="3.4" fill="none" opacity=".75" stroke-linecap="round"/>
+  <!-- whipped-cream swirl peak on top -->
+  <path d="M160 60 C154 54 156 46 162 48 C168 44 174 50 170 56 C176 54 178 62 172 64 C176 68 170 74 164 70 C158 74 152 66 160 60 Z" fill="#fff8ee"/>
+  <ellipse cx="158" cy="54" rx="4" ry="2.4" fill="#fffdf7" opacity=".8"/>
+  <!-- glace cherry on top -->
+  <circle cx="166" cy="46" r="6" fill="#e02648"/>
+  <circle cx="164" cy="44" r="1.8" fill="#ff90a4" opacity=".85"/>
+  <path d="M166 40 C168 34 174 32 178 30" stroke="#4d7d2b" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+  <!-- rainbow sprinkles on the scoops -->
+  <g stroke-linecap="round">
+    <path d="M150 78 l4 -2" stroke="#35e0ff" stroke-width="2.2"/>
+    <path d="M168 76 l3 3" stroke="#ffd60a" stroke-width="2.2"/>
+    <path d="M158 90 l4 1" stroke="#ff4d6d" stroke-width="2.2"/>
+    <path d="M176 88 l-3 3" stroke="#5ecb4e" stroke-width="2.2"/>
+    <path d="M144 96 l4 -1" stroke="#b478ff" stroke-width="2.2"/>
+    <path d="M186 98 l-3 -2" stroke="#ffd60a" stroke-width="2.2"/>
+    <path d="M132 94 l3 2" stroke="#ff4d6d" stroke-width="2"/>
+  </g>
+  <!-- toasted-nut fleck -->
+  <circle cx="150" cy="100" r="1.8" fill="#c9974a" opacity=".85"/>
+  <circle cx="176" cy="104" r="1.6" fill="#b5843e" opacity=".8"/>
+  <!-- glass sheen overlay + condensation streaks -->
+  <path d="M116 108 C116 138 138 150 160 150 C182 150 204 138 204 108 Z" fill="url(#sunglass)"/>
+  <path d="M126 112 L134 140" stroke="#ffffff" stroke-width="3" opacity=".24" stroke-linecap="round"/>
+  <path d="M194 112 L188 138" stroke="#ffffff" stroke-width="2" opacity=".16" stroke-linecap="round"/>
+  <!-- gloss / condensation dots -->
+  <circle cx="132" cy="120" r="1.4" fill="#fff" opacity=".5"/>
+  <circle cx="150" cy="132" r="1.2" fill="#fff" opacity=".45"/>
+  <circle cx="184" cy="124" r="1.2" fill="#fff" opacity=".4"/>
+</svg>

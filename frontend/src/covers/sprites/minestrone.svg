@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="minBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="minbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#3a1120"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <radialGradient id="minbowl" cx="50%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <radialGradient id="minbroth" cx="44%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#e8623a"/><stop offset="52%" stop-color="#c53a1e"/><stop offset="100%" stop-color="#8f2210"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#minbg)"/>
+  <!-- rising steam wisps -->
+  <path d="M124 52 C114 34 134 26 124 6" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#minBlur3)"/>
+  <path d="M196 50 C188 34 206 26 198 6" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#minBlur3)"/>
+  <ellipse cx="160" cy="188" rx="140" ry="20" fill="#000" opacity=".5"/>
+  <!-- deep soup bowl -->
+  <path d="M44 108 C44 96 72 90 160 90 C248 90 276 96 276 108 C276 150 226 178 160 178 C94 178 44 150 44 108 Z" fill="url(#minbowl)"/>
+  <path d="M44 108 C44 96 72 90 160 90 C248 90 276 96 276 108 C276 150 226 178 160 178 C94 178 44 150 44 108 Z" fill="none" stroke="#26262e" stroke-width="3"/>
+  <ellipse cx="160" cy="106" rx="112" ry="30" fill="#0c0c0f"/>
+  <!-- neon steam arc (rose family) -->
+  <path d="M58 96 Q108 66 168 66" stroke="#ff4d6d" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- rich red tomato-vegetable broth -->
+  <ellipse cx="160" cy="106" rx="106" ry="27" fill="url(#minbroth)"/>
+  <ellipse cx="160" cy="102" rx="98" ry="22" fill="#d84a26" opacity=".45"/>
+  <!-- chunky vegetables tumbled through the soup -->
+  <!-- diced tomato -->
+  <path d="M112 100 h11 v9 h-11 Z" fill="#ff7350" stroke="#c31f12" stroke-width="1" transform="rotate(-8 117 104)"/>
+  <path d="M182 104 h10 v9 h-10 Z" fill="#ff6a48" stroke="#c31f12" stroke-width="1" transform="rotate(12 187 108)"/>
+  <!-- carrot cubes -->
+  <path d="M138 96 h10 v9 h-10 Z" fill="#f0902a" stroke="#c96e16" stroke-width="1" transform="rotate(6 143 100)"/>
+  <path d="M204 100 h9 v8 h-9 Z" fill="#ef7d1c" stroke="#c96e16" stroke-width="1" transform="rotate(-14 208 104)"/>
+  <!-- zucchini/celery green cubes -->
+  <path d="M158 98 h10 v9 h-10 Z" fill="#7fb84a" stroke="#4f8c2f" stroke-width="1" transform="rotate(-10 163 102)"/>
+  <path d="M126 116 h9 v8 h-9 Z" fill="#6aa63c" stroke="#4f8c2f" stroke-width="1" transform="rotate(14 130 120)"/>
+  <path d="M196 116 h9 v8 h-9 Z" fill="#8ac356" stroke="#4f8c2f" stroke-width="1" transform="rotate(-6 200 120)"/>
+  <!-- cannellini / kidney beans (kidney-shaped) -->
+  <path d="M150 116 C146 112 152 108 158 110 C162 108 166 112 162 116 C166 118 160 122 154 120 C150 122 146 118 150 116 Z" fill="#e8d3a8" stroke="#b89a62" stroke-width="1"/>
+  <path d="M170 118 C166 114 172 110 178 112 C182 110 186 114 182 118 C186 120 180 124 174 122 C170 124 166 120 170 118 Z" fill="#a54a2a" stroke="#7a3016" stroke-width="1"/>
+  <path d="M108 118 C104 114 110 110 116 112 C120 110 124 114 120 118 C124 120 118 124 112 122 C108 124 104 120 108 118 Z" fill="#e8d3a8" stroke="#b89a62" stroke-width="1"/>
+  <!-- small pasta shapes (ditalini rings / elbow) -->
+  <ellipse cx="176" cy="96" rx="5" ry="4" fill="#f2e2b6" stroke="#c9a86e" stroke-width="1.2"/>
+  <ellipse cx="176" cy="96" rx="1.8" ry="1.4" fill="#c53a1e"/>
+  <ellipse cx="132" cy="110" rx="4.6" ry="3.6" fill="#eeddad" stroke="#c9a86e" stroke-width="1.2"/>
+  <ellipse cx="132" cy="110" rx="1.6" ry="1.2" fill="#c53a1e"/>
+  <ellipse cx="216" cy="108" rx="4.4" ry="3.4" fill="#f2e2b6" stroke="#c9a86e" stroke-width="1.2"/>
+  <ellipse cx="216" cy="108" rx="1.6" ry="1.2" fill="#a52810"/>
+  <!-- fresh basil / parsley on top + parmesan flecks -->
+  <path d="M154 92 C150 88 156 84 160 88 C164 84 170 88 166 92 C162 96 158 96 154 92 Z" fill="#4f9c37"/>
+  <rect x="188" y="94" width="7" height="2.8" rx="1.3" fill="#5ecb4e" transform="rotate(-16 191 95)"/>
+  <rect x="120" y="102" width="6" height="2.6" rx="1.2" fill="#6aa63c" transform="rotate(18 123 103)"/>
+  <circle cx="146" cy="106" r="1.4" fill="#fbf3df" opacity=".85"/>
+  <circle cx="200" cy="98" r="1.3" fill="#fbf3df" opacity=".8"/>
+  <!-- oil gloss dots -->
+  <circle cx="138" cy="94" r="1.4" fill="#fff" opacity=".6"/>
+  <circle cx="192" cy="102" r="1.3" fill="#fff" opacity=".55"/>
+  <circle cx="160" cy="118" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

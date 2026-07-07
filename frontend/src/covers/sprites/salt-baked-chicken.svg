@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="sbcBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="sbcbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="sbcpot" cx="50%" cy="30%" r="82%">
+      <stop offset="0%" stop-color="#6b4029"/><stop offset="55%" stop-color="#3d2113"/><stop offset="100%" stop-color="#1c0d06"/>
+    </radialGradient>
+    <linearGradient id="sbcskin" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f2c766"/><stop offset="48%" stop-color="#d98f34"/><stop offset="100%" stop-color="#9c5716"/>
+    </linearGradient>
+    <linearGradient id="sbcleg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e8b355"/><stop offset="55%" stop-color="#c17c28"/><stop offset="100%" stop-color="#8a4c13"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#sbcbg)"/>
+  <!-- steam -->
+  <path d="M118 52 C108 34 128 26 118 6" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#sbcBlur3)"/>
+  <path d="M198 50 C190 34 208 26 200 6" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#sbcBlur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="186" rx="150" ry="22" fill="#000" opacity=".5"/>
+  <!-- clay pot (curved-wall braise vessel) -->
+  <path d="M40 116 C40 96 92 84 160 84 C228 84 280 96 280 116 L272 150 C266 172 224 182 160 182 C96 182 54 172 48 150 Z" fill="url(#sbcpot)"/>
+  <path d="M40 116 C40 96 92 84 160 84 C228 84 280 96 280 116 L272 150 C266 172 224 182 160 182 C96 182 54 172 48 150 Z" fill="none" stroke="#2a1408" stroke-width="2.5" opacity=".7"/>
+  <!-- pot rim ring -->
+  <ellipse cx="160" cy="112" rx="120" ry="30" fill="#4d2c18"/>
+  <ellipse cx="160" cy="112" rx="120" ry="30" fill="none" stroke="#7c4a26" stroke-width="2.5" opacity=".8"/>
+  <ellipse cx="160" cy="114" rx="104" ry="24" fill="#2a160b"/>
+  <!-- neon steam arc (warm/local) -->
+  <path d="M52 104 Q104 74 168 72" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- coarse rock salt bed under the bird -->
+  <g opacity=".9">
+    <circle cx="88" cy="122" r="3" fill="#e8e0cf"/><circle cx="102" cy="128" r="2.4" fill="#cabfa8"/>
+    <circle cx="120" cy="130" r="2.8" fill="#e8e0cf"/><circle cx="216" cy="126" r="3" fill="#e8e0cf"/>
+    <circle cx="228" cy="122" r="2.4" fill="#cabfa8"/><circle cx="200" cy="130" r="2.6" fill="#ded3bd"/>
+    <circle cx="96" cy="116" r="2" fill="#ded3bd"/><circle cx="222" cy="132" r="2.2" fill="#cabfa8"/>
+  </g>
+  <!-- WHOLE SALT-BAKED CHICKEN: glossy golden body, tucked drumsticks -->
+  <!-- back drumstick -->
+  <path d="M196 108 C214 100 230 106 232 120 C232 132 218 138 206 132 C196 128 190 118 196 108 Z" fill="url(#sbcleg)" stroke="#7a3f10" stroke-width="1.4" opacity="1"/>
+  <ellipse cx="228" cy="120" rx="5" ry="6" fill="#f6ddb2"/>
+  <ellipse cx="228" cy="120" rx="5" ry="6" fill="none" stroke="#c98a45" stroke-width="1" opacity=".6"/>
+  <!-- main body/breast mound -->
+  <path d="M92 130 C86 104 116 90 160 90 C204 90 232 104 226 130 C216 148 190 156 160 156 C130 156 102 148 92 130 Z" fill="url(#sbcskin)"/>
+  <path d="M92 130 C86 104 116 90 160 90 C204 90 232 104 226 130 C216 148 190 156 160 156 C130 156 102 148 92 130 Z" fill="none" stroke="#8a4c13" stroke-width="1.5" opacity=".6"/>
+  <!-- breast center crease -->
+  <path d="M160 96 C158 112 158 130 160 150" stroke="#a35a18" stroke-width="1.6" fill="none" opacity=".5"/>
+  <!-- glossy sheen highlights on the skin -->
+  <ellipse cx="132" cy="108" rx="20" ry="8" fill="#ffe9b8" opacity=".5"/>
+  <ellipse cx="190" cy="110" rx="18" ry="7" fill="#ffe9b8" opacity=".45"/>
+  <ellipse cx="160" cy="122" rx="14" ry="6" fill="#fff2cf" opacity=".4"/>
+  <!-- crispy skin dimple texture -->
+  <g fill="#a35a18" opacity=".35">
+    <circle cx="120" cy="124" r="1.4"/><circle cx="140" cy="132" r="1.4"/><circle cx="176" cy="130" r="1.4"/>
+    <circle cx="200" cy="124" r="1.4"/><circle cx="150" cy="114" r="1.3"/><circle cx="186" cy="120" r="1.3"/>
+  </g>
+  <!-- front drumstick (jointed, brighter) -->
+  <path d="M92 116 C74 106 58 112 56 128 C56 142 72 148 86 141 C97 136 100 124 92 116 Z" fill="url(#sbcleg)" stroke="#7a3f10" stroke-width="1.4"/>
+  <ellipse cx="60" cy="128" rx="5.5" ry="6.5" fill="#f6ddb2"/>
+  <ellipse cx="60" cy="128" rx="5.5" ry="6.5" fill="none" stroke="#c98a45" stroke-width="1" opacity=".6"/>
+  <ellipse cx="76" cy="120" rx="10" ry="4" fill="#ffe9b8" opacity=".5"/>
+  <!-- garnish: cilantro sprig + scallion + sesame -->
+  <rect x="130" y="146" width="7" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(-16 133 147)"/>
+  <rect x="168" y="148" width="6" height="2.4" rx="1.2" fill="#5ecb4e" transform="rotate(18 171 149)"/>
+  <circle cx="146" cy="150" r="2" fill="#2f7d2b"/>
+  <circle cx="158" cy="152" r="1.8" fill="#3f9c37"/>
+  <circle cx="176" cy="150" r="1.6" fill="#2f7d2b"/>
+  <circle cx="150" cy="118" r="1.2" fill="#f8eed6"/><circle cx="188" cy="130" r="1.2" fill="#f8eed6"/>
+  <!-- oil gloss dots -->
+  <circle cx="128" cy="106" r="1.5" fill="#fff" opacity=".6"/>
+  <circle cx="192" cy="108" r="1.4" fill="#fff" opacity=".5"/>
+  <circle cx="162" cy="120" r="1.2" fill="#fff" opacity=".55"/>
+</svg>

@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="hd1Blur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="hd1bg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="hd1bowl" cx="50%" cy="32%" r="80%">
+      <stop offset="0%" stop-color="#1c1622"/><stop offset="100%" stop-color="#0c0c10"/>
+    </radialGradient>
+    <radialGradient id="hd1sesame" cx="46%" cy="34%" r="78%">
+      <stop offset="0%" stop-color="#b98a4e"/><stop offset="55%" stop-color="#976b31"/><stop offset="100%" stop-color="#6e491d"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#hd1bg)"/>
+  <!-- rising steam -->
+  <path d="M124 52 C114 34 134 28 124 8" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#hd1Blur3)"/>
+  <path d="M198 50 C190 34 208 26 200 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#hd1Blur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="188" rx="146" ry="22" fill="#000" opacity=".5"/>
+  <!-- shallow wide bowl -->
+  <ellipse cx="160" cy="134" rx="134" ry="46" fill="url(#hd1bowl)"/>
+  <ellipse cx="160" cy="134" rx="134" ry="46" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="132" rx="118" ry="38" fill="#0e0d12"/>
+  <!-- neon steam arc (cyan) -->
+  <path d="M50 116 Q104 84 168 82" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- sesame-paste-coated dry noodle nest (glossy golden-brown, tossed) -->
+  <ellipse cx="160" cy="122" rx="98" ry="30" fill="url(#hd1sesame)"/>
+  <g fill="none" stroke-linecap="round">
+    <path d="M76 122 C108 106 150 104 196 110 C216 112 236 118 244 124" stroke="#6e491d" stroke-width="6.5" opacity=".9"/>
+    <path d="M80 128 C112 114 158 112 200 118 C222 121 238 126 246 130" stroke="#a67a40" stroke-width="6.5"/>
+    <path d="M84 116 C118 100 160 98 204 104" stroke="#c79a58" stroke-width="6"/>
+    <path d="M92 132 C124 120 168 118 210 124" stroke="#8a5f2a" stroke-width="6"/>
+    <path d="M100 110 C132 96 172 96 210 102" stroke="#c79a58" stroke-width="5.5"/>
+    <path d="M88 122 C120 108 162 106 202 112" stroke="#d9b878" stroke-width="2" opacity=".7"/>
+    <path d="M96 128 C128 116 170 114 208 120" stroke="#e6cf9d" stroke-width="1.8" opacity=".6"/>
+  </g>
+  <!-- pickled radish dice (萝卜丁) + chopped scallion garnish -->
+  <rect x="112" y="108" width="6" height="5" rx="1.4" fill="#e7b23a" transform="rotate(-12 115 110)"/>
+  <rect x="150" y="104" width="6" height="5" rx="1.4" fill="#e7b23a" transform="rotate(10 153 106)"/>
+  <rect x="184" y="110" width="6" height="5" rx="1.4" fill="#d99a28" transform="rotate(-8 187 112)"/>
+  <rect x="132" y="122" width="6" height="5" rx="1.4" fill="#e7b23a" transform="rotate(18 135 124)"/>
+  <rect x="198" y="120" width="5.5" height="4.6" rx="1.3" fill="#d99a28" transform="rotate(-14 200 122)"/>
+  <!-- scallion greens -->
+  <rect x="124" y="114" width="7" height="2.6" rx="1.3" fill="#5ecb4e" transform="rotate(-20 127 115)"/>
+  <rect x="166" y="112" width="7" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(14 169 113)"/>
+  <rect x="142" y="126" width="6" height="2.4" rx="1.2" fill="#58c14a" transform="rotate(24 145 127)"/>
+  <rect x="192" y="128" width="6" height="2.4" rx="1.2" fill="#5ecb4e" transform="rotate(-10 195 129)"/>
+  <!-- sesame seeds sprinkled -->
+  <circle cx="130" cy="118" r="1.3" fill="#f8eed6"/>
+  <circle cx="172" cy="120" r="1.3" fill="#f8eed6"/>
+  <circle cx="150" cy="112" r="1.2" fill="#f8eed6"/>
+  <circle cx="196" cy="116" r="1.2" fill="#f8eed6"/>
+  <!-- chili-oil drizzle streak -->
+  <path d="M108 126 C136 118 168 118 196 124" stroke="#ef5520" stroke-width="2" fill="none" opacity=".45" stroke-linecap="round"/>
+  <!-- chopsticks lifting a clump of noodles (upper right) -->
+  <g stroke-linecap="round">
+    <path d="M212 60 L172 116" stroke="#b98a4e" stroke-width="5"/>
+    <path d="M224 66 L182 118" stroke="#a67a40" stroke-width="5"/>
+  </g>
+  <g fill="none" stroke-linecap="round" opacity=".92">
+    <path d="M176 116 C178 100 176 84 180 70" stroke="#c79a58" stroke-width="4"/>
+    <path d="M182 118 C184 102 182 86 186 72" stroke="#a67a40" stroke-width="4"/>
+    <path d="M180 116 C182 100 180 86 184 74" stroke="#e6cf9d" stroke-width="1.6" opacity=".7"/>
+  </g>
+  <!-- gloss dots -->
+  <circle cx="128" cy="116" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="176" cy="118" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="152" cy="124" r="1.2" fill="#fff" opacity=".45"/>
+</svg>

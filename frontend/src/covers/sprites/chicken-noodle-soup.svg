@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="cnsBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="cnsbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="cnsbowl" cx="50%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <radialGradient id="cnsbroth" cx="44%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#f6cf6a"/><stop offset="55%" stop-color="#e2a838"/><stop offset="100%" stop-color="#b87a1e"/>
+    </radialGradient>
+    <linearGradient id="cnschick" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f6ecd6"/><stop offset="60%" stop-color="#ecd6ac"/><stop offset="100%" stop-color="#d8bb82"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#cnsbg)"/>
+  <!-- rising steam wisps (hot soup) -->
+  <path d="M124 52 C114 34 134 26 124 6" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#cnsBlur3)"/>
+  <path d="M196 50 C188 34 206 26 198 6" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#cnsBlur3)"/>
+  <ellipse cx="160" cy="188" rx="140" ry="20" fill="#000" opacity=".5"/>
+  <!-- deep soup bowl: high curved walls -->
+  <path d="M44 108 C44 96 72 90 160 90 C248 90 276 96 276 108 C276 150 226 178 160 178 C94 178 44 150 44 108 Z" fill="url(#cnsbowl)"/>
+  <path d="M44 108 C44 96 72 90 160 90 C248 90 276 96 276 108 C276 150 226 178 160 178 C94 178 44 150 44 108 Z" fill="none" stroke="#26262e" stroke-width="3"/>
+  <!-- broth surface ellipse -->
+  <ellipse cx="160" cy="106" rx="112" ry="30" fill="#0c0c0f"/>
+  <!-- neon steam arc (warm white) -->
+  <path d="M58 96 Q108 66 168 66" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- golden broth pool -->
+  <ellipse cx="160" cy="106" rx="106" ry="27" fill="url(#cnsbroth)"/>
+  <ellipse cx="160" cy="102" rx="98" ry="22" fill="#f3c556" opacity=".45"/>
+  <!-- golden fat droplets shimmering on the broth -->
+  <circle cx="112" cy="100" r="3" fill="#ffdf7a" opacity=".7"/>
+  <circle cx="204" cy="104" r="2.6" fill="#ffdf7a" opacity=".65"/>
+  <circle cx="150" cy="114" r="2.4" fill="#ffe58c" opacity=".6"/>
+  <circle cx="182" cy="96" r="2" fill="#ffdf7a" opacity=".6"/>
+  <!-- egg-noodle nest: pale wavy strands laid across the broth -->
+  <g stroke-linecap="round" fill="none">
+    <path d="M92 100 C118 92 152 108 188 98 C210 92 226 100 236 96" stroke="#7a4c14" stroke-width="6" opacity=".55"/>
+    <path d="M90 98 C116 90 150 106 186 96 C208 90 224 98 234 94" stroke="#e6cf9d" stroke-width="5.5"/>
+    <path d="M96 112 C124 104 158 118 194 108 C214 102 228 110 236 106" stroke="#7a4c14" stroke-width="6" opacity=".5"/>
+    <path d="M94 110 C122 102 156 116 192 106 C212 100 226 108 234 104" stroke="#d9bd85" stroke-width="5.5"/>
+    <path d="M100 92 C128 86 160 96 196 90 C214 86 226 92 232 90" stroke="#e6cf9d" stroke-width="5"/>
+    <path d="M104 120 C132 114 162 124 194 116" stroke="#d9bd85" stroke-width="5" opacity=".9"/>
+    <path d="M92 98 C118 90 150 106 186 96" stroke="#fff1c9" stroke-width="1.6" opacity=".7"/>
+    <path d="M96 110 C124 102 156 116 192 106" stroke="#fff1c9" stroke-width="1.6" opacity=".6"/>
+  </g>
+  <!-- chunks of white chicken (soft irregular pieces) -->
+  <g>
+    <path d="M118 106 C112 100 122 94 132 96 C142 92 150 100 146 108 C150 116 138 120 128 116 C120 118 114 112 118 106 Z" fill="url(#cnschick)" stroke="#c9a86e" stroke-width="1.2"/>
+    <ellipse cx="128" cy="100" rx="6" ry="2.6" fill="#fbf3df" opacity=".8"/>
+  </g>
+  <g>
+    <path d="M176 110 C170 104 180 98 190 100 C200 96 208 104 204 112 C208 120 196 124 186 120 C178 122 172 116 176 110 Z" fill="url(#cnschick)" stroke="#c9a86e" stroke-width="1.2"/>
+    <ellipse cx="186" cy="104" rx="6" ry="2.6" fill="#fbf3df" opacity=".8"/>
+  </g>
+  <!-- carrot coins: bright orange discs -->
+  <ellipse cx="150" cy="98" rx="7" ry="4" fill="#f0902a" stroke="#c96e16" stroke-width="1"/>
+  <ellipse cx="150" cy="98" rx="3" ry="1.8" fill="#f8b055" opacity=".7"/>
+  <ellipse cx="208" cy="98" rx="6.5" ry="3.6" fill="#ef7d1c" stroke="#c96e16" stroke-width="1"/>
+  <ellipse cx="208" cy="98" rx="2.8" ry="1.6" fill="#f8b055" opacity=".7"/>
+  <ellipse cx="122" cy="120" rx="6" ry="3.4" fill="#f0902a" stroke="#c96e16" stroke-width="1"/>
+  <!-- celery bits + parsley -->
+  <rect x="164" y="100" width="7" height="3" rx="1.4" fill="#7fb84a" transform="rotate(-12 167 101)"/>
+  <rect x="138" y="116" width="6" height="2.8" rx="1.3" fill="#6aa63c" transform="rotate(20 141 117)"/>
+  <rect x="196" y="116" width="6" height="2.6" rx="1.2" fill="#4f9c37" transform="rotate(-18 199 117)"/>
+  <rect x="110" y="112" width="5" height="2.4" rx="1.1" fill="#5ecb4e" transform="rotate(14 112 113)"/>
+  <!-- oil gloss dots -->
+  <circle cx="134" cy="94" r="1.4" fill="#fff" opacity=".6"/>
+  <circle cx="192" cy="100" r="1.3" fill="#fff" opacity=".55"/>
+  <circle cx="160" cy="118" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

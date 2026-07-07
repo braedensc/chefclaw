@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="tyBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="tybg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#3a1120"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <radialGradient id="tyball" cx="38%" cy="30%" r="78%">
+      <stop offset="0%" stop-color="#ffffff"/><stop offset="55%" stop-color="#f4ecec"/><stop offset="100%" stop-color="#dcc9cf"/>
+    </radialGradient>
+    <radialGradient id="typink" cx="38%" cy="30%" r="78%">
+      <stop offset="0%" stop-color="#ffe6ec"/><stop offset="55%" stop-color="#ffc2d2"/><stop offset="100%" stop-color="#e895ac"/>
+    </radialGradient>
+    <radialGradient id="tybroth" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#f6e7c9" stop-opacity=".55"/><stop offset="100%" stop-color="#c99b6a" stop-opacity=".2"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#tybg)"/>
+  <!-- cold/subtle: no steam wisps; faint sweet aroma sparkle instead -->
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="186" rx="132" ry="20" fill="#000" opacity=".5"/>
+  <!-- neon accent arc (rose family, sweet dessert) -->
+  <path d="M74 80 Q124 54 186 58" stroke="#ff4d6d" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- wide shallow dessert bowl -->
+  <ellipse cx="160" cy="150" rx="118" ry="40" fill="#141018"/>
+  <ellipse cx="160" cy="150" rx="118" ry="40" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="146" rx="100" ry="32" fill="#0f0d13"/>
+  <!-- clear osmanthus/ginger syrup pooled in the bowl -->
+  <ellipse cx="160" cy="146" rx="96" ry="30" fill="url(#tybroth)"/>
+  <ellipse cx="160" cy="140" rx="90" ry="24" fill="#f4e5c6" opacity=".22"/>
+  <!-- floating glutinous rice balls (soft pale spheres) -->
+  <!-- back row (smaller/dimmer) -->
+  <g opacity=".92">
+    <circle cx="120" cy="134" r="15" fill="url(#tyball)"/>
+    <ellipse cx="114" cy="128" rx="6" ry="3.4" fill="#ffffff" opacity=".85"/>
+    <circle cx="120" cy="134" r="15" fill="none" stroke="#d8c3ca" stroke-width="1" opacity=".5"/>
+  </g>
+  <g opacity=".92">
+    <circle cx="200" cy="134" r="15" fill="url(#typink)"/>
+    <ellipse cx="194" cy="128" rx="6" ry="3.4" fill="#ffffff" opacity=".8"/>
+    <circle cx="200" cy="134" r="15" fill="none" stroke="#e6a5b6" stroke-width="1" opacity=".5"/>
+  </g>
+  <!-- front row (larger/brighter, one showing sesame heart) -->
+  <g>
+    <circle cx="146" cy="146" r="19" fill="url(#tyball)"/>
+    <ellipse cx="139" cy="139" rx="8" ry="4.4" fill="#ffffff" opacity=".9"/>
+    <circle cx="146" cy="146" r="19" fill="none" stroke="#d8c3ca" stroke-width="1.1" opacity=".55"/>
+  </g>
+  <g>
+    <circle cx="184" cy="148" r="20" fill="url(#tyball)"/>
+    <ellipse cx="177" cy="140" rx="8.5" ry="4.6" fill="#ffffff" opacity=".9"/>
+    <circle cx="184" cy="148" r="20" fill="none" stroke="#d8c3ca" stroke-width="1.1" opacity=".55"/>
+    <!-- bitten/broken ball leaking dark black-sesame filling -->
+    <path d="M184 148 C186 158 194 160 196 152 C200 148 198 140 190 140 C186 142 184 144 184 148 Z" fill="#2b1c14"/>
+    <path d="M188 146 C190 149 190 152 189 154" stroke="#0f0a06" stroke-width="1.2" fill="none" opacity=".7"/>
+    <circle cx="191" cy="149" r="1.4" fill="#5a4632" opacity=".8"/>
+  </g>
+  <!-- one small pink ball tucked in front -->
+  <g>
+    <circle cx="160" cy="156" r="13" fill="url(#typink)"/>
+    <ellipse cx="155" cy="151" rx="5.5" ry="3" fill="#ffffff" opacity=".85"/>
+    <circle cx="160" cy="156" r="13" fill="none" stroke="#e6a5b6" stroke-width="1" opacity=".55"/>
+  </g>
+  <!-- osmanthus flecks + goji dots floating in syrup -->
+  <circle cx="128" cy="120" r="1.6" fill="#ffcf5a" opacity=".85"/>
+  <circle cx="176" cy="122" r="1.6" fill="#ffcf5a" opacity=".8"/>
+  <circle cx="214" cy="150" r="2.4" fill="#c62438" opacity=".85"/>
+  <circle cx="106" cy="150" r="2.2" fill="#c62438" opacity=".8"/>
+  <circle cx="150" cy="128" r="1.4" fill="#ffcf5a" opacity=".8"/>
+  <!-- condensation / sweet sparkle (cold-dish substitute for steam) -->
+  <path d="M104 66 l0 8 M100 70 l8 0" stroke="#ffd0da" stroke-width="1.6" opacity=".7" stroke-linecap="round"/>
+  <path d="M226 88 l0 6 M223 91 l6 0" stroke="#ffd0da" stroke-width="1.4" opacity=".6" stroke-linecap="round"/>
+  <circle cx="248" cy="70" r="1.5" fill="#ffe4ea" opacity=".7"/>
+  <!-- surface gloss dots -->
+  <circle cx="140" cy="140" r="1.5" fill="#fff" opacity=".7"/>
+  <circle cx="192" cy="146" r="1.4" fill="#fff" opacity=".6"/>
+  <circle cx="164" cy="152" r="1.2" fill="#fff" opacity=".55"/>
+</svg>

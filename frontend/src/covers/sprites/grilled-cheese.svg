@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="gcBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="gcbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <linearGradient id="gcbread" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e6a54e"/><stop offset="50%" stop-color="#c9812f"/><stop offset="100%" stop-color="#9c5c1c"/>
+    </linearGradient>
+    <linearGradient id="gccrumb" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f3d59a"/><stop offset="100%" stop-color="#e0b56e"/>
+    </linearGradient>
+    <linearGradient id="gccheese" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffd24a"/><stop offset="55%" stop-color="#f6a91f"/><stop offset="100%" stop-color="#e08512"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#gcbg)"/>
+  <!-- rising steam -->
+  <path d="M118 52 C108 36 128 28 118 8" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#gcBlur3)"/>
+  <path d="M200 50 C192 34 208 26 200 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#gcBlur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="176" rx="130" ry="18" fill="#000" opacity=".5"/>
+  <!-- oval plate -->
+  <ellipse cx="160" cy="150" rx="128" ry="34" fill="#141018"/>
+  <ellipse cx="160" cy="150" rx="128" ry="34" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="150" rx="112" ry="27" fill="#0f0d13"/>
+  <!-- neon steam arc (warm) -->
+  <path d="M56 108 Q106 74 168 74" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- BACK triangle half of the sandwich, leaning -->
+  <g transform="translate(178 92) rotate(8)">
+    <path d="M0 40 L64 40 L4 -20 Z" fill="url(#gcbread)" stroke="#7a4514" stroke-width="1.4"/>
+    <!-- toasted crust top edge -->
+    <path d="M4 -20 L64 40" stroke="#8a5a24" stroke-width="3" opacity=".5" stroke-linecap="round"/>
+    <!-- cut-face cheese layer -->
+    <path d="M0 40 L64 40 L60 30 L2 30 Z" fill="url(#gccheese)"/>
+    <path d="M8 46 C10 56 14 60 16 52 C20 60 24 58 24 50 C30 58 34 54 32 46" fill="url(#gccheese)" opacity=".9"/>
+  </g>
+  <!-- FRONT triangle half: the hero, cut face toward viewer with cheese pull -->
+  <g transform="translate(74 96) rotate(-6)">
+    <!-- bread body -->
+    <path d="M0 44 L72 44 L2 -24 Z" fill="url(#gcbread)" stroke="#7a4514" stroke-width="1.4"/>
+    <!-- crumb highlight on the toasted face -->
+    <path d="M8 40 L60 40 L8 -6 Z" fill="url(#gccrumb)" opacity=".55"/>
+    <!-- griddle char streaks -->
+    <path d="M10 42 L64 42 M18 40 L62 22 M14 36 L50 8" stroke="#8a5216" stroke-width="2" opacity=".45" stroke-linecap="round"/>
+    <!-- thick molten cheese along the cut edge -->
+    <path d="M0 44 L72 44 L66 32 L2 32 Z" fill="url(#gccheese)" stroke="#c47712" stroke-width="1"/>
+    <!-- cheese highlight ridge -->
+    <path d="M6 34 L64 34" stroke="#ffe58a" stroke-width="2" opacity=".6" stroke-linecap="round"/>
+    <!-- oozing cheese drips + the classic stretch pull -->
+    <path d="M18 44 C16 56 20 62 24 60 C28 62 30 56 28 46 Z" fill="url(#gccheese)"/>
+    <path d="M46 44 C44 58 50 66 54 62 C58 64 58 54 56 46 Z" fill="url(#gccheese)"/>
+    <path d="M64 40 C86 46 98 44 110 52" stroke="url(#gccheese)" stroke-width="4" fill="none" opacity=".9" stroke-linecap="round"/>
+    <path d="M64 40 C86 46 98 44 110 52" stroke="#ffe58a" stroke-width="1.4" fill="none" opacity=".6" stroke-linecap="round"/>
+  </g>
+  <!-- oil gloss dots on the crust -->
+  <circle cx="100" cy="82" r="1.5" fill="#fff" opacity=".55"/>
+  <circle cx="120" cy="98" r="1.3" fill="#fff" opacity=".45"/>
+  <circle cx="196" cy="96" r="1.4" fill="#fff" opacity=".5"/>
+  <!-- crumb crumbs on the plate -->
+  <circle cx="126" cy="156" r="1.8" fill="#c9812f" opacity=".8"/>
+  <circle cx="184" cy="158" r="1.6" fill="#e0b56e" opacity=".8"/>
+</svg>

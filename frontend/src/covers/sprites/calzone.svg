@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="czBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="czbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <linearGradient id="czcrust" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f0c777"/><stop offset="50%" stop-color="#d99b45"/><stop offset="100%" stop-color="#a86a24"/>
+    </linearGradient>
+    <linearGradient id="czcrustlo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#c78a3e"/><stop offset="100%" stop-color="#8a5219"/>
+    </linearGradient>
+    <radialGradient id="czcheese" cx="42%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#ffe9a6"/><stop offset="55%" stop-color="#ffcf5c"/><stop offset="100%" stop-color="#f2a52a"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#czbg)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="176" rx="128" ry="20" fill="#000" opacity=".5"/>
+  <!-- rising steam wisps from the torn opening -->
+  <path d="M150 56 C142 40 158 32 150 12" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#czBlur3)"/>
+  <path d="M186 58 C178 42 194 34 186 14" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#czBlur3)"/>
+  <!-- wooden serving board -->
+  <ellipse cx="160" cy="150" rx="132" ry="34" fill="#2a1c10"/>
+  <ellipse cx="160" cy="150" rx="132" ry="34" fill="none" stroke="#3d2a17" stroke-width="3"/>
+  <ellipse cx="160" cy="148" rx="114" ry="27" fill="#22160c"/>
+  <path d="M60 148 L260 148" stroke="#3a2614" stroke-width="1" opacity=".5"/>
+  <path d="M74 140 L246 140" stroke="#38240f" stroke-width="1" opacity=".4"/>
+  <!-- neon steam arc (warm) -->
+  <path d="M56 118 Q108 86 172 84" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- CALZONE: golden half-moon, crimped seam along the top curve -->
+  <!-- body -->
+  <path d="M64 138 C64 96 108 76 160 76 C212 76 256 96 256 138 C220 150 200 150 160 150 C120 150 100 150 64 138 Z" fill="url(#czcrust)"/>
+  <!-- underbelly shadow -->
+  <path d="M64 138 C100 150 120 150 160 150 C200 150 220 150 256 138 C244 146 200 152 160 152 C120 152 76 146 64 138 Z" fill="url(#czcrustlo)" opacity=".9"/>
+  <!-- outline -->
+  <path d="M64 138 C64 96 108 76 160 76 C212 76 256 96 256 138 C220 150 200 150 160 150 C120 150 100 150 64 138 Z" fill="none" stroke="#7a4a17" stroke-width="1.5" opacity=".55"/>
+  <!-- crimped seam ridge along the top arc -->
+  <path d="M66 132 C70 100 110 82 160 82 C210 82 250 100 254 132" fill="none" stroke="#b47d33" stroke-width="4" opacity=".7" stroke-linecap="round"/>
+  <g stroke="#8a5219" stroke-width="1.8" opacity=".6" stroke-linecap="round">
+    <path d="M80 120 l-4 -6 M96 108 l-4 -6 M114 100 l-3 -6 M134 94 l-2 -6 M158 90 l0 -6 M182 90 l2 -6 M204 94 l3 -6 M224 100 l4 -6 M242 110 l4 -6"/>
+  </g>
+  <!-- egg-wash sheen highlight on the dome -->
+  <path d="M96 100 C130 82 190 82 224 100 C200 96 120 96 96 100 Z" fill="#ffe6a8" opacity=".45"/>
+  <!-- golden blister spots -->
+  <g fill="#a86a24" opacity=".55">
+    <circle cx="118" cy="112" r="3"/><circle cx="150" cy="104" r="2.6"/><circle cx="186" cy="106" r="3.2"/><circle cx="212" cy="116" r="2.8"/><circle cx="146" cy="124" r="2.4"/>
+  </g>
+  <!-- TORN OPENING with molten cheese oozing (front, off-center) -->
+  <path d="M158 128 C150 118 156 108 168 108 C182 106 194 114 190 126 C196 134 186 144 174 142 C164 144 156 138 158 128 Z" fill="#6b3a14"/>
+  <path d="M160 128 C154 120 160 112 170 112 C182 110 190 118 187 126 C192 132 184 140 174 138 C166 140 160 134 160 128 Z" fill="url(#czcheese)"/>
+  <!-- cheese pull strands stretching up -->
+  <path d="M172 112 C176 100 180 96 178 86" stroke="#ffdf8c" stroke-width="3" fill="none" opacity=".9" stroke-linecap="round"/>
+  <path d="M182 116 C188 106 190 100 190 92" stroke="#ffcf5c" stroke-width="2.4" fill="none" opacity=".85" stroke-linecap="round"/>
+  <path d="M166 120 C162 110 160 104 162 96" stroke="#ffe9a6" stroke-width="2.2" fill="none" opacity=".8" stroke-linecap="round"/>
+  <!-- a red tomato-sauce fleck peeking inside -->
+  <ellipse cx="176" cy="128" rx="5" ry="3" fill="#d23a1c" opacity=".9"/>
+  <ellipse cx="168" cy="132" rx="3" ry="2" fill="#e0501f" opacity=".8"/>
+  <!-- oregano / basil fleck garnish on top -->
+  <rect x="130" y="112" width="6" height="2.4" rx="1.2" fill="#3f9c37" transform="rotate(-20 133 113)"/>
+  <rect x="200" y="118" width="6" height="2.4" rx="1.2" fill="#58c14a" transform="rotate(16 203 119)"/>
+  <g fill="#2f7d2b" opacity=".8">
+    <circle cx="150" cy="118" r="1.3"/><circle cx="184" cy="100" r="1.2"/><circle cx="118" cy="124" r="1.2"/>
+  </g>
+  <!-- gloss dots -->
+  <circle cx="120" cy="98" r="1.5" fill="#fff" opacity=".6"/>
+  <circle cx="204" cy="102" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="178" cy="120" r="1.3" fill="#fff" opacity=".55"/>
+</svg>

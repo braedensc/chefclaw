@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="fjBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="fjbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#123138"/><stop offset="45%" stop-color="#0b090b"/><stop offset="100%" stop-color="#060507"/>
+    </radialGradient>
+    <radialGradient id="fjpan" cx="50%" cy="36%" r="80%">
+      <stop offset="0%" stop-color="#20202a"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <linearGradient id="fjmeat" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8a4020"/><stop offset="55%" stop-color="#5e2410"/><stop offset="100%" stop-color="#3b1608"/>
+    </linearGradient>
+    <linearGradient id="fjredpep" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ff5a3a"/><stop offset="100%" stop-color="#c31f12"/>
+    </linearGradient>
+    <linearGradient id="fjgrnpep" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5ecb4e"/><stop offset="100%" stop-color="#2f7d2b"/>
+    </linearGradient>
+    <linearGradient id="fjonion" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f4e6cc"/><stop offset="100%" stop-color="#d8b47f"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#fjbg)"/>
+  <!-- billowing sizzle steam wisps -->
+  <path d="M118 56 C106 36 130 28 118 6" stroke="#fff" stroke-width="8" fill="none" opacity=".12" filter="url(#fjBlur3)"/>
+  <path d="M164 50 C154 32 174 24 166 4" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#fjBlur3)"/>
+  <path d="M204 56 C196 38 212 30 206 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#fjBlur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="150" cy="186" rx="150" ry="22" fill="#000" opacity=".5"/>
+  <!-- cast-iron skillet handle (protruding right) -->
+  <rect x="256" y="120" width="58" height="13" rx="6.5" fill="#161318"/>
+  <rect x="256" y="120" width="58" height="13" rx="6.5" fill="none" stroke="#2c2136" stroke-width="2"/>
+  <circle cx="304" cy="126" r="3" fill="#0b0b0d"/>
+  <!-- skillet body -->
+  <ellipse cx="150" cy="126" rx="128" ry="50" fill="url(#fjpan)"/>
+  <ellipse cx="150" cy="126" rx="128" ry="50" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="150" cy="126" rx="112" ry="42" fill="#0c0c0f"/>
+  <!-- neon steam arc (cyan) -->
+  <path d="M40 112 Q96 80 160 80" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- sizzling glaze sheen in the pan -->
+  <ellipse cx="150" cy="120" rx="98" ry="32" fill="#3a1c0c" opacity=".55"/>
+  <!-- tangle of pepper + onion + meat strips -->
+  <g stroke-linejoin="round">
+    <!-- meat strips (darker, seared) -->
+    <g transform="translate(70 104) rotate(-16)"><rect width="60" height="12" rx="5.5" fill="url(#fjmeat)" stroke="#2a0f06" stroke-width="1"/><rect y="2" width="60" height="2.6" rx="1.3" fill="#a85e34" opacity=".6"/></g>
+    <g transform="translate(88 128) rotate(8)"><rect width="66" height="12" rx="5.5" fill="url(#fjmeat)" stroke="#2a0f06" stroke-width="1"/><rect y="2" width="66" height="2.6" rx="1.3" fill="#a85e34" opacity=".55"/></g>
+    <!-- red pepper strips -->
+    <g transform="translate(96 100) rotate(-6)"><rect width="58" height="10" rx="4.6" fill="url(#fjredpep)" stroke="#8f1608" stroke-width="1"/><rect y="1.6" width="58" height="2.4" rx="1.2" fill="#ff9d7d" opacity=".7"/></g>
+    <g transform="translate(70 122) rotate(20)"><rect width="50" height="10" rx="4.6" fill="url(#fjredpep)" stroke="#8f1608" stroke-width="1"/><rect y="1.6" width="50" height="2.4" rx="1.2" fill="#ff9d7d" opacity=".65"/></g>
+    <!-- green pepper strips -->
+    <g transform="translate(120 118) rotate(-22)"><rect width="56" height="10" rx="4.6" fill="url(#fjgrnpep)" stroke="#1f5a1c" stroke-width="1"/><rect y="1.6" width="56" height="2.4" rx="1.2" fill="#9be08a" opacity=".6"/></g>
+    <g transform="translate(150 106) rotate(12)"><rect width="52" height="10" rx="4.6" fill="url(#fjgrnpep)" stroke="#1f5a1c" stroke-width="1"/><rect y="1.6" width="52" height="2.4" rx="1.2" fill="#9be08a" opacity=".6"/></g>
+    <!-- onion strips -->
+    <g transform="translate(108 134) rotate(-4)"><rect width="60" height="8" rx="3.8" fill="url(#fjonion)" stroke="#b5915e" stroke-width="1"/></g>
+    <g transform="translate(160 126) rotate(-18)"><rect width="48" height="8" rx="3.8" fill="url(#fjonion)" stroke="#b5915e" stroke-width="1"/></g>
+    <!-- one more red on top for depth -->
+    <g transform="translate(140 118) rotate(28)"><rect width="46" height="10" rx="4.6" fill="url(#fjredpep)" stroke="#8f1608" stroke-width="1"/><rect y="1.6" width="46" height="2.4" rx="1.2" fill="#ff9d7d" opacity=".65"/></g>
+  </g>
+  <!-- char flecks + sizzle bubbles -->
+  <circle cx="96" cy="116" r="1.6" fill="#260903"/>
+  <circle cx="176" cy="120" r="1.6" fill="#260903"/>
+  <circle cx="130" cy="140" r="1.4" fill="#260903"/>
+  <circle cx="118" cy="112" r="1.4" fill="#fff" opacity=".55"/>
+  <circle cx="164" cy="112" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="146" cy="132" r="1.2" fill="#fff" opacity=".5"/>
+  <!-- warm sizzle glow arc over the food -->
+  <path d="M78 104 Q140 86 192 100" stroke="#ffb066" stroke-width="1.6" fill="none" opacity=".35" stroke-linecap="round"/>
+  <!-- cilantro fleck garnish -->
+  <rect x="126" y="106" width="6" height="2.4" rx="1.2" fill="#58c14a" transform="rotate(-14 129 107)"/>
+  <rect x="166" y="128" width="6" height="2.4" rx="1.2" fill="#3f9c37" transform="rotate(18 169 129)"/>
+</svg>

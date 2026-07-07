@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="enBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="enbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#3a1120"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <linearGradient id="ensauce" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#c93417"/><stop offset="55%" stop-color="#9c2410"/><stop offset="100%" stop-color="#6e1608"/>
+    </linearGradient>
+    <linearGradient id="entort" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e0b578"/><stop offset="55%" stop-color="#c9924f"/><stop offset="100%" stop-color="#a06e33"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#enbg)"/>
+  <!-- steam wisps -->
+  <path d="M126 52 C118 36 134 28 126 8" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#enBlur3)"/>
+  <path d="M196 50 C188 34 204 26 196 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#enBlur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="186" rx="150" ry="22" fill="#000" opacity=".5"/>
+  <!-- oval plate -->
+  <ellipse cx="160" cy="130" rx="140" ry="48" fill="#141018"/>
+  <ellipse cx="160" cy="130" rx="140" ry="48" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="130" rx="126" ry="40" fill="#0f0d13"/>
+  <!-- neon steam arc (rose) -->
+  <path d="M52 116 Q104 84 168 82" stroke="#ff4d6d" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- red-sauce pool blanketing the two enchiladas -->
+  <path d="M64 128 C70 100 108 92 160 92 C212 92 250 100 256 128 C230 150 196 156 160 156 C124 156 90 150 64 128 Z" fill="url(#ensauce)"/>
+  <path d="M70 122 C82 106 116 100 160 100 C204 100 238 106 250 122" fill="none" stroke="#e05a34" stroke-width="1.6" opacity=".45"/>
+  <!-- rolled tortilla #1 (upper) -->
+  <g>
+    <path d="M74 112 C74 104 88 100 120 100 C168 100 208 100 236 104 C244 106 246 114 240 118 C210 122 168 122 120 122 C88 122 76 120 74 112 Z" fill="url(#entort)"/>
+    <path d="M74 112 C74 104 88 100 120 100 C168 100 208 100 236 104" fill="none" stroke="#f0d29a" stroke-width="1.6" opacity=".6"/>
+    <!-- seam roll lines -->
+    <path d="M96 103 Q100 111 96 119 M132 101 Q136 110 132 120 M172 101 Q176 110 172 120 M210 103 Q214 111 210 119" stroke="#8a5c28" stroke-width="1.2" fill="none" opacity=".5"/>
+    <path d="M74 112 C74 104 88 100 120 100 C168 100 208 100 236 104 C244 106 246 114 240 118 C210 122 168 122 120 122 C88 122 76 120 74 112 Z" fill="none" stroke="#6e4520" stroke-width="1.3" opacity=".5"/>
+  </g>
+  <!-- rolled tortilla #2 (lower) -->
+  <g>
+    <path d="M80 134 C80 126 94 122 126 122 C174 122 214 122 242 126 C250 128 250 136 244 140 C214 144 172 144 124 144 C92 144 82 142 80 134 Z" fill="url(#entort)"/>
+    <path d="M80 134 C80 126 94 122 126 122 C174 122 214 122 242 126" fill="none" stroke="#f0d29a" stroke-width="1.6" opacity=".55"/>
+    <path d="M104 125 Q108 133 104 141 M140 123 Q144 132 140 142 M180 123 Q184 132 180 142 M216 125 Q220 133 216 141" stroke="#8a5c28" stroke-width="1.2" fill="none" opacity=".5"/>
+    <path d="M80 134 C80 126 94 122 126 122 C174 122 214 122 242 126 C250 128 250 136 244 140 C214 144 172 144 124 144 C92 144 82 142 80 134 Z" fill="none" stroke="#6e4520" stroke-width="1.3" opacity=".5"/>
+  </g>
+  <!-- red sauce drizzle across the top of the rolls -->
+  <path d="M84 108 C120 102 200 102 234 110" stroke="#b02408" stroke-width="4" fill="none" opacity=".7" stroke-linecap="round"/>
+  <path d="M90 132 C126 126 206 126 236 134" stroke="#b02408" stroke-width="4" fill="none" opacity=".65" stroke-linecap="round"/>
+  <!-- melted cheese shreds on top -->
+  <g fill="#ffe6a0" stroke="#e8c25a" stroke-width=".7" opacity=".95">
+    <rect x="100" y="104" width="16" height="3" rx="1.5" transform="rotate(-8 108 105)"/>
+    <rect x="138" y="102" width="18" height="3" rx="1.5" transform="rotate(6 147 103)"/>
+    <rect x="178" y="103" width="16" height="3" rx="1.5" transform="rotate(-5 186 104)"/>
+    <rect x="210" y="106" width="14" height="3" rx="1.5" transform="rotate(10 217 107)"/>
+    <rect x="112" y="128" width="16" height="3" rx="1.5" transform="rotate(7 120 129)"/>
+    <rect x="150" y="126" width="18" height="3" rx="1.5" transform="rotate(-6 159 127)"/>
+    <rect x="192" y="128" width="15" height="3" rx="1.5" transform="rotate(9 199 129)"/>
+  </g>
+  <!-- crema drizzle -->
+  <path d="M96 116 C130 112 190 112 224 118" stroke="#fff3e0" stroke-width="2.2" fill="none" opacity=".8" stroke-linecap="round"/>
+  <!-- garnish: cilantro + diced onion + chili flecks -->
+  <rect x="120" y="112" width="7" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(-18 123 113)"/>
+  <rect x="164" y="110" width="7" height="2.6" rx="1.3" fill="#58c14a" transform="rotate(14 167 111)"/>
+  <rect x="200" y="116" width="7" height="2.6" rx="1.3" fill="#3f9c37" transform="rotate(-10 203 117)"/>
+  <rect x="146" y="132" width="6" height="2.4" rx="1.2" fill="#5ecb4e" transform="rotate(20 149 133)"/>
+  <circle cx="132" cy="120" r="1.8" fill="#f2eee0"/>
+  <circle cx="180" cy="118" r="1.8" fill="#f2eee0"/>
+  <circle cx="152" cy="120" r="1.6" fill="#e0341f"/>
+  <circle cx="214" cy="122" r="1.6" fill="#e0341f"/>
+  <!-- gloss dots -->
+  <circle cx="112" cy="107" r="1.5" fill="#fff" opacity=".6"/>
+  <circle cx="178" cy="112" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="150" cy="130" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

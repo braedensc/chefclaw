@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="pkBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="pkbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#123138"/><stop offset="45%" stop-color="#0b090b"/><stop offset="100%" stop-color="#060507"/>
+    </radialGradient>
+    <radialGradient id="pkpot" cx="50%" cy="26%" r="88%">
+      <stop offset="0%" stop-color="#6b4029"/><stop offset="52%" stop-color="#3d2113"/><stop offset="100%" stop-color="#1c0d06"/>
+    </radialGradient>
+    <radialGradient id="pkliquid" cx="46%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#9c2b10"/><stop offset="55%" stop-color="#661408"/><stop offset="100%" stop-color="#3b0b05"/>
+    </radialGradient>
+    <linearGradient id="pkskin" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#cf5226"/><stop offset="55%" stop-color="#9c3212"/><stop offset="100%" stop-color="#5e2410"/>
+    </linearGradient>
+    <linearGradient id="pkfat" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f6ddb2"/><stop offset="100%" stop-color="#d8b47f"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#pkbg)"/>
+  <!-- rising steam -->
+  <path d="M120 50 C112 34 128 28 120 8" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#pkBlur3)"/>
+  <path d="M198 52 C190 36 206 30 198 10" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#pkBlur3)"/>
+  <ellipse cx="160" cy="188" rx="140" ry="21" fill="#000" opacity=".5"/>
+  <!-- neon steam arc (cyan savory/braise) -->
+  <path d="M60 92 Q116 58 176 60" stroke="#35e0ff" stroke-width="2.5" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- CLAY POT silhouette (curved-wall) -->
+  <path d="M52 104 C52 152 96 180 160 180 C224 180 268 152 268 104 Z" fill="url(#pkpot)"/>
+  <path d="M52 104 C52 152 96 180 160 180 C224 180 268 152 268 104" fill="none" stroke="#2a160b" stroke-width="3"/>
+  <!-- pot rim (thick lip) -->
+  <ellipse cx="160" cy="104" rx="108" ry="30" fill="#4a2915"/>
+  <ellipse cx="160" cy="104" rx="108" ry="30" fill="none" stroke="#6b4029" stroke-width="2.5"/>
+  <ellipse cx="160" cy="106" rx="96" ry="25" fill="#241109"/>
+  <!-- pot side handles -->
+  <ellipse cx="48" cy="118" rx="10" ry="16" fill="none" stroke="#4a2915" stroke-width="7"/>
+  <ellipse cx="272" cy="118" rx="10" ry="16" fill="none" stroke="#4a2915" stroke-width="7"/>
+  <!-- braising liquid pooled inside -->
+  <ellipse cx="160" cy="106" rx="90" ry="22" fill="url(#pkliquid)"/>
+  <ellipse cx="132" cy="98" rx="30" ry="6" fill="#b83a18" opacity=".4"/>
+
+  <!-- BRAISED PORK KNUCKLE chunks — glossy irregular pieces, glazed skin over fat -->
+  <!-- back chunk -->
+  <g transform="translate(0 0)">
+    <path d="M104 84 C100 74 116 68 132 72 C148 68 160 78 156 90 C160 100 142 108 126 104 C110 106 100 96 104 84 Z" fill="url(#pkskin)" stroke="#4a1808" stroke-width="1.4" opacity=".95"/>
+    <path d="M112 92 C120 88 140 88 148 92 C142 98 122 100 112 96 Z" fill="url(#pkfat)" opacity=".85"/>
+    <ellipse cx="120" cy="80" rx="10" ry="4" fill="#ff8a4a" opacity=".45"/>
+  </g>
+  <!-- back-right chunk with visible bone -->
+  <g transform="translate(0 0)">
+    <path d="M170 82 C166 72 182 66 198 70 C214 68 224 80 218 92 C222 102 204 108 188 104 C172 104 166 92 170 82 Z" fill="url(#pkskin)" stroke="#4a1808" stroke-width="1.4"/>
+    <path d="M178 92 C188 88 206 88 214 92 C206 98 188 100 178 96 Z" fill="url(#pkfat)" opacity=".85"/>
+    <!-- bone cross-section -->
+    <ellipse cx="196" cy="86" rx="7" ry="6" fill="#f3e6cf"/>
+    <ellipse cx="196" cy="86" rx="3" ry="2.6" fill="#c9a97a" opacity=".7"/>
+    <ellipse cx="196" cy="86" rx="7" ry="6" fill="none" stroke="#b58f5a" stroke-width="1" opacity=".6"/>
+  </g>
+  <!-- front-left big glazed chunk -->
+  <g transform="translate(0 4)">
+    <path d="M84 100 C80 88 100 82 120 86 C140 82 154 94 148 108 C152 120 128 128 108 122 C90 124 82 112 84 100 Z" fill="url(#pkskin)" stroke="#3d1206" stroke-width="1.5"/>
+    <path d="M94 110 C106 105 130 105 140 110 C132 118 108 120 94 115 Z" fill="url(#pkfat)" opacity=".9"/>
+    <path d="M100 108 C112 104 130 104 138 108" stroke="#f6ecd6" stroke-width="1.4" fill="none" opacity=".6"/>
+    <ellipse cx="102" cy="94" rx="14" ry="5" fill="#ff8a4a" opacity=".5"/>
+  </g>
+  <!-- front-right glazed chunk -->
+  <g transform="translate(0 4)">
+    <path d="M158 104 C154 92 174 86 194 90 C214 86 228 98 222 112 C226 124 202 130 182 124 C164 126 156 116 158 104 Z" fill="url(#pkskin)" stroke="#3d1206" stroke-width="1.5"/>
+    <path d="M168 114 C180 109 202 109 212 114 C204 122 182 124 168 119 Z" fill="url(#pkfat)" opacity=".9"/>
+    <ellipse cx="178" cy="98" rx="13" ry="5" fill="#ff8a4a" opacity=".5"/>
+  </g>
+  <!-- glossy braise glaze drizzle -->
+  <path d="M96 120 C130 128 190 128 224 120" stroke="#7a1808" stroke-width="2.4" fill="none" opacity=".6" stroke-linecap="round"/>
+  <!-- garnish: scallion + star-anise + dried chili -->
+  <rect x="128" y="112" width="8" height="2.8" rx="1.4" fill="#5ecb4e" transform="rotate(-16 132 113)"/>
+  <rect x="164" y="116" width="8" height="2.8" rx="1.4" fill="#3f9c37" transform="rotate(18 168 117)"/>
+  <rect x="146" y="118" width="7" height="2.6" rx="1.3" fill="#e0341f" transform="rotate(-8 149 119)"/>
+  <!-- star anise -->
+  <g transform="translate(210 116)" opacity=".9">
+    <path d="M0 -5 L1.5 -1 L5 0 L1.5 1 L0 5 L-1.5 1 L-5 0 L-1.5 -1 Z" fill="#5a2c10" stroke="#3a1a08" stroke-width=".8"/>
+  </g>
+  <!-- gloss dots (rich oily sheen) -->
+  <circle cx="104" cy="92" r="1.6" fill="#fff" opacity=".6"/>
+  <circle cx="184" cy="96" r="1.5" fill="#fff" opacity=".55"/>
+  <circle cx="150" cy="110" r="1.3" fill="#fff" opacity=".5"/>
+</svg>

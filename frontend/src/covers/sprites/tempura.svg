@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="tpBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="tpbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <linearGradient id="tpboard" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5a3e22"/><stop offset="100%" stop-color="#3a2614"/>
+    </linearGradient>
+    <radialGradient id="tpbatter" cx="42%" cy="32%" r="78%">
+      <stop offset="0%" stop-color="#f8dc94"/><stop offset="52%" stop-color="#e6b552"/><stop offset="100%" stop-color="#b87c26"/>
+    </radialGradient>
+    <linearGradient id="tpshrimp" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ff9d6a"/><stop offset="100%" stop-color="#e2683a"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#tpbg)"/>
+  <!-- steam -->
+  <path d="M116 50 C106 32 126 24 116 6" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#tpBlur3)"/>
+  <path d="M200 52 C192 36 210 28 202 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#tpBlur3)"/>
+  <ellipse cx="160" cy="188" rx="156" ry="22" fill="#000" opacity=".5"/>
+  <!-- neon steam arc (warm / oil family) -->
+  <path d="M52 118 Q104 86 168 84" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- wooden serving board (rectangular slab, distinct from a plate) -->
+  <rect x="30" y="118" width="260" height="40" rx="8" fill="#2c1d10"/>
+  <rect x="30" y="112" width="260" height="40" rx="8" fill="url(#tpboard)"/>
+  <rect x="30" y="112" width="260" height="40" rx="8" fill="none" stroke="#7a5330" stroke-width="1.5" opacity=".7"/>
+  <!-- wood grain lines -->
+  <path d="M44 122 H276 M44 132 H276 M44 142 H276" stroke="#4a3018" stroke-width="1" opacity=".45"/>
+  <!-- kaishi paper under the pieces -->
+  <path d="M70 118 L246 118 L236 150 L80 150 Z" fill="#efe7d6" opacity=".9"/>
+  <path d="M70 118 L246 118 L236 150 L80 150 Z" fill="none" stroke="#d8ccb2" stroke-width="1" opacity=".6"/>
+  <!-- TEMPURA SHRIMP (ebi): straight battered body + curled pink-red tail, laid diagonally -->
+  <g transform="translate(94 112) rotate(-18)">
+    <!-- battered body with craggy nubs -->
+    <path d="M0 0 C10 -8 30 -8 48 -3 C60 0 62 8 54 12 C40 18 16 18 4 12 C-4 8 -6 4 0 0 Z" fill="url(#tpbatter)" stroke="#9a5f16" stroke-width="1.3"/>
+    <path d="M8 -4 c3 -3 7 0 5 3 M22 -6 c3 -2 6 1 4 4 M38 -3 c3 -2 6 1 4 4 M16 12 c3 2 2 6 -2 5 M34 13 c3 2 2 6 -2 5" stroke="#c98a2e" stroke-width="1.6" fill="none" opacity=".8"/>
+    <ellipse cx="20" cy="1" rx="16" ry="4" fill="#ffe6a0" opacity=".5"/>
+    <!-- curled shrimp tail -->
+    <path d="M54 6 L74 -6 L80 0 L70 10 L78 16 L60 14 Z" fill="url(#tpshrimp)" stroke="#c23f18" stroke-width="1.2"/>
+    <path d="M72 -3 L78 2 M74 4 L80 9" stroke="#ffd0b0" stroke-width="1.2" opacity=".7"/>
+  </g>
+  <!-- SECOND SHRIMP behind, smaller -->
+  <g transform="translate(150 106) rotate(-8) scale(.9)">
+    <path d="M0 0 C10 -8 30 -8 48 -3 C60 0 62 8 54 12 C40 18 16 18 4 12 C-4 8 -6 4 0 0 Z" fill="url(#tpbatter)" stroke="#9a5f16" stroke-width="1.3"/>
+    <path d="M10 -4 c3 -3 7 0 5 3 M26 -6 c3 -2 6 1 4 4 M40 -2 c3 -2 6 1 4 4" stroke="#c98a2e" stroke-width="1.6" fill="none" opacity=".8"/>
+    <ellipse cx="22" cy="1" rx="15" ry="4" fill="#ffe6a0" opacity=".5"/>
+    <path d="M54 6 L74 -6 L80 0 L70 10 L78 16 L60 14 Z" fill="url(#tpshrimp)" stroke="#c23f18" stroke-width="1.2"/>
+  </g>
+  <!-- TEMPURA VEGETABLE FAN (kabocha / sweet potato round, golden craggy) front-right -->
+  <g transform="translate(214 128) rotate(6)">
+    <path d="M-20 8 C-24 -6 -10 -16 6 -14 C22 -12 30 0 24 12 C14 22 -12 22 -20 8 Z" fill="url(#tpbatter)" stroke="#9a5f16" stroke-width="1.4"/>
+    <path d="M-14 -6 c2 -4 8 -2 6 2 M2 -12 c3 -3 8 0 5 4 M16 -4 c3 -2 6 2 3 5 M-8 14 c3 3 1 7 -3 5 M10 16 c3 2 2 6 -2 5" stroke="#c98a2e" stroke-width="1.6" fill="none" opacity=".8"/>
+    <ellipse cx="0" cy="-3" rx="12" ry="5" fill="#ffe6a0" opacity=".5"/>
+  </g>
+  <!-- battery crisp crumbs (tenkasu) scattered -->
+  <circle cx="128" cy="134" r="2" fill="#e6b552"/>
+  <circle cx="176" cy="140" r="1.8" fill="#f0c86a"/>
+  <circle cx="236" cy="148" r="1.6" fill="#e6b552"/>
+  <circle cx="108" cy="142" r="1.6" fill="#f0c86a"/>
+  <!-- small dipping-sauce bowl (tentsuyu) bottom-left corner -->
+  <ellipse cx="70" cy="150" rx="26" ry="11" fill="#141018"/>
+  <ellipse cx="70" cy="150" rx="26" ry="11" fill="none" stroke="#2c2136" stroke-width="2"/>
+  <ellipse cx="70" cy="149" rx="20" ry="8" fill="#3a2110"/>
+  <ellipse cx="66" cy="146" rx="7" ry="2.6" fill="#6b4020" opacity=".7"/>
+  <!-- grated daikon dab in the sauce -->
+  <circle cx="74" cy="150" r="3" fill="#f3ead8" opacity=".9"/>
+  <!-- gloss dots -->
+  <circle cx="112" cy="102" r="1.5" fill="#fff" opacity=".6"/>
+  <circle cx="164" cy="100" r="1.4" fill="#fff" opacity=".5"/>
+  <circle cx="210" cy="122" r="1.3" fill="#fff" opacity=".5"/>
+</svg>

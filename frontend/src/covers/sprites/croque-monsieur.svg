@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="cmBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="cmbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#332818"/><stop offset="45%" stop-color="#0b0a08"/><stop offset="100%" stop-color="#060606"/>
+    </radialGradient>
+    <radialGradient id="cmplate" cx="50%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <linearGradient id="cmbread" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e6b46a"/><stop offset="55%" stop-color="#cf934a"/><stop offset="100%" stop-color="#a06726"/>
+    </linearGradient>
+    <linearGradient id="cmcheese" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffe08a"/><stop offset="45%" stop-color="#f6b93a"/><stop offset="100%" stop-color="#d88a1a"/>
+    </linearGradient>
+    <linearGradient id="cmham" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f6a9a0"/><stop offset="100%" stop-color="#d96b62"/>
+    </linearGradient>
+    <linearGradient id="cmcrust" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#c98a4a"/><stop offset="100%" stop-color="#8a5522"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#cmbg)"/>
+  <!-- steam -->
+  <path d="M120 50 C112 34 128 26 120 6" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#cmBlur3)"/>
+  <path d="M198 52 C192 36 206 28 198 8" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#cmBlur3)"/>
+  <!-- cast shadow -->
+  <ellipse cx="160" cy="188" rx="150" ry="22" fill="#000" opacity=".5"/>
+  <!-- plate -->
+  <ellipse cx="160" cy="134" rx="140" ry="46" fill="url(#cmplate)"/>
+  <ellipse cx="160" cy="134" rx="140" ry="46" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <ellipse cx="160" cy="134" rx="126" ry="38" fill="#0f0d13"/>
+  <!-- neon steam arc (warm white) -->
+  <path d="M52 116 Q104 84 168 82" stroke="#ffe9c9" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- stacked toasted sandwich, cut on the bias so the fillings show -->
+  <g>
+    <!-- bottom slice -->
+    <path d="M92 150 L228 150 L214 158 C200 162 120 162 106 158 Z" fill="url(#cmcrust)"/>
+    <rect x="94" y="132" width="132" height="20" rx="4" fill="url(#cmbread)"/>
+    <path d="M94 132 h132 v4 h-132 Z" fill="#f2c884" opacity=".6"/>
+    <!-- melting ham layer -->
+    <path d="M100 128 C130 122 190 122 220 128 C210 134 110 134 100 128 Z" fill="url(#cmham)"/>
+    <path d="M108 127 C140 124 180 124 212 127" stroke="#c25046" stroke-width="1" fill="none" opacity=".6"/>
+    <!-- inner melted cheese ooze -->
+    <path d="M104 124 C120 118 200 118 216 124 C208 130 112 130 104 124 Z" fill="url(#cmcheese)"/>
+    <!-- top slice -->
+    <rect x="96" y="104" width="128" height="20" rx="4" fill="url(#cmbread)"/>
+    <path d="M96 104 h128 v4 h-128 Z" fill="#f2c884" opacity=".6"/>
+    <!-- gratinéed cheese crown (béchamel + cheese, browned) -->
+    <path d="M98 104 C110 92 210 92 222 104 C210 100 110 100 98 104 Z" fill="url(#cmcheese)"/>
+    <path d="M104 98 C130 90 190 90 216 98 C196 96 124 96 104 98 Z" fill="#ffe9a0" opacity=".7"/>
+    <!-- browned bubbly spots on the gratin -->
+    <circle cx="120" cy="96" r="2.6" fill="#a86a1e"/>
+    <circle cx="150" cy="93" r="3" fill="#8a5518"/>
+    <circle cx="182" cy="95" r="2.6" fill="#a86a1e"/>
+    <circle cx="200" cy="98" r="2.2" fill="#8a5518"/>
+    <!-- outline -->
+    <rect x="96" y="104" width="128" height="20" rx="4" fill="none" stroke="#5e3a12" stroke-width="1.3" opacity=".5"/>
+    <rect x="94" y="132" width="132" height="20" rx="4" fill="none" stroke="#5e3a12" stroke-width="1.3" opacity=".5"/>
+  </g>
+  <!-- cut-corner triangle leaning against the stack showing layers -->
+  <g transform="translate(232 118) rotate(18)">
+    <path d="M0 0 L34 0 L34 44 Z" fill="url(#cmbread)" stroke="#5e3a12" stroke-width="1.2" stroke-opacity=".5"/>
+    <path d="M0 0 L34 0 L34 8 L2 3 Z" fill="url(#cmcheese)"/>
+    <path d="M2 6 L34 12 L34 18 L4 11 Z" fill="url(#cmham)"/>
+  </g>
+  <!-- frisée / side salad flecks -->
+  <rect x="70" y="146" width="7" height="2.6" rx="1.3" fill="#5ecb4e" transform="rotate(-24 73 147)"/>
+  <rect x="80" y="150" width="6" height="2.4" rx="1.2" fill="#3f9c37" transform="rotate(18 83 151)"/>
+  <!-- gloss dots -->
+  <circle cx="130" cy="98" r="1.5" fill="#fff" opacity=".6"/>
+  <circle cx="176" cy="122" r="1.3" fill="#fff" opacity=".5"/>
+  <circle cx="150" cy="123" r="1.2" fill="#fff" opacity=".5"/>
+</svg>

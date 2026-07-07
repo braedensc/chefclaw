@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="rbBlur3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <radialGradient id="rbbg" cx="85%" cy="-5%" r="100%">
+      <stop offset="0%" stop-color="#3a1120"/><stop offset="45%" stop-color="#0b090a"/><stop offset="100%" stop-color="#060506"/>
+    </radialGradient>
+    <radialGradient id="rbbowl" cx="50%" cy="30%" r="82%">
+      <stop offset="0%" stop-color="#1a1420"/><stop offset="100%" stop-color="#0b0b0d"/>
+    </radialGradient>
+    <radialGradient id="rbsoup" cx="46%" cy="34%" r="78%">
+      <stop offset="0%" stop-color="#8f2a18"/><stop offset="52%" stop-color="#6a1a0e"/><stop offset="100%" stop-color="#3c0d06"/>
+    </radialGradient>
+    <radialGradient id="rbbean" cx="38%" cy="32%" r="80%">
+      <stop offset="0%" stop-color="#a23b22"/><stop offset="55%" stop-color="#71200f"/><stop offset="100%" stop-color="#3f0d05"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="200" fill="url(#rbbg)"/>
+  <!-- rising steam (warm dessert soup) -->
+  <path d="M132 48 C124 32 140 26 132 8" stroke="#fff" stroke-width="7" fill="none" opacity=".1" filter="url(#rbBlur3)"/>
+  <path d="M190 50 C182 34 198 28 190 10" stroke="#fff" stroke-width="6" fill="none" opacity=".08" filter="url(#rbBlur3)"/>
+  <ellipse cx="160" cy="188" rx="128" ry="20" fill="#000" opacity=".5"/>
+  <!-- neon steam arc (rose family — warm) -->
+  <path d="M74 84 Q120 54 172 56" stroke="#ff4d6d" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
+  <!-- DEEP BOWL silhouette -->
+  <!-- foot/base ring -->
+  <ellipse cx="160" cy="176" rx="46" ry="10" fill="#141018"/>
+  <ellipse cx="160" cy="176" rx="46" ry="10" fill="none" stroke="#2c2136" stroke-width="2"/>
+  <!-- bowl body (deep rounded) -->
+  <path d="M74 108 C74 150 108 178 160 178 C212 178 246 150 246 108 Z" fill="url(#rbbowl)"/>
+  <path d="M74 108 C74 150 108 178 160 178 C212 178 246 150 246 108" fill="none" stroke="#2c2136" stroke-width="3"/>
+  <!-- inner rim -->
+  <ellipse cx="160" cy="108" rx="86" ry="26" fill="#0d0b10"/>
+  <ellipse cx="160" cy="108" rx="86" ry="26" fill="none" stroke="#241a2c" stroke-width="2"/>
+  <!-- SOUP surface (glossy dark red) -->
+  <ellipse cx="160" cy="108" rx="80" ry="22" fill="url(#rbsoup)"/>
+  <!-- soup surface sheen -->
+  <ellipse cx="132" cy="100" rx="34" ry="7" fill="#b8442a" opacity=".4"/>
+  <path d="M96 106 C128 98 192 98 224 106" stroke="#c1502f" stroke-width="1.6" fill="none" opacity=".4" stroke-linecap="round"/>
+  <!-- red beans mounded / scattered on the surface -->
+  <g>
+    <ellipse cx="128" cy="104" rx="7" ry="5" fill="url(#rbbean)"/>
+    <path d="M124 104 q4 -3 8 0" stroke="#4a1006" stroke-width="1" fill="none" opacity=".7"/>
+    <ellipse cx="150" cy="110" rx="7.5" ry="5.2" fill="url(#rbbean)"/>
+    <path d="M146 110 q4 -3 8 0" stroke="#4a1006" stroke-width="1" fill="none" opacity=".7"/>
+    <ellipse cx="176" cy="105" rx="7" ry="5" fill="url(#rbbean)"/>
+    <path d="M172 105 q4 -3 8 0" stroke="#4a1006" stroke-width="1" fill="none" opacity=".7"/>
+    <ellipse cx="196" cy="111" rx="6.5" ry="4.6" fill="url(#rbbean)"/>
+    <path d="M192.5 111 q3.5 -2.6 7 0" stroke="#4a1006" stroke-width="1" fill="none" opacity=".7"/>
+    <ellipse cx="138" cy="114" rx="6.5" ry="4.6" fill="url(#rbbean)"/>
+    <ellipse cx="164" cy="113" rx="6.8" ry="4.8" fill="url(#rbbean)"/>
+    <path d="M160 113 q4 -3 8 0" stroke="#4a1006" stroke-width="1" fill="none" opacity=".7"/>
+    <ellipse cx="112" cy="110" rx="6" ry="4.4" fill="url(#rbbean)"/>
+    <ellipse cx="208" cy="105" rx="6" ry="4.4" fill="url(#rbbean)"/>
+    <ellipse cx="186" cy="116" rx="6" ry="4.2" fill="url(#rbbean)"/>
+  </g>
+  <!-- coconut-milk / cream swirl drizzled on top -->
+  <path d="M110 100 C136 92 172 96 200 92 C186 100 150 102 118 106" stroke="#f3e6d6" stroke-width="3" fill="none" opacity=".65" stroke-linecap="round"/>
+  <ellipse cx="146" cy="98" rx="10" ry="4" fill="#f6ece0" opacity=".55"/>
+  <!-- dried-tangerine-peel fleck garnish -->
+  <rect x="170" y="100" width="7" height="2.6" rx="1.3" fill="#c9631f" transform="rotate(-16 173 101)"/>
+  <!-- bean gloss highlights -->
+  <circle cx="126" cy="102" r="1.5" fill="#e88a5a" opacity=".7"/>
+  <circle cx="174" cy="103" r="1.4" fill="#e88a5a" opacity=".65"/>
+  <!-- oil/soup gloss dots -->
+  <circle cx="120" cy="98" r="1.4" fill="#fff" opacity=".5"/>
+  <circle cx="200" cy="102" r="1.2" fill="#fff" opacity=".45"/>
+</svg>
