@@ -25,6 +25,7 @@ import type {
   RecipeDetail,
   RecipePage,
   SpendSummaryOut,
+  UserAdminRow,
 } from '../client/types.gen';
 import {
   adminSpendSummary,
@@ -56,6 +57,11 @@ interface GenState {
   logout: MutationMock;
   createInvite: MutationMock;
   revokeInvite: MutationMock;
+  /** GET /api/admin/users — members + their real-frame grant (V2-F). */
+  usersList: UserAdminRow[];
+  /** When set, the users-list queryFn throws it. */
+  usersError: Error | null;
+  setRealCovers: MutationMock;
   recipesPage: RecipePage;
   recipesById: Record<string, RecipeDetail>;
   jobsById: Record<string, JobOut>;
@@ -94,6 +100,9 @@ export const genState: GenState = {
   logout: mutationMock(),
   createInvite: mutationMock(),
   revokeInvite: mutationMock(),
+  usersList: [],
+  usersError: null,
+  setRealCovers: mutationMock(),
   recipesPage: recipePage([]),
   recipesById: {},
   jobsById: {},
@@ -170,6 +179,19 @@ export function genMockModule() {
     }),
     revokeInviteApiAdminInvitesInviteIdRevokePostMutation: () => ({
       mutationFn: (options: unknown) => genState.revokeInvite(options),
+    }),
+    listUsersApiAdminUsersGetQueryKey: () => [
+      { _id: 'listUsersApiAdminUsersGet' },
+    ],
+    listUsersApiAdminUsersGetOptions: () => ({
+      queryKey: [{ _id: 'listUsersApiAdminUsersGet' }],
+      queryFn: async () => {
+        if (genState.usersError) throw genState.usersError;
+        return { items: genState.usersList };
+      },
+    }),
+    setUserRealCoversApiAdminUsersUserIdPatchMutation: () => ({
+      mutationFn: (options: unknown) => genState.setRealCovers(options),
     }),
     publicInviteApiInvitesTokenGetOptions: (options: {
       path: { token: string };

@@ -2,7 +2,7 @@ import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ApiError } from '../api-error';
-import { inviteOut, meOut } from '../test/fixtures';
+import { inviteOut, meOut, userAdminRow } from '../test/fixtures';
 import { genState, resetGenState } from '../test/gen-mock';
 import { renderApp } from '../test/render-app';
 
@@ -91,5 +91,55 @@ describe('AdminInvitesPage', () => {
     renderApp('/admin/invites');
     const spend = within(await screen.findByRole('region', { name: 'Spend' }));
     expect(await spend.findByText(/could not load spend/i)).toBeInTheDocument();
+  });
+
+  it('lists members and toggles a real-frame cover grant', async () => {
+    genState.usersList = [
+      userAdminRow({ id: 'u1', email: 'owner@x.com', is_admin: true }),
+      userAdminRow({
+        id: 'u2',
+        email: 'pal@x.com',
+        real_covers_enabled: false,
+      }),
+    ];
+    genState.setRealCovers.mockResolvedValue(
+      userAdminRow({ id: 'u2', email: 'pal@x.com', real_covers_enabled: true }),
+    );
+    renderApp('/admin/invites');
+
+    expect(await screen.findByText('pal@x.com')).toBeInTheDocument();
+    // The owner row carries an "owner" marker.
+    expect(screen.getByText('owner')).toBeInTheDocument();
+    // Two grant checkboxes, both unchecked initially.
+    const checkboxes = screen.getAllByRole('checkbox', {
+      name: /real covers/i,
+    });
+    expect(checkboxes).toHaveLength(2);
+    expect(checkboxes[1]).not.toBeChecked();
+
+    fireEvent.click(checkboxes[1]); // grant pal@x.com
+    await waitFor(() =>
+      expect(genState.setRealCovers).toHaveBeenCalledWith(
+        expect.objectContaining({
+          path: { user_id: 'u2' },
+          body: { real_covers_enabled: true },
+        }),
+      ),
+    );
+  });
+
+  it('surfaces an error when a grant update fails', async () => {
+    genState.usersList = [userAdminRow({ id: 'u2', email: 'pal@x.com' })];
+    genState.setRealCovers.mockRejectedValue(
+      new ApiError(404, 'Not Found', { detail: 'no user' }),
+    );
+    renderApp('/admin/invites');
+
+    fireEvent.click(
+      await screen.findByRole('checkbox', { name: /real covers/i }),
+    );
+    expect(
+      await screen.findByText(/could not update that grant/i),
+    ).toBeInTheDocument();
   });
 });

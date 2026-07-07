@@ -92,8 +92,14 @@ def assert_prod_auth_safe(settings: Settings) -> None:
 
 async def fetch_session_owner_id(token_hash: str) -> uuid.UUID | None:
     """Resolve the owner behind a session cookie's sha256. Stubbed in the unit
-    tier (no DB); the real path delegates to sessions.resolve_owner."""
-    return await sessions.resolve_owner(db.get_sessionmaker(), token_hash)
+    tier (no DB); the real path delegates to sessions.resolve_owner, passing the
+    configured idle-timeout (V2-D) so an unused session stops resolving before
+    its absolute TTL."""
+    return await sessions.resolve_owner(
+        db.get_sessionmaker(),
+        token_hash,
+        idle_timeout_hours=get_settings().session_idle_timeout_hours,
+    )
 
 
 async def fetch_account(owner_id: uuid.UUID) -> "Account | None":

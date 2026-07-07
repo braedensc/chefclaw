@@ -149,3 +149,29 @@ async def test_callback_unbound_identity_creates_no_session(sessionmaker, monkey
     async with sessionmaker() as s:
         count = await s.scalar(select(func.count(Session.id)))
     assert count == 0  # no side effects
+
+
+# ── idle timeout (V2-D) ───────────────────────────────────────────────────────
+
+
+async def test_idle_session_stops_resolving_before_absolute_expiry(sessionmaker) -> None:
+    """last_seen_at becomes load-bearing (V2-D): a session unused longer than the
+    idle window stops resolving even while its absolute expires_at is far in the
+    future — and idle_timeout_hours=0 disables the check (absolute TTL only)."""
+    owner_id = await _seed_user(sessionmaker)
+    raw = await sessions.create_session(sessionmaker, owner_id, ttl_hours=720)  # 30d absolute
+    h = sessions.hash_token(raw)
+
+    # Fresh session, within the idle window ⇒ resolves.
+    assert await sessions.resolve_owner(sessionmaker, h, idle_timeout_hours=24) == owner_id
+
+    # 48h later with a 24h idle window: last_seen_at is stale ⇒ does NOT resolve
+    # (checked BEFORE the throttled last_seen bump, so the idle row is excluded).
+    future = datetime.now(UTC) + timedelta(hours=48)
+    assert (
+        await sessions.resolve_owner(sessionmaker, h, idle_timeout_hours=24, now=future) is None
+    )
+    # Idle check disabled ⇒ the same still-unexpired session resolves.
+    assert (
+        await sessions.resolve_owner(sessionmaker, h, idle_timeout_hours=0, now=future) == owner_id
+    )

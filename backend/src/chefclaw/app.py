@@ -22,7 +22,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from chefclaw import db, observability, spend
+from chefclaw import db, observability, ratelimit, spend
 from chefclaw.auth import assert_prod_auth_safe, require_owner
 from chefclaw.config import Settings, get_settings
 from chefclaw.errors import ConfigError
@@ -76,6 +76,10 @@ class HealthResponse(BaseModel):
     # Settings screen shows the caller what they actually run on.
     model: str = "fake-extractor"
     paid_tier: bool = False
+    # Which cover mode is live (V2-F): sprite (default) | fake | gemini. The SPA
+    # hides the legacy "Regenerate illustration" control in sprite mode (there
+    # are no illustrations to regenerate — covers are inline sprites).
+    cover_mode: str = "sprite"
     spend_month_usd: float | None = None
     # V2-A additions. Caps are null when the budget config is fail-closed
     # (unset/unparseable) — the UI says "extraction disabled", never invents
@@ -270,6 +274,7 @@ async def health(
         extractor=settings.chefclaw_extractor,
         model=model,
         paid_tier=paid_tier,
+        cover_mode=settings.chefclaw_image_generator,
         spend_month_usd=await _spend_month_to_date(owner_id) if db_ok else None,
         budget_monthly_usd=budget_monthly_usd,
         daily_attempt_cap=daily_attempt_cap,
@@ -299,6 +304,20 @@ async def _lifespan(app: FastAPI):
     # Health reads aliveness off this: a done() task = the worker died while
     # the api keeps answering (the failure mode worth surfacing).
     app.state.worker_task = task
+    # The request throttle is wired HERE (lifespan), not in create_app: the unit
+    # tier runs under ASGITransport (no lifespan, no DB), so it never gets a
+    # limiter and is never throttled. A real server (uvicorn runs the lifespan)
+    # gets the Postgres-backed limiter and active throttling. Fail-open by design
+    # (chefclaw.ratelimit), so a DB hiccup here never wedges the app.
+    app.state.rate_limiter = ratelimit.PostgresRateLimiter(
+        db.get_sessionmaker(),
+        authenticated_rule=ratelimit.RateLimitRule(
+            limit=settings.rate_limit_authenticated_per_minute, window_seconds=60
+        ),
+        public_rule=ratelimit.RateLimitRule(
+            limit=settings.rate_limit_public_per_minute, window_seconds=60
+        ),
+    )
     try:
         yield
     finally:
@@ -404,9 +423,13 @@ def create_app() -> FastAPI:
     # Enforced cap for the tier-2 upload endpoint; the middleware reads it off
     # app.state so tests can lower it without a rebuild.
     app.state.max_upload_bytes = get_settings().max_upload_mb * 1024 * 1024
-    # Order matters (last added = outermost): the upload cap is added first so
-    # it sits INSIDE the request log — a rejected 413 upload still gets logged.
+    # Order matters (last added = outermost). Nesting from outside in:
+    # RequestLog → RateLimit → UploadSize → app. So a rejected 429/413 is still
+    # logged, and the throttle fires BEFORE an oversized upload body is spooled.
     app.add_middleware(UploadSizeLimitMiddleware)
+    # Per-session / per-IP request throttle (V2-D). No-op when app.state has no
+    # rate_limiter (the unit tier) — set in the lifespan for a real server.
+    app.add_middleware(ratelimit.RateLimitMiddleware)
     # Structured request log for /api/* (method/path/status/latency/owner —
     # never query strings, headers, or bodies). Logging + Sentry themselves
     # are configured at the PROCESS entrypoint (main.py), not here — the app

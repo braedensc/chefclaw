@@ -106,16 +106,17 @@ async def test_m2_migration_backfills_owner_and_swaps_dedupe(migrated_db) -> Non
                 await conn.execute(
                     text(
                         "SELECT tablename FROM pg_tables "
-                        "WHERE tablename IN ('invites', 'sessions')"
+                        "WHERE tablename IN ('invites', 'sessions', 'request_events')"
                     )
                 )
             ).all()
         }
-        assert tables == {"invites", "sessions"}
+        # request_events lands with the V2-D rate-limit revision (f3a4b5c6d7e8).
+        assert tables == {"invites", "sessions", "request_events"}
 
 
 async def test_m3_migration_adds_paid_tier_default_false(migrated_db) -> None:
-    """The M3 migration (f3a4b5c6d7e8) adds users.paid_tier NOT NULL default
+    """The M3 migration (a1c2e3f4b5d6) adds users.paid_tier NOT NULL default
     false — the seed owner backfilled to false, and a new insert without the
     column defaults false (no data migration needed)."""
     async with migrated_db.begin() as conn:

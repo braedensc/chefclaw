@@ -1,7 +1,7 @@
 """add users.paid_tier (per-user paid Gemini tier)
 
-Revision ID: f3a4b5c6d7e8
-Revises: c3f0a1b2d4e5
+Revision ID: a1c2e3f4b5d6
+Revises: f3a4b5c6d7e8
 Create Date: 2026-07-07
 
 M3 (ADR 2026-07-07-per-user-budget-caps). Adds the per-user paid-tier flag:
@@ -18,8 +18,8 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "f3a4b5c6d7e8"
-down_revision: str | None = "c3f0a1b2d4e5"
+revision: str = "a1c2e3f4b5d6"
+down_revision: str | None = "f3a4b5c6d7e8"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

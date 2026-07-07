@@ -13,7 +13,22 @@ import type {
   RecipePage,
   RecipeSummary,
   SpendSummaryOut,
+  UserAdminRow,
 } from '../client/types.gen';
+
+export function userAdminRow(
+  overrides: Partial<UserAdminRow> = {},
+): UserAdminRow {
+  return {
+    id: '01890000-0000-7000-8000-000000000009',
+    email: 'friend@example.com',
+    display_name: 'Friend',
+    is_admin: false,
+    status: 'active',
+    real_covers_enabled: false,
+    ...overrides,
+  };
+}
 
 export function meOut(overrides: Partial<MeOut> = {}): MeOut {
   return {
@@ -200,6 +215,7 @@ export function healthResponse(
     extractor: 'gemini',
     model: 'gemini-2.5-flash',
     paid_tier: false,
+    cover_mode: 'sprite', // V2-F default; illustration-control tests override to 'gemini'
     spend_month_usd: 0.2,
     budget_monthly_usd: 10,
     daily_attempt_cap: 25,
