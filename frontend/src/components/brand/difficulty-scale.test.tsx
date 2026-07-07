@@ -40,4 +40,10 @@ describe('DifficultyScale', () => {
       screen.getByLabelText('Difficulty: hard (estimated)'),
     ).toBeInTheDocument();
   });
+
+  it('drops the "(estimated)" flag once the owner has overridden', () => {
+    render(<DifficultyScale level={1} estimated={false} />);
+    expect(screen.getByLabelText('Difficulty: easy')).toBeInTheDocument();
+    expect(screen.queryByLabelText(/\(estimated\)/)).not.toBeInTheDocument();
+  });
 });

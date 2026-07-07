@@ -19,13 +19,13 @@ import { apiErrorMessage } from '../lib/error-message';
 import { asRecipeDoc } from '../lib/recipe-document';
 import type { IngredientDoc, RecipeDoc, StepDoc } from '../lib/recipe-document';
 import { CoverImage } from './brand/cover-image';
-import { DifficultyScale } from './brand/difficulty-scale';
+import { DIFFICULTY_WORDS, DifficultyScale } from './brand/difficulty-scale';
 import {
   fallbackCoverGradient,
   platformAccent,
 } from './brand/platform-accents';
 import { PuppyChef } from './brand/puppy-chef';
-import { SpicinessScale } from './brand/spiciness-scale';
+import { SPICINESS_WORDS, SpicinessScale } from './brand/spiciness-scale';
 import { PlatformBadge } from './platform-badge';
 
 /**
@@ -271,12 +271,16 @@ function RegenerateIllustration({
  * cuisine come verbatim from the document; dot-separated.
  */
 function HeroMeta({ detail, doc }: { detail: RecipeDetail; doc: RecipeDoc }) {
+  // Once the owner has corrected the estimates (source "user") they are no
+  // longer the model's guess, so the "(estimated)" affordance drops.
+  const isEstimate = detail.estimated_source !== 'user';
   const items: ReactNode[] = [];
   if (detail.estimated_spiciness_level != null) {
     items.push(
       <SpicinessScale
         key="spiciness"
         level={detail.estimated_spiciness_level}
+        estimated={isEstimate}
       />,
     );
   }
@@ -285,6 +289,7 @@ function HeroMeta({ detail, doc }: { detail: RecipeDetail; doc: RecipeDoc }) {
       <DifficultyScale
         key="difficulty"
         level={detail.estimated_difficulty_level}
+        estimated={isEstimate}
       />,
     );
   }
@@ -542,11 +547,29 @@ function RawJsonDrawer({ detail }: { detail: RecipeDetail }) {
   );
 }
 
-/** Tags + notes are the ONLY user-editable fields (PATCH whitelist). */
+const fieldClass =
+  'mt-1.5 w-full rounded-field border border-line-bright bg-panel-deep px-3.5 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-cyan/70 focus:glow-cyan focus:outline-none';
+const saveButtonClass =
+  'rounded-field border border-line-bright px-3.5 py-2 font-display text-xs font-semibold tracking-[0.16em] text-ink-dim uppercase transition hover:border-cyan/55 hover:text-cyan disabled:opacity-50';
+const metaLabelClass =
+  'block font-display text-[11px] font-semibold tracking-[0.2em] text-ink-dim uppercase';
+
+/**
+ * The user-editable fields (PATCH whitelist): free-text tags + notes, plus the
+ * two derived 0–3 estimates. Correcting a rating flags the whole `estimated`
+ * object `source:"user"` server-side (it drops the "estimated" affordance and
+ * takes precedence over any future re-derivation).
+ */
 function MetaEditor({ detail }: { detail: RecipeDetail }) {
   const queryClient = useQueryClient();
   const [tagsDraft, setTagsDraft] = useState(detail.tags.join(', '));
   const [notesDraft, setNotesDraft] = useState(detail.user_notes ?? '');
+  const [spiceDraft, setSpiceDraft] = useState<number | null>(
+    detail.estimated_spiciness_level ?? null,
+  );
+  const [difficultyDraft, setDifficultyDraft] = useState<number | null>(
+    detail.estimated_difficulty_level ?? null,
+  );
 
   const patch = useMutation({
     ...patchRecipeApiRecipesRecipeIdPatchMutation(),
@@ -580,20 +603,28 @@ function MetaEditor({ detail }: { detail: RecipeDetail }) {
     });
   }
 
-  const fieldClass =
-    'mt-1.5 w-full rounded-field border border-line-bright bg-panel-deep px-3.5 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-cyan/70 focus:glow-cyan focus:outline-none';
-  const saveButtonClass =
-    'rounded-field border border-line-bright px-3.5 py-2 font-display text-xs font-semibold tracking-[0.16em] text-ink-dim uppercase transition hover:border-cyan/55 hover:text-cyan disabled:opacity-50';
+  function saveRatings(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    // Both are sent so the intent is explicit; the server flags the whole
+    // `estimated` object source:"user" (one provenance for the pair).
+    patch.mutate({
+      path: { recipe_id: detail.id },
+      body: {
+        estimated_spiciness_level: spiceDraft,
+        estimated_difficulty_level: difficultyDraft,
+      },
+    });
+  }
 
   return (
-    <section aria-label="Your notes and tags" className="mt-10 space-y-4">
+    <section
+      aria-label="Your notes, tags, and ratings"
+      className="mt-10 space-y-4"
+    >
       <SectionHeading en="Your notes & tags" zh="笔记" />
       <form onSubmit={saveTags} className="flex items-end gap-2">
         <div className="min-w-0 flex-1">
-          <label
-            htmlFor="recipe-tags"
-            className="block font-display text-[11px] font-semibold tracking-[0.2em] text-ink-dim uppercase"
-          >
+          <label htmlFor="recipe-tags" className={metaLabelClass}>
             Tags
           </label>
           <input
@@ -615,10 +646,7 @@ function MetaEditor({ detail }: { detail: RecipeDetail }) {
       </form>
 
       <form onSubmit={saveNotes}>
-        <label
-          htmlFor="recipe-notes"
-          className="block font-display text-[11px] font-semibold tracking-[0.2em] text-ink-dim uppercase"
-        >
+        <label htmlFor="recipe-notes" className={metaLabelClass}>
           Notes
         </label>
         <textarea
@@ -638,6 +666,37 @@ function MetaEditor({ detail }: { detail: RecipeDetail }) {
         </button>
       </form>
 
+      <form onSubmit={saveRatings} className="space-y-3">
+        <RatingSelect
+          id="recipe-spiciness"
+          label="Spiciness"
+          words={SPICINESS_WORDS}
+          value={spiceDraft}
+          onChange={setSpiceDraft}
+          preview={<SpicinessScale level={spiceDraft} decorative />}
+        />
+        <RatingSelect
+          id="recipe-difficulty"
+          label="Difficulty"
+          words={DIFFICULTY_WORDS}
+          value={difficultyDraft}
+          onChange={setDifficultyDraft}
+          preview={<DifficultyScale level={difficultyDraft} decorative />}
+        />
+        <p className="text-xs text-ink-faint">
+          {detail.estimated_source === 'user'
+            ? 'Your ratings — you’ve overridden the model’s estimate.'
+            : 'The model’s estimates — adjust either to save your own.'}
+        </p>
+        <button
+          type="submit"
+          disabled={patch.isPending}
+          className={saveButtonClass}
+        >
+          Save ratings
+        </button>
+      </form>
+
       {patch.isError && (
         <p role="alert" className="text-sm text-chili-bright">
           {apiErrorMessage(patch.error)}
@@ -647,6 +706,57 @@ function MetaEditor({ detail }: { detail: RecipeDetail }) {
         <p className="text-sm text-gold">Saved.</p>
       )}
     </section>
+  );
+}
+
+/**
+ * One 0–3 estimate as a labelled `<select>` (— no estimate ‖ 0..3) with a live,
+ * decorative scale preview. The preview scale is passed `decorative` so it
+ * carries no accessible label — the `<select>`'s label is the single a11y
+ * control here, and the read-only hero scale keeps sole ownership of the
+ * "Spiciness: …" / "Difficulty: …" labels.
+ */
+function RatingSelect({
+  id,
+  label,
+  words,
+  value,
+  onChange,
+  preview,
+}: {
+  id: string;
+  label: string;
+  words: readonly string[];
+  value: number | null;
+  onChange: (value: number | null) => void;
+  preview: ReactNode;
+}) {
+  return (
+    <div className="flex items-end gap-3">
+      <div className="min-w-0 flex-1">
+        <label htmlFor={id} className={metaLabelClass}>
+          {label}
+        </label>
+        <select
+          id={id}
+          value={value === null ? '' : String(value)}
+          onChange={(event) =>
+            onChange(
+              event.target.value === '' ? null : Number(event.target.value),
+            )
+          }
+          className={fieldClass}
+        >
+          <option value="">— no estimate</option>
+          {words.map((word, index) => (
+            <option key={word} value={index}>{`${index} · ${word}`}</option>
+          ))}
+        </select>
+      </div>
+      <span aria-hidden="true" className="pb-2">
+        {preview}
+      </span>
+    </div>
   );
 }
 

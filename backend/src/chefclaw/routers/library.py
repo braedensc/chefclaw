@@ -1,7 +1,8 @@
 """The recipe library endpoints (plan §6): list / detail / patch / delete.
 
-PATCH accepts ONLY tags + user_notes (RecipePatch is extra='forbid' — a body
-mentioning `document` or anything else is a 422). DELETE is a hard delete.
+PATCH accepts tags + user_notes + the two derived estimate levels
+(RecipePatch is extra='forbid' — a body mentioning `document` or anything else
+is a 422). DELETE is a hard delete.
 """
 
 import uuid
@@ -141,13 +142,17 @@ async def patch_recipe(
     session: Annotated[AsyncSession, Depends(db.get_session)],
 ) -> RecipeDetail | JSONResponse:
     # Only forward fields the client actually sent — an absent field is
-    # untouched, an explicit null clears (user_notes only).
+    # untouched, an explicit null clears (user_notes and the estimate levels).
     provided = body.model_fields_set
-    kwargs = {}
+    kwargs: dict[str, object] = {}
     if "tags" in provided:
         kwargs["tags"] = body.tags if body.tags is not None else []
     if "user_notes" in provided:
         kwargs["user_notes"] = body.user_notes
+    if "estimated_spiciness_level" in provided:
+        kwargs["estimated_spiciness_level"] = body.estimated_spiciness_level
+    if "estimated_difficulty_level" in provided:
+        kwargs["estimated_difficulty_level"] = body.estimated_difficulty_level
     recipe = await recipes_service.patch_recipe(session, owner_id, recipe_id, **kwargs)
     if recipe is None:
         return error_response(404, "not_found", f"no recipe {recipe_id}")

@@ -208,34 +208,46 @@ class RecipeDocument(BaseModel):
 
 
 class EstimatedAttributes(BaseModel):
-    """DERIVED spiciness + difficulty estimates (Hard Rule 7).
+    """Spiciness + difficulty estimates (Hard Rule 7).
 
-    These are the ONLY inferred numeric fields in the pipeline — the model's
-    ASSESSMENTS (0 = not spicy / very easy, 3 = very spicy / hard), null when
-    it is genuinely unsure. They live in a SEPARATE column from the raw
-    ``document`` and NEVER overwrite verbatim captures — ``source`` is fixed to
-    ``"derived"`` so the flag can never masquerade as a stated value, the same
-    posture as the reserved nutrition_ref.
+    These are the ONLY inferred numeric fields in the pipeline — 0 = not spicy /
+    very easy, 3 = very spicy / hard, null when unsure. They live in a SEPARATE
+    column from the raw ``document`` and NEVER overwrite verbatim captures.
+
+    ``source`` records provenance, the same posture as the reserved
+    nutrition_ref: ``"derived"`` for the model's own ASSESSMENT (the extraction
+    default — provenance is pipeline-owned, so the model can never claim a
+    higher status: :func:`validate_estimated` strips any model-supplied
+    ``source``), or ``"user"`` when the owner has corrected the estimate via
+    ``RecipePatch``. An owner-authored (``"user"``) object takes precedence over
+    the model's derivation and MUST survive any future re-derivation (the
+    re-extraction ADR is deferred; this flag is the contract it must respect).
     """
 
     model_config = _STRICT
 
     spiciness_level: int | None = Field(default=None, ge=0, le=3)
     difficulty_level: int | None = Field(default=None, ge=0, le=3)
-    source: Literal["derived"] = "derived"
+    source: Literal["derived", "user"] = "derived"
 
 
 def validate_estimated(raw: dict | None) -> EstimatedAttributes | None:
-    """Validate the optional per-dish ``estimated`` object.
+    """Validate the optional per-dish ``estimated`` object from an extraction.
 
     None or an empty dict ⇒ ``None`` (no estimate supplied). A non-empty dict
     is validated; on ANY failure a :class:`ValidationFailedError` is raised
     with ``raw_output`` carrying the offending object (never repaired).
+
+    Provenance is pipeline-owned (like the document's ``source`` block): any
+    model-supplied ``source`` is DROPPED before validation so an extraction is
+    always ``source="derived"`` — the model can never mark its own estimate as
+    the owner-authored ``"user"`` (that flag is set only by :func:`patch_recipe`).
     """
     if not raw:
         return None
+    payload = {k: v for k, v in raw.items() if k != "source"}
     try:
-        return EstimatedAttributes.model_validate(raw)
+        return EstimatedAttributes.model_validate(payload)
     except ValidationError as exc:
         raise ValidationFailedError(
             f"estimated attributes failed validation: {exc}", raw_output=raw
