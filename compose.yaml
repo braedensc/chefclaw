@@ -37,18 +37,29 @@ services:
       timeout: 3s
       retries: 10
 
-  # One-shot: applies Alembic migrations, then exits. The api waits for it.
+  # One-shot: applies Alembic migrations, then (under fake auth) seeds the
+  # FIXED-id owner the fake provider resolves to, then exits. The api waits for
+  # it. In fake auth mode require_owner short-circuits to CHEFCLAW_FAKE_OWNER_ID
+  # (no cookie/session), so that id must be a real users row for the FK +
+  # /api/me to resolve — otherwise a fresh stack lands on the login page. The
+  # seed NO-OPS when the provider is 'google' (real deploy: accounts come from
+  # OAuth), so passing the provider through here is what makes it fail-safe.
   migrate:
     build:
       context: .
       dockerfile: Dockerfile.api
-    command: ["alembic", "upgrade", "head"]
+    command:
+      ["sh", "-c", "alembic upgrade head && python -m chefclaw.seed_fake_owner"]
     environment:
       DB_HOST: postgres
       DB_PORT: "5432"
       DB_USER: ${DB_USER:-chefclaw}
       DB_PASSWORD: ${DB_PASSWORD:-chefclaw-local-dev}
       DB_NAME: ${DB_NAME:-chefclaw}
+      # Must match the api's values so the seeded id == the id fake auth resolves
+      # (and so a google deploy skips the seed).
+      CHEFCLAW_AUTH_PROVIDER: ${CHEFCLAW_AUTH_PROVIDER:-fake}
+      CHEFCLAW_FAKE_OWNER_ID: ${CHEFCLAW_FAKE_OWNER_ID:-01890000-0000-7000-8000-000000000001}
     depends_on:
       postgres:
         condition: service_healthy
