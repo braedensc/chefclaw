@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- chefclaw PWA app icon (V2-C): the neon puppy chef head on the night-market
+       black, full-bleed square so it works as an Android MASKABLE icon (a circle
+       crop stays inside the head) and, un-masked, as the apple-touch icon. The
+       art is the committed favicon.svg puppy, scaled into the maskable safe zone
+       (central ~62%). Rasterized to the PNGs the manifest references. -->
+  <defs>
+    <radialGradient id="glowC" cx="82%" cy="12%" r="60%">
+      <stop offset="0%" stop-color="#35e0ff" stop-opacity="0.20"/>
+      <stop offset="60%" stop-color="#35e0ff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowR" cx="12%" cy="14%" r="60%">
+      <stop offset="0%" stop-color="#ff2d55" stop-opacity="0.20"/>
+      <stop offset="60%" stop-color="#ff2d55" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="g" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="1.3" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- full-bleed night ground + ambient neon pools (the app's resting light) -->
+  <rect width="512" height="512" fill="#050505"/>
+  <rect width="512" height="512" fill="url(#glowC)"/>
+  <rect width="512" height="512" fill="url(#glowR)"/>
+
+  <!-- puppy chef head — favicon paths mapped from 0..100 space into the safe
+       zone: translate(66,47) scale(3.8) centers (50,55) at (256,256). -->
+  <g transform="translate(66 47) scale(3.8)">
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#g)">
+      <!-- tan floppy ears -->
+      <g stroke="#e0a458" stroke-width="5">
+        <path d="M28 48 C14 46 8 62 14 74 C17 80 25 80 29 73 C32 67 33 58 33 52"/>
+        <path d="M72 48 C86 46 92 62 86 74 C83 80 75 80 71 73 C68 67 67 58 67 52"/>
+      </g>
+      <!-- warm-white head -->
+      <path stroke="#fff3e0" stroke-width="5"
+        d="M30 46 C22 54 18 64 18 74 C18 88 32 96 50 96 C68 96 82 88 82 74 C82 64 78 54 70 46"/>
+      <!-- pink toque -->
+      <g stroke="#ff4d6d" stroke-width="5.5">
+        <path d="M32 46 C22 46 17 36 22 29 C26 24 32 23 36 26 C38 18 46 14 50 14 C54 14 62 18 64 26 C68 23 74 24 78 29 C83 36 78 46 68 46"/>
+        <path d="M31 49 L69 49"/>
+      </g>
+      <!-- cyan eyes + glints, nose, smile -->
+      <g stroke="#35e0ff" stroke-width="4.5">
+        <circle cx="40" cy="70" r="4.6" fill="#35e0ff" stroke="none"/>
+        <circle cx="60" cy="70" r="4.6" fill="#35e0ff" stroke="none"/>
+        <circle cx="42" cy="68" r="1.5" fill="#fff3e0" stroke="none"/>
+        <circle cx="62" cy="68" r="1.5" fill="#fff3e0" stroke="none"/>
+        <ellipse cx="50" cy="82" rx="4" ry="3.2" fill="#35e0ff" stroke="none"/>
+        <path d="M50 87 Q50 93 43 94" stroke-width="3.5"/>
+        <path d="M50 87 Q50 93 57 94" stroke-width="3.5"/>
+      </g>
+    </g>
+  </g>
+</svg>
