@@ -278,9 +278,12 @@ Living, load-bearing constraints — do not re-derive these differently:
 - **`POST /api/recipes/extract` always returns the JOB resource** — 202 (new) or 200
   (existing active-or-completed job); `result_recipe_ids` carries the recipes. It
   never returns a recipe body.
-- **Auth from the first slice:** bearer `CHEFCLAW_API_TOKEN` behind a swappable
-  FastAPI dependency; the SPA token flow (entered once in the UI → localStorage →
-  `Authorization` header) lands in Phase 1. **`/api/health` is not publicly exempt.**
+- **Auth behind ONE swappable dependency (`require_owner`):** the original bearer
+  `CHEFCLAW_API_TOKEN` + localStorage-token plan was swapped by M2 for Google OAuth +
+  opaque server-side session cookies and invite-only signup (ADR
+  `2026-07-07-m2-accounts-and-invites`) — internals-only, the `-> uuid.UUID` contract
+  is unchanged. Local dev defaults to `CHEFCLAW_AUTH_PROVIDER=fake` (short-circuits to
+  a seeded owner, no sign-in). **`/api/health` is not publicly exempt.**
 - **Multi-dish stores atomically:** the N-recipe insert and the job's status flip to
   `stored` happen in ONE database transaction.
 - **`DELETE /api/recipes/{id}` is a hard delete for MVP.** `recipes.status` values are
