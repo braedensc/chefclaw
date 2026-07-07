@@ -213,3 +213,22 @@ async def test_callback_consumes_invite_end_to_end(sm, monkeypatch) -> None:
     assert session_count == 1
     assert inv.status == "accepted"
     assert inv.accepted_user_id == new_user.id
+
+
+# ── DB-enforced TTL on consume (V2-D) ─────────────────────────────────────────
+
+
+async def test_consume_expired_invite_is_none(sm) -> None:
+    """An expired pending invite cannot be consumed — the consume path filters
+    (and the UPDATE guards) on expires_at > now(), so activation returns None
+    (→ opaque 403) and creates no user."""
+    admin = await _seed_admin(sm)
+    # invite_ttl_hours negative ⇒ issued already-expired.
+    await invites.issue_invite(
+        sm, _settings(invite_ttl_hours=-1), invited_by=admin, email="late@x.com"
+    )
+    ident = VerifiedIdentity("google", "sub-late", "late@x.com", True, "Late")
+    assert await invites.activate_identity(sm, _settings(), ident) is None
+    async with sm() as s:
+        users = await s.scalar(select(func.count(User.id)))
+    assert users == 1  # only the seed admin — no account created

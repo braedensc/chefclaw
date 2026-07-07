@@ -99,6 +99,13 @@ jobs:
       - name: secretlint (scan all tracked files)
         run: git ls-files -z | xargs -0 npx secretlint --secretlintrc .secretlintrc.json
 
+      # npm dependency advisory check (V2-D security audit). Gate on high+critical
+      # so a transient low-severity dev-tool advisory can't wedge every open PR;
+      # Dependabot (once enabled) tracks the long tail. Currently zero across all
+      # levels — keep it that way.
+      - name: npm audit (advisory check)
+        run: npm audit --audit-level=high
+
   backend:
     name: Backend
     runs-on: ubuntu-latest
@@ -122,6 +129,12 @@ jobs:
 
       - name: pytest (no database — unit tier only; docs/TESTING.md)
         run: uv run pytest -q
+
+      # Dependency advisory check (V2-D security audit): fail the gate on any
+      # known CVE in the resolved Python env. Drive to zero — bump the dep, or,
+      # for an advisory with no fix, pin + `--ignore-vuln <ID>` with a rationale.
+      - name: pip-audit (Python advisory check)
+        run: uv run pip-audit
 
   lint:
     name: Lint

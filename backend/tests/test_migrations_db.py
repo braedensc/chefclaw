@@ -106,12 +106,13 @@ async def test_m2_migration_backfills_owner_and_swaps_dedupe(migrated_db) -> Non
                 await conn.execute(
                     text(
                         "SELECT tablename FROM pg_tables "
-                        "WHERE tablename IN ('invites', 'sessions')"
+                        "WHERE tablename IN ('invites', 'sessions', 'request_events')"
                     )
                 )
             ).all()
         }
-        assert tables == {"invites", "sessions"}
+        # request_events lands with the V2-D rate-limit revision (f3a4b5c6d7e8).
+        assert tables == {"invites", "sessions", "request_events"}
 
 
 async def test_m2_owner_scoped_unique_allows_two_owners_same_canonical(migrated_db) -> None:

@@ -703,3 +703,39 @@ async def test_fake_source_failure_injection(tmp_path: Path) -> None:
     for _ in range(2):
         with pytest.raises(errors.UnsupportedUrlError):
             await fake_resolve.resolve("fake://video/3")
+
+
+# ── rednote media download: SSRF guard + byte cap (V2-D) ─────────────────────
+
+
+async def test_rednote_download_media_refuses_internal_target(tmp_path: Path) -> None:
+    """SSRF guard: a sidecar-supplied media URL resolving to a non-public host is
+    refused BEFORE any fetch. No transport ⇒ the real DNS pre-resolve runs; a
+    literal loopback IP resolves locally (no network), so the guard trips and the
+    error is non-retryable (the URL always resolves the same way)."""
+    source = RednoteSource(settings())  # no transport ⇒ guard active
+    async with httpx.AsyncClient() as client:  # never used — the guard raises first
+        with pytest.raises(errors.DownloadFailedError) as excinfo:
+            await source._download_media(
+                client, "http://127.0.0.1:9/evil.mp4", rednote_ref(), 0, tmp_path
+            )
+    assert excinfo.value.retryable is False
+
+
+async def test_rednote_media_download_byte_cap(tmp_path: Path) -> None:
+    """A media stream larger than MAX_UPLOAD_MB is aborted mid-write (disk-
+    exhaustion DoS guard). The MockTransport makes the SSRF pre-resolve inert, so
+    this exercises the streaming byte cap alone."""
+    over_cap = b"x" * (1024 * 1024 + 4096)  # > 1 MB
+    detail = httpx.Response(
+        200,
+        json={"message": "ok", "data": {"下载地址": ["https://cdn.example.com/big.mp4"]}},
+    )
+    source = RednoteSource(
+        settings(xhs_sidecar_url="http://xhs:5556", max_upload_mb=1),
+        transport=sidecar_transport({}, detail_response=detail, media_bytes=over_cap),
+    )
+    with pytest.raises(errors.DownloadFailedError) as excinfo:
+        await source.fetch(rednote_ref(), tmp_path)
+    assert excinfo.value.retryable is False
+    assert "cap" in str(excinfo.value).lower()
