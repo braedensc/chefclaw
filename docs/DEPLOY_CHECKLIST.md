@@ -158,6 +158,68 @@ Run the scripted smoke check (RUNBOOK §4 step 10) and confirm each:
 
 ---
 
+## Gate 5 — continuous deployment **[HUMAN]** (optional; after Gate 4 passes)
+
+Turns "push to `main`" into an automatic deploy (build in CI → ship the immutable
+image → the box redeploys itself with a backup + migration + health-gate +
+auto-rollback). Full mechanics + rollback/disable: [`RUNBOOK.md`](RUNBOOK.md) §4
+"Continuous deployment (push-based, GHCR)"; rationale in
+[`…-push-based-cd-ghcr`](adr/2026-07-07-push-based-cd-ghcr.md). Do this **only
+after** a successful manual §4 deploy — CD redeploys an already-healthy box.
+
+- [ ] **Deploy user can drive docker + git WITHOUT sudo** (deploy.sh runs as
+      `ubuntu` under a no-pty forced command — it cannot sudo): `sudo usermod -aG
+      docker ubuntu` (re-login), `sudo chown -R ubuntu:ubuntu /opt/chefclaw`,
+      `git config --global --add safe.directory /opt/chefclaw`. Verify `docker
+      info` succeeds as `ubuntu`. Without this the FIRST CD run dies at `docker
+      compose pull` / `git merge`.
+- [ ] **Dedicated deploy keypair** generated locally (`ssh-keygen -t ed25519 -C
+      chefclaw-deploy -f ./chefclaw-deploy -N ''`); neither half committed.
+- [ ] **PUBLIC half in the box's `authorized_keys` with the FORCED COMMAND** line
+      (RUNBOOK §4 step 3 — `command="/opt/chefclaw/scripts/deploy.sh",restrict,…`);
+      `chmod +x /opt/chefclaw/scripts/deploy.sh` done. A leaked key can then *only*
+      trigger a deploy, never get a shell.
+- [ ] **Box host key pinned:** `ssh-keyscan -t ed25519 <host>` output captured for
+      `DEPLOY_KNOWN_HOSTS` (no trust-on-first-use at deploy time).
+- [ ] **GitHub `production` Environment** created; protection = *Deployment
+      branches: `main` only*, **no required reviewer** (keeps push=auto-deploy).
+- [ ] **Environment secrets** set on `production` (not repo-level): `DEPLOY_SSH_KEY`
+      (private half), `DEPLOY_HOST`, `DEPLOY_USER` (=`ubuntu`),
+      `DEPLOY_KNOWN_HOSTS`; `DEPLOY_PORT` **only** if sshd ≠ 22.
+- [ ] **Repo VARIABLE `VITE_SENTRY_DSN`** added (Actions → Variables — a public
+      ingest address, **not** a secret; baked into the SPA at CI build). No server
+      secret is ever a build-arg (Hard Rule 4).
+- [ ] **Sequence the GHCR package public:** first CI push → make the `chefclaw`
+      package **Public** → then the first deploy. (An anonymous pull 401s until
+      it's public.)
+- [ ] **Flip the master switch LAST:** add repo VARIABLE `CD_ENABLED=true` (Actions
+      → Variables). Until it's `true` the `deploy` job SKIPS (grey, not red) — so
+      merging the CD PR never fires a half-configured deploy; set it only once
+      everything above is done. Setting it to anything else later pauses CD.
+- [ ] **First automatic deploy is ATTENDED** — no previous image exists yet, so a
+      failed health-gate can't auto-roll-back. Watch the **`Deploy to VPS`** job to
+      green before walking away.
+- [ ] **Merge-then-require:** let `Build and push image` report green on `main`
+      once before adding it to branch protection (`Deploy to VPS` runs only on
+      `main`, never gates a PR).
+- [ ] **`.github/dependabot.yml`** (github-actions, weekly) present — bump action
+      SHA pins only via its PRs, never by hand-editing a tag.
+- [ ] **Box tree stays clean:** never hand-edit tracked files under
+      `/opt/chefclaw` — `deploy.sh`'s `git merge --ff-only` aborts (and reds every
+      deploy) on a diverged tree. `.env.local` is untracked and human-owned.
+- [ ] **Migrations are backward-compatible** with the immediately-previous
+      release (expand-then-contract) — rollback reverts CODE, never the SCHEMA; a
+      bad migration needs a DB restore from the pre-deploy backup, not an image
+      roll (RUNBOOK §4 CD note).
+
+> **To pause CD** without a code change: set the repo variable `CD_ENABLED` to
+> anything but `true` (or delete it) — the `deploy` job then skips. Or add a
+> required reviewer on the `production` Environment (every push becomes a
+> pending-approval deploy). The running stack is untouched. To pull ingress, use
+> the Abort/rollback section below.
+
+---
+
 ## First-real-exercise flags (unverified-live until deploy day)
 
 These have **never run against their real services** — expect first-run

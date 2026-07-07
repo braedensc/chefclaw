@@ -473,6 +473,206 @@ Tailscale-private path needs no domain (Tailscale supplies the `*.ts.net` name
       of the guest tier (see §5 if it degrades). Link-paste + the Rednote sidecar
       belong to this posture only.
 
+### Continuous deployment (push-based, GHCR)
+
+Once the manual §4 deploy has run **once** and the box is healthy, deploys become
+automatic: **push to `main` → CI builds and ships → the box redeploys itself**.
+No one SSHes in by hand for a normal release. The mechanism is
+`.github/workflows/deploy.yml` (a two-job pipeline), `compose.prod.yaml` (a prod
+override that runs the CI-built image instead of building on the box), and
+`scripts/deploy.sh` (the on-box redeploy, run as an SSH forced command). ADR:
+`docs/adr/2026-07-07-push-based-cd-ghcr.md`.
+
+**The flow, end to end:**
+
+1. You merge to `main`. GitHub Actions job **`build`** (untrusted-code side —
+   holds a GHCR-write token, **no** SSH key) builds the single image from
+   `Dockerfile.api` and pushes it to `ghcr.io/braedensc/chefclaw`, tagged
+   `sha-<7hex>` + `latest` for humans. Only three build-args go in —
+   `GIT_SHA`, `VITE_SENTRY_DSN` (the public repo **variable**),
+   `VITE_SENTRY_ENVIRONMENT=vps`. **No server secret is ever a build-arg** (Hard
+   Rule 4); the image is public-safe.
+2. The build hands job **`deploy`** (trusted side — holds the SSH key, **no**
+   GHCR scope) the image's immutable **`@sha256:<digest>`**. The box runs the
+   *digest*, never a moving `:latest`/`:sha-` tag.
+3. `deploy` opens one `ssh` connection to the box. The box's `authorized_keys`
+   pins that key to a **forced command** (`scripts/deploy.sh`), so the SSH call
+   can't get a shell — it can only trigger the deploy. The digest rides in as the
+   SSH command string; `deploy.sh` reads it from `$SSH_ORIGINAL_COMMAND` and
+   **strict-allowlists** it (`^ghcr\.io/braedensc/chefclaw@sha256:[0-9a-f]{64}$`)
+   before touching anything.
+4. `scripts/deploy.sh` runs, on the box, **in order**:
+   1. Validate the incoming digest (reject anything not a chefclaw `@sha256`).
+   2. **Capture the currently-running api image as a pullable rollback ref** —
+      the running container's `RepoDigests[0]`
+      (`ghcr.io/braedensc/chefclaw@sha256:…`), falling back to the last-good
+      digest persisted at `ops/last-deploy-image`. (It must NOT be the bare local
+      config id from `{{.Image}}` — that is not a pullable reference and would
+      break rollback.)
+   3. **Backup first** (`scripts/backup.sh`, read-only vs the stack) — a deploy
+      never runs without a fresh encrypted dump. (First-ever deploy: the media
+      volume doesn't exist yet, so the media leg is skipped. If the stack was
+      previously `down`ed, deploy.sh brings postgres up first so pg_dump can run.)
+   4. **Sync the repo** `git fetch` + `git merge --ff-only origin/main` (pulls
+      the matching compose files, scripts, migration context). **Fast-forward
+      only** — it *aborts* if the box's tracked tree was hand-edited (see below).
+   5. **Pull** the immutable image (`docker compose … pull`) — never `--build`.
+   6. **Migrate** (`docker compose … run --rm migrate`, i.e. `alembic upgrade
+      head`) and **gate on its exit code** — a failed migration aborts *before*
+      the api is swapped, so the old api keeps serving.
+   7. **Swap the api** (`docker compose … up -d --no-build --no-deps api`).
+   8. **Health-gate:** poll `GET http://127.0.0.1:8000/` (the unauthenticated
+      SPA index; 200 = process alive) up to 30× / 90s. `/api/health` is **401 by
+      design and is never probed here**.
+   9. On health-gate failure, **roll back** to the image captured in step 2
+      (with `--pull never`, since it is already local) and `up -d` again, then
+      **exit non-zero** so the Actions `deploy` job goes red. On success it
+      records `ops/last-deploy-image` and prunes images older than a week.
+
+Because the SSH exit status *is* `deploy.sh`'s exit status (forced command), a
+failed migration, health-gate, or rollback turns the GitHub deploy red — you get
+a notification, and the last-good image stays live.
+
+> **Rollback reverts CODE, never the SCHEMA.** Step 4.vi runs `alembic upgrade
+> head` *before* the api swap; the auto-rollback in step 4.ix reverts only the
+> image (old code), it does **not** run `alembic downgrade`. So a
+> backward-incompatible or destructive migration leaves the rolled-back old api
+> running against the *new* schema — and the SPA-index health gate (which serves
+> a static file) can still pass. **Keep migrations additive / backward-compatible
+> with the immediately-previous release** (expand-then-contract). Recovering from
+> a bad migration means a **DB restore from the pre-deploy backup** (§2), not an
+> image roll. This is the concrete reason the future `/api/livez` readiness probe
+> matters.
+
+**Reading a red deploy.** Open the failed **`Deploy to VPS`** job in the Actions
+run; the box's stdout is streamed back over SSH. Grep the log for
+`deploy: FAIL:` — that line names the failing step (bad digest, docker/socket or
+repo-ownership problem, backup failed, non-fast-forward tree, migration failed,
+health gate failed). A red deploy that rolled back means the box is **still
+serving the previous image**; a red deploy on the *first* run means there was no
+previous image to roll back to — that one is attended by design (see the
+checklist).
+
+**Roll back / roll forward.** Rollback is **redeploy an older known-good
+commit**, not a special mode:
+
+- **Preferred:** `workflow_dispatch` — Actions → **Deploy** → *Run workflow*,
+  pick the older commit/ref. It rebuilds that commit and ships it exactly like a
+  push.
+- The health-gate already auto-reverts a *broken* image within a single deploy
+  (step 4.ix above) — you only need a manual rollback for a deploy that came up
+  "healthy" (SPA 200) but is behaviourally wrong.
+- **Break-glass, box-side:** SSH-trigger `deploy.sh` with an older digest
+  directly (the last N `sha-` tags are kept in GHCR for exactly this). Resolve
+  the older tag to its digest first (`docker buildx imagetools inspect
+  ghcr.io/braedensc/chefclaw:sha-<7hex>`), then send that `@sha256:…` as the SSH
+  command.
+
+**Pause / disable CD.** The master switch is the repo **variable `CD_ENABLED`**
+(Settings → Secrets and variables → Actions → Variables): the `deploy` job runs
+only when it is `'true'`. Set it to anything else (or delete it) and the job
+**skips** (grey, not red) on every push — the cleanest pause, and the reason
+merging the pipeline itself doesn't fire a deploy before Gate 5 is done. Other
+levers: add a **required reviewer** on the `production` Environment (every push
+becomes a *pending-approval* deploy) or disable the **Deploy** workflow in the
+Actions tab. None of these touch the running stack — the box keeps serving
+whatever it last deployed. To pull ingress entirely, use the `systemctl stop
+caddy` / `tailscale serve … off` break-glass from the checklist's Abort section.
+
+**Box-tree-must-stay-clean rule.** `deploy.sh` uses `git merge --ff-only`, so
+**never hand-edit tracked files under `/opt/chefclaw`** — a dirty/diverged tree
+makes the fast-forward fail and reds every deploy until you reset it
+(`git fetch origin && git reset --hard origin/main`, having preserved
+`.env.local` and anything under gitignored `ops/`). `.env.local` is untracked
+and human-owned, so editing it is fine and expected.
+
+#### One-time human setup (before the first automatic deploy)
+
+Do these once, in order. Steps 1–5 are on the box / locally; 6–9 are in GitHub.
+The **first** deploy after this is **attended** — there's no previous image to
+roll back to (see risk #1 in the ADR).
+
+1. **Grant the deploy user docker + repo access (box).** `deploy.sh` runs as
+   `ubuntu` via an SSH forced command **with no tty — it cannot `sudo`** — yet
+   the manual §4 steps clone the repo with `sudo git clone` (root-owned) and run
+   `sudo -E docker compose` (ubuntu not in the docker group). Reconcile that once,
+   or the first CD run dies at `docker compose pull` (socket permission denied) or
+   `git merge` (dubious ownership):
+
+   ```bash
+   sudo usermod -aG docker ubuntu                       # then log out/in so the group takes effect
+   sudo chown -R ubuntu:ubuntu /opt/chefclaw            # ubuntu owns the tree (git ff-merge + ops/ writes)
+   git config --global --add safe.directory /opt/chefclaw
+   docker info >/dev/null && echo "docker reachable as ubuntu"   # sanity check (no sudo)
+   ```
+
+   After this the manual §4 commands no longer need `sudo` for docker/git either.
+
+2. **Generate a DEDICATED deploy keypair** (locally, **not** on the box; never
+   commit either half — the filename avoids `.pem`/`.key` so the guardrails
+   don't trip):
+
+   ```bash
+   ssh-keygen -t ed25519 -C chefclaw-deploy -f ./chefclaw-deploy -N ''
+   ```
+
+3. **On the box, install the PUBLIC half with a forced command.** Append to
+   `~ubuntu/.ssh/authorized_keys` — this single line is what makes a leaked key
+   able to *only* trigger a deploy, never get a shell:
+
+   ```
+   command="/opt/chefclaw/scripts/deploy.sh",restrict,no-agent-forwarding,no-port-forwarding,no-X11-forwarding,no-pty ssh-ed25519 AAAA...<deploy pubkey> chefclaw-deploy
+   ```
+
+   (`restrict` is the modern all-off baseline on Ubuntu 24.04; the explicit
+   `no-*` flags are kept for defence-in-depth and self-documentation.) Then make
+   the script executable: `chmod +x /opt/chefclaw/scripts/deploy.sh`.
+
+4. **Pin the box's host key** (no trust-on-first-use at deploy time). From your
+   Mac:
+
+   ```bash
+   ssh-keyscan -t ed25519 <box-host-or-ip>
+   ```
+
+   Keep the full output — it becomes the `DEPLOY_KNOWN_HOSTS` secret in step 7.
+
+5. **Confirm the box can pull the image anonymously.** The `deploy` job holds no
+   GHCR scope — the box pulls the *public* package itself. Make sure the GHCR
+   package is public (step 8) before the first deploy, or the pull 401s.
+
+6. **Create the GitHub `production` Environment** (Settings → Environments →
+   New). Set its protection rule to **Deployment branches: selected → `main`
+   only**. Leave **no required reviewer** — that keeps *push = auto-deploy*.
+   (Adding a reviewer is a deliberate opt-in that turns every push into a
+   pending-approval deploy — see "Pause / disable CD" above.)
+
+7. **Add the ENVIRONMENT secrets** (on `production`, **not** repo-level):
+
+   | Secret | Value |
+   |---|---|
+   | `DEPLOY_SSH_KEY` | the **private** half from step 2 |
+   | `DEPLOY_HOST` | the box hostname / public IP |
+   | `DEPLOY_USER` | `ubuntu` |
+   | `DEPLOY_KNOWN_HOSTS` | the full `ssh-keyscan` output from step 4 |
+   | `DEPLOY_PORT` | **only** if sshd is not on 22 (defaults to 22 otherwise) |
+
+8. **Add the repo VARIABLE `VITE_SENTRY_DSN`** — Settings → Secrets and
+   variables → Actions → **Variables** (not Secrets). It's a public Sentry ingest
+   *address*, baked into the SPA at build time. The backend runtime `SENTRY_DSN`
+   is unchanged (still from the box's `.env.local`).
+
+9. **Sequence the GHCR package public, then merge-then-require.** Push to `main`
+   once → let job **`build`** succeed → in GitHub → Packages → **`chefclaw`** →
+   Package settings, set visibility to **Public** (until it's public the box's
+   *anonymous* `docker pull` 401s; order matters: **first CI push → make package
+   public → first deploy**). Then let the job names **`Build and push image`**
+   and **`Deploy to VPS`** report green on `main` once before adding either to
+   branch protection (they are *not* auto-required; `Deploy to VPS` runs only on
+   `main`, so it never gates a PR). `.github/dependabot.yml` (github-actions,
+   weekly) is the sanctioned way to bump the action SHA pins — never hand-edit a
+   pin's tag.
+
 ---
 
 ## 5. Rednote escalation ladder (operator playbook)

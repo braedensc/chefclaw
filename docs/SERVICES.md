@@ -208,6 +208,13 @@ that dies on the VPS is just a log line nobody was watching.
   it could send you fake events, not read anything. It may be baked into the
   public SPA bundle (`VITE_SENTRY_DSN`); it still lives in `.env.local`, and
   Hard Rule 4 (server keys never as `VITE_*`) is unaffected.
+- **`VITE_SENTRY_DSN` is baked at CI BUILD time under push-based CD.** Since the
+  push-based deploy (RUNBOOK §4 "Continuous deployment"), the SPA's DSN is passed
+  as a build-arg from a GitHub Actions **repository variable** (`vars.VITE_SENTRY_DSN`
+  — public, `vars.` not `secrets.`) and compiled into the public bundle by CI; the
+  box's `.env.local` `VITE_SENTRY_DSN` now matters only for a local/manual `up -d
+  --build`. The **backend** runtime `SENTRY_DSN` is unchanged — still read from
+  `.env.local` on the box. Server keys are never build-args.
 - **Gating (kit pattern):** empty/unset DSN ⇒ the SDK is **never initialised**
   — dev, CI, and tests send zero events by construction. Proven by unit test
   (`backend/tests/test_observability.py`, `frontend/src/sentry.test.ts`).

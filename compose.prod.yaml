@@ -1,0 +1,56 @@
+# chefclaw production override — push-based CD (GHCR)
+#
+# Prod override for push-based CD. Points BOTH Dockerfile.api services (migrate +
+# api) at the SAME immutable GHCR image, pinned by @sha256 digest via
+# ${CHEFCLAW_IMAGE} (exported by scripts/deploy.sh). NEVER pass `--build` with
+# this file. postgres (postgres:18-alpine) + xhs (digest-pinned public image)
+# already pull-not-build and are NOT redefined.
+#
+# Invoke (as scripts/deploy.sh does, run ON the box):
+#   docker compose -f compose.yaml -f compose.prod.yaml --env-file .env.local pull
+#   docker compose -f compose.yaml -f compose.prod.yaml --env-file .env.local up -d --no-build api
+#
+# Why this is minimal:
+#   - Only `image:` + `pull_policy:` change on the two build-based services.
+#   - The base `build:` block still merges in but is INERT because deploy.sh
+#     NEVER passes `--build` (and always runs an explicit `pull` first). We
+#     deliberately do NOT use `build: !reset null` — that needs Compose >=2.24,
+#     which is unconfirmed on the box; skipping it removes a version dependency.
+#   - CHEFCLAW_IMAGE is content-addressed:
+#       ghcr.io/braedensc/chefclaw@sha256:<64hex>
+#     so the exact artifact CI built is what runs, and rollback is deterministic.
+#   - ${CHEFCLAW_IMAGE:?...} makes compose HARD-FAIL if the var is unset — no
+#     silent fallback to a dev/stale/`latest` image.
+#
+# ROLLBACK NOTE: `pull_policy: always` below forces a registry pull on a normal
+# forward deploy (good — proves the digest is fetchable). But on the health-gate
+# rollback path scripts/deploy.sh re-runs the PREVIOUS image, which is already
+# local, so it passes `--pull never` on that `up` to OVERRIDE this policy — a
+# rollback must never depend on the network. See scripts/deploy.sh STEP 8.
+#
+# NO top-level `volumes:` and NO `networks:` here — inherit chefclaw_pgdata,
+# chefclaw_media, and the implicit default project network from the base file.
+# NEVER redeclare the two IRREPLACEABLE volumes; NEVER add a custom network
+# (would break api<->xhs at http://xhs:5556). postgres and xhs are untouched:
+# `command`, `environment`, `depends_on`, `ports` (127.0.0.1:8000:8000), the
+# chefclaw_media + ./ops:/data/ops:ro mounts all inherit unchanged.
+#
+# Prod env (secrets + CHEFCLAW_AUTH_PROVIDER=google, CHEFCLAW_EMAIL=ses,
+# SENTRY_ENVIRONMENT=vps) comes from the box's human-created .env.local, passed
+# via deploy.sh's explicit `--env-file .env.local`. The api fails boot if
+# SENTRY_ENVIRONMENT=vps while either provider is still 'fake'
+# (assert_prod_auth_safe) — fail-closed.
+
+name: chefclaw # MUST equal base -> same project -> SAME named volumes reused
+
+services:
+  # Migrations + app code ship as ONE artifact: both services get the IDENTICAL
+  # ${CHEFCLAW_IMAGE} digest, so `alembic upgrade head` (from Dockerfile.api) and
+  # the running app can never drift. One env var guarantees no drift.
+  migrate:
+    image: ${CHEFCLAW_IMAGE:?CHEFCLAW_IMAGE must be set by scripts/deploy.sh}
+    pull_policy: always
+
+  api:
+    image: ${CHEFCLAW_IMAGE:?CHEFCLAW_IMAGE must be set by scripts/deploy.sh}
+    pull_policy: always

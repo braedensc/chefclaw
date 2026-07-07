@@ -1,0 +1,187 @@
+name: Deploy
+
+# ══════════════════════════════════════════════════════════════════════════════
+# chefclaw push-based Continuous Deployment → Lightsail VPS via GHCR.
+#
+# On push to main (or a manual workflow_dispatch of the current HEAD) CI:
+#   1. builds the single image from Dockerfile.api and pushes it to
+#      ghcr.io/braedensc/chefclaw (tags: sha-<7hex> + latest for humans);
+#   2. hands the deploy job the pushed @sha256 DIGEST — the box runs the
+#      immutable digest, never a moving tag;
+#   3. SSHes into the box, whose authorized_keys FORCED COMMAND runs
+#      /opt/chefclaw/scripts/deploy.sh (backup → pull → migrate → up → health
+#      gate → rollback-on-failure). The ssh exit status IS the deploy result.
+#
+# TWO-JOB TRUST SPLIT (compromised-dependency containment):
+#   • build  — runs UNTRUSTED code (deps, Dockerfile). Holds the ONLY write
+#              scope (packages: write, to push to GHCR). Has NO ssh/deploy
+#              secret.
+#   • deploy — TRUSTED. Holds the SSH key. Has contents:read ONLY — no
+#              packages, no id-token (the box pulls the public image itself,
+#              anonymously). SSH is pure shell here — no third-party action
+#              near the key.
+# Top-level `permissions: {}` is deny-all; each job re-grants the minimum.
+#
+# MASTER SWITCH: the deploy job runs ONLY when the repo variable
+# CD_ENABLED == 'true'. Until you flip it on (after the box + Environment
+# secrets are ready — DEPLOY_CHECKLIST Gate 5), the deploy job SKIPS (grey, not
+# red) — so merging the PR that introduces this pipeline never fires a half-
+# configured deploy. Setting CD_ENABLED to anything but 'true' (or deleting it)
+# is also the clean pause switch. The build job always runs (a fresh GHCR image
+# on every merge is harmless and desirable).
+#
+# MERGE-THEN-REQUIRE: the job names below ("Build and push image",
+# "Deploy to VPS") are NOT auto-required. Add them to branch protection ONLY
+# after each has reported green on main once — requiring a never-reported
+# context wedges every open PR (docs/LESSONS.md). "Deploy to VPS" runs only on
+# main, so it never gates PRs.
+#
+# ACTION PINNING: every third-party action is pinned to a 40-hex commit SHA
+# with a trailing `# vX.Y.Z` comment (each verified against the live lightweight
+# tag on 2026-07-07). Bump these ONLY via Dependabot github-actions PRs
+# (.github/dependabot.yml) — never hand-edit the tag.
+#
+# SECRET HANDLING: never interpolate `${{ secrets.* }}` INSIDE a `run:` body —
+# GitHub substitutes the raw value into the script text before it runs, so a
+# `"`/backtick/`$(…)` in a secret breaks quoting or injects a command. Always
+# pass secrets via a step `env:` block and reference them as `"$VAR"`.
+#
+# NEVER add `pull_request` or `pull_request_target` to this workflow — that
+# would run fork code with our deploy secrets. This file deploys; the PR gate
+# lives in ci.yml.
+# ══════════════════════════════════════════════════════════════════════════════
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}          # manual re-deploy of current HEAD (rollback = redeploy an older commit)
+
+permissions: {}                  # deny-all; each job re-grants the minimum
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false      # serialize; never kill a deploy mid-migration
+
+env:
+  IMAGE: ghcr.io/braedensc/chefclaw
+
+jobs:
+  build:
+    name: Build and push image
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write            # the ONLY write scope in the whole file
+    outputs:
+      digest: ${{ steps.push.outputs.digest }}
+    steps:
+      # Third-party action SHAs below are Dependabot-maintained — do not hand-edit.
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Log in to GHCR
+        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3.4.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}   # auto-scoped, auto-expiring — NO PAT
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2 # v3.10.0
+
+      - name: Derive image tags and labels
+        id: meta
+        uses: docker/metadata-action@902fa8ec7d6ecbf8d84d538b9b233a880e428804 # v5.7.0
+        with:
+          images: ${{ env.IMAGE }}
+          tags: |
+            type=sha,prefix=sha-,format=short
+            type=raw,value=latest
+          labels: |
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.source=https://github.com/braedensc/chefclaw
+
+      - name: Build and push image
+        id: push
+        uses: docker/build-push-action@471d1dc4e07e5cdedd4c2171150001c434f0b7a4 # v6.15.0
+        with:
+          context: .                       # repo ROOT — Dockerfile.api COPYs package.json, frontend/, backend/
+          file: Dockerfile.api
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          # The ONLY three build-args. No server secret is EVER a build-arg (Hard
+          # Rule 4): GEMINI_API_KEY / DASHSCOPE_API_KEY / XHS_COOKIE /
+          # BILIBILI_COOKIE / CHEFCLAW_API_TOKEN / GOOGLE_OAUTH_CLIENT_SECRET /
+          # AWS_* / backend SENTRY_DSN never appear here. The image is
+          # PUBLIC-safe: only VITE_SENTRY_DSN (a public ingest ADDRESS) is baked.
+          build-args: |
+            GIT_SHA=${{ github.sha }}
+            VITE_SENTRY_DSN=${{ vars.VITE_SENTRY_DSN }}
+            VITE_SENTRY_ENVIRONMENT=vps
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          provenance: true                 # SLSA provenance attestation
+          sbom: true                       # SBOM attestation
+      # steps.push.outputs.digest is the pushed @sha256:<64hex> — handed to deploy.
+
+  deploy:
+    name: Deploy to VPS
+    needs: build
+    # Runs only on main AND only once CD is switched on (repo variable
+    # CD_ENABLED='true'). Unset/anything-else ⇒ this job SKIPS, so it never goes
+    # red before Gate 5 is done, and flipping the variable pauses/resumes CD.
+    if: github.ref == 'refs/heads/main' && vars.CD_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production                # gates secret reads behind the Environment protection rule
+    permissions:
+      contents: read                       # no packages, no id-token — the box pulls the public image itself
+    steps:
+      - name: Prepare SSH
+        # Secrets are passed via env: and referenced as "$VAR" — NEVER
+        # interpolated as ${{ secrets.* }} inside the run: body (that would inline
+        # the raw value into the script text and break on a quote/backtick, or
+        # allow command injection). GitHub auto-masks these in the log.
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          test -n "$DEPLOY_KNOWN_HOSTS"   # HARD-FAIL if unset — no TOFU fallback
+          install -m 700 -d "$HOME/.ssh"
+          printf '%s\n' "$DEPLOY_SSH_KEY" > "$HOME/.ssh/deploy_key"
+          chmod 600 "$HOME/.ssh/deploy_key"
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          chmod 644 "$HOME/.ssh/known_hosts"
+
+      - name: Trigger deploy on the box
+        # Named DEPLOY_USER (not USER) to avoid shadowing the runner's own USER
+        # env var. Secrets ride via env: and are referenced as "$VAR" — never
+        # interpolated into the run: body.
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT || '22' }}
+          DIGEST: ${{ needs.build.outputs.digest }}
+        run: |
+          set -euo pipefail
+          # The box's authorized_keys forced command ignores $DIGEST as a command
+          # but exposes it in $SSH_ORIGINAL_COMMAND for deploy.sh to strictly
+          # validate and run. The ssh exit status IS deploy.sh's exit status → a
+          # failed health-gate/rollback reds this job. Never `set -x` around
+          # secrets; the env values above are auto-masked by the runner.
+          ssh -o StrictHostKeyChecking=yes \
+              -o UserKnownHostsFile="$HOME/.ssh/known_hosts" \
+              -o IdentitiesOnly=yes \
+              -o BatchMode=yes \
+              -o ConnectTimeout=15 \
+              -i "$HOME/.ssh/deploy_key" \
+              -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "$DIGEST"
+
+      - name: Cleanup deploy key
+        if: always()
+        run: shred -u "$HOME/.ssh/deploy_key" 2>/dev/null || rm -f "$HOME/.ssh/deploy_key"
