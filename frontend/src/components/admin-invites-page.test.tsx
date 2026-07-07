@@ -2,7 +2,13 @@ import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ApiError } from '../api-error';
-import { inviteOut, meOut, userAdminRow } from '../test/fixtures';
+import {
+  adminSpendSummary,
+  adminUserSpend,
+  inviteOut,
+  meOut,
+  userAdminRow,
+} from '../test/fixtures';
 import { genState, resetGenState } from '../test/gen-mock';
 import { renderApp } from '../test/render-app';
 
@@ -140,6 +146,191 @@ describe('AdminInvitesPage', () => {
     );
     expect(
       await screen.findByText(/could not update that grant/i),
+    ).toBeInTheDocument();
+  });
+
+  // ── Budgets & tier (per-user caps + paid tier, M3) ──────────────────────────
+
+  /** A single-user rollup so the Budgets controls are unambiguous to select. */
+  function oneBudgetUser(over = {}) {
+    genState.adminSpend = adminSpendSummary({
+      users: [
+        adminUserSpend({
+          id: 'u9',
+          email: 'pal@x.com',
+          paid_tier: false,
+          month_to_date_usd: 0.5,
+          attempts_today: 1,
+          budget_monthly_usd: 2,
+          daily_attempt_cap: 5,
+          cap_is_personal: true,
+          ...over,
+        }),
+      ],
+    });
+  }
+
+  it('shows each member with their effective cap + spend in Budgets & tier', async () => {
+    oneBudgetUser();
+    renderApp('/admin/invites');
+    const budgets = within(
+      await screen.findByRole('region', { name: 'Budgets & tier' }),
+    );
+    // The row carries spend context and its effective (personal) cap.
+    expect(
+      await budgets.findByText(/\$0\.50 spent of \$2\.00 \(personal\)/),
+    ).toBeInTheDocument();
+    // The number fields default to the effective caps as placeholders.
+    expect(budgets.getByLabelText('Monthly budget ($)')).toHaveAttribute(
+      'placeholder',
+      '2.00',
+    );
+    expect(budgets.getByLabelText('Attempts / day')).toHaveAttribute(
+      'placeholder',
+      '5',
+    );
+  });
+
+  it('saves a new monthly budget + daily cap for one member', async () => {
+    oneBudgetUser();
+    genState.updateUserBudget.mockResolvedValue(
+      adminUserSpend({ id: 'u9', email: 'pal@x.com' }),
+    );
+    renderApp('/admin/invites');
+    const form = await screen.findByRole('form', {
+      name: 'Budget for pal@x.com',
+    });
+    const scoped = within(form);
+    fireEvent.change(scoped.getByLabelText('Monthly budget ($)'), {
+      target: { value: '12.5' },
+    });
+    fireEvent.change(scoped.getByLabelText('Attempts / day'), {
+      target: { value: '8' },
+    });
+    fireEvent.click(scoped.getByRole('button', { name: 'Save' }));
+
+    await waitFor(() =>
+      expect(genState.updateUserBudget).toHaveBeenCalledWith(
+        expect.objectContaining({
+          path: { user_id: 'u9' },
+          body: { monthly_budget_usd: 12.5, max_attempts_per_day: 8 },
+        }),
+      ),
+    );
+  });
+
+  it('sends only the fields that were filled (partial update)', async () => {
+    oneBudgetUser();
+    genState.updateUserBudget.mockResolvedValue(
+      adminUserSpend({ id: 'u9', email: 'pal@x.com' }),
+    );
+    renderApp('/admin/invites');
+    const scoped = within(
+      await screen.findByRole('form', { name: 'Budget for pal@x.com' }),
+    );
+    fireEvent.change(scoped.getByLabelText('Monthly budget ($)'), {
+      target: { value: '9' },
+    });
+    fireEvent.click(scoped.getByRole('button', { name: 'Save' }));
+
+    await waitFor(() =>
+      expect(genState.updateUserBudget).toHaveBeenCalledWith(
+        expect.objectContaining({
+          path: { user_id: 'u9' },
+          body: { monthly_budget_usd: 9 },
+        }),
+      ),
+    );
+  });
+
+  it('rejects a non-positive cap without calling the API', async () => {
+    oneBudgetUser();
+    renderApp('/admin/invites');
+    const scoped = within(
+      await screen.findByRole('form', { name: 'Budget for pal@x.com' }),
+    );
+    fireEvent.change(scoped.getByLabelText('Monthly budget ($)'), {
+      target: { value: '0' },
+    });
+    fireEvent.click(scoped.getByRole('button', { name: 'Save' }));
+
+    expect(
+      await screen.findByText(/must be a positive dollar amount/i),
+    ).toBeInTheDocument();
+    expect(genState.updateUserBudget).not.toHaveBeenCalled();
+  });
+
+  it('rejects an empty save (nothing to change)', async () => {
+    oneBudgetUser();
+    renderApp('/admin/invites');
+    const scoped = within(
+      await screen.findByRole('form', { name: 'Budget for pal@x.com' }),
+    );
+    fireEvent.click(scoped.getByRole('button', { name: 'Save' }));
+
+    expect(
+      await screen.findByText(/enter a new budget or cap/i),
+    ).toBeInTheDocument();
+    expect(genState.updateUserBudget).not.toHaveBeenCalled();
+  });
+
+  it('clears both caps to the global default via "Use global"', async () => {
+    oneBudgetUser();
+    genState.updateUserBudget.mockResolvedValue(
+      adminUserSpend({ id: 'u9', email: 'pal@x.com' }),
+    );
+    renderApp('/admin/invites');
+    const scoped = within(
+      await screen.findByRole('form', { name: 'Budget for pal@x.com' }),
+    );
+    fireEvent.click(scoped.getByRole('button', { name: 'Use global' }));
+
+    await waitFor(() =>
+      expect(genState.updateUserBudget).toHaveBeenCalledWith(
+        expect.objectContaining({
+          path: { user_id: 'u9' },
+          body: { monthly_budget_usd: null, max_attempts_per_day: null },
+        }),
+      ),
+    );
+  });
+
+  it('toggles a member onto the paid tier', async () => {
+    oneBudgetUser({ paid_tier: false });
+    genState.updateUserBudget.mockResolvedValue(
+      adminUserSpend({ id: 'u9', email: 'pal@x.com', paid_tier: true }),
+    );
+    renderApp('/admin/invites');
+    const budgets = within(
+      await screen.findByRole('region', { name: 'Budgets & tier' }),
+    );
+    fireEvent.click(
+      await budgets.findByRole('checkbox', { name: /paid model tier/i }),
+    );
+
+    await waitFor(() =>
+      expect(genState.updateUserBudget).toHaveBeenCalledWith(
+        expect.objectContaining({
+          path: { user_id: 'u9' },
+          body: { paid_tier: true },
+        }),
+      ),
+    );
+  });
+
+  it('surfaces an error when a budget update fails', async () => {
+    oneBudgetUser();
+    genState.updateUserBudget.mockRejectedValue(
+      new ApiError(404, 'Not Found', { detail: 'no user' }),
+    );
+    renderApp('/admin/invites');
+    const scoped = within(
+      await screen.findByRole('form', { name: 'Budget for pal@x.com' }),
+    );
+    fireEvent.click(scoped.getByRole('button', { name: 'Use global' }));
+
+    expect(
+      await screen.findByText(/could not update that budget/i),
     ).toBeInTheDocument();
   });
 });

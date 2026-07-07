@@ -78,6 +78,8 @@ interface GenState {
   adminSpend: AdminSpendOut;
   /** When set, the admin-spend queryFn throws it instead. */
   adminSpendError: Error | null;
+  /** PATCH /api/admin/users/{id}/budget — per-user caps + paid tier (M3). */
+  updateUserBudget: MutationMock;
   /** GET /api/admin/config — the runtime-policy + secrets + infra view. */
   adminConfig: AdminConfigOut;
   /** When set, the admin-config queryFn throws it instead. */
@@ -120,6 +122,7 @@ export const genState: GenState = {
   spendError: null,
   adminSpend: adminSpendSummary(),
   adminSpendError: null,
+  updateUserBudget: mutationMock(),
   adminConfig: adminConfig(),
   adminConfigError: null,
   patchConfig: mutationMock(),
@@ -151,6 +154,7 @@ export function resetGenState(): void {
   genState.spendError = null;
   genState.adminSpend = adminSpendSummary();
   genState.adminSpendError = null;
+  genState.updateUserBudget = mutationMock();
   genState.adminConfig = adminConfig();
   genState.adminConfigError = null;
   genState.patchConfig = mutationMock();
@@ -314,12 +318,20 @@ export function genMockModule() {
     }),
 
     // admin-invites-page.tsx spend rollup — genState.adminSpendError fails it.
+    adminSpendApiAdminSpendGetQueryKey: () => [
+      { _id: 'adminSpendApiAdminSpendGet' },
+    ],
     adminSpendApiAdminSpendGetOptions: () => ({
       queryKey: [{ _id: 'adminSpendApiAdminSpendGet' }],
       queryFn: async () => {
         if (genState.adminSpendError) throw genState.adminSpendError;
         return genState.adminSpend;
       },
+    }),
+
+    // admin-invites-page.tsx per-user budget/tier PATCH (Budgets & tier).
+    updateUserBudgetApiAdminUsersUserIdBudgetPatchMutation: () => ({
+      mutationFn: (options: unknown) => genState.updateUserBudget(options),
     }),
 
     // admin-config-page.tsx — genState.adminConfigError drives failures.

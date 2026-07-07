@@ -5,6 +5,7 @@
 import type {
   AdminConfigOut,
   AdminSpendOut,
+  AdminUserSpend,
   HealthResponse,
   InviteOut,
   InvitePublicOut,
@@ -283,6 +284,23 @@ export function spendSummary(
   };
 }
 
+/** One user's row in the admin cross-user spend rollup (effective caps). */
+export function adminUserSpend(
+  overrides: Partial<AdminUserSpend> = {},
+): AdminUserSpend {
+  return {
+    id: '01890000-0000-7000-8000-000000000002',
+    email: 'friend@x.com',
+    paid_tier: false,
+    month_to_date_usd: 0.5,
+    attempts_today: 1,
+    budget_monthly_usd: 2,
+    daily_attempt_cap: 5,
+    cap_is_personal: true,
+    ...overrides,
+  };
+}
+
 /** A /api/admin/spend rollup: the paid-tier owner + a capped friend. */
 export function adminSpendSummary(
   overrides: Partial<AdminSpendOut> = {},
@@ -293,7 +311,7 @@ export function adminSpendSummary(
     budget_monthly_usd: 25,
     daily_attempt_cap: 20,
     users: [
-      {
+      adminUserSpend({
         id: '01890000-0000-7000-8000-000000000001',
         email: 'owner@localhost',
         paid_tier: true,
@@ -302,8 +320,8 @@ export function adminSpendSummary(
         budget_monthly_usd: 25,
         daily_attempt_cap: 20,
         cap_is_personal: false,
-      },
-      {
+      }),
+      adminUserSpend({
         id: '01890000-0000-7000-8000-000000000002',
         email: 'friend@x.com',
         paid_tier: false,
@@ -312,7 +330,7 @@ export function adminSpendSummary(
         budget_monthly_usd: 2,
         daily_attempt_cap: 5,
         cap_is_personal: true,
-      },
+      }),
     ],
     ...overrides,
   };
