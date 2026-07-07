@@ -1,21 +1,50 @@
 import { useQuery } from '@tanstack/react-query';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { ApiError } from '../api-error';
 import { listRecipesApiRecipesGetOptions } from '../client/@tanstack/react-query.gen';
-import type { JobOut } from '../client/types.gen';
+import type { JobOut, RecipeSummary } from '../client/types.gen';
+import { CHILI_BTN } from '../lib/button-styles';
 import { useDebouncedValue } from '../lib/use-debounced-value';
 import { useTokenActions } from '../token-context';
+import { PuppyChef } from './brand/puppy-chef';
 import { JobChip } from './job-chip';
 import { PasteBar } from './paste-bar';
 import { RecipeCard } from './recipe-card';
+import type { SiblingInfo } from './recipe-card';
 
 const SEARCH_DEBOUNCE_MS = 300;
 
 /**
+ * Multi-dish videos share platform+canonical_id — map each grouped recipe id
+ * to its "same video · ①/②" ticket (only groups with 2+ visible cards; a
+ * card whose siblings are filtered/paged out falls back to its dish_index
+ * inside RecipeCard, so the multi-dish mark never disappears).
+ */
+function computeSiblings(items: RecipeSummary[]): Map<string, SiblingInfo> {
+  const groups = new Map<string, RecipeSummary[]>();
+  for (const item of items) {
+    const key = `${item.platform}\u0000${item.canonical_id}`;
+    const group = groups.get(key);
+    if (group) group.push(item);
+    else groups.set(key, [item]);
+  }
+  const siblings = new Map<string, SiblingInfo>();
+  for (const group of groups.values()) {
+    if (group.length < 2) continue;
+    const ordered = [...group].sort((a, b) => a.dish_index - b.dish_index);
+    ordered.forEach((item, index) => {
+      siblings.set(item.id, { index, count: ordered.length });
+    });
+  }
+  return siblings;
+}
+
+/**
  * Screen 1 (plan §7): the core loop on one page. Paste bar pinned at top,
  * live job chips inline above the grid, card grid from GET /api/recipes with
- * server-driven search + platform/tag filters.
+ * server-driven search + platform/tag filters — dressed as direction B's
+ * night market: neon stall front, marquee tickets, tonight's menu board.
  */
 export function LibraryPage() {
   const { clearToken } = useTokenActions();
@@ -52,14 +81,27 @@ export function LibraryPage() {
   const status =
     recipes.error instanceof ApiError ? recipes.error.status : null;
 
+  const recipesData = recipes.data;
+  const siblings = useMemo(
+    () =>
+      recipesData === undefined
+        ? new Map<string, SiblingInfo>()
+        : computeSiblings(recipesData.items),
+    [recipesData],
+  );
+
+  const fieldClasses =
+    'rounded-field border border-line bg-panel px-3.5 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-cyan/60 focus:outline-none';
+
   return (
     <div>
-      <div className="sticky top-14 z-10 -mx-4 border-b border-neutral-800/80 bg-neutral-950/95 px-4 py-3 backdrop-blur">
+      {/* top offset matches AppShell's h-14 header */}
+      <div className="sticky top-14 z-10 -mx-4 bg-night/95 px-4 py-3 backdrop-blur">
         <PasteBar onJob={addChip} />
       </div>
 
       {chipJobs.length > 0 && (
-        <ul aria-label="Extraction jobs" className="mt-4 flex flex-wrap gap-2">
+        <ul aria-label="Extraction jobs" className="mt-4 flex flex-col gap-3">
           {chipJobs.map((job) => (
             <li key={job.id}>
               <JobChip initialJob={job} onGone={removeChip} />
@@ -68,7 +110,7 @@ export function LibraryPage() {
         </ul>
       )}
 
-      <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+      <div className="mt-5 flex flex-col gap-2.5 sm:flex-row">
         <label className="sr-only" htmlFor="library-search">
           Search recipes
         </label>
@@ -78,7 +120,7 @@ export function LibraryPage() {
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           placeholder="Search dishes"
-          className="min-w-0 flex-1 rounded-md border border-neutral-800 bg-neutral-900 px-3 py-1.5 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-emerald-500 focus:outline-none"
+          className={`min-w-0 flex-1 ${fieldClasses}`}
         />
         <label className="sr-only" htmlFor="library-platform">
           Platform filter
@@ -87,7 +129,7 @@ export function LibraryPage() {
           id="library-platform"
           value={platform}
           onChange={(event) => setPlatform(event.target.value)}
-          className="rounded-md border border-neutral-800 bg-neutral-900 px-3 py-1.5 text-sm text-neutral-100 focus:border-emerald-500 focus:outline-none"
+          className={`${fieldClasses} text-ink-dim`}
         >
           <option value="">All platforms</option>
           <option value="bilibili">bilibili</option>
@@ -103,36 +145,41 @@ export function LibraryPage() {
           value={tag}
           onChange={(event) => setTag(event.target.value)}
           placeholder="Filter by tag"
-          className="rounded-md border border-neutral-800 bg-neutral-900 px-3 py-1.5 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-emerald-500 focus:outline-none sm:w-44"
+          className={`${fieldClasses} sm:w-44`}
         />
       </div>
 
-      <section aria-label="Recipe library" className="mt-6">
+      <section aria-label="Recipe library" className="mt-7">
         {recipes.isPending && (
-          <p className="text-sm text-neutral-400">Loading library…</p>
+          <div className="flex flex-col items-center gap-3 py-10 text-center">
+            <PuppyChef size={110} animated />
+            <p className="text-sm text-ink-dim">
+              firing up the stalls… <span lang="zh">开火中</span>
+            </p>
+          </div>
         )}
 
         {recipes.isError && (
           <div
             role="alert"
-            className="rounded-md border border-red-900 bg-red-950/40 p-4 text-sm"
+            className="glow-chili rounded-card border border-chili/40 bg-chili/5 p-5 text-sm"
           >
             {status === 401 ? (
               <>
-                <p className="text-red-300">
+                <p className="text-chili-bright">
                   Token rejected (401) — clear the token and re-enter it.
                 </p>
                 <button
                   type="button"
                   onClick={clearToken}
-                  className="mt-3 rounded-md bg-red-800 px-3 py-1.5 text-xs font-medium text-red-100 hover:bg-red-700"
+                  className={`mt-3 ${CHILI_BTN}`}
                 >
                   Clear token & re-enter
                 </button>
               </>
             ) : (
               <>
-                <p className="text-red-300">
+                <p className="text-chili-bright">
                   {status !== null
                     ? `Could not load the library (HTTP ${status}).`
                     : 'Could not reach the API — is the stack running?'}
@@ -140,7 +187,7 @@ export function LibraryPage() {
                 <button
                   type="button"
                   onClick={() => void recipes.refetch()}
-                  className="mt-3 rounded-md bg-red-800 px-3 py-1.5 text-xs font-medium text-red-100 hover:bg-red-700"
+                  className={`mt-3 ${CHILI_BTN}`}
                 >
                   Retry
                 </button>
@@ -151,18 +198,60 @@ export function LibraryPage() {
 
         {recipes.isSuccess &&
           (recipes.data.items.length === 0 ? (
-            <p className="rounded-lg border border-dashed border-neutral-800 p-8 text-center text-sm text-neutral-500">
-              No recipes yet — paste a cooking-video link above to start the
-              library.
-            </p>
+            <div className="rounded-card border border-line bg-panel-deep px-6 py-10 text-center">
+              <PuppyChef size={150} animated className="neon-flicker mx-auto" />
+              <p className="glow-text-warm mt-3 font-display text-[16.5px] font-extrabold tracking-[0.22em] text-warm uppercase">
+                The stalls are dark{' '}
+                <span
+                  lang="zh"
+                  className="font-body font-medium tracking-[0.1em]"
+                >
+                  · 还没开张
+                </span>
+              </p>
+              <p className="mx-auto mt-2.5 max-w-xs text-[13px] leading-relaxed text-ink-dim">
+                Your cookbook is hungry — paste your first cooking video and get
+                that wok going.{' '}
+                <span lang="zh" className="text-[#8a8272]">
+                  夜市等你点灯。
+                </span>
+              </p>
+              <button
+                type="button"
+                onClick={() => document.getElementById('paste-url')?.focus()}
+                className={`glow-chili mt-5 ${CHILI_BTN}`}
+              >
+                Paste a link
+              </button>
+            </div>
           ) : (
-            <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {recipes.data.items.map((recipe) => (
-                <li key={recipe.id}>
-                  <RecipeCard recipe={recipe} />
-                </li>
-              ))}
-            </ul>
+            <>
+              <div className="mb-4 flex flex-wrap items-baseline gap-3">
+                <h2 className="glow-text-warm font-display text-lg font-extrabold tracking-[0.24em] text-warm uppercase">
+                  Tonight&rsquo;s menu
+                </h2>
+                <span
+                  lang="zh"
+                  className="glow-text-gold text-[13.5px] font-medium tracking-[0.12em] text-gold"
+                >
+                  今晚的菜单
+                </span>
+                <span className="ml-auto font-display text-[10.5px] font-semibold tracking-[0.24em] text-ink-faint uppercase">
+                  {recipes.data.total}{' '}
+                  {recipes.data.total === 1 ? 'dish' : 'dishes'} on the board
+                </span>
+              </div>
+              <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {recipes.data.items.map((recipe) => (
+                  <li key={recipe.id}>
+                    <RecipeCard
+                      recipe={recipe}
+                      sibling={siblings.get(recipe.id)}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </>
           ))}
       </section>
     </div>

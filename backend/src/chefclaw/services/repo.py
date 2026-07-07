@@ -13,7 +13,7 @@ row locks live only inside the claim and the atomic store.
 
 import uuid
 from decimal import Decimal
-from typing import Any, Protocol
+from typing import Any, NamedTuple, Protocol
 
 from sqlalchemy import select, text, update
 from sqlalchemy.exc import IntegrityError
@@ -21,7 +21,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from chefclaw import spend
 from chefclaw.config import Settings
-from chefclaw.documents import RecipeDocument
+from chefclaw.documents import EstimatedAttributes, RecipeDocument
 from chefclaw.extractors import ExtractionUsage
 from chefclaw.models import Job, JobStatus, Recipe
 
@@ -31,8 +31,25 @@ __all__ = [
     "JobStore",
     "PostgresJobStore",
     "PostgresSpendReader",
+    "RecipeImageRef",
     "SpendReader",
 ]
+
+
+class RecipeImageRef(NamedTuple):
+    """The slice of a recipe the illustration backfill needs — deliberately
+    not the full ORM row (extraction_meta JSONB would ride along for nothing).
+    Carries the ``document`` (the prompt is built from its text fields),
+    ``owner_id`` + ``job_id`` (to budget-gate + attribute the spend row), and
+    the media-path parts."""
+
+    id: uuid.UUID
+    owner_id: uuid.UUID
+    job_id: uuid.UUID
+    platform: str
+    canonical_id: str
+    dish_index: int
+    document: dict[str, Any]
 
 # A job in any of these states already owns its (platform, canonical_id) —
 # the dedupe check returns it instead of enqueueing a twin.
@@ -107,9 +124,17 @@ class JobStore(Protocol):
         self,
         job: Job,
         documents: list[RecipeDocument],
+        estimates: list[EstimatedAttributes | None],
+        tags: list[list[str]],
         *,
         extraction_meta: dict[str, Any],
     ) -> list[uuid.UUID] | None: ...
+
+    async def list_recipes_missing_images(self) -> list[RecipeImageRef]: ...
+
+    async def set_recipe_image(
+        self, recipe_id: uuid.UUID, image_url: str, style_version: str
+    ) -> None: ...
 
     async def reconcile_interrupted(self) -> int: ...
 
@@ -274,13 +299,23 @@ class PostgresJobStore:
         self,
         job: Job,
         documents: list[RecipeDocument],
+        estimates: list[EstimatedAttributes | None],
+        tags: list[list[str]],
         *,
         extraction_meta: dict[str, Any],
     ) -> list[uuid.UUID] | None:
         """ATOMIC multi-dish store: N recipe inserts + the job's flip to
-        ``stored`` in ONE transaction (§16.4). Returns the new recipe ids, or
-        ``None`` when UNIQUE(platform, canonical_id, dish_index) fired — a
-        raced duplicate the caller adopts instead of failing."""
+        ``stored`` in ONE transaction (§16.4). ``image_url`` lands NULL here —
+        illustrations are generated best-effort AFTER this commit (never inside
+        the paid-work crash-loss window) and persisted via set_recipe_image.
+        Derived ``estimated`` attributes (spiciness/difficulty — kept SEPARATE
+        from the verbatim document, Hard Rule 7) are stored atomically here.
+        Auto-``tags`` (0–3 sanitized labels) seed the user-editable
+        ``recipes.tags`` column as a smart default — the user can edit them
+        later via RecipePatch.
+        Returns the new recipe ids, or ``None`` when UNIQUE(platform,
+        canonical_id, dish_index) fired — a raced duplicate the caller adopts
+        instead of failing."""
         source_url = job.payload["url"]
         try:
             async with self._sessionmaker() as session:
@@ -295,10 +330,18 @@ class PostgresJobStore:
                             canonical_id=job.canonical_id,
                             dish_index=index,
                             status="stored",
+                            tags=dish_tags,
                             document=document.model_dump(mode="json"),
+                            estimated=(
+                                estimate.model_dump(mode="json")
+                                if estimate is not None
+                                else None
+                            ),
                             extraction_meta=extraction_meta,
                         )
-                        for index, document in enumerate(documents)
+                        for index, (document, estimate, dish_tags) in enumerate(
+                            zip(documents, estimates, tags, strict=False)
+                        )
                     ]
                     session.add_all(rows)
                     await session.flush()  # RETURNING populates the uuidv7 ids
@@ -316,6 +359,42 @@ class PostgresJobStore:
             return recipe_ids
         except IntegrityError:
             return None  # raced duplicate — caller adopts the existing rows
+
+    async def list_recipes_missing_images(self) -> list[RecipeImageRef]:
+        """Startup illustration-backfill input: recipes WHERE image_url IS NULL,
+        joined to their originating stored job (which carries the recipe id in
+        result_recipe_ids) so the backfill can attribute its spend row to a real
+        jobs row. The document rides along (the prompt is built from its text
+        fields); extraction_meta stays unloaded. A recipe with no locatable job
+        is skipped (an inner join) — the illustration budget row needs a valid
+        FK."""
+        stmt = (
+            select(
+                Recipe.id,
+                Recipe.owner_id,
+                Job.id.label("job_id"),
+                Recipe.platform,
+                Recipe.canonical_id,
+                Recipe.dish_index,
+                Recipe.document,
+            )
+            .join(Job, Job.result_recipe_ids.any(Recipe.id))
+            .where(Recipe.image_url.is_(None))
+            .order_by(Recipe.created_at)
+        )
+        async with self._sessionmaker() as session:
+            rows = (await session.execute(stmt)).all()
+        return [RecipeImageRef(*row) for row in rows]
+
+    async def set_recipe_image(
+        self, recipe_id: uuid.UUID, image_url: str, style_version: str
+    ) -> None:
+        async with self._sessionmaker() as session, session.begin():
+            await session.execute(
+                update(Recipe)
+                .where(Recipe.id == recipe_id)
+                .values(image_url=image_url, image_style_version=style_version)
+            )
 
     async def reconcile_interrupted(self) -> int:
         """Startup reconcile: any job stranded mid-stage by a restart becomes

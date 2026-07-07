@@ -5,14 +5,16 @@ mentioning `document` or anything else is a 422). DELETE is a hard delete.
 """
 
 import uuid
+from pathlib import Path
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query, Response
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from chefclaw import db
 from chefclaw.auth import require_owner
+from chefclaw.config import Settings, get_settings
 from chefclaw.routers.deps import error_response
 from chefclaw.schemas import ErrorBody, RecipeDetail, RecipePage, RecipePatch, RecipeSummary
 from chefclaw.services import recipes as recipes_service
@@ -62,6 +64,41 @@ async def get_recipe(
     if recipe is None:
         return error_response(404, "not_found", f"no recipe {recipe_id}")
     return RecipeDetail.model_validate(recipe)
+
+
+@router.get(
+    "/{recipe_id}/image",
+    response_model=None,  # a file stream, not a schema-modeled body
+    response_class=FileResponse,
+    responses={
+        200: {
+            "content": {"image/jpeg": {}},
+            "description": "The recipe's generated illustration.",
+        },
+        **_NOT_FOUND,
+    },
+)
+async def get_recipe_image(
+    recipe_id: uuid.UUID,
+    owner_id: Annotated[uuid.UUID, Depends(require_owner)],
+    session: Annotated[AsyncSession, Depends(db.get_session)],
+    settings: Annotated[Settings, Depends(get_settings)],
+) -> FileResponse | JSONResponse:
+    """Stream the generated illustration. One 404 covers every miss — no
+    recipe, no illustration generated yet, file gone from the archive."""
+    recipe = await recipes_service.get_recipe(session, owner_id, recipe_id)
+    if recipe is None or recipe.image_url is None:
+        return error_response(404, "not_found", f"no image for recipe {recipe_id}")
+    image_path = Path(recipe.image_url).resolve()
+    media_root = Path(settings.media_dir).resolve()
+    # Belt-and-braces: only ever serve files from inside the media archive.
+    if not image_path.is_relative_to(media_root) or not image_path.is_file():
+        return error_response(404, "not_found", f"no image for recipe {recipe_id}")
+    return FileResponse(
+        image_path,
+        media_type="image/jpeg",
+        headers={"Cache-Control": "private, max-age=86400"},
+    )
 
 
 @router.patch("/{recipe_id}", response_model=RecipeDetail, responses=_NOT_FOUND)

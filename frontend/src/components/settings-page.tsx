@@ -7,6 +7,7 @@ import {
   healthApiHealthGetOptions,
 } from '../client/@tanstack/react-query.gen';
 import type { HealthResponse } from '../client/types.gen';
+import { CHILI_BTN, CYAN_BTN } from '../lib/button-styles';
 import { useTokenActions } from '../token-context';
 
 /**
@@ -40,31 +41,42 @@ export function SettingsPage() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="text-lg font-semibold text-neutral-100">Settings</h1>
+      <h1 className="text-warm glow-text-warm font-display text-xl font-extrabold tracking-[0.24em] uppercase">
+        Settings
+      </h1>
+      <p className="text-ink-faint mt-1 font-display text-[10px] font-semibold tracking-[0.3em] uppercase">
+        <span
+          lang="zh"
+          className="text-gold/60 font-body font-medium tracking-[0.22em]"
+        >
+          后厨状态
+        </span>{' '}
+        · stall status
+      </p>
 
       {health.isPending && (
-        <p className="mt-4 text-sm text-neutral-400">Checking API health…</p>
+        <p className="text-ink-dim mt-4 text-sm">Checking API health…</p>
       )}
 
       {health.isError && (
-        <div className="mt-4 rounded-md border border-red-900 bg-red-950/40 p-4">
+        <div className="rounded-card border-chili/40 bg-panel-deep glow-chili mt-4 border p-4">
           {status === 401 ? (
             <>
-              <p className="text-sm text-red-300">
+              <p className="text-chili-bright text-sm">
                 Token rejected (401) — clear the token and re-enter it.
               </p>
               <div className="mt-3 flex gap-2">
                 <button
                   type="button"
                   onClick={clearToken}
-                  className="rounded-md bg-red-800 px-3 py-1.5 text-xs font-medium text-red-100 hover:bg-red-700"
+                  className={CHILI_BTN}
                 >
                   Clear token & re-enter
                 </button>
                 <button
                   type="button"
                   onClick={() => void health.refetch()}
-                  className="rounded-md border border-red-800 px-3 py-1.5 text-xs text-red-200 hover:border-red-600"
+                  className={CYAN_BTN}
                 >
                   Retry
                 </button>
@@ -72,7 +84,7 @@ export function SettingsPage() {
             </>
           ) : (
             <>
-              <p className="text-sm text-red-300">
+              <p className="text-chili-bright text-sm">
                 {status !== null
                   ? `The API responded with an unexpected error (HTTP ${status}). Retry, or check the api container logs.`
                   : 'Could not reach the API — is the stack running (docker compose up)?'}
@@ -80,7 +92,7 @@ export function SettingsPage() {
               <button
                 type="button"
                 onClick={() => void health.refetch()}
-                className="mt-3 rounded-md bg-red-800 px-3 py-1.5 text-xs font-medium text-red-100 hover:bg-red-700"
+                className={`mt-3 ${CHILI_BTN}`}
               >
                 Retry
               </button>
@@ -106,9 +118,9 @@ function Section({ label, children }: { label: string; children: ReactNode }) {
   return (
     <section
       aria-label={label}
-      className="rounded-xl border border-neutral-800 bg-neutral-900 p-5"
+      className="rounded-card border-line bg-panel border p-5"
     >
-      <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-300">
+      <h2 className="text-ink-faint font-display text-[11px] font-bold tracking-[0.28em] uppercase">
         {label}
       </h2>
       {children}
@@ -119,16 +131,16 @@ function Section({ label, children }: { label: string; children: ReactNode }) {
 function Row({ label, children }: { label: string; children: ReactNode }) {
   return (
     <>
-      <dt className="text-neutral-400">{label}</dt>
+      <dt className="text-ink-faint">{label}</dt>
       <dd>{children}</dd>
     </>
   );
 }
 
-const OK_CLASS = 'font-medium text-emerald-400';
-const WARN_CLASS = 'font-medium text-amber-400';
-const BAD_CLASS = 'font-medium text-red-400';
-const NEUTRAL_CLASS = 'text-neutral-300';
+const OK_CLASS = 'font-medium text-cyan';
+const WARN_CLASS = 'font-medium text-gold';
+const BAD_CLASS = 'font-medium text-chili-bright';
+const NEUTRAL_CLASS = 'text-ink-dim';
 
 /** Overall status + db — the Phase-1 HealthPanel readout, plus the V2-A
  * worker-aliveness and error-tracking rows. */
@@ -153,7 +165,7 @@ function ApiSection({ health }: { health: HealthResponse }) {
           ) : worker === 'dead' ? (
             <div>
               <span className={BAD_CLASS}>dead</span>
-              <p className="mt-1 text-xs text-neutral-400">
+              <p className="mt-1 text-xs text-ink-dim">
                 The job worker crashed — no extraction will run. Restart the api
                 container (docker compose restart api).
               </p>
@@ -188,7 +200,7 @@ function ExtractionSection({ health }: { health: HealthResponse }) {
           <span className={NEUTRAL_CLASS}>{health.extractor ?? 'unknown'}</span>
         </Row>
         <Row label="model">
-          <span className="font-mono text-xs text-neutral-300">
+          <span className="text-ink-dim font-mono text-xs">
             {health.model ?? 'unknown'}
           </span>
         </Row>
@@ -210,7 +222,7 @@ function ExtractionSection({ health }: { health: HealthResponse }) {
         </p>
       ) : spend === null ? (
         // Honest null state: null means "could not read the ledger", not $0.
-        <p className="mt-3 text-sm text-neutral-400">
+        <p className="text-ink-dim mt-3 text-sm">
           Month-to-date spend is unavailable — the spend ledger could not be
           read (is the database up?).
         </p>
@@ -231,17 +243,13 @@ function SpendBar({
   const fraction = spendUsd / budgetUsd;
   const widthPct = Math.min(100, Math.max(0, fraction * 100));
   const barClass =
-    fraction >= 1
-      ? 'bg-red-500'
-      : fraction >= 0.8
-        ? 'bg-amber-400'
-        : 'bg-emerald-500';
+    fraction >= 1 ? 'bg-chili' : fraction >= 0.8 ? 'bg-gold' : 'bg-cyan';
   return (
     <div className="mt-3">
-      <p className="text-sm text-neutral-300">
+      <p className="text-ink-dim text-sm">
         Month-to-date spend:{' '}
-        <span className="font-medium">${spendUsd.toFixed(2)}</span>
-        <span className="text-neutral-500">
+        <span className="text-ink font-medium">${spendUsd.toFixed(2)}</span>
+        <span className="text-ink-faint">
           {' '}
           of ${budgetUsd.toFixed(2)} budget
         </span>
@@ -252,7 +260,7 @@ function SpendBar({
         aria-valuemin={0}
         aria-valuemax={budgetUsd}
         aria-valuenow={spendUsd}
-        className="mt-2 h-2 w-full overflow-hidden rounded-full bg-neutral-800"
+        className="border-line bg-night mt-2 h-2 w-full overflow-hidden rounded-full border"
       >
         <div
           className={`h-full ${barClass}`}
@@ -275,26 +283,26 @@ function SpendHistorySection() {
   return (
     <Section label="Spend history">
       {spend.isPending && (
-        <p className="mt-3 text-sm text-neutral-400">Loading spend history…</p>
+        <p className="mt-3 text-sm text-ink-dim">Loading spend history…</p>
       )}
       {spend.isError && (
-        <p className="mt-3 text-sm text-neutral-400">
+        <p className="mt-3 text-sm text-ink-dim">
           Spend history is unavailable (could not read the ledger).
         </p>
       )}
       {spend.isSuccess && spend.data.days.length === 0 && (
-        <p className="mt-3 text-sm text-neutral-400">
+        <p className="mt-3 text-sm text-ink-dim">
           No extraction attempts in the last {spend.data.period_days} days.
         </p>
       )}
       {spend.isSuccess && spend.data.days.length > 0 && (
         <>
-          <p className="mt-3 text-sm text-neutral-300">
+          <p className="mt-3 text-sm text-ink-dim">
             Last {spend.data.period_days} days:{' '}
             <span className="font-medium">
               ${spend.data.total_usd.toFixed(2)}
             </span>
-            <span className="text-neutral-500">
+            <span className="text-ink-faint">
               {' '}
               · month to date ${spend.data.month_to_date_usd.toFixed(2)}
             </span>
@@ -305,16 +313,16 @@ function SpendHistorySection() {
                 key={day.date}
                 className="flex flex-wrap items-baseline gap-x-3 gap-y-1"
               >
-                <span className="font-mono text-xs text-neutral-400">
+                <span className="font-mono text-xs text-ink-dim">
                   {day.date}
                 </span>
-                <span className="font-medium text-neutral-200">
+                <span className="font-medium text-ink">
                   ${day.cost_usd.toFixed(2)}
                 </span>
-                <span className="text-neutral-500">
+                <span className="text-ink-faint">
                   {day.attempts} attempt{day.attempts === 1 ? '' : 's'}
                 </span>
-                <span className="font-mono text-xs text-neutral-500">
+                <span className="font-mono text-xs text-ink-faint">
                   {day.models
                     .map((m) => `${m.model} $${m.cost_usd.toFixed(2)}`)
                     .join(' · ')}
@@ -368,7 +376,7 @@ function CookieStatus({ health }: { health: HealthResponse }) {
     return (
       <div>
         <span className={OK_CLASS}>guest tier (no cookie configured)</span>
-        <p className="mt-1 text-xs text-neutral-500">
+        <p className="text-ink-faint mt-1 text-xs">
           The default posture: Rednote is fetched without an account. A
           throwaway cookie is only needed for content the guest tier can't reach
           — this is a healthy state, not an error.
@@ -386,7 +394,7 @@ function CookieStatus({ health }: { health: HealthResponse }) {
       <span className={freshness === 'aging' ? WARN_CLASS : BAD_CLASS}>
         {`${freshness}${setDateSuffix}`}
       </span>
-      <p className="mt-1 text-xs text-neutral-400">
+      <p className="text-ink-dim mt-1 text-xs">
         {freshness === 'aging'
           ? 'Refresh it soon — Rednote cookies last 2–4 weeks. '
           : 'Refresh it now — the cookie has likely expired. '}
@@ -403,7 +411,7 @@ function BackupsSection({ health }: { health: HealthResponse }) {
     <Section label="Backups">
       <div className="mt-3 text-sm">
         {backup === 'not_configured' && (
-          <p className="text-neutral-300">
+          <p className="text-ink-dim">
             No backups are configured yet — recipes are irreplaceable. Schedule
             scripts/backup.sh (daily launchd job) and see docs/RUNBOOK.md for
             the setup and restore procedure.
@@ -412,7 +420,7 @@ function BackupsSection({ health }: { health: HealthResponse }) {
         {backup === 'fresh' && (
           <p>
             <span className={OK_CLASS}>fresh</span>
-            <span className="text-neutral-400">
+            <span className="text-ink-dim">
               {' '}
               — last backup finished{' '}
               <span className="font-mono text-xs">{finishedAt}</span>
@@ -423,7 +431,7 @@ function BackupsSection({ health }: { health: HealthResponse }) {
           <div>
             <p>
               <span className={BAD_CLASS}>stale</span>
-              <span className="text-neutral-400">
+              <span className="text-ink-dim">
                 {' '}
                 — last recorded run:{' '}
                 {finishedAt !== null ? (
@@ -433,7 +441,7 @@ function BackupsSection({ health }: { health: HealthResponse }) {
                 )}
               </span>
             </p>
-            <p className="mt-1 text-xs text-neutral-400">
+            <p className="text-ink-dim mt-1 text-xs">
               Check the launchd job and see docs/RUNBOOK.md.
             </p>
           </div>

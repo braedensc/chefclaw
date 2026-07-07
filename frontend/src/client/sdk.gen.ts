@@ -2,7 +2,7 @@
 
 import { type Client, type ClientMeta, formDataBodySerializer, type Options as Options2, type RequestResult, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { DeleteRecipeApiRecipesRecipeIdDeleteData, DeleteRecipeApiRecipesRecipeIdDeleteErrors, DeleteRecipeApiRecipesRecipeIdDeleteResponses, ExtractRecipeApiRecipesExtractPostData, ExtractRecipeApiRecipesExtractPostErrors, ExtractRecipeApiRecipesExtractPostResponses, GetJobApiJobsJobIdGetData, GetJobApiJobsJobIdGetErrors, GetJobApiJobsJobIdGetResponses, GetRecipeApiRecipesRecipeIdGetData, GetRecipeApiRecipesRecipeIdGetErrors, GetRecipeApiRecipesRecipeIdGetResponses, GetSpendApiSpendGetData, GetSpendApiSpendGetErrors, GetSpendApiSpendGetResponses, HealthApiHealthGetData, HealthApiHealthGetResponses, ListJobsApiJobsGetData, ListJobsApiJobsGetErrors, ListJobsApiJobsGetResponses, ListRecipesApiRecipesGetData, ListRecipesApiRecipesGetErrors, ListRecipesApiRecipesGetResponses, PatchRecipeApiRecipesRecipeIdPatchData, PatchRecipeApiRecipesRecipeIdPatchErrors, PatchRecipeApiRecipesRecipeIdPatchResponses, UploadRecipeVideoApiRecipesUploadPostData, UploadRecipeVideoApiRecipesUploadPostErrors, UploadRecipeVideoApiRecipesUploadPostResponses } from './types.gen';
+import type { DeleteRecipeApiRecipesRecipeIdDeleteData, DeleteRecipeApiRecipesRecipeIdDeleteErrors, DeleteRecipeApiRecipesRecipeIdDeleteResponses, ExtractRecipeApiRecipesExtractPostData, ExtractRecipeApiRecipesExtractPostErrors, ExtractRecipeApiRecipesExtractPostResponses, GetJobApiJobsJobIdGetData, GetJobApiJobsJobIdGetErrors, GetJobApiJobsJobIdGetResponses, GetRecipeApiRecipesRecipeIdGetData, GetRecipeApiRecipesRecipeIdGetErrors, GetRecipeApiRecipesRecipeIdGetResponses, GetRecipeImageApiRecipesRecipeIdImageGetData, GetRecipeImageApiRecipesRecipeIdImageGetErrors, GetRecipeImageApiRecipesRecipeIdImageGetResponses, GetSpendApiSpendGetData, GetSpendApiSpendGetErrors, GetSpendApiSpendGetResponses, HealthApiHealthGetData, HealthApiHealthGetResponses, ListJobsApiJobsGetData, ListJobsApiJobsGetErrors, ListJobsApiJobsGetResponses, ListRecipesApiRecipesGetData, ListRecipesApiRecipesGetErrors, ListRecipesApiRecipesGetResponses, PatchRecipeApiRecipesRecipeIdPatchData, PatchRecipeApiRecipesRecipeIdPatchErrors, PatchRecipeApiRecipesRecipeIdPatchResponses, UploadRecipeVideoApiRecipesUploadPostData, UploadRecipeVideoApiRecipesUploadPostErrors, UploadRecipeVideoApiRecipesUploadPostResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -119,6 +119,18 @@ export const patchRecipeApiRecipesRecipeIdPatch = <ThrowOnError extends boolean 
         'Content-Type': 'application/json',
         ...options.headers
     }
+});
+
+/**
+ * Get Recipe Image
+ *
+ * Stream the generated illustration. One 404 covers every miss — no
+ * recipe, no illustration generated yet, file gone from the archive.
+ */
+export const getRecipeImageApiRecipesRecipeIdImageGet = <ThrowOnError extends boolean = false>(options: Options<GetRecipeImageApiRecipesRecipeIdImageGetData, ThrowOnError>): RequestResult<GetRecipeImageApiRecipesRecipeIdImageGetResponses, GetRecipeImageApiRecipesRecipeIdImageGetErrors, ThrowOnError> => (options.client ?? client).get<GetRecipeImageApiRecipesRecipeIdImageGetResponses, GetRecipeImageApiRecipesRecipeIdImageGetErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/recipes/{recipe_id}/image',
+    ...options
 });
 
 /**

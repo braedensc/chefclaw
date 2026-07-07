@@ -171,4 +171,23 @@ describe('JobsDrawer', () => {
     expect(rows[1]).toHaveTextContent('fake-golden-1');
     expect(rows[1]).toHaveTextContent('Stored');
   });
+
+  it('keeps the sober statusLabel vocabulary for stored jobs (golden contract)', async () => {
+    genState.jobsList = [
+      jobOut({
+        id: 'j-stored',
+        status: 'stored',
+        canonical_id: 'fake-golden-1',
+      }),
+    ];
+
+    const drawer = await openDrawer();
+
+    const [row] = await within(drawer).findAllByRole('listitem');
+    // The golden suite asserts the literal 'Stored' — the playful cooking
+    // microcopy (lib/cooking-stages) stays on the chips, never the drawer.
+    expect(row).toHaveTextContent('Stored');
+    expect(row).toHaveTextContent('bilibili');
+    expect(row).not.toHaveTextContent('上菜');
+  });
 });

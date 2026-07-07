@@ -44,6 +44,12 @@ interface GenState {
   upload: MutationMock;
   patch: MutationMock;
   deleteRecipe: MutationMock;
+  /**
+   * CoverImage's blob fetch — resolve with a Blob to show the illustration;
+   * the default (resolving undefined) errors the query, so images fall back
+   * to the platform tile unless a test opts in.
+   */
+  image: MutationMock;
 }
 
 export const genState: GenState = {
@@ -59,6 +65,7 @@ export const genState: GenState = {
   upload: mutationMock(),
   patch: mutationMock(),
   deleteRecipe: mutationMock(),
+  image: mutationMock(),
 };
 
 export function resetGenState(): void {
@@ -74,6 +81,7 @@ export function resetGenState(): void {
   genState.upload = mutationMock();
   genState.patch = mutationMock();
   genState.deleteRecipe = mutationMock();
+  genState.image = mutationMock();
 }
 
 /** The `_id` discriminators match the real generated module's createQueryKey. */
@@ -102,6 +110,26 @@ export function genMockModule() {
         const job = genState.jobsById[options.path.job_id];
         if (!job) throw new Error(`gen-mock: no job ${options.path.job_id}`);
         return job;
+      },
+    }),
+
+    getRecipeImageApiRecipesRecipeIdImageGetQueryKey: (options: {
+      path: { recipe_id: string };
+    }) => [
+      { _id: 'getRecipeImageApiRecipesRecipeIdImageGet', path: options.path },
+    ],
+    getRecipeImageApiRecipesRecipeIdImageGetOptions: (options: {
+      path: { recipe_id: string };
+    }) => ({
+      queryKey: [
+        { _id: 'getRecipeImageApiRecipesRecipeIdImageGet', path: options.path },
+      ],
+      queryFn: async () => {
+        const image = await genState.image(options);
+        if (image === undefined) {
+          throw new Error(`gen-mock: no image for ${options.path.recipe_id}`);
+        }
+        return image;
       },
     }),
 

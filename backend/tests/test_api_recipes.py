@@ -70,6 +70,9 @@ def make_recipe_row(**overrides) -> Recipe:
         status="stored",
         tags=["pork"],
         user_notes=None,
+        image_url=None,
+        image_style_version=None,
+        estimated=None,
         document=document,
         extraction_meta={"model_id": "fake-extractor"},
         created_at=datetime(2026, 7, 1, tzinfo=UTC),
@@ -332,6 +335,54 @@ async def test_list_recipes_page_shape_and_filter_passthrough(
     }
 
 
+async def test_list_recipes_projects_card_fields_from_document(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    row = make_recipe_row(
+        image_url="/data/media/bilibili/BVtest00001-p1/illustration-0.jpg",
+        estimated={"spiciness_level": 2, "difficulty_level": 1, "source": "derived"},
+    )
+
+    async def fake_list(session, owner_id, **kwargs):
+        return [row], 1
+
+    monkeypatch.setattr(recipes_service, "list_recipes", fake_list)
+    async with client_for(build_app()) as client:
+        response = await client.get("/api/recipes", headers=bearer(TEST_TOKEN))
+    item = response.json()["items"][0]
+    # Projected VERBATIM from the stored validated document (Hard Rule 7):
+    assert item["has_image"] is True
+    assert item["difficulty"] == "medium"
+    assert item["total_time_minutes"] == 75
+    assert item["ingredient_count"] == 3
+    # Derived estimates projected from the separate `estimated` column:
+    assert item["estimated_spiciness_level"] == 2
+    assert item["estimated_difficulty_level"] == 1
+    assert "image_url" not in item  # the filesystem path never leaves the API
+
+
+async def test_list_recipes_projections_none_safe_on_partial_documents(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    empty = make_recipe_row(document={})
+    partial = make_recipe_row(document={"total_time_minutes": 40}, canonical_id="BVother")
+
+    async def fake_list(session, owner_id, **kwargs):
+        return [empty, partial], 2
+
+    monkeypatch.setattr(recipes_service, "list_recipes", fake_list)
+    async with client_for(build_app()) as client:
+        response = await client.get("/api/recipes", headers=bearer(TEST_TOKEN))
+    first, second = response.json()["items"]
+    assert (first["has_image"], first["difficulty"]) == (False, None)
+    assert (first["total_time_minutes"], first["ingredient_count"]) == (None, None)
+    # Null `estimated` column ⇒ both derived levels None (None-safe):
+    assert (first["estimated_spiciness_level"], first["estimated_difficulty_level"]) == (None, None)
+    assert second["total_time_minutes"] == 40
+    assert second["difficulty"] is None
+    assert second["ingredient_count"] is None
+
+
 # ─── GET /api/recipes/{id} ───────────────────────────────────────────────────
 
 
@@ -351,6 +402,85 @@ async def test_get_recipe_detail_includes_document(monkeypatch: pytest.MonkeyPat
     assert body["source_url"] == FAKE_URL
     assert missing.status_code == 404
     assert missing.json()["error_type"] == "not_found"
+
+
+async def test_get_recipe_detail_preserves_has_image_through_revalidation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """FastAPI re-validates the response as a dumped dict (carrying a
+    ``document`` key but no ``image_url``/``estimated``): the projection
+    validator must keep the already-computed has_image + estimated levels, not
+    recompute them to false/None."""
+    row = make_recipe_row(
+        image_url="/data/media/bilibili/BVtest00001-p1/illustration-0.jpg",
+        estimated={"spiciness_level": 3, "difficulty_level": 2, "source": "derived"},
+    )
+
+    async def fake_get(session, owner_id, recipe_id):
+        return row if recipe_id == row.id else None
+
+    monkeypatch.setattr(recipes_service, "get_recipe", fake_get)
+    async with client_for(build_app()) as client:
+        response = await client.get(f"/api/recipes/{row.id}", headers=bearer(TEST_TOKEN))
+    body = response.json()
+    assert body["has_image"] is True
+    assert body["ingredient_count"] == 3
+    assert body["estimated_spiciness_level"] == 3
+    assert body["estimated_difficulty_level"] == 2
+    assert "image_url" not in body  # the filesystem path never leaves the API
+
+
+# ─── GET /api/recipes/{id}/image ─────────────────────────────────────────────
+
+
+async def test_get_image_200_image_bytes_and_cache_header(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    media_dir = tmp_path / "media"
+    image_dir = media_dir / "bilibili" / "BVtest00001-p1"
+    image_dir.mkdir(parents=True)
+    image_file = image_dir / "illustration-0.jpg"
+    image_file.write_bytes(b"\xff\xd8fake jpeg bytes")
+    row = make_recipe_row(image_url=str(image_file))
+
+    async def fake_get(session, owner_id, recipe_id):
+        return row if recipe_id == row.id else None
+
+    monkeypatch.setattr(recipes_service, "get_recipe", fake_get)
+    settings = Settings(chefclaw_api_token=TEST_TOKEN, media_dir=str(media_dir))
+    async with client_for(build_app(settings=settings)) as client:
+        response = await client.get(f"/api/recipes/{row.id}/image", headers=bearer(TEST_TOKEN))
+    assert response.status_code == 200
+    assert response.content == b"\xff\xd8fake jpeg bytes"
+    assert response.headers["content-type"] == "image/jpeg"
+    assert response.headers["cache-control"] == "private, max-age=86400"
+
+
+async def test_get_image_404_variants(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    """One 404 shape for every miss: unknown recipe, no illustration generated,
+    file gone from the archive — and (belt-and-braces) a path escaping
+    media_dir."""
+    media_dir = tmp_path / "media"
+    media_dir.mkdir()
+    outside = tmp_path / "outside.jpg"
+    outside.write_bytes(b"escaped")
+    no_image = make_recipe_row(image_url=None)
+    file_gone = make_recipe_row(image_url=str(media_dir / "x" / "illustration-0.jpg"))
+    escapes_root = make_recipe_row(image_url=str(outside))
+    rows = {row.id: row for row in (no_image, file_gone, escapes_root)}
+
+    async def fake_get(session, owner_id, recipe_id):
+        return rows.get(recipe_id)
+
+    monkeypatch.setattr(recipes_service, "get_recipe", fake_get)
+    settings = Settings(chefclaw_api_token=TEST_TOKEN, media_dir=str(media_dir))
+    async with client_for(build_app(settings=settings)) as client:
+        for recipe_id in (uuid.uuid4(), no_image.id, file_gone.id, escapes_root.id):
+            response = await client.get(
+                f"/api/recipes/{recipe_id}/image", headers=bearer(TEST_TOKEN)
+            )
+            assert response.status_code == 404
+            assert response.json()["error_type"] == "not_found"
 
 
 # ─── PATCH /api/recipes/{id} ─────────────────────────────────────────────────
@@ -431,6 +561,7 @@ async def test_delete_recipe_204_and_404(monkeypatch: pytest.MonkeyPatch) -> Non
     [
         ("GET", "/api/recipes"),
         ("GET", f"/api/recipes/{uuid.uuid4()}"),
+        ("GET", f"/api/recipes/{uuid.uuid4()}/image"),
         ("GET", "/api/jobs"),
         ("GET", f"/api/jobs/{uuid.uuid4()}"),
         ("PATCH", f"/api/recipes/{uuid.uuid4()}"),

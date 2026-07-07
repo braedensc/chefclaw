@@ -47,9 +47,18 @@ GEMINI_PRICING: dict[str, tuple[Decimal, Decimal]] = {
     "gemini-2.5-pro": (Decimal("2.50"), Decimal("15.00")),
     "gemini-2.5-flash-lite": (Decimal("0.40"), Decimal("3.20")),
     "gemini-2.5-flash": (Decimal("0.60"), Decimal("5.00")),
-    # The fake extractor is genuinely free. Its ledger rows still count toward
-    # the daily attempt cap (attempts_today counts rows, not dollars).
+    # The fake extractor / fake image generator are genuinely free. Their
+    # ledger rows still count toward the daily attempt cap (attempts_today
+    # counts rows, not dollars).
     "fake-extractor": (Decimal("0"), Decimal("0")),
+    "fake-image": (Decimal("0"), Decimal("0")),
+    # Image models bill a FLAT per-image cost, NOT per token — the illustration
+    # stage passes that flat cost straight to record_spend and never routes
+    # through estimate_cost. This entry only guards _rates_for from ever being
+    # asked for a zero-token image row and inventing a per-token rate; the
+    # tokens are 0 so the dollar effect is nil regardless.
+    "gemini-3.1-flash-image": (Decimal("0"), Decimal("0")),
+    "gemini-2.5-flash-image": (Decimal("0"), Decimal("0")),
 }
 
 _COST_QUANTUM = Decimal("0.000001")  # matches llm_spend.cost_usd numeric(10,6)

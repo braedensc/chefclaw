@@ -112,7 +112,7 @@ async def test_qwen_happy_path_documented_request_shape(video: Path):
     assert outcome.dishes == DISHES
     assert outcome.usage == ExtractionUsage(
         model_id="qwen-test-model",
-        prompt_version="v1",
+        prompt_version="v3",
         tokens_in=2509,
         tokens_out=34,
         tokens_thinking=0,

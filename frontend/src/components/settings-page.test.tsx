@@ -118,7 +118,7 @@ describe('SettingsPage', () => {
       expect(bar).toHaveAttribute('aria-valuenow', '12.34');
       const fill = bar.firstElementChild as HTMLElement;
       expect(fill.style.width).toBe('100%');
-      expect(fill.className).toContain('bg-red-500');
+      expect(fill.className).toContain('bg-chili');
     });
 
     it('is honest when spend is null: unavailable, not $0, no bar', async () => {

@@ -13,6 +13,8 @@ import {
   RETRYABLE_ERROR_TYPES,
   statusLabel,
 } from '../lib/job-status';
+import { STRIP_LIGHT } from './brand/platform-accents';
+import { SteamWisps } from './brand/steam-wisps';
 import { PlatformBadge } from './platform-badge';
 
 interface JobsDrawerProps {
@@ -22,6 +24,8 @@ interface JobsDrawerProps {
 /**
  * Screen 3 (plan §7): the jobs panel — GET /api/jobs, active jobs first, with
  * the typed-error actions (retry / runbook pointer / budget & config notices).
+ * Status text stays the sober statusLabel() vocabulary (the golden suite
+ * asserts it) — the playful cooking microcopy lives on the chips only.
  */
 export function JobsDrawer({ onClose }: JobsDrawerProps) {
   const queryClient = useQueryClient();
@@ -50,14 +54,27 @@ export function JobsDrawer({ onClose }: JobsDrawerProps) {
   return (
     <aside
       aria-label="Jobs"
-      className="fixed inset-y-0 right-0 z-30 flex w-full max-w-md flex-col border-l border-neutral-800 bg-neutral-900 shadow-2xl"
+      className="fixed inset-y-0 right-0 z-30 flex w-full max-w-md flex-col border-l border-line bg-panel shadow-2xl shadow-black"
     >
-      <div className="flex items-center justify-between border-b border-neutral-800 px-4 py-3">
-        <h2 className="text-base font-semibold text-neutral-100">Jobs</h2>
+      {/* neon strip light along the top of the stall (B's paste-bar ::before) */}
+      <div
+        aria-hidden="true"
+        className="h-px shrink-0 opacity-80"
+        style={{ background: STRIP_LIGHT }}
+      />
+      <div className="flex items-center justify-between border-b border-line px-4 py-3">
+        <span className="flex items-baseline gap-2">
+          <h2 className="font-display text-[15px] font-bold tracking-[0.24em] text-warm uppercase glow-text-warm">
+            Jobs
+          </h2>
+          <span lang="zh" className="text-xs font-medium text-gold">
+            订单
+          </span>
+        </span>
         <button
           type="button"
           onClick={onClose}
-          className="rounded-md border border-neutral-700 px-3 py-1 text-xs text-neutral-300 hover:border-neutral-500 hover:text-neutral-100"
+          className="rounded-field border border-line-bright px-3 py-1 font-display text-[11px] font-semibold tracking-[0.16em] text-ink-dim uppercase transition hover:border-cyan/55 hover:text-cyan"
         >
           Close
         </button>
@@ -67,21 +84,21 @@ export function JobsDrawer({ onClose }: JobsDrawerProps) {
         {retry.isError && (
           <p
             role="alert"
-            className="mb-3 rounded-md border border-red-900/60 bg-red-950/30 p-2 text-xs text-red-300"
+            className="mb-3 rounded-field border border-chili/40 bg-chili/5 p-2.5 text-xs text-chili-bright"
           >
             Retry failed — {apiErrorMessage(retry.error)}
           </p>
         )}
         {jobs.isPending && (
-          <p className="text-sm text-neutral-400">Loading jobs…</p>
+          <p className="text-sm text-ink-dim">Loading jobs…</p>
         )}
         {jobs.isError && (
-          <p role="alert" className="text-sm text-red-400">
+          <p role="alert" className="text-sm text-chili-bright">
             Could not load jobs.
           </p>
         )}
         {jobs.isSuccess && sorted.length === 0 && (
-          <p className="text-sm text-neutral-500">No jobs yet.</p>
+          <p className="text-sm text-ink-faint">No jobs yet.</p>
         )}
         {sorted.length > 0 && (
           <ul className="space-y-3">
@@ -100,6 +117,25 @@ export function JobsDrawer({ onClose }: JobsDrawerProps) {
   );
 }
 
+/** Simmering-pot accent for active rows — wisps animate reduced-motion-guarded. */
+function SteamAccent() {
+  // The viewBox frames the shared 64-space trio at the same on-screen size,
+  // position, and stroke weight the old hand-drawn 24-space copy had.
+  return (
+    <svg
+      viewBox="14 -6 36 36"
+      aria-hidden="true"
+      className="size-4 shrink-0 text-warm"
+    >
+      <SteamWisps
+        stroke="currentColor"
+        strokeWidth={3}
+        opacities={[0.45, 0.65, 0.45]}
+      />
+    </svg>
+  );
+}
+
 interface JobRowProps {
   job: JobOut;
   retryPending: boolean;
@@ -107,34 +143,45 @@ interface JobRowProps {
 }
 
 function JobRow({ job, retryPending, onRetry }: JobRowProps) {
+  const active = !isTerminalStatus(job.status);
+  const statusClass =
+    job.status === 'failed'
+      ? 'text-chili-bright'
+      : job.status === 'stored'
+        ? 'text-warm'
+        : 'text-gold glow-text-gold';
+
   return (
-    <li className="rounded-lg border border-neutral-800 bg-neutral-950/60 p-3 text-sm">
+    <li
+      className={`rounded-card border bg-panel-deep p-3.5 text-sm ${
+        active ? 'border-gold/40 glow-gold' : 'border-line'
+      }`}
+    >
       <div className="flex items-center justify-between gap-2">
         <span className="flex min-w-0 items-center gap-2">
           {job.platform != null && <PlatformBadge platform={job.platform} />}
-          <span className="truncate font-mono text-xs text-neutral-400">
+          <span className="truncate font-mono text-xs text-ink-dim">
             {job.canonical_id ?? '—'}
           </span>
         </span>
-        <span
-          className={
-            job.status === 'failed'
-              ? 'font-medium text-red-400'
-              : job.status === 'stored'
-                ? 'font-medium text-emerald-400'
-                : 'font-medium text-amber-300'
-          }
-        >
-          {statusLabel(job.status)}
+        <span className="flex shrink-0 items-center gap-1.5">
+          {active && <SteamAccent />}
+          <span
+            className={`font-display text-[11.5px] font-bold tracking-[0.18em] uppercase ${statusClass}`}
+          >
+            {statusLabel(job.status)}
+          </span>
         </span>
       </div>
       {job.url != null && (
-        <p className="mt-1 truncate text-xs text-neutral-500">{job.url}</p>
+        <p className="mt-1.5 truncate font-mono text-xs text-ink-faint">
+          {job.url}
+        </p>
       )}
       {job.status === 'failed' && job.error_type != null && (
-        <div className="mt-2 rounded-md border border-red-900/60 bg-red-950/30 p-2 text-xs">
-          <p className="text-red-300">
-            {job.error_type}
+        <div className="mt-2.5 rounded-field border border-chili/40 bg-chili/5 p-2.5 text-xs">
+          <p className="text-chili-bright">
+            <span className="font-mono">{job.error_type}</span>
             {job.error_detail ? ` — ${job.error_detail}` : ''}
           </p>
           <JobErrorAction
@@ -171,7 +218,7 @@ function JobErrorAction({
     // staged file is gone once the job is terminal — re-upload is the retry.
     if (job.type === 'upload') {
       return (
-        <p className="mt-1 text-red-200">
+        <p className="mt-1.5 text-ink-dim">
           Upload jobs can't be retried from a link — re-upload the video file
           from the paste bar.
         </p>
@@ -184,7 +231,7 @@ function JobErrorAction({
         onClick={() => {
           if (job.url != null) onRetry(job.url);
         }}
-        className="mt-2 rounded-md bg-red-800 px-3 py-1 font-medium text-red-100 hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+        className="mt-2 rounded-field border border-cyan/60 bg-cyan/10 px-3.5 py-1.5 font-display text-[11px] font-bold tracking-[0.16em] text-cyan uppercase glow-cyan transition hover:bg-cyan/20 disabled:cursor-not-allowed disabled:opacity-50"
       >
         Retry
       </button>
@@ -192,7 +239,7 @@ function JobErrorAction({
   }
   if (errorType === 'cookies_expired') {
     return (
-      <p className="mt-1 text-red-200">
+      <p className="mt-1.5 text-ink-dim">
         The Rednote cookie has expired — follow the cookie-refresh runbook
         (docs/RUNBOOK.md §1).
       </p>
@@ -200,7 +247,7 @@ function JobErrorAction({
   }
   if (errorType === 'budget_exceeded') {
     return (
-      <p className="mt-1 text-red-200">
+      <p className="mt-1.5 text-ink-dim">
         Budget cap reached — extraction pauses until the monthly budget or daily
         attempt cap resets.
       </p>
@@ -208,7 +255,7 @@ function JobErrorAction({
   }
   if (errorType === 'config_error') {
     return (
-      <p className="mt-1 text-red-200">
+      <p className="mt-1.5 text-ink-dim">
         Check server configuration (budget and adapter settings).
       </p>
     );

@@ -33,14 +33,21 @@ from typing import Any
 
 from chefclaw import errors, observability, spend
 from chefclaw.config import Settings
-from chefclaw.documents import SourceInfo, validate_extraction
+from chefclaw.documents import RecipeDocument, SourceInfo, validate_extraction
 from chefclaw.extractors import (
     ExtractionUsage,
     ExtractorAdapter,
     extractor_model_id,
     get_extractor,
 )
+from chefclaw.images import (
+    STYLE_VERSION,
+    ImageGeneratorAdapter,
+    build_illustration_prompt,
+    get_image_generator,
+)
 from chefclaw.models import Job, JobStatus
+from chefclaw.services.illustrations import illustration_path, write_illustration
 from chefclaw.services.repo import JobStore
 from chefclaw.sources import CanonicalRef, FetchedMedia, SourceAdapter, resolve_source
 from chefclaw.sources.localfile import LocalFileSource
@@ -222,6 +229,10 @@ class Worker:
         settings: Settings,
         *,
         extractor_factory: Callable[[Settings], ExtractorAdapter] = get_extractor,
+        image_generator_factory: Callable[
+            [Settings], ImageGeneratorAdapter
+        ] = get_image_generator,
+        backfill_illustrations_on_start: bool = False,
         sleeper: Sleeper = asyncio.sleep,
         jitter: Callable[[], float] = random.random,
         idle_seconds: float = IDLE_SLEEP_SECONDS,
@@ -230,6 +241,14 @@ class Worker:
         self._adapters_by_platform = {adapter.platform: adapter for adapter in adapters}
         self._settings = settings
         self._extractor_factory = extractor_factory
+        # Injectable like the extractor factory: CI-tier tests inject a fake
+        # image generator (no network, no spend). The backfill flag defaults
+        # OFF (tests); the app turns it on for the one-shot startup pass.
+        self._image_generator_factory = image_generator_factory
+        self._backfill_illustrations_on_start = backfill_illustrations_on_start
+        # The one-shot backfill's task handle (run_forever spawns it in the
+        # background) — exposed for tests and cancelled on worker shutdown.
+        self.backfill_task: asyncio.Task[None] | None = None
         self._sleeper = sleeper
         self._jitter = jitter
         self._idle_seconds = idle_seconds
@@ -241,49 +260,65 @@ class Worker:
         hiccup (compose boots services in parallel; CI smoke has no DB at
         all) — it just idles and retries."""
         reconciled = False
-        while True:
-            if not reconciled:
+        try:
+            while True:
+                if not reconciled:
+                    try:
+                        flipped = await self.store.reconcile_interrupted()
+                        if flipped:
+                            logger.warning("reconciled %d interrupted job(s) to failed", flipped)
+                        reconciled = True
+                    except Exception:
+                        logger.debug("startup reconcile failed (db not up yet?)", exc_info=True)
+                        await self._sleeper(self._idle_seconds)
+                        continue
+                    if self._backfill_illustrations_on_start and self.backfill_task is None:
+                        # One-shot, best-effort, never raises — spawned in the
+                        # BACKGROUND so a slow image pass never delays the first
+                        # claim. Job execution stays strictly serial: the
+                        # backfill only runs subprocess/HTTP + row updates,
+                        # which is acceptable concurrency.
+                        self.backfill_task = asyncio.create_task(
+                            self.backfill_illustrations(), name="chefclaw-illustration-backfill"
+                        )
                 try:
-                    flipped = await self.store.reconcile_interrupted()
-                    if flipped:
-                        logger.warning("reconciled %d interrupted job(s) to failed", flipped)
-                    reconciled = True
+                    job = await self.store.claim_next_job()
                 except Exception:
-                    logger.debug("startup reconcile failed (db not up yet?)", exc_info=True)
+                    logger.warning("job claim failed; retrying", exc_info=True)
                     await self._sleeper(self._idle_seconds)
                     continue
-            try:
-                job = await self.store.claim_next_job()
-            except Exception:
-                logger.warning("job claim failed; retrying", exc_info=True)
-                await self._sleeper(self._idle_seconds)
-                continue
-            if job is None:
-                await self._sleeper(self._idle_seconds)
-                continue
-            try:
-                await self.process(job)
-            except Exception as exc:
-                # process() only leaks an exception when the STORE itself
-                # failed (db outage mid-job: set_status/requeue/mark_failed
-                # raised). The job is left mid-stage for the next boot's
-                # reconcile — but the worker task MUST survive: a dead task
-                # means no job ever runs again while the api looks healthy.
-                logger.exception(
-                    "job %s processing leaked an error (db outage?); "
-                    "leaving it mid-stage for reconcile",
-                    job.id,
-                    extra={"job_id": str(job.id), "stage": "store"},
-                )
-                observability.capture_job_failure(
-                    exc,
-                    job_id=job.id,
-                    stage="store",
-                    error_type="store_failure",
-                    platform=job.platform,
-                    attempt=job.attempts,
-                )
-                await self._sleeper(self._idle_seconds)
+                if job is None:
+                    await self._sleeper(self._idle_seconds)
+                    continue
+                try:
+                    await self.process(job)
+                except Exception as exc:
+                    # process() only leaks an exception when the STORE itself
+                    # failed (db outage mid-job: set_status/requeue/mark_failed
+                    # raised). The job is left mid-stage for the next boot's
+                    # reconcile — but the worker task MUST survive: a dead task
+                    # means no job ever runs again while the api looks healthy.
+                    logger.exception(
+                        "job %s processing leaked an error (db outage?); "
+                        "leaving it mid-stage for reconcile",
+                        job.id,
+                        extra={"job_id": str(job.id), "stage": "store"},
+                    )
+                    observability.capture_job_failure(
+                        exc,
+                        job_id=job.id,
+                        stage="store",
+                        error_type="store_failure",
+                        platform=job.platform,
+                        attempt=job.attempts,
+                    )
+                    await self._sleeper(self._idle_seconds)
+        finally:
+            # Worker shutdown takes the illustration backfill with it
+            # (best-effort work — the next boot's backfill picks up whatever it
+            # left missing).
+            if self.backfill_task is not None:
+                self.backfill_task.cancel()
 
     # ── one job, claim to terminal ───────────────────────────────────────────
 
@@ -509,7 +544,14 @@ class Worker:
             creator=media.creator,
             video_duration_seconds=media.duration_seconds,
         )
-        documents = validate_extraction(outcome.dishes, source)
+        # (document, estimated, tags) triples — the derived estimates and the
+        # editable auto-tags ride in their own columns, never inside the
+        # verbatim document (Hard Rule 7). Tags seed recipes.tags as a smart
+        # default; the user can edit them later via RecipePatch.
+        validated = validate_extraction(outcome.dishes, source)
+        documents = [dish.document for dish in validated]
+        estimates = [dish.estimated for dish in validated]
+        tags = [dish.tags for dish in validated]
 
         extraction_meta: dict[str, Any] = {
             "model_id": outcome.usage.model_id,
@@ -529,8 +571,12 @@ class Worker:
         if retention_warnings:
             extraction_meta["warnings"].extend(retention_warnings)
 
+        # The atomic store comes FIRST — the illustration stage must never sit
+        # inside the paid-work crash-loss window (an image API hiccup before
+        # the store would reconcile to interrupted and a human retry would
+        # re-pay). Derived estimates ride along in the atomic store.
         recipe_ids = await self.store.store_results(
-            job, documents, extraction_meta=extraction_meta
+            job, documents, estimates, tags, extraction_meta=extraction_meta
         )
         if recipe_ids is None:
             # UNIQUE(platform, canonical_id, dish_index) fired: a raced
@@ -547,6 +593,11 @@ class Worker:
                 err.retryable = False
                 raise err
             await self.store.adopt_recipes(job.id, recipe_ids)
+            return recipe_ids  # the racer's rows — their own image pass owns them
+        # Illustrations AFTER the commit: best-effort, budget-gated, and a
+        # crash between the store and here is healed by the startup backfill
+        # (its documented job).
+        await self._store_illustrations(job, documents, recipe_ids)
         return recipe_ids
 
     async def _record_attempt(self, job: Job, usage: ExtractionUsage | None) -> None:
@@ -568,6 +619,142 @@ class Worker:
             usage=usage,
             cost_usd=spend.estimate_cost(usage),
         )
+
+    # ── illustrations (generated cartoon covers — best-effort, post-store) ───
+
+    def _media_root(self) -> Path:
+        # resolve() so every persisted image_url is absolute — the /image route
+        # serves only files that resolve under this same root.
+        return Path(self._settings.media_dir).resolve()
+
+    async def _store_illustrations(
+        self, job: Job, documents: Sequence[RecipeDocument], recipe_ids: Sequence[uuid.UUID]
+    ) -> None:
+        """One generated illustration per dish, AFTER the atomic store. STRICTLY
+        BEST-EFFORT: budget refusal, an image-API error, or a write failure
+        just leaves image_url NULL (the backfill may heal it later) — it must
+        NEVER fail or delay the recipe store. Unlike the old ffmpeg covers, this
+        does NOT depend on a retained video: the prompt is built from the
+        recipe's text fields (Hard Rule 7)."""
+        media_root = self._media_root()
+        for dish_index, (document, recipe_id) in enumerate(
+            zip(documents, recipe_ids, strict=False)
+        ):
+            prompt = build_illustration_prompt(document.model_dump(mode="json"))
+            out_path = illustration_path(
+                media_root, job.platform, job.canonical_id, dish_index
+            )
+            await self._generate_and_persist_illustration(
+                job_id=job.id,
+                owner_id=job.owner_id,
+                recipe_id=recipe_id,
+                prompt=prompt,
+                out_path=out_path,
+            )
+
+    async def _generate_and_persist_illustration(
+        self,
+        *,
+        job_id: uuid.UUID,
+        owner_id: uuid.UUID,
+        recipe_id: uuid.UUID,
+        prompt: str,
+        out_path: Path,
+    ) -> bool:
+        """The shared budget-gate → generate → persist → ledger path (live
+        post-store stage AND the startup backfill). Returns True when an
+        illustration landed. Best-effort: every failure logs and returns False,
+        leaving image_url NULL. Budget check + ledger row bracket the paid call
+        exactly like extraction (fail-closed). ``job_id`` attributes the spend
+        row to the recipe's originating job (an existing jobs row)."""
+        try:
+            # Budget gate FIRST (cheap, no write), immediately before the paid
+            # image call — a full backfill's spike is bounded by the same
+            # fail-closed monthly budget / daily cap as extraction.
+            await self.store.check_budget(owner_id)
+            adapter = self._image_generator_factory(self._settings)  # ConfigError ⇒ skip
+            result = await adapter.generate(prompt)
+        except Exception:
+            logger.warning(
+                "illustration generation skipped for recipe %s (best-effort)",
+                recipe_id,
+                exc_info=True,
+            )
+            return False
+
+        # Ledger the paid image attempt: a flat per-image cost (NOT token-based
+        # estimate_cost) with the image model id and STYLE_VERSION as the
+        # "prompt version". Best-effort — a ledger hiccup must not undo the
+        # image (the daily cap still counts extraction attempts).
+        try:
+            await self.store.record_spend(
+                job_id=job_id,
+                owner_id=owner_id,
+                usage=ExtractionUsage(
+                    model_id=result.model_id,
+                    prompt_version=STYLE_VERSION,
+                    tokens_in=0,
+                    tokens_out=0,
+                    tokens_thinking=0,
+                ),
+                cost_usd=result.cost_usd,
+            )
+        except Exception:
+            logger.warning(
+                "illustration spend-ledger write failed for recipe %s", recipe_id, exc_info=True
+            )
+
+        persisted = write_illustration(out_path, result.image_bytes)
+        if persisted is None:
+            return False
+        try:
+            await self.store.set_recipe_image(recipe_id, persisted, STYLE_VERSION)
+        except Exception:
+            logger.warning(
+                "illustration persist failed for recipe %s", recipe_id, exc_info=True
+            )
+            return False
+        return True
+
+    async def backfill_illustrations(self) -> None:
+        """One-shot startup backfill (best-effort): any recipe with image_url
+        NULL — stored before the illustration stage existed, OR by a run that
+        crashed between the atomic store and its post-store image pass — gets a
+        generated illustration. Budget-gated per image (a full-library backfill
+        is the only cost spike). Never raises — a failed backfill must never
+        take the worker down."""
+        try:
+            missing = await self.store.list_recipes_missing_images()
+        except Exception:
+            logger.warning("illustration backfill: could not list recipes", exc_info=True)
+            return
+        if not missing:
+            return
+        generated = skipped = 0
+        media_root = self._media_root()
+        for recipe in missing:
+            try:
+                prompt = build_illustration_prompt(recipe.document)
+                out_path = illustration_path(
+                    media_root, recipe.platform, recipe.canonical_id, recipe.dish_index
+                )
+                # The spend row is attributed to the recipe's originating job.
+                if await self._generate_and_persist_illustration(
+                    job_id=recipe.job_id,
+                    owner_id=recipe.owner_id,
+                    recipe_id=recipe.id,
+                    prompt=prompt,
+                    out_path=out_path,
+                ):
+                    generated += 1
+                else:
+                    skipped += 1
+            except Exception:
+                skipped += 1
+                logger.warning(
+                    "illustration backfill failed for recipe %s", recipe.id, exc_info=True
+                )
+        logger.info("illustration backfill: %d generated, %d skipped", generated, skipped)
 
     # ── media retention (§4, MEDIA_RETENTION knob) ───────────────────────────
 

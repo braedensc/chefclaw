@@ -353,6 +353,17 @@
             "title": "Created At",
             "type": "string"
           },
+          "difficulty": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Difficulty"
+          },
           "dish_index": {
             "title": "Dish Index",
             "type": "integer"
@@ -362,15 +373,53 @@
             "title": "Document",
             "type": "object"
           },
+          "estimated_difficulty_level": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimated Difficulty Level"
+          },
+          "estimated_spiciness_level": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimated Spiciness Level"
+          },
           "extraction_meta": {
             "additionalProperties": true,
             "title": "Extraction Meta",
             "type": "object"
           },
+          "has_image": {
+            "default": false,
+            "title": "Has Image",
+            "type": "boolean"
+          },
           "id": {
             "format": "uuid",
             "title": "Id",
             "type": "string"
+          },
+          "ingredient_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ingredient Count"
           },
           "platform": {
             "title": "Platform",
@@ -412,6 +461,17 @@
               }
             ],
             "title": "Title Original"
+          },
+          "total_time_minutes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Time Minutes"
           },
           "user_notes": {
             "anyOf": [
@@ -508,7 +568,7 @@
         "type": "object"
       },
       "RecipeSummary": {
-        "description": "Library-card shape (list endpoint).",
+        "description": "Library-card shape (list endpoint). ``difficulty`` /\n``total_time_minutes`` are lifted VERBATIM from the stored validated\ndocument; ``ingredient_count`` is the length of its ingredients list — a\nstructural count, not a food quantity (Hard Rule 7 governs food data like\namounts/weights, which stay verbatim inside the document). ``has_image``\nderives from the server-side ``image_url`` (the generated illustration\npath), which itself never leaves the API (the /image endpoint streams the\nfile). ``estimated_spiciness_level`` / ``estimated_difficulty_level`` are\nthe DERIVED estimates projected from the separate ``estimated`` column —\nflagged 'estimated' in the UI, never inside the verbatim document.",
         "properties": {
           "canonical_id": {
             "title": "Canonical Id",
@@ -519,14 +579,63 @@
             "title": "Created At",
             "type": "string"
           },
+          "difficulty": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Difficulty"
+          },
           "dish_index": {
             "title": "Dish Index",
             "type": "integer"
+          },
+          "estimated_difficulty_level": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimated Difficulty Level"
+          },
+          "estimated_spiciness_level": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimated Spiciness Level"
+          },
+          "has_image": {
+            "default": false,
+            "title": "Has Image",
+            "type": "boolean"
           },
           "id": {
             "format": "uuid",
             "title": "Id",
             "type": "string"
+          },
+          "ingredient_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ingredient Count"
           },
           "platform": {
             "title": "Platform",
@@ -564,6 +673,17 @@
               }
             ],
             "title": "Title Original"
+          },
+          "total_time_minutes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Time Minutes"
           }
         },
         "required": [
@@ -1376,6 +1496,61 @@
           }
         ],
         "summary": "Patch Recipe",
+        "tags": [
+          "recipes"
+        ]
+      }
+    },
+    "/api/recipes/{recipe_id}/image": {
+      "get": {
+        "description": "Stream the generated illustration. One 404 covers every miss — no\nrecipe, no illustration generated yet, file gone from the archive.",
+        "operationId": "get_recipe_image_api_recipes__recipe_id__image_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "recipe_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Recipe Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "image/jpeg": {}
+            },
+            "description": "The recipe's generated illustration."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Recipe Image",
         "tags": [
           "recipes"
         ]

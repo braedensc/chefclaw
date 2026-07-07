@@ -5,6 +5,7 @@ The database URL is always assembled from parts; a full URL-with-password
 literal must never exist anywhere in the codebase.
 """
 
+from decimal import Decimal
 from functools import lru_cache
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -34,7 +35,13 @@ class Settings(BaseSettings):
     # unparseable => NO paid calls, surfaced as a typed ConfigError — §16.8).
     monthly_llm_budget_usd: str = ""
     max_extraction_attempts_per_day: str = ""
-    media_retention: str = "keep"  # keep | discard — the retained low-res archive
+    # keep | discard — the retained source-video archive. Default DISCARD
+    # (Braeden's 2026-07-06 V2-E decision): card covers are now generated
+    # cartoon illustrations built from TEXT fields, not real video frames, so
+    # the source video no longer needs retaining (it's also the legally
+    # riskiest artifact — a literal reproduction). Overridable to "keep" for
+    # re-extraction insurance or the optional provenance thumbnail.
+    media_retention: str = "discard"
     # Upload size cap (tier-2 file upload). Enforced pre-parse in middleware so
     # an oversized upload is rejected 413 BEFORE Starlette spools it to disk —
     # an unbounded upload endpoint lets an authed client fill the box's disk.
@@ -55,6 +62,21 @@ class Settings(BaseSettings):
     dashscope_api_key: str = ""
     dashscope_model: str = "qwen3-vl-plus"  # config, never trusted as current
     dashscope_base_url: str = "https://dashscope-intl.aliyuncs.com/compatible-mode/v1"
+
+    # ── Illustration cover generation (V2-E, 2026-07-06) ────────────────────
+    # Card covers are GENERATED cartoon illustrations built from text fields
+    # (never a video frame). "fake" is the SAFE default (tests, golden suite,
+    # zero spend/network); compose sets "gemini" for the real stack. Reuses the
+    # existing Gemini key/SDK — no new provider or secret.
+    chefclaw_image_generator: str = "fake"
+    # !!! CONFIRM this model id at deploy — image models sunset FAST and this
+    # cannot be verified from here (Gemini 2.5 Flash Image / Imagen 4 both
+    # retire Aug–Oct 2026). "Nano Banana 2". !!!
+    gemini_image_model: str = "gemini-3.1-flash-image"
+    # Flat per-image cost written to the spend ledger (image models bill per
+    # image, not per token). Tune to the model's real published price at deploy
+    # (~$0.067/image single, ~$0.034 batch as of 2026-07).
+    gemini_image_cost_usd: Decimal = Decimal("0.067")
 
     # ── Sources (Phase 2) ───────────────────────────────────────────────────
     # Source-adapter selection (plan §16.9 golden-suite split): "real" registers

@@ -1,6 +1,7 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type { RecipeDetail } from '../client/types.gen';
 import { recipeDetail } from '../test/fixtures';
 import { genState, resetGenState } from '../test/gen-mock';
 import { renderApp } from '../test/render-app';
@@ -45,9 +46,80 @@ describe('RecipeDetailPage', () => {
     expect(
       await screen.findByText(/Skim until the surface foam is gone/),
     ).toBeInTheDocument();
-    expect(screen.getByText('Visual cue:')).toBeInTheDocument();
-    expect(screen.getByText('Technique:')).toBeInTheDocument();
+    expect(screen.getByText('Visual cue')).toBeInTheDocument();
+    expect(screen.getByText('Technique')).toBeInTheDocument();
     expect(screen.getByText(/Duration: 1小时/)).toBeInTheDocument();
+  });
+
+  it('renders the illustration hero when the recipe has an image', async () => {
+    genState.recipesById['r1'] = recipeDetail({ has_image: true });
+
+    renderApp('/recipes/r1');
+
+    // In jsdom the blob fetch never succeeds, so CoverImage shows its
+    // platform-tinted fallback — role img + the alt name either way.
+    expect(
+      await screen.findByRole('img', { name: /cover photo/ }),
+    ).toBeInTheDocument();
+    // One heading carries both languages; EN-title selectors still match.
+    expect(
+      screen.getByRole('heading', { name: /Red-braised pork belly/ }),
+    ).toBeInTheDocument();
+  });
+
+  it('shows no illustration hero when has_image is false', async () => {
+    genState.recipesById['r1'] = recipeDetail({ has_image: false });
+
+    renderApp('/recipes/r1');
+
+    await screen.findByRole('heading', { name: /Red-braised pork belly/ });
+    expect(
+      screen.queryByRole('img', { name: /cover photo/ }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows the estimated spiciness + difficulty scales in the hero meta', async () => {
+    genState.recipesById['r1'] = recipeDetail();
+
+    renderApp('/recipes/r1');
+
+    // Recipe-level ESTIMATES from detail: spiciness=2 → medium, difficulty=1
+    // → easy; two distinct, flagged-estimated indicators.
+    expect(
+      await screen.findByLabelText('Spiciness: medium (estimated)'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByLabelText('Difficulty: easy (estimated)'),
+    ).toBeInTheDocument();
+  });
+
+  it('omits the estimate scales when the fields are null (never invent)', async () => {
+    genState.recipesById['r1'] = recipeDetail({
+      estimated_spiciness_level: null,
+      estimated_difficulty_level: null,
+    });
+
+    renderApp('/recipes/r1');
+
+    await screen.findByRole('heading', { name: /Red-braised pork belly/ });
+    expect(screen.queryByLabelText(/Spiciness:/)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/Difficulty:/)).not.toBeInTheDocument();
+  });
+
+  it('shows the sleeping pup while the recipe loads', async () => {
+    // A never-settling thenable keeps the detail query pending forever, so
+    // the loading state is stable to assert against.
+    genState.recipesById['r1'] = new Promise<never>(
+      () => undefined,
+    ) as unknown as RecipeDetail;
+
+    renderApp('/recipes/r1');
+
+    expect(await screen.findByText(/plating up/)).toBeInTheDocument();
+    expect(screen.getByText('上菜中')).toBeInTheDocument();
+    expect(
+      document.querySelector('svg[data-variant="sleeping"]'),
+    ).not.toBeNull();
   });
 
   it('opens the raw-JSON drawer with document + extraction_meta', async () => {

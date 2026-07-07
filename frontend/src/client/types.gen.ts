@@ -199,6 +199,10 @@ export type RecipeDetail = {
      */
     created_at: string;
     /**
+     * Difficulty
+     */
+    difficulty?: string | null;
+    /**
      * Dish Index
      */
     dish_index: number;
@@ -209,15 +213,31 @@ export type RecipeDetail = {
         [key: string]: unknown;
     };
     /**
+     * Estimated Difficulty Level
+     */
+    estimated_difficulty_level?: number | null;
+    /**
+     * Estimated Spiciness Level
+     */
+    estimated_spiciness_level?: number | null;
+    /**
      * Extraction Meta
      */
     extraction_meta: {
         [key: string]: unknown;
     };
     /**
+     * Has Image
+     */
+    has_image?: boolean;
+    /**
      * Id
      */
     id: string;
+    /**
+     * Ingredient Count
+     */
+    ingredient_count?: number | null;
     /**
      * Platform
      */
@@ -242,6 +262,10 @@ export type RecipeDetail = {
      * Title Original
      */
     title_original: string | null;
+    /**
+     * Total Time Minutes
+     */
+    total_time_minutes?: number | null;
     /**
      * User Notes
      */
@@ -289,7 +313,16 @@ export type RecipePatch = {
 /**
  * RecipeSummary
  *
- * Library-card shape (list endpoint).
+ * Library-card shape (list endpoint). ``difficulty`` /
+ * ``total_time_minutes`` are lifted VERBATIM from the stored validated
+ * document; ``ingredient_count`` is the length of its ingredients list — a
+ * structural count, not a food quantity (Hard Rule 7 governs food data like
+ * amounts/weights, which stay verbatim inside the document). ``has_image``
+ * derives from the server-side ``image_url`` (the generated illustration
+ * path), which itself never leaves the API (the /image endpoint streams the
+ * file). ``estimated_spiciness_level`` / ``estimated_difficulty_level`` are
+ * the DERIVED estimates projected from the separate ``estimated`` column —
+ * flagged 'estimated' in the UI, never inside the verbatim document.
  */
 export type RecipeSummary = {
     /**
@@ -301,13 +334,33 @@ export type RecipeSummary = {
      */
     created_at: string;
     /**
+     * Difficulty
+     */
+    difficulty?: string | null;
+    /**
      * Dish Index
      */
     dish_index: number;
     /**
+     * Estimated Difficulty Level
+     */
+    estimated_difficulty_level?: number | null;
+    /**
+     * Estimated Spiciness Level
+     */
+    estimated_spiciness_level?: number | null;
+    /**
+     * Has Image
+     */
+    has_image?: boolean;
+    /**
      * Id
      */
     id: string;
+    /**
+     * Ingredient Count
+     */
+    ingredient_count?: number | null;
     /**
      * Platform
      */
@@ -328,6 +381,10 @@ export type RecipeSummary = {
      * Title Original
      */
     title_original: string | null;
+    /**
+     * Total Time Minutes
+     */
+    total_time_minutes?: number | null;
 };
 
 /**
@@ -772,6 +829,38 @@ export type PatchRecipeApiRecipesRecipeIdPatchResponses = {
 };
 
 export type PatchRecipeApiRecipesRecipeIdPatchResponse = PatchRecipeApiRecipesRecipeIdPatchResponses[keyof PatchRecipeApiRecipesRecipeIdPatchResponses];
+
+export type GetRecipeImageApiRecipesRecipeIdImageGetData = {
+    body?: never;
+    path: {
+        /**
+         * Recipe Id
+         */
+        recipe_id: string;
+    };
+    query?: never;
+    url: '/api/recipes/{recipe_id}/image';
+};
+
+export type GetRecipeImageApiRecipesRecipeIdImageGetErrors = {
+    /**
+     * Not Found
+     */
+    404: ErrorBody;
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetRecipeImageApiRecipesRecipeIdImageGetError = GetRecipeImageApiRecipesRecipeIdImageGetErrors[keyof GetRecipeImageApiRecipesRecipeIdImageGetErrors];
+
+export type GetRecipeImageApiRecipesRecipeIdImageGetResponses = {
+    /**
+     * The recipe's generated illustration.
+     */
+    200: unknown;
+};
 
 export type GetSpendApiSpendGetData = {
     body?: never;

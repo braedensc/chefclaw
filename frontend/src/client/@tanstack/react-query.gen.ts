@@ -3,8 +3,8 @@
 import { type DefaultError, type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { deleteRecipeApiRecipesRecipeIdDelete, extractRecipeApiRecipesExtractPost, getJobApiJobsJobIdGet, getRecipeApiRecipesRecipeIdGet, getSpendApiSpendGet, healthApiHealthGet, listJobsApiJobsGet, listRecipesApiRecipesGet, type Options, patchRecipeApiRecipesRecipeIdPatch, uploadRecipeVideoApiRecipesUploadPost } from '../sdk.gen';
-import type { DeleteRecipeApiRecipesRecipeIdDeleteData, DeleteRecipeApiRecipesRecipeIdDeleteError, DeleteRecipeApiRecipesRecipeIdDeleteResponse, ExtractRecipeApiRecipesExtractPostData, ExtractRecipeApiRecipesExtractPostError, ExtractRecipeApiRecipesExtractPostResponse, GetJobApiJobsJobIdGetData, GetJobApiJobsJobIdGetError, GetJobApiJobsJobIdGetResponse, GetRecipeApiRecipesRecipeIdGetData, GetRecipeApiRecipesRecipeIdGetError, GetRecipeApiRecipesRecipeIdGetResponse, GetSpendApiSpendGetData, GetSpendApiSpendGetError, GetSpendApiSpendGetResponse, HealthApiHealthGetData, HealthApiHealthGetResponse, ListJobsApiJobsGetData, ListJobsApiJobsGetError, ListJobsApiJobsGetResponse, ListRecipesApiRecipesGetData, ListRecipesApiRecipesGetError, ListRecipesApiRecipesGetResponse, PatchRecipeApiRecipesRecipeIdPatchData, PatchRecipeApiRecipesRecipeIdPatchError, PatchRecipeApiRecipesRecipeIdPatchResponse, UploadRecipeVideoApiRecipesUploadPostData, UploadRecipeVideoApiRecipesUploadPostError, UploadRecipeVideoApiRecipesUploadPostResponse } from '../types.gen';
+import { deleteRecipeApiRecipesRecipeIdDelete, extractRecipeApiRecipesExtractPost, getJobApiJobsJobIdGet, getRecipeApiRecipesRecipeIdGet, getRecipeImageApiRecipesRecipeIdImageGet, getSpendApiSpendGet, healthApiHealthGet, listJobsApiJobsGet, listRecipesApiRecipesGet, type Options, patchRecipeApiRecipesRecipeIdPatch, uploadRecipeVideoApiRecipesUploadPost } from '../sdk.gen';
+import type { DeleteRecipeApiRecipesRecipeIdDeleteData, DeleteRecipeApiRecipesRecipeIdDeleteError, DeleteRecipeApiRecipesRecipeIdDeleteResponse, ExtractRecipeApiRecipesExtractPostData, ExtractRecipeApiRecipesExtractPostError, ExtractRecipeApiRecipesExtractPostResponse, GetJobApiJobsJobIdGetData, GetJobApiJobsJobIdGetError, GetJobApiJobsJobIdGetResponse, GetRecipeApiRecipesRecipeIdGetData, GetRecipeApiRecipesRecipeIdGetError, GetRecipeApiRecipesRecipeIdGetResponse, GetRecipeImageApiRecipesRecipeIdImageGetData, GetRecipeImageApiRecipesRecipeIdImageGetError, GetSpendApiSpendGetData, GetSpendApiSpendGetError, GetSpendApiSpendGetResponse, HealthApiHealthGetData, HealthApiHealthGetResponse, ListJobsApiJobsGetData, ListJobsApiJobsGetError, ListJobsApiJobsGetResponse, ListRecipesApiRecipesGetData, ListRecipesApiRecipesGetError, ListRecipesApiRecipesGetResponse, PatchRecipeApiRecipesRecipeIdPatchData, PatchRecipeApiRecipesRecipeIdPatchError, PatchRecipeApiRecipesRecipeIdPatchResponse, UploadRecipeVideoApiRecipesUploadPostData, UploadRecipeVideoApiRecipesUploadPostError, UploadRecipeVideoApiRecipesUploadPostResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -264,6 +264,27 @@ export const patchRecipeApiRecipesRecipeIdPatchMutation = (options?: Partial<Opt
     };
     return mutationOptions;
 };
+
+export const getRecipeImageApiRecipesRecipeIdImageGetQueryKey = (options: Options<GetRecipeImageApiRecipesRecipeIdImageGetData>) => createQueryKey('getRecipeImageApiRecipesRecipeIdImageGet', options);
+
+/**
+ * Get Recipe Image
+ *
+ * Stream the generated illustration. One 404 covers every miss — no
+ * recipe, no illustration generated yet, file gone from the archive.
+ */
+export const getRecipeImageApiRecipesRecipeIdImageGetOptions = (options: Options<GetRecipeImageApiRecipesRecipeIdImageGetData>) => queryOptions<unknown, GetRecipeImageApiRecipesRecipeIdImageGetError, unknown, ReturnType<typeof getRecipeImageApiRecipesRecipeIdImageGetQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getRecipeImageApiRecipesRecipeIdImageGet({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getRecipeImageApiRecipesRecipeIdImageGetQueryKey(options)
+});
 
 export const getSpendApiSpendGetQueryKey = (options?: Options<GetSpendApiSpendGetData>) => createQueryKey('getSpendApiSpendGet', options);
 

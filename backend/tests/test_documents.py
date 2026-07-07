@@ -17,6 +17,7 @@ from chefclaw.documents import (
     Quantity,
     RecipeDocument,
     SourceInfo,
+    sanitize_tags,
     validate_document,
     validate_extraction,
 )
@@ -200,12 +201,17 @@ def test_valid_single_dish_document() -> None:
 
 def test_valid_multi_dish_extraction() -> None:
     source = make_source()
-    docs = validate_extraction([make_hongshaorou(), make_liangban_huanggua()], source)
+    results = validate_extraction([make_hongshaorou(), make_liangban_huanggua()], source)
+    docs = [dish.document for dish in results]
     assert len(docs) == 2
     assert docs[0].dish_name.original == "红烧肉"
     assert docs[1].dish_name.original == "凉拌黄瓜"
     for doc in docs:
         assert doc.source == source
+    # No `estimated` block on these fixtures ⇒ each estimate is None.
+    assert all(dish.estimated is None for dish in results)
+    # No `tags` on these fixtures ⇒ each tags list is empty.
+    assert all(dish.tags == [] for dish in results)
 
 
 def test_local_platform_accepted_and_unknown_platform_rejected() -> None:
@@ -492,7 +498,7 @@ def test_validate_extraction_overrides_model_supplied_source() -> None:
         "video_duration_seconds": 1,
     }
     source = make_source()
-    docs = validate_extraction([dish], source)
+    docs = [v.document for v in validate_extraction([dish], source)]
     assert docs[0].source == source
     assert docs[0].source.url == BILI_SOURCE["url"]
 
@@ -501,7 +507,7 @@ def test_validate_extraction_injects_source_when_absent() -> None:
     dish = make_hongshaorou()
     del dish["source"]
     source = make_source(platform="rednote", url="https://www.xiaohongshu.com/explore/65f0a1")
-    docs = validate_extraction([dish], source)
+    docs = [v.document for v in validate_extraction([dish], source)]
     assert docs[0].source.platform == "rednote"
 
 
@@ -533,6 +539,61 @@ def test_validate_extraction_error_names_failing_dish() -> None:
         validate_extraction([good, bad], make_source())
     assert "dish 1" in str(exc_info.value)
     assert exc_info.value.raw_output["dish_name"]["original"] == "凉拌黄瓜"
+
+
+# ---------------------------------------------------------------------------
+# sanitize_tags + auto-tags — editable metadata, deliberately lenient
+# (never raises; bad tags are dropped, not a fabrication of food data)
+# ---------------------------------------------------------------------------
+
+
+def test_sanitize_tags_happy_path_lowercases_trims_and_keeps_order() -> None:
+    assert sanitize_tags(["Sichuan", "  Braise ", "PORK"]) == ["sichuan", "braise", "pork"]
+
+
+def test_sanitize_tags_caps_at_three_preserving_order() -> None:
+    assert sanitize_tags(["a", "b", "c", "d", "e"]) == ["a", "b", "c"]
+
+
+def test_sanitize_tags_dedupes_after_normalization_preserving_first_seen() -> None:
+    # Dedupe happens post-lowercase/trim; the cap counts unique tags.
+    assert sanitize_tags(["Pork", "pork", " PORK ", "braise"]) == ["pork", "braise"]
+
+
+def test_sanitize_tags_drops_empties_whitespace_and_non_strings() -> None:
+    assert sanitize_tags(["", "   ", "braise", 5, None, True, {"x": 1}]) == ["braise"]
+
+
+def test_sanitize_tags_drops_overlong_tags() -> None:
+    ok = "a" * 24  # exactly the 24-char ceiling — kept
+    too_long = "b" * 25  # one over — dropped
+    assert sanitize_tags([ok, too_long, "pork"]) == [ok, "pork"]
+
+
+def test_sanitize_tags_absent_or_non_list_is_empty() -> None:
+    assert sanitize_tags(None) == []
+    assert sanitize_tags("braise") == []  # a bare string is not a list of tags
+    assert sanitize_tags({"tags": ["pork"]}) == []
+    assert sanitize_tags([]) == []
+
+
+def test_validate_extraction_splits_tags_out_of_the_document() -> None:
+    dish = make_hongshaorou()
+    dish["tags"] = ["Sichuan", "braise", "PORK", "extra-that-is-capped"]
+    [validated] = validate_extraction([dish], make_source())
+    # Sanitized (lowercased, capped at 3) and lifted OUT of the document so it
+    # stays extra="forbid" clean.
+    assert validated.tags == ["sichuan", "braise", "pork"]
+    assert "tags" not in validated.document.model_dump()
+
+
+def test_validate_extraction_bad_tags_never_fail_the_dish() -> None:
+    # A garbage `tags` value is dropped, not raised — tags are a nice-to-have
+    # default, never captured food data.
+    dish = make_hongshaorou()
+    dish["tags"] = "not-a-list"
+    [validated] = validate_extraction([dish], make_source())
+    assert validated.tags == []
 
 
 # ---------------------------------------------------------------------------
