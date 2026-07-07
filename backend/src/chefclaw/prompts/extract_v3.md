@@ -156,8 +156,13 @@ Field notes:
      `raw_text` must always be a real string when the object exists.
 - `quantity.unit_type` — `volume` (spoons, cups, ml), `mass` (g, kg, 斤, 两),
   `count` (pieces, cloves, 个/根/瓣), `approx` (适量/少许/to-taste/unspecified).
-- `prep_state` — `"dried"`, `"fresh"`, `"cooked"`, `"raw"`, `"frozen"`, or `null` when the
-  video doesn't indicate one.
+- `prep_state` — the ingredient's physical STATE, and ONLY one of `"dried"`,
+  `"fresh"`, `"cooked"`, `"raw"`, `"frozen"`, or `null` when the video doesn't
+  indicate one. It is NOT for knife-work or prep actions: `"sliced"`, `"diced"`,
+  `"minced"`, `"chopped"`, `"cut into chunks"`, `切块`, `切段`, `去皮`, and the
+  like are prep detail that goes in that ingredient's `notes` (exactly as the
+  `切块 (cut into chunks)` example shows) — NEVER in `prep_state`. Any value here
+  outside the five listed states fails the whole extraction.
 - `notes` — verbatim qualifiers from the host ("要肥瘦相间的", "去皮"), else null.
 - `nutrition_ref` — ALWAYS `null`. It is reserved for a later system; you never
   fill it.

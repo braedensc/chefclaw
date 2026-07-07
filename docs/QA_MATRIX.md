@@ -41,21 +41,55 @@ uses Braeden's Gemini key.
 
 ## The matrix
 
-| # | Case | Tier | Exercises | Expected behavior | Observed |
-|---|------|------|-----------|-------------------|----------|
-| 1 | Single-dish cooking video | Paid | The happy path | 1 job → `stored`; 1 recipe; bilingual doc, verbatim quantities; 1 spend row | ⏳ pending paid run |
-| 2 | Multi-dish video | Paid | N-recipe atomic store + sibling display | 1 job → `stored`; N recipes under one `(platform, canonical_id)`; siblings shown as related on the detail page | ⏳ pending paid run |
-| 3 | Heavy on-screen text | Paid | Media-resolution escalation | With `GEMINI_MEDIA_RESOLUTION_MAX=high`: model reports `unreadable` at `low` → one retry at `high`; escalation log line; a single **summed** spend row; richer ingredient capture | ⏳ pending paid run |
-| 4 | Long video | Paid | Per-stage timeout | Completes under the 900s extract deadline, or fails typed `extraction_failed` ("extraction timed out"), retryable, requeued — never wedges the serial queue | ⏳ pending paid run |
-| 5 | 适量-heavy recipe | Paid | Null-quantity faithful capture | Recipe stores; 适量/少许 ingredients keep `raw_text`, `value: null`, `unit: null`, `unit_type: "approx"` — never a fabricated number (Hard Rule 7) | ⏳ pending paid run |
-| 6 | Deleted / expired URL | Free | Typed error UX | Rednote: `cookies_expired` (login-required) or `download_failed` (stale `xsec_token`) → drawer shows actionable copy, no Retry burn on deterministic failures; Bilibili: `download_failed`, retryable | ⏳ pending run |
-| 7 | Non-cooking video | Paid | Empty-array handling | Model returns `[]` (or `{"dishes": []}`); job → `stored` with **0 recipes**; NOT an error, NOT an escalation trigger | ⏳ pending paid run |
-| 8 | Very-long-ingredient recipe | Paid | Large document validation | Stores fully; all ingredients captured; document validates; detail page + card render without layout breakage | ⏳ pending paid run |
-| 9a | Bilibili video | Paid | Bilibili source (yt-dlp, DASH+ffmpeg) | Resolves `BVxxx-pN`; downloads 480p; extracts and stores | ⏳ pending paid run |
-| 9b | Rednote video | Paid | Rednote sidecar (guest tier) | Resolves 24-hex note id; guest fetch; extracts and stores | ⏳ pending paid run |
-| 10a | `b23.tv` short link | Free | Bilibili short-link resolution | Redirect followed → canonical `BVxxx-pN`; dedupes to the same identity as the full URL | ⏳ pending run |
-| 10b | `xhslink.com` short link | Free | Rednote short-link resolution | Redirect followed → 24-hex note id, `xsec_token` preserved in `fetch_url` only | ⏳ pending run |
-| 11 | Image-note (图文) post | Free | Image-note fast-fail | `作品类型 = 图文` detected after the free metadata call → typed `image_note_unsupported`, **no media download, no paid call**; drawer: "image gallery … paste a video post" | ✅ covered by tests (unit); ⏳ confirm live |
+**Run 1 — 2026-07-07, Bilibili only** (Rednote rows need the sidecar; deferred).
+Driven directly through the real `BilibiliSource` + `GeminiExtractor` +
+`validate_extraction` (no DB/worker — those layers are unit-tested), one video at
+a time, yt-dlp anonymous 480p, jittered politeness. Videos referenced by
+creator/dish (all public 美食作家王刚 / classic tutorials).
+
+| # | Case | Tier | Expected behavior | Observed (Run 1) |
+|---|------|------|-------------------|------------------|
+| 1 | Single-dish | Paid | 1 recipe; bilingual; verbatim quantities | ✅ 王刚 红烧肉 → 1 recipe, 16 ing, verbatim (`400克`→400 g/mass, `几根`→approx), 13 steps, est 0/2, tags ok. (1st upload hit a transient Gemini processing fail; **succeeded on retry**.) |
+| 2 | Multi-dish | Paid | N recipes under one identity; siblings related | ⚠️ Composite `一鱼两吃` (将军过桥) → model returned **1** dish (a sound judgment — it's one named dish). Extreme 12-dish 年夜饭 → download-timeout (see #4). Clean N-distinct-recipe *live* demo not captured; the atomic N-recipe store is unit-tested (`test_worker`). |
+| 3 | Heavy text / **escalation** | Paid | v4 envelope; `unreadable`→ one higher-res retry; summed spend | ✅ v4 envelope works live (`prompt=v4`, clean extraction). Escalation **did not fire** (model reported legible) — the firing path is unit-tested. **Surfaced the `prep_state` bug (below); fixed.** |
+| 4 | Long video | Paid | Completes under deadline, or fails typed (retryable), never wedges queue | ✅ 13.5-min video (73 MB) completed within deadlines. Extreme 12-dish video **exceeded the download deadline → typed timeout** (retryable), queue not wedged — the designed behavior. |
+| 5 | 适量-heavy | Paid | 适量/少许 → `value:null, unit:null, approx`; no fabricated number | ✅ 脆皮蛋饼 → 15 ing, **7 approx (适量)**, 8 valued, 0 fabricated. Hard Rule 7 intact. |
+| 6 | Non-cooking | Paid | `[]` → 0 recipes (not an error) | ✅ A game video → model emitted **1 dish with 0 ingredients** → correctly **`validation_failed`** (raw preserved, nothing fabricated). Not the `[]` path, but the same safe outcome; the drawer copy ("may not be a cooking video, nothing saved") fits exactly. |
+| 7 | `b23.tv` short link + dedupe | Free | Same canonical id as the full URL | ✅ `b23.tv/BV…` → **identical** `BV…-p1` as the full URL (tracking params stripped) → dedupe holds. (Redirect-following for random short codes is unit-tested.) |
+| 8 | Unsupported / deleted | Free | Typed pre-paid failure | ✅ youtube.com + legacy `av…` id → `unsupported_url`. A nonexistent/deleted BV → `download_failed` (unit-tested; a random BV in-run happened to hit a real video). |
+| — | Very-long-ingredient | Paid | Large document validates | Partially covered by #5 (15 ing) + 将军过桥 (13 ing). Dedicated 佛跳墙 not run (cost). |
+| — | Rednote video / xhslink / image-note (图文) | — | guest fetch / short-link / `image_note_unsupported` fast-fail | Deferred — Bilibili-only run. Image-note fast-fail is unit-tested (`test_sources`, `test_worker`); live confirm needs the sidecar. |
+
+### Findings & fixes (Run 1)
+
+1. **`prep_state` misuse → whole recipe lost (fixed).** The model sometimes puts
+   knife-work (`"sliced"`, `"cut into chunks"`) in `prep_state`, whose enum is
+   only physical states (dried/fresh/cooked/raw/frozen) → `validation_failed`
+   rejects the *entire* recipe. **Fix:** tightened the `prep_state` guidance in
+   the v3 + v4 prompts (state-only; knife-work belongs in `notes`, as the example
+   already shows). The fix is in the PROMPT, not the validator — `documents.py`
+   deliberately **never coerces or repairs, rejects whole** (a Hard-Rule-7-grade
+   invariant), so the correct fix is to make the model emit valid output, not to
+   silently relocate it. See _Open question_ below.
+2. **Gemini Files API "failed to be processed" is flaky.** A transient
+   upload-processing failure that is correctly typed `extraction_failed`
+   (retryable) — the worker retries up to 3×. Observed it clear on retry, and
+   also observed a video fail all 3 attempts, so a video can occasionally be
+   un-processable in a burst. No code change: the taxonomy + worker retry + the
+   drawer copy ("usually transient — retry to try again") already cover it.
+3. **Faithful capture confirmed** across three real videos: verbatim quantities,
+   `适量`→approx, genuinely-unstated→`quantity:null`, bilingual names, derived
+   estimates + tags — no fabrication anywhere.
+
+### Open question for Braeden
+
+`prep_state` slips are now *mitigated* by the prompt, but strict validation still
+rejects a whole recipe on any residual slip (by design). A targeted **leniency**
+(relocate an out-of-enum `prep_state` into `notes` instead of failing) would make
+extraction more resilient, but it changes `documents.py`'s documented
+"never coerce, reject whole" invariant. **Recommendation: keep strict** (don't
+erode the Hard-Rule-7 trust boundary for a minor descriptor); revisit only if
+real usage shows prep_state slips are frequent after the prompt fix.
 
 ## Per-case notes
 
@@ -83,4 +117,10 @@ Record each real run here (date, URL kind, job outcome, spend, bugs found +
 fixed). Keep URLs generic — this repo is public; never paste a personal link or
 any `xsec_token`.
 
-_(pending the flagged paid run — filled in after go-ahead)_
+- **Run 1 — 2026-07-07 (Bilibili, ~8 real videos, well under $0.50 of Gemini
+  quota).** Single-dish, 适量-heavy, composite multi-dish, non-cooking,
+  long-video-timeout, short-link dedupe, and unsupported-URL cases exercised
+  against real Gemini. One bug found + fixed (`prep_state` prompt tightening);
+  Gemini Files-API processing flakiness documented (handled by the existing
+  retry path). Rednote rows deferred (need the sidecar). N-distinct-recipe and
+  live escalation-firing not captured — both unit-tested.
