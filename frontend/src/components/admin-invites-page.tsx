@@ -8,8 +8,12 @@ import {
   createInviteApiAdminInvitesPostMutation,
   listInvitesApiAdminInvitesGetOptions,
   listInvitesApiAdminInvitesGetQueryKey,
+  listUsersApiAdminUsersGetOptions,
+  listUsersApiAdminUsersGetQueryKey,
   revokeInviteApiAdminInvitesInviteIdRevokePostMutation,
+  setUserRealCoversApiAdminUsersUserIdPatchMutation,
 } from '../client/@tanstack/react-query.gen';
+import type { UserAdminRow } from '../client/types.gen';
 import { CHILI_BTN, CYAN_BTN } from '../lib/button-styles';
 
 const STATUS_CLASS: Record<string, string> = {
@@ -189,6 +193,92 @@ export function AdminInvitesPage() {
           </ul>
         )}
       </section>
+
+      <MembersSection />
     </div>
+  );
+}
+
+/**
+ * Members roster + the per-user PRIVATE real-frame cover grant (V2-F). A frame
+ * only ever reaches a granted user AND only when the server runs with
+ * CHEFCLAW_REAL_COVERS on — both default off, so this toggle is inert until the
+ * operator enables real covers globally. Only the owner (admin) sees this; the
+ * server enforces admin on every /api/admin/* route.
+ */
+function MembersSection() {
+  const queryClient = useQueryClient();
+  const users = useQuery(listUsersApiAdminUsersGetOptions());
+  const setRealCovers = useMutation({
+    ...setUserRealCoversApiAdminUsersUserIdPatchMutation(),
+    onSuccess: () =>
+      void queryClient.invalidateQueries({
+        queryKey: listUsersApiAdminUsersGetQueryKey(),
+      }),
+  });
+
+  function toggle(user: UserAdminRow) {
+    setRealCovers.mutate({
+      path: { user_id: user.id },
+      body: { real_covers_enabled: !user.real_covers_enabled },
+    });
+  }
+
+  return (
+    <section
+      aria-label="Members"
+      className="rounded-card border-line bg-panel mt-4 border p-5"
+    >
+      <h2 className="text-ink-faint font-display text-[11px] font-bold tracking-[0.28em] uppercase">
+        Members · real-frame covers
+      </h2>
+      <p className="text-ink-dim mt-2 text-xs">
+        Real dish-photo covers are private and off by default. A member only
+        sees them when granted here <em>and</em> the server runs with real
+        covers enabled; everyone else always sees the illustrated sprite.
+      </p>
+      {users.isPending && (
+        <p className="text-ink-dim mt-3 text-sm">Loading members…</p>
+      )}
+      {users.isError && (
+        <p className="text-ink-dim mt-3 text-sm">
+          Could not load members (are you signed in as an admin?).
+        </p>
+      )}
+      {users.isSuccess && (
+        <ul className="mt-3 space-y-2 text-sm">
+          {users.data.items.map((user) => (
+            <li
+              key={user.id}
+              className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1"
+            >
+              <span className="text-ink">
+                {user.email}
+                {user.is_admin && (
+                  <span className="text-gold ml-2 font-display text-[9.5px] font-semibold tracking-[0.18em] uppercase">
+                    owner
+                  </span>
+                )}
+              </span>
+              <label className="text-ink-dim flex cursor-pointer items-center gap-2 text-xs select-none">
+                <input
+                  type="checkbox"
+                  checked={user.real_covers_enabled}
+                  disabled={setRealCovers.isPending}
+                  onChange={() => toggle(user)}
+                  className="accent-cyan h-4 w-4"
+                />
+                real covers
+              </label>
+            </li>
+          ))}
+        </ul>
+      )}
+      {setRealCovers.isError && (
+        <p role="alert" className="text-chili-bright mt-3 text-sm">
+          Could not update that grant — try again.
+        </p>
+      )}
+    </section>
   );
 }

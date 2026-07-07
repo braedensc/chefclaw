@@ -93,6 +93,10 @@ export type HealthResponse = {
      */
     cookie_set_date?: string | null;
     /**
+     * Cover Mode
+     */
+    cover_mode?: string;
+    /**
      * Daily Attempt Cap
      */
     daily_attempt_cap?: number | null;

@@ -8,6 +8,7 @@ import {
   deleteRecipeApiRecipesRecipeIdDeleteMutation,
   getRecipeApiRecipesRecipeIdGetOptions,
   getRecipeApiRecipesRecipeIdGetQueryKey,
+  healthApiHealthGetOptions,
   listJobsApiJobsGetQueryKey,
   listRecipesApiRecipesGetOptions,
   listRecipesApiRecipesGetQueryKey,
@@ -228,6 +229,11 @@ function RecipeHero({ detail, doc }: { detail: RecipeDetail; doc: RecipeDoc }) {
  * Enqueue a fresh cover illustration (its own retriable job). The new image
  * appears once the worker processes the job — so this confirms the enqueue and
  * points at the Jobs drawer rather than optimistically swapping the cover.
+ *
+ * Rendered ONLY in an illustration cover mode (fake/gemini). In the default
+ * `sprite` mode covers are inline sprites — there is no illustration to
+ * (re)generate, and enqueuing one would just fail — so the control is hidden
+ * (V2-F). The mode comes from /api/health (cached).
  */
 function RegenerateIllustration({
   recipeId,
@@ -237,6 +243,7 @@ function RegenerateIllustration({
   hasImage: boolean;
 }) {
   const queryClient = useQueryClient();
+  const healthQuery = useQuery(healthApiHealthGetOptions());
   const regenerate = useMutation({
     ...regenerateIllustrationApiRecipesRecipeIdIllustrationPostMutation(),
     onSuccess: () => {
@@ -245,6 +252,11 @@ function RegenerateIllustration({
       });
     },
   });
+
+  // Show only once health confirms an illustration mode — hidden while loading
+  // and in sprite mode (the common case), so no broken button ever appears.
+  const coverMode = healthQuery.data?.cover_mode;
+  if (coverMode !== 'fake' && coverMode !== 'gemini') return null;
 
   return (
     <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">

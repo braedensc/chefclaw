@@ -70,6 +70,10 @@ class HealthResponse(BaseModel):
     backup_finished_at: str | None = None
     extractor: str = "fake"
     model: str = "fake-extractor"
+    # Which cover mode is live (V2-F): sprite (default) | fake | gemini. The SPA
+    # hides the legacy "Regenerate illustration" control in sprite mode (there
+    # are no illustrations to regenerate — covers are inline sprites).
+    cover_mode: str = "sprite"
     spend_month_usd: float | None = None
     # V2-A additions. Caps are null when the budget config is fail-closed
     # (unset/unparseable) — the UI says "extraction disabled", never invents
@@ -223,6 +227,7 @@ async def health(
         backup_finished_at=backup_finished_at,
         extractor=settings.chefclaw_extractor,
         model=extractor_model_id(settings),
+        cover_mode=settings.chefclaw_image_generator,
         spend_month_usd=await _spend_month_to_date(owner_id) if db_ok else None,
         budget_monthly_usd=budget_monthly_usd,
         daily_attempt_cap=daily_attempt_cap,
