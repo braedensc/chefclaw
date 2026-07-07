@@ -44,13 +44,24 @@ are active from the first session.
 **Run the full stack** (prod-mode: the api serves the built SPA same-origin):
 
 ```bash
-CHEFCLAW_API_TOKEN=pick-something docker compose up -d --build
-open http://127.0.0.1:8000        # paste the same token into the token gate
+docker compose up -d --build
+open http://127.0.0.1:8000        # the app loads straight to your library — no sign-in
 # once .env.local exists, prefer: docker compose --env-file .env.local up -d
 ```
 
+**No sign-in locally.** The default stack runs `CHEFCLAW_AUTH_PROVIDER=fake`
+(M2, ADR `2026-07-07-m2-accounts-and-invites`): `require_owner` short-circuits to
+a single fixed owner with no cookie or token. The `migrate` step seeds that
+owner's `users` row (`chefclaw.seed_fake_owner`) so `GET /api/me` resolves and
+the SPA opens directly on the library — there is **no token gate** (deleted in
+M2) and **no Google sign-in** page. Real accounts (Google OAuth + invite-only
+signup) switch on only when you flip `CHEFCLAW_AUTH_PROVIDER=google` for a
+deploy; the SPA then shows the login page instead.
+
 > **Deploying to a VPS instead of running locally?** The turn-key procedure
-> (Hetzner + Tailscale + systemd backups) is `docs/RUNBOOK.md` §4.
+> (Hetzner + Tailscale + systemd backups) is `docs/RUNBOOK.md` §4 — a real
+> deploy flips auth to Google OAuth, so you sign in there with an invited
+> account (the seed above no-ops under `google`).
 
 **Dev loop** (hot reload): `docker compose up -d postgres migrate` for the DB, then
 `uv run python -m chefclaw.main` in backend/ and `npm run dev` at the root (Vite on
@@ -68,7 +79,9 @@ the *local* and *host* store; GitHub Actions secrets is the CI store (currently 
 
 | Var | Needed from | Meaning |
 |---|---|---|
-| `CHEFCLAW_API_TOKEN` | Phase 1 | API bearer token. **Server secret at birth**: never a `VITE_*` var, never in the JS bundle. Entered once in the UI → localStorage. Empty ⇒ the api 401s every request with instructions (disabled-closed). |
+| `CHEFCLAW_AUTH_PROVIDER` | M2 | `fake` (default) → `require_owner` short-circuits to `CHEFCLAW_FAKE_OWNER_ID`, no sign-in — the local/dev/golden mode. `google` → real Authorization-Code OAuth + invite-only signup (a deploy setting; see compose.yaml + `docs/RUNBOOK.md`). Unknown ⇒ boot fails; `fake` in a `vps` env ⇒ boot fails (never a silent auth bypass). |
+| `CHEFCLAW_FAKE_OWNER_ID` | M2 | The fixed owner id fake auth resolves to (default `01890000-…-000000000001`). The compose `migrate` step seeds this `users` row so `/api/me` resolves; only consulted under `fake`. |
+| `CHEFCLAW_API_TOKEN` | Phase 1 (**legacy**) | The pre-M2 shared bearer token. **Superseded by M2 cookie sessions** (the bearer branch is deleted) — unused under fake auth and not needed for local dev. Kept only through the deploy window; **server secret at birth**, never a `VITE_*` var. |
 | `DB_HOST` / `DB_PORT` / `DB_USER` / `DB_PASSWORD` / `DB_NAME` | Phase 1 | Postgres connection **parts** — the app assembles the URL so no URL-with-password string ever exists in a file. Defaults match the local compose stack. |
 | `GEMINI_API_KEY` | Phase 2 | Extraction model. Free tier is training-eligible → public cooking videos only; paid tier is a precondition for any personal data. |
 | `DASHSCOPE_API_KEY` | Phase 4 | Qwen fallback extractor (config-flagged). |
@@ -171,6 +184,10 @@ All published ports bind to `127.0.0.1` — nothing listens on the LAN.
 - **Old Node in hooks or scripts** — the nvm non-interactive gotcha above:
   `nvm alias default 22`, or export the absolute Node path (docs/LESSONS.md).
 - **`uv: command not found`** — `brew install uv`.
-- **api answers 401 to everything** — `CHEFCLAW_API_TOKEN` is unset in the api's
-  environment (disabled-closed by design). Set it inline or via
-  `docker compose --env-file .env.local up`.
+- **The local app shows the "Sign in with Google" page** (instead of loading the
+  library) — under fake auth that means the fixed fake owner has no `users` row,
+  so `/api/me` 404s. The `migrate` step seeds it (`chefclaw.seed_fake_owner`);
+  re-run `docker compose up -d migrate`, and confirm `CHEFCLAW_AUTH_PROVIDER` is
+  `fake` and `CHEFCLAW_FAKE_OWNER_ID` matches between the `api` and `migrate`
+  services. (A real Google deploy shows this page by design — sign in with an
+  invited account.)
