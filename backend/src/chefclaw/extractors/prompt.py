@@ -14,17 +14,36 @@ from chefclaw.errors import ConfigError
 PROMPT_VERSION = "v4"
 _PROMPT_RESOURCE = "extract_v4.md"
 
+# The escalation variant (V2-C, ADR 2026-07-07-extractor-robustness-qa).
+# IDENTICAL faithful-capture + cover-sprite rules to v4, wrapped in a two-key
+# envelope that adds a ``capture_quality.on_screen_text`` self-report so the
+# Gemini adapter can tell when overlay text was unreadable at the base resolution
+# and escalate. Used ONLY by the Gemini adapter when media-resolution escalation
+# is enabled (GEMINI_MEDIA_RESOLUTION_MAX set); v4 stays the shared default for
+# the no-escalation path and for the Qwen fallback (never exercised live).
+ESCALATION_PROMPT_VERSION = "v5"
+_ESCALATION_PROMPT_RESOURCE = "extract_v5.md"
 
-def load_prompt() -> str:
-    """Load the versioned extraction prompt shipped inside the package."""
+
+def _load(resource: str) -> str:
     text = (
-        resources.files("chefclaw").joinpath("prompts").joinpath(_PROMPT_RESOURCE).read_text(
+        resources.files("chefclaw").joinpath("prompts").joinpath(resource).read_text(
             encoding="utf-8"
         )
     )
     if not text.strip():
-        raise ConfigError(f"Extraction prompt {_PROMPT_RESOURCE!r} is empty — refusing paid calls.")
+        raise ConfigError(f"Extraction prompt {resource!r} is empty — refusing paid calls.")
     return text
+
+
+def load_prompt() -> str:
+    """Load the versioned extraction prompt shipped inside the package."""
+    return _load(_PROMPT_RESOURCE)
+
+
+def load_escalation_prompt() -> str:
+    """Load the v5 envelope prompt used by the resolution-escalation path."""
+    return _load(_ESCALATION_PROMPT_RESOURCE)
 
 
 # The platform title is creator-controlled free text: a bounded, framed hint,

@@ -109,12 +109,42 @@ class Quantity(BaseModel):
     unit_type: Literal["volume", "mass", "count", "approx"] | None = None
 
 
+# The controlled prep_state vocabulary — keep in sync with the Literal below.
+_PREP_STATES = frozenset({"dried", "fresh", "cooked", "raw", "frozen"})
+
+
 class Ingredient(BaseModel):
     model_config = _STRICT
 
     raw_text: str = Field(min_length=1, description="Verbatim from the source — immutable.")
     name: BilingualText
     quantity: Quantity | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def _relocate_unknown_prep_state(cls, data: object) -> object:
+        """Canonicalize an out-of-vocabulary ``prep_state`` (V2-C QA finding).
+
+        Models sometimes put knife-work — "sliced", "cut into chunks", "切块" —
+        into the STATE-only ``prep_state`` field, whose enum is the five physical
+        states below. ``prep_state`` is NOT verbatim food-quantity data (Hard
+        Rule 7 governs quantities, weights, times, counts — not descriptors), so
+        rather than fail the WHOLE recipe over a mis-slotted descriptor, move the
+        stray value into ``notes`` — exactly where the schema already puts
+        knife-work (the prompt's own ``切块`` example) — and null ``prep_state``.
+        Nothing is fabricated and nothing is lost: the model's own descriptor
+        survives in the right field, and a genuinely-new STATE (e.g. "pickled")
+        likewise survives in ``notes``, visible for a future enum addition
+        instead of being silently dropped. A canonicalization, NOT a repair of
+        food data.
+        """
+        if isinstance(data, dict):
+            prep = data.get("prep_state")
+            if isinstance(prep, str) and prep not in _PREP_STATES:
+                existing = data.get("notes")
+                merged = f"{existing}; {prep}" if isinstance(existing, str) and existing else prep
+                data = {**data, "prep_state": None, "notes": merged}
+        return data
 
     @model_validator(mode="before")
     @classmethod
@@ -148,9 +178,10 @@ class Ingredient(BaseModel):
         gt=0,
         description="ONLY if the host explicitly states a weight — never estimated.",
     )
-    # Enum grows EVIDENCE-DRIVEN: values are added when real videos surface
-    # them (validation_failed preserves the raw output, so a miss is loud).
-    # "frozen" added 2026-07-06 from the first real Rednote acceptance video.
+    # State-only vocabulary ("frozen" added 2026-07-06 from a real Rednote
+    # video). An out-of-vocabulary value no longer fails the recipe: since V2-C
+    # ``_relocate_unknown_prep_state`` moves it into ``notes`` (it stays visible
+    # there for a future enum addition). Keep in sync with _PREP_STATES above.
     prep_state: Literal["dried", "fresh", "cooked", "raw", "frozen"] | None = None
     notes: str | None = None
     # Reserved for pillar 2 (nutrition). The `None` type IS the validator:

@@ -183,6 +183,65 @@ describe('JobsDrawer', () => {
     ).not.toBeInTheDocument();
   });
 
+  it('gives every non-retryable type actionable copy and no Retry button', async () => {
+    genState.jobsList = [
+      jobOut({
+        id: 'j-image',
+        status: 'failed',
+        platform: 'rednote',
+        error_type: 'image_note_unsupported',
+        error_detail: 'note is an image post (图文)',
+        url: 'https://www.xiaohongshu.com/explore/abc',
+      }),
+      jobOut({
+        id: 'j-unsupported',
+        status: 'failed',
+        error_type: 'unsupported_url',
+        url: 'https://example.com/not-a-video',
+      }),
+      jobOut({
+        id: 'j-validation',
+        status: 'failed',
+        error_type: 'validation_failed',
+        url: 'fake://weird-output',
+      }),
+    ];
+
+    const drawer = await openDrawer();
+
+    // Image notes name the concrete fix (paste a video), never a bare error.
+    expect(
+      await within(drawer).findByText(/image gallery.*paste a video post/i),
+    ).toBeInTheDocument();
+    expect(
+      within(drawer).getByText(/Bilibili and Rednote.*video links/i),
+    ).toBeInTheDocument();
+    expect(
+      within(drawer).getByText(/didn't form a valid recipe/i),
+    ).toBeInTheDocument();
+    // None of these can be fixed by retrying — no Retry button anywhere.
+    expect(
+      within(drawer).queryByRole('button', { name: 'Retry' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('falls back to generic guidance for an unrecognized error_type', async () => {
+    genState.jobsList = [
+      jobOut({
+        id: 'j-weird',
+        status: 'failed',
+        error_type: 'some_new_backend_type',
+        url: null,
+      }),
+    ];
+
+    const drawer = await openDrawer();
+
+    expect(
+      await within(drawer).findByText(/Something went wrong on the server/i),
+    ).toBeInTheDocument();
+  });
+
   it('lists active jobs before terminal ones with status and identity', async () => {
     genState.jobsList = [
       jobOut({

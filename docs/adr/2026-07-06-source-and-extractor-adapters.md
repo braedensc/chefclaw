@@ -52,8 +52,12 @@ DASH merge requires **ffmpeg in the api image**.
 The extractor **never validates or repairs output** (Hard Rule 7); the documents
 layer validates strictly and preserves raw output on failure. Gemini: Files API,
 `thinking_budget=0`, `temperature=0.1`, `media_resolution` from config (escalate only
-if overlay text is missed), model id from config. **No internal retries** — the
-worker owns attempts and runs budget checks before every paid call.
+if overlay text is missed — wired opt-in in the 2026-07-07 V2-C ADR: a single
+higher-res retry when the model reports unreadable text), model id from config.
+**No internal *attempt* retries** — the worker owns attempts and runs budget
+checks before every paid call. (The V2-C escalation is a bounded, opt-in
+within-attempt quality retry, not a new attempt; see
+[Extractor robustness QA](2026-07-07-extractor-robustness-qa.md).)
 
 ## Why
 
@@ -76,8 +80,12 @@ worker owns attempts and runs budget checks before every paid call.
   `fetch_url`s go stale as tokens expire — re-extraction may need a fresh share link.
 - **Legacy Bilibili av-ids are deliberately unsupported** (`UnsupportedUrlError`) —
   a decision, not a gap.
-- **Image notes (图文):** the first media item becomes `video_path`; all media is
-  preserved in `extra`.
+- **Image notes (图文):** ~~the first media item becomes `video_path`; all media is
+  preserved in `extra`.~~
+  **Update (2026-07-07, V2-C):** superseded — image notes now **fast-fail typed**
+  (`ImageNoteUnsupportedError`) from the sidecar's `作品类型` before any download or
+  paid call, rather than silently uploading a first still frame. See
+  [Extractor robustness QA](2026-07-07-extractor-robustness-qa.md).
 
 ## Verified (2026-07-06, real spikes)
 
