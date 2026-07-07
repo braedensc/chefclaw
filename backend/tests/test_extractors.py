@@ -117,13 +117,15 @@ async def test_fake_default_dish_passes_documents_schema():
     )
     results = validate_extraction(outcome.dishes, source)
     assert len(results) == 1
-    document, estimated = results[0]
+    document, estimated, tags = results[0]
     assert document.dish_name.original == "红烧肉"
     # The v2 fake dish carries derived estimates, split out of the document:
     assert estimated is not None
     assert estimated.spiciness_level == 1
     assert estimated.difficulty_level == 1
     assert estimated.source == "derived"
+    # The v3 fake dish carries auto-tags, split into the editable tags column:
+    assert tags == ["braise", "pork", "classic"]
 
 
 async def test_fake_usage_is_deterministic():
@@ -131,7 +133,7 @@ async def test_fake_usage_is_deterministic():
     second = await FakeExtractor().extract(VIDEO, None, None)
     assert first.usage == second.usage
     assert first.usage.tokens_thinking == 0
-    assert first.usage.prompt_version == "v2"
+    assert first.usage.prompt_version == "v3"
 
 
 async def test_fake_injection_of_dishes_and_warnings():
@@ -252,7 +254,7 @@ async def test_gemini_happy_path_upload_wait_generate_parse():
     assert outcome.dishes == DISHES
     assert outcome.usage == ExtractionUsage(
         model_id="gemini-test-model",
-        prompt_version="v2",
+        prompt_version="v3",
         tokens_in=1200,
         tokens_out=340,
         tokens_thinking=0,  # thinking disabled — SDK reports None, recorded as 0
@@ -303,7 +305,7 @@ async def test_gemini_parse_failure_carries_usage_when_sdk_surfaced_it():
     carried = exc_info.value.usage
     assert carried == ExtractionUsage(
         model_id="gemini-test-model",
-        prompt_version="v2",
+        prompt_version="v3",
         tokens_in=1200,
         tokens_out=340,
         tokens_thinking=0,
@@ -449,16 +451,17 @@ async def test_gemini_cleanup_errors_never_fail_extraction():
 
 
 def prompt_text() -> str:
-    # The ACTIVE prompt (v2 adds the derived-estimate fields). v1 is kept in
-    # place historically but no backend loads it any more.
+    # The ACTIVE prompt (v3 adds the auto-tags field on top of v2's derived
+    # estimates). v1/v2 are kept in place historically but no backend loads
+    # them any more.
     return (
-        resources.files("chefclaw").joinpath("prompts/extract_v2.md").read_text(encoding="utf-8")
+        resources.files("chefclaw").joinpath("prompts/extract_v3.md").read_text(encoding="utf-8")
     )
 
 
 def test_prompt_exists_and_is_not_gutted():
     text = prompt_text()
-    assert text.strip(), "extract_v2.md must not be empty"
+    assert text.strip(), "extract_v3.md must not be empty"
     # Literal markers guarding against accidental gutting of the invariant.
     assert "适量" in text
     assert "JSON" in text
@@ -466,15 +469,17 @@ def test_prompt_exists_and_is_not_gutted():
     # v2 markers: the derived-estimate fields must be present.
     assert "estimated" in text
     assert "spiciness_level" in text
+    # v3 markers: the auto-tags field must be present.
+    assert "tags" in text
 
 
-def test_prompt_version_is_v2():
-    assert PROMPT_VERSION == "v2"
+def test_prompt_version_is_v3():
+    assert PROMPT_VERSION == "v3"
 
 
-async def test_gemini_stamps_prompt_version_v2():
+async def test_gemini_stamps_prompt_version_v3():
     files = StubFiles(upload_result=active_file())
     models = StubModels(response=gemini_response(json.dumps(DISHES)))
     extractor = make_gemini(files, models)
     outcome = await extractor.extract(VIDEO, None, None)
-    assert outcome.usage.prompt_version == "v2"
+    assert outcome.usage.prompt_version == "v3"

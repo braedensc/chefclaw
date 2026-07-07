@@ -544,11 +544,14 @@ class Worker:
             creator=media.creator,
             video_duration_seconds=media.duration_seconds,
         )
-        # (document, estimated) pairs — the derived estimates ride in their own
-        # column, never inside the verbatim document (Hard Rule 7).
+        # (document, estimated, tags) triples — the derived estimates and the
+        # editable auto-tags ride in their own columns, never inside the
+        # verbatim document (Hard Rule 7). Tags seed recipes.tags as a smart
+        # default; the user can edit them later via RecipePatch.
         validated = validate_extraction(outcome.dishes, source)
-        documents = [document for document, _estimated in validated]
-        estimates = [estimated for _document, estimated in validated]
+        documents = [dish.document for dish in validated]
+        estimates = [dish.estimated for dish in validated]
+        tags = [dish.tags for dish in validated]
 
         extraction_meta: dict[str, Any] = {
             "model_id": outcome.usage.model_id,
@@ -573,7 +576,7 @@ class Worker:
         # the store would reconcile to interrupted and a human retry would
         # re-pay). Derived estimates ride along in the atomic store.
         recipe_ids = await self.store.store_results(
-            job, documents, estimates, extraction_meta=extraction_meta
+            job, documents, estimates, tags, extraction_meta=extraction_meta
         )
         if recipe_ids is None:
             # UNIQUE(platform, canonical_id, dish_index) fired: a raced

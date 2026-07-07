@@ -240,7 +240,7 @@ async def test_happy_path_multi_dish_atomic_store(tmp_path: Path) -> None:
     # extraction_meta carries the §16.4-adjacent audit fields:
     meta = store.recipes[0].extraction_meta
     assert meta["model_id"] == "fake-extractor"
-    assert meta["prompt_version"] == "v2"
+    assert meta["prompt_version"] == "v3"
     assert meta["tokens"] == {"in": 1000, "out": 250, "thinking": 0}
     assert "extracted_at" in meta and "media_resolution" in meta
     # Derived estimates land in the SEPARATE column, never in the document:
@@ -250,6 +250,9 @@ async def test_happy_path_multi_dish_atomic_store(tmp_path: Path) -> None:
         "source": "derived",
     }
     assert "estimated" not in store.recipes[0].document
+    # Auto-tags seed the editable tags column for every dish:
+    assert store.recipes[0].tags == ["braise", "pork", "classic"]
+    assert store.recipes[1].tags == ["braise", "pork", "classic"]
     # Ledger rows: one extraction attempt + one illustration per dish (2).
     extraction_rows = [r for r in store.spend_rows if r["model"] == "fake-extractor"]
     image_rows = [r for r in store.spend_rows if r["model"] == "fake-image"]
@@ -627,7 +630,7 @@ class ConflictNoRowsStore(FakeJobStore):
     """store_results reports the UNIQUE violation but NO racer rows exist —
     the inconsistent-datastore shape (a non-dedupe IntegrityError)."""
 
-    async def store_results(self, job, documents, estimates, *, extraction_meta):
+    async def store_results(self, job, documents, estimates, tags, *, extraction_meta):
         return None
 
 
@@ -946,6 +949,35 @@ async def test_estimated_fields_land_on_the_recipe(tmp_path: Path) -> None:
         "source": "derived",
     }
     assert "estimated" not in store.recipes[0].document
+
+
+async def test_auto_tags_seed_the_editable_tags_column(tmp_path: Path) -> None:
+    """The fake extractor's _DEFAULT_DISH carries a `tags` list; it seeds the
+    user-editable recipes.tags column as a smart default (never the document)."""
+    store, source = FakeJobStore(), make_source()
+    settings = make_settings(tmp_path)
+    worker, _ = make_worker(store, source, settings, FakeExtractor())
+
+    await enqueue_extract(store, OWNER_ID, FAKE_URL, [source], settings)
+    await claim_and_process(worker, store)
+
+    assert store.recipes[0].tags == ["braise", "pork", "classic"]
+    assert "tags" not in store.recipes[0].document
+
+
+async def test_dish_without_tags_stores_empty_list(tmp_path: Path) -> None:
+    """A dish with no `tags` key stores an empty list — tags are an optional
+    smart default, absent is fine (never fails the extraction)."""
+    store, source = FakeJobStore(), make_source()
+    settings = make_settings(tmp_path)
+    untagged = default_dish()
+    del untagged["tags"]
+    worker, _ = make_worker(store, source, settings, FakeExtractor(dishes=[untagged]))
+
+    await enqueue_extract(store, OWNER_ID, FAKE_URL, [source], settings)
+    await claim_and_process(worker, store)
+
+    assert store.recipes[0].tags == []
 
 
 async def test_illustration_hang_cannot_lose_the_paid_store(tmp_path: Path) -> None:

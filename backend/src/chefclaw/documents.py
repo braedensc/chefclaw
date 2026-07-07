@@ -37,9 +37,18 @@ inferred numeric fields) OUT of each dish before document validation, so
 ``RecipeDocument`` never carries a derived value and the raw captures are never
 overwritten (Hard Rule 7). Estimates land in their own column,
 ``source="derived"``, the same posture as the reserved nutrition_ref.
+
+Auto-tags are the same shape: :func:`validate_extraction` SPLITS an optional
+per-dish ``tags`` list OUT of each dish before document validation. Tags are
+categorical ASSESSMENTS (cuisine / cooking method / key ingredient), the same
+class of judgment as ``difficulty`` and ``cuisine_type`` — NOT verbatim food
+data. They seed the user-editable ``recipes.tags`` column (never the immutable
+``document``), so :func:`sanitize_tags` is deliberately LENIENT: bad tags are
+dropped, never raised, because a nice-to-have default must not fail a whole
+extraction.
 """
 
-from typing import Literal
+from typing import Literal, NamedTuple
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
@@ -53,10 +62,17 @@ __all__ = [
     "RecipeDocument",
     "SourceInfo",
     "Step",
+    "ValidatedDish",
+    "sanitize_tags",
     "validate_document",
     "validate_estimated",
     "validate_extraction",
 ]
+
+# Auto-tag cap and per-tag length ceiling (sanitize_tags). Kept small on
+# purpose: 1–3 short labels are a smart default, not an index.
+_MAX_TAGS = 3
+_MAX_TAG_LENGTH = 24
 
 # Strict everywhere: no type coercion beyond lossless int -> float, and no
 # unknown keys — see the module docstring's coercion contract.
@@ -226,6 +242,37 @@ def validate_estimated(raw: dict | None) -> EstimatedAttributes | None:
         ) from exc
 
 
+def sanitize_tags(raw: object) -> list[str]:
+    """Coerce the model's optional per-dish ``tags`` value into 1–3 clean labels.
+
+    Tags are editable categorical METADATA (cuisine / cooking method / key
+    ingredient — the same class of assessment as ``difficulty``), NOT verbatim
+    captured food data, so this is deliberately LENIENT where document
+    validation is strict: anything malformed is dropped, never raised — a
+    nice-to-have default must never fail a whole extraction.
+
+    Each tag is coerced to a stripped, lowercased, non-empty string of at most
+    ``_MAX_TAG_LENGTH`` chars; non-strings, empties, and overlong tags are
+    dropped; duplicates are removed preserving first-seen order; the result is
+    capped at ``_MAX_TAGS``. Absent or non-list input ⇒ ``[]``.
+    """
+    if not isinstance(raw, list):
+        return []
+    cleaned: list[str] = []
+    for item in raw:
+        if not isinstance(item, str):
+            continue
+        tag = item.strip().lower()
+        if not tag or len(tag) > _MAX_TAG_LENGTH:
+            continue
+        if tag in cleaned:
+            continue
+        cleaned.append(tag)
+        if len(cleaned) == _MAX_TAGS:
+            break
+    return cleaned
+
+
 def validate_document(raw: dict) -> RecipeDocument:
     """Validate one raw dish dict against the document schema.
 
@@ -241,16 +288,30 @@ def validate_document(raw: dict) -> RecipeDocument:
         ) from exc
 
 
+class ValidatedDish(NamedTuple):
+    """One validated dish: the verbatim ``document``, its DERIVED ``estimated``
+    attributes (or None), and the sanitized auto-``tags`` (0–3, editable
+    metadata). The estimates and tags are SPLIT OUT of the raw dish before
+    document validation so ``RecipeDocument`` never carries a non-verbatim
+    value (Hard Rule 7)."""
+
+    document: RecipeDocument
+    estimated: EstimatedAttributes | None
+    tags: list[str]
+
+
 def validate_extraction(
     raw_dishes: list[dict], source: SourceInfo
-) -> list[tuple[RecipeDocument, EstimatedAttributes | None]]:
+) -> list[ValidatedDish]:
     """Validate a full extraction (one video ⇒ N dishes) into
-    ``(document, estimated)`` pairs.
+    :class:`ValidatedDish` triples of ``(document, estimated, tags)``.
 
     Each raw dish may carry an optional ``estimated`` object (derived spiciness
-    + difficulty — Hard Rule 7). It is SPLIT OUT of the dish BEFORE document
-    validation so ``RecipeDocument`` stays ``extra="forbid"`` clean and the
-    derived values are stored in their own column, never inside the verbatim
+    + difficulty — Hard Rule 7) and an optional ``tags`` list (1–3 categorical
+    labels — editable metadata, not verbatim capture). Both are SPLIT OUT of
+    the dish BEFORE document validation so ``RecipeDocument`` stays
+    ``extra="forbid"`` clean: the estimates land in their own column, the tags
+    seed the user-editable ``recipes.tags`` column — never inside the verbatim
     ``document``. The document's ``source`` block is injected/overwritten from
     the pipeline's own knowledge — the model must not control provenance, so
     any model-emitted ``source`` is discarded. Inputs are never mutated.
@@ -258,8 +319,10 @@ def validate_extraction(
     An empty ``raw_dishes`` is a validation failure: a stored extraction must
     contain at least one dish (mirrors the min-1 ingredients/steps rule).
 
-    Raises :class:`~chefclaw.errors.ValidationFailedError` on ANY failure,
-    ``raw_output`` preserving the offending payload.
+    Raises :class:`~chefclaw.errors.ValidationFailedError` on ANY document or
+    estimate failure, ``raw_output`` preserving the offending payload. Bad tags
+    never raise — :func:`sanitize_tags` drops them (a smart default, not
+    captured data).
     """
     if not raw_dishes:
         raise ValidationFailedError(
@@ -268,17 +331,18 @@ def validate_extraction(
         )
 
     provenance = source.model_dump()
-    results: list[tuple[RecipeDocument, EstimatedAttributes | None]] = []
+    results: list[ValidatedDish] = []
     for index, dish in enumerate(raw_dishes):
         if not isinstance(dish, dict):
             raise ValidationFailedError(
                 f"dish {index} is not a JSON object (got {type(dish).__name__})",
                 raw_output=dish,
             )
-        # Split the derived estimates out (without mutating the input) so the
-        # document validates clean under extra="forbid".
+        # Split the derived estimates and auto-tags out (without mutating the
+        # input) so the document validates clean under extra="forbid".
         estimated = validate_estimated(dish.get("estimated"))
-        merged = {k: v for k, v in dish.items() if k != "estimated"}
+        tags = sanitize_tags(dish.get("tags"))
+        merged = {k: v for k, v in dish.items() if k not in ("estimated", "tags")}
         merged["source"] = provenance
         try:
             document = RecipeDocument.model_validate(merged)
@@ -286,5 +350,5 @@ def validate_extraction(
             raise ValidationFailedError(
                 f"dish {index} failed validation: {exc}", raw_output=merged
             ) from exc
-        results.append((document, estimated))
+        results.append(ValidatedDish(document, estimated, tags))
     return results

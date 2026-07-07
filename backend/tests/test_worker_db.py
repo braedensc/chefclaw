@@ -190,6 +190,8 @@ async def test_atomic_store_and_ledger(sessionmaker, owner_id, tmp_path: Path) -
         "source": "derived",
     }
     assert "estimated" not in recipes[0].document
+    # Auto-tags seed the user-editable tags column (never the verbatim document):
+    assert recipes[0].tags == ["braise", "pork", "classic"]
     # Illustrations persisted AFTER the atomic store (per-row set_recipe_image
     # UPDATEs from the resolved media root) — never inside the paid-work
     # crash-loss window.
@@ -251,9 +253,10 @@ async def test_store_results_unique_violation_adopts(
         [default_dish()],
         SourceInfo(platform="bilibili", url=FAKE_URL, creator=None, video_duration_seconds=None),
     )
-    documents = [doc for doc, _est in validated]
-    estimates = [est for _doc, est in validated]
-    result = await store.store_results(job_b, documents, estimates, extraction_meta={})
+    documents = [dish.document for dish in validated]
+    estimates = [dish.estimated for dish in validated]
+    tags = [dish.tags for dish in validated]
+    result = await store.store_results(job_b, documents, estimates, tags, extraction_meta={})
     assert result is None  # the real IntegrityError path
     await store.adopt_recipes(job_b.id, raced_ids)
     async with sessionmaker() as session:

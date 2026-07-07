@@ -191,6 +191,7 @@ class FakeJobStore:
         job: Job,
         documents: list[RecipeDocument],
         estimates: list[EstimatedAttributes | None],
+        tags: list[list[str]],
         *,
         extraction_meta: dict[str, Any],
     ) -> list[uuid.UUID] | None:
@@ -210,12 +211,13 @@ class FakeJobStore:
                 )
             return None
         recipe_ids: list[uuid.UUID] = []
-        for index, (document, estimate) in enumerate(
-            zip(documents, estimates, strict=False)
+        for index, (document, estimate, dish_tags) in enumerate(
+            zip(documents, estimates, tags, strict=False)
         ):
             # image_url lands NULL — illustrations are persisted post-store via
             # set_recipe_image (never inside the paid-work crash-loss window).
-            # Derived estimates ride in their own column (Hard Rule 7).
+            # Derived estimates ride in their own column (Hard Rule 7); auto-tags
+            # seed the user-editable recipes.tags column.
             recipe = self.seed_recipe(
                 owner_id=job.owner_id,
                 platform=job.platform,
@@ -224,6 +226,7 @@ class FakeJobStore:
                 dish_index=index,
                 title_en=document.dish_name.en,
                 title_original=document.dish_name.original,
+                tags=dish_tags,
                 document=document.model_dump(mode="json"),
                 estimated=estimate.model_dump(mode="json") if estimate is not None else None,
                 extraction_meta=extraction_meta,

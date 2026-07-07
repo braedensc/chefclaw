@@ -125,6 +125,7 @@ class JobStore(Protocol):
         job: Job,
         documents: list[RecipeDocument],
         estimates: list[EstimatedAttributes | None],
+        tags: list[list[str]],
         *,
         extraction_meta: dict[str, Any],
     ) -> list[uuid.UUID] | None: ...
@@ -299,6 +300,7 @@ class PostgresJobStore:
         job: Job,
         documents: list[RecipeDocument],
         estimates: list[EstimatedAttributes | None],
+        tags: list[list[str]],
         *,
         extraction_meta: dict[str, Any],
     ) -> list[uuid.UUID] | None:
@@ -308,6 +310,9 @@ class PostgresJobStore:
         the paid-work crash-loss window) and persisted via set_recipe_image.
         Derived ``estimated`` attributes (spiciness/difficulty — kept SEPARATE
         from the verbatim document, Hard Rule 7) are stored atomically here.
+        Auto-``tags`` (0–3 sanitized labels) seed the user-editable
+        ``recipes.tags`` column as a smart default — the user can edit them
+        later via RecipePatch.
         Returns the new recipe ids, or ``None`` when UNIQUE(platform,
         canonical_id, dish_index) fired — a raced duplicate the caller adopts
         instead of failing."""
@@ -325,6 +330,7 @@ class PostgresJobStore:
                             canonical_id=job.canonical_id,
                             dish_index=index,
                             status="stored",
+                            tags=dish_tags,
                             document=document.model_dump(mode="json"),
                             estimated=(
                                 estimate.model_dump(mode="json")
@@ -333,8 +339,8 @@ class PostgresJobStore:
                             ),
                             extraction_meta=extraction_meta,
                         )
-                        for index, (document, estimate) in enumerate(
-                            zip(documents, estimates, strict=False)
+                        for index, (document, estimate, dish_tags) in enumerate(
+                            zip(documents, estimates, tags, strict=False)
                         )
                     ]
                     session.add_all(rows)
