@@ -26,14 +26,14 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
-from sqlalchemy import func, select
+from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from chefclaw.config import Settings
 from chefclaw.extractors.fake import FakeExtractor, default_dish
 from chefclaw.images import ImageResult
 from chefclaw.models import Base, Job, LlmSpend, Recipe, User
-from chefclaw.services.jobs import Worker, enqueue_extract
+from chefclaw.services.jobs import Worker, enqueue_extract, enqueue_illustration
 from chefclaw.services.repo import PostgresJobStore
 from chefclaw.sources.fake import FakeSource
 
@@ -142,10 +142,11 @@ async def test_skip_locked_claim_is_exclusive(sessionmaker, owner_id, tmp_path: 
 
 async def test_atomic_store_and_ledger(sessionmaker, owner_id, tmp_path: Path) -> None:
     """Full pipeline against real SQL: N-row insert + job flip in one
-    transaction, extraction + illustration spend ledgered, illustrations
-    persisted POST-store (real set_recipe_image UPDATEs), derived estimates
-    stored, dedupe visible to a re-enqueue. Illustrations do NOT depend on
-    media_retention (default discard here)."""
+    transaction; the extraction ledgers ONE attempt and enqueues one
+    illustration job per recipe; draining those (real claim + jsonb-backed
+    dedupe/load + set_recipe_image UPDATEs) ledgers the image spend and persists
+    the covers. Derived estimates stored; dedupe visible to a re-enqueue.
+    Illustrations do NOT depend on media_retention (default discard here)."""
     settings = golden_settings(tmp_path)
     store = PostgresJobStore(sessionmaker, settings)
     source = FakeSource(platform="bilibili", canonical_id="BVgolden003-p1")
@@ -165,8 +166,46 @@ async def test_atomic_store_and_ledger(sessionmaker, owner_id, tmp_path: Path) -
     job = await store.claim_next_job()
     await worker.process(job)
 
+    # Extraction stored WITHOUT inline images — image work is deferred to the
+    # per-recipe illustration jobs it enqueued.
     async with sessionmaker() as session:
         stored_job = await session.get(Job, job.id)
+        recipes = (
+            (await session.execute(select(Recipe).order_by(Recipe.dish_index))).scalars().all()
+        )
+        image_spend = await session.scalar(
+            select(func.count(LlmSpend.id)).where(LlmSpend.model == "fake-image")
+        )
+        pending_jobs = (
+            (
+                await session.execute(
+                    select(Job).where(Job.type == "illustration").order_by(Job.created_at)
+                )
+            )
+            .scalars()
+            .all()
+        )
+    assert stored_job.status == "stored"
+    assert len(recipes) == 2
+    assert [r.dish_index for r in recipes] == [0, 1]
+    assert stored_job.result_recipe_ids == [r.id for r in recipes]
+    assert recipes[0].document["source"]["url"] == FAKE_URL
+    assert all(r.image_url is None for r in recipes)  # deferred
+    assert image_spend == 0
+    # One illustration job per recipe: null platform (never touches canonical
+    # dedupe), pending, keyed to the recipe ids in the payload.
+    assert len(pending_jobs) == 2
+    assert all(j.platform is None and j.status == "pending" for j in pending_jobs)
+    assert sorted(rid for j in pending_jobs for rid in j.payload["recipe_ids"]) == sorted(
+        str(r.id) for r in recipes
+    )
+
+    # Drain the illustration jobs (real SKIP LOCKED claim → jsonb load →
+    # per-row set_recipe_image UPDATEs):
+    while (next_job := await store.claim_next_job()) is not None:
+        await worker.process(next_job)
+
+    async with sessionmaker() as session:
         recipes = (
             (await session.execute(select(Recipe).order_by(Recipe.dish_index))).scalars().all()
         )
@@ -176,13 +215,14 @@ async def test_atomic_store_and_ledger(sessionmaker, owner_id, tmp_path: Path) -
         image_spend = await session.scalar(
             select(func.count(LlmSpend.id)).where(LlmSpend.model == "fake-image")
         )
-    assert stored_job.status == "stored"
-    assert len(recipes) == 2
-    assert [r.dish_index for r in recipes] == [0, 1]
-    assert stored_job.result_recipe_ids == [r.id for r in recipes]
-    assert recipes[0].document["source"]["url"] == FAKE_URL
+        illustration_states = (
+            (await session.execute(select(Job.status).where(Job.type == "illustration")))
+            .scalars()
+            .all()
+        )
     assert extraction_spend == 1  # one extraction attempt
-    assert image_spend == 2  # one illustration per dish
+    assert image_spend == 2  # one illustration per dish, ledgered on drain
+    assert set(illustration_states) == {"stored"}
     # Derived estimates stored SEPARATE from the verbatim document:
     assert recipes[0].estimated == {
         "spiciness_level": 1,
@@ -192,9 +232,8 @@ async def test_atomic_store_and_ledger(sessionmaker, owner_id, tmp_path: Path) -
     assert "estimated" not in recipes[0].document
     # Auto-tags seed the user-editable tags column (never the verbatim document):
     assert recipes[0].tags == ["braise", "pork", "classic"]
-    # Illustrations persisted AFTER the atomic store (per-row set_recipe_image
-    # UPDATEs from the resolved media root) — never inside the paid-work
-    # crash-loss window.
+    # Covers persisted via the real per-row set_recipe_image UPDATE from the
+    # resolved media root.
     archive_dir = Path(settings.media_dir).resolve() / "bilibili" / "BVgolden003-p1"
     assert [r.image_url for r in recipes] == [
         str(archive_dir / "illustration-0.jpg"),
@@ -206,6 +245,100 @@ async def test_atomic_store_and_ledger(sessionmaker, owner_id, tmp_path: Path) -
     again, existing = await enqueue_extract(store, owner_id, FAKE_URL, [source], settings)
     assert existing is True
     assert again.id == job.id
+
+
+async def _seed_stored_recipe(sessionmaker, owner_id, canonical_id: str) -> Recipe:
+    async with sessionmaker() as session:
+        recipe = Recipe(
+            owner_id=owner_id,
+            title_en="X",
+            title_original="菜",
+            platform="bilibili",
+            source_url=FAKE_URL,
+            canonical_id=canonical_id,
+            dish_index=0,
+            status="stored",
+            document=default_dish(),
+        )
+        session.add(recipe)
+        await session.commit()
+        await session.refresh(recipe)
+        return recipe
+
+
+async def test_illustration_dedupe_and_load_against_real_sql(
+    sessionmaker, owner_id, tmp_path: Path
+) -> None:
+    """The illustration-job SQL only the golden tier can exercise: the
+    jsonb_exists(payload->'recipe_ids', :id) per-recipe dedupe and the
+    recipe-slice load, against REAL postgres."""
+    store = make_store(sessionmaker, tmp_path)
+    recipe = await _seed_stored_recipe(sessionmaker, owner_id, "BVgolden007-p1")
+
+    # First enqueue inserts; second dedupes via the real jsonb_exists query.
+    job, existing = await enqueue_illustration(store, owner_id, recipe.id)
+    assert existing is False
+    again, existing = await enqueue_illustration(store, owner_id, recipe.id)
+    assert existing is True
+    assert again.id == job.id
+    # A DIFFERENT recipe id must NOT dedupe onto this job:
+    other, existing = await enqueue_illustration(store, owner_id, uuid.uuid4())
+    assert existing is False
+    assert other.id != job.id
+
+    # load_recipes_for_illustration returns the recipe slice, job_id = the job:
+    refs = await store.load_recipes_for_illustration(job.id, [recipe.id])
+    assert len(refs) == 1
+    ref = refs[0]
+    assert (ref.id, ref.job_id, ref.platform, ref.dish_index) == (
+        recipe.id, job.id, "bilibili", 0,
+    )
+
+    # A terminal job no longer dedupes — a fresh regenerate enqueues:
+    async with sessionmaker() as session:
+        await session.execute(update(Job).where(Job.id == job.id).values(status="stored"))
+        await session.commit()
+    fresh, existing = await enqueue_illustration(store, owner_id, recipe.id)
+    assert existing is False
+    assert fresh.id != job.id
+
+
+async def test_illustration_job_failure_marks_failed_real_sql(
+    sessionmaker, owner_id, tmp_path: Path
+) -> None:
+    """Driving an illustration job whose generator errors: the job is marked
+    failed (illustration_failed) via real SQL, the recipe is untouched
+    (image_url NULL), and no image spend row lands."""
+    settings = golden_settings(tmp_path)
+    store = PostgresJobStore(sessionmaker, settings)
+    recipe = await _seed_stored_recipe(sessionmaker, owner_id, "BVgolden008-p1")
+
+    class _BoomImages:
+        async def generate(self, prompt):
+            raise RuntimeError("image API exploded")
+
+    worker = Worker(
+        store=store,
+        adapters=[FakeSource(platform="bilibili", canonical_id="BVgolden008-p1")],
+        settings=settings,
+        extractor_factory=lambda _s: FakeExtractor(),
+        image_generator_factory=lambda _s: _BoomImages(),
+        sleeper=_noop_sleep,
+    )
+
+    job, _ = await enqueue_illustration(store, owner_id, recipe.id)
+    await worker.process(await store.claim_next_job())
+
+    async with sessionmaker() as session:
+        done = await session.get(Job, job.id)
+        rechecked = await session.get(Recipe, recipe.id)
+        image_spend = await session.scalar(
+            select(func.count(LlmSpend.id)).where(LlmSpend.model == "fake-image")
+        )
+    assert done.status == "failed"
+    assert done.error_type == "illustration_failed"
+    assert rechecked.image_url is None
+    assert image_spend == 0
 
 
 async def test_store_results_unique_violation_adopts(
@@ -306,7 +439,10 @@ async def test_hard_delete_reopens_extraction(sessionmaker, owner_id, tmp_path: 
     assert fresh.id != job.id
     assert fresh.status == "pending"
 
-    await worker.process(await store.claim_next_job())
+    # Drain the whole queue: the fresh extraction PLUS the leftover illustration
+    # job from the first extraction (whose recipe was deleted — a no-op store).
+    while (next_job := await store.claim_next_job()) is not None:
+        await worker.process(next_job)
     async with sessionmaker() as session:
         stored_fresh = await session.get(Job, fresh.id)
         recipe_count = await session.scalar(select(func.count(Recipe.id)))

@@ -11,15 +11,18 @@ export function isTerminalStatus(status: string): boolean {
 }
 
 /**
- * error_type values whose action is a Retry button (re-POST the job's url).
- * cookies_expired / budget_exceeded / config_error get text guidance instead
- * — retrying them without operator action would just fail again.
+ * error_type values whose action is a Retry button. For extract/upload jobs the
+ * Retry re-POSTs the job's url; for illustration jobs it re-enqueues an
+ * illustration job for the recipe (see the jobs drawer). cookies_expired /
+ * budget_exceeded / config_error get text guidance instead — retrying them
+ * without operator action would just fail again.
  */
 export const RETRYABLE_ERROR_TYPES: ReadonlySet<string> = new Set([
   'interrupted',
   'download_failed',
   'extraction_failed',
   'rate_limited',
+  'illustration_failed',
 ]);
 
 const STATUS_LABELS: Record<string, string> = {
@@ -27,6 +30,7 @@ const STATUS_LABELS: Record<string, string> = {
   downloading: 'Downloading',
   extracting: 'Extracting',
   validating: 'Validating',
+  illustrating: 'Illustrating',
   stored: 'Stored',
   failed: 'Failed',
 };

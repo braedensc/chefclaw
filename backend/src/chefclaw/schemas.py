@@ -58,6 +58,10 @@ class JobOut(BaseModel):
     # affordance re-POSTs it: a failed job is never ACTIVE for dedupe, so the
     # re-POST creates a fresh job (jobs ADR).
     url: str | None = None
+    # For an ILLUSTRATION job: the recipe(s) it (re)generates covers for
+    # (lifted from the payload). Empty for extract/upload jobs. The drawer's
+    # Retry re-enqueues an illustration job for these recipes.
+    recipe_ids: list[uuid.UUID] = []
     created_at: datetime
     updated_at: datetime
 
@@ -81,6 +85,7 @@ class JobOut(BaseModel):
             "error_detail": data.error_detail,
             "result_recipe_ids": data.result_recipe_ids,
             "url": payload.get("url"),
+            "recipe_ids": payload.get("recipe_ids", []),
             "created_at": data.created_at,
             "updated_at": data.updated_at,
         }

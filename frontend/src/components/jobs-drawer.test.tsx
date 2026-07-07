@@ -104,6 +104,42 @@ describe('JobsDrawer', () => {
     expect(genState.extract).not.toHaveBeenCalled();
   });
 
+  it('retries a failed illustration job by re-enqueueing, not re-POSTing an extract', async () => {
+    genState.jobsList = [
+      jobOut({
+        id: 'j-illus',
+        type: 'illustration',
+        platform: null,
+        canonical_id: null,
+        url: null,
+        recipe_ids: ['recipe-42'],
+        status: 'failed',
+        error_type: 'illustration_failed',
+        error_detail: '1 of 1 illustration(s) could not be generated',
+      }),
+    ];
+    genState.regenerateIllustration.mockResolvedValue(
+      jobOut({ id: 'j-illus-2', type: 'illustration' }),
+    );
+
+    const drawer = await openDrawer();
+
+    // The row reads as a cover job, not a canonical id:
+    const [row] = await within(drawer).findAllByRole('listitem');
+    expect(row).toHaveTextContent('Cover illustration');
+
+    fireEvent.click(
+      await within(drawer).findByRole('button', { name: 'Retry' }),
+    );
+    await waitFor(() =>
+      expect(genState.regenerateIllustration).toHaveBeenCalledWith(
+        expect.objectContaining({ path: { recipe_id: 'recipe-42' } }),
+      ),
+    );
+    // It must NOT re-POST the extract endpoint for an illustration job:
+    expect(genState.extract).not.toHaveBeenCalled();
+  });
+
   it('maps non-retryable typed errors onto guidance text', async () => {
     genState.jobsList = [
       jobOut({

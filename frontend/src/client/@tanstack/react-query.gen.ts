@@ -3,8 +3,8 @@
 import { type DefaultError, type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { deleteRecipeApiRecipesRecipeIdDelete, extractRecipeApiRecipesExtractPost, getJobApiJobsJobIdGet, getRecipeApiRecipesRecipeIdGet, getRecipeImageApiRecipesRecipeIdImageGet, getSpendApiSpendGet, healthApiHealthGet, listJobsApiJobsGet, listRecipesApiRecipesGet, type Options, patchRecipeApiRecipesRecipeIdPatch, uploadRecipeVideoApiRecipesUploadPost } from '../sdk.gen';
-import type { DeleteRecipeApiRecipesRecipeIdDeleteData, DeleteRecipeApiRecipesRecipeIdDeleteError, DeleteRecipeApiRecipesRecipeIdDeleteResponse, ExtractRecipeApiRecipesExtractPostData, ExtractRecipeApiRecipesExtractPostError, ExtractRecipeApiRecipesExtractPostResponse, GetJobApiJobsJobIdGetData, GetJobApiJobsJobIdGetError, GetJobApiJobsJobIdGetResponse, GetRecipeApiRecipesRecipeIdGetData, GetRecipeApiRecipesRecipeIdGetError, GetRecipeApiRecipesRecipeIdGetResponse, GetRecipeImageApiRecipesRecipeIdImageGetData, GetRecipeImageApiRecipesRecipeIdImageGetError, GetSpendApiSpendGetData, GetSpendApiSpendGetError, GetSpendApiSpendGetResponse, HealthApiHealthGetData, HealthApiHealthGetResponse, ListJobsApiJobsGetData, ListJobsApiJobsGetError, ListJobsApiJobsGetResponse, ListRecipesApiRecipesGetData, ListRecipesApiRecipesGetError, ListRecipesApiRecipesGetResponse, PatchRecipeApiRecipesRecipeIdPatchData, PatchRecipeApiRecipesRecipeIdPatchError, PatchRecipeApiRecipesRecipeIdPatchResponse, UploadRecipeVideoApiRecipesUploadPostData, UploadRecipeVideoApiRecipesUploadPostError, UploadRecipeVideoApiRecipesUploadPostResponse } from '../types.gen';
+import { deleteRecipeApiRecipesRecipeIdDelete, extractRecipeApiRecipesExtractPost, getJobApiJobsJobIdGet, getRecipeApiRecipesRecipeIdGet, getRecipeImageApiRecipesRecipeIdImageGet, getSpendApiSpendGet, healthApiHealthGet, listJobsApiJobsGet, listRecipesApiRecipesGet, type Options, patchRecipeApiRecipesRecipeIdPatch, regenerateIllustrationApiRecipesRecipeIdIllustrationPost, uploadRecipeVideoApiRecipesUploadPost } from '../sdk.gen';
+import type { DeleteRecipeApiRecipesRecipeIdDeleteData, DeleteRecipeApiRecipesRecipeIdDeleteError, DeleteRecipeApiRecipesRecipeIdDeleteResponse, ExtractRecipeApiRecipesExtractPostData, ExtractRecipeApiRecipesExtractPostError, ExtractRecipeApiRecipesExtractPostResponse, GetJobApiJobsJobIdGetData, GetJobApiJobsJobIdGetError, GetJobApiJobsJobIdGetResponse, GetRecipeApiRecipesRecipeIdGetData, GetRecipeApiRecipesRecipeIdGetError, GetRecipeApiRecipesRecipeIdGetResponse, GetRecipeImageApiRecipesRecipeIdImageGetData, GetRecipeImageApiRecipesRecipeIdImageGetError, GetSpendApiSpendGetData, GetSpendApiSpendGetError, GetSpendApiSpendGetResponse, HealthApiHealthGetData, HealthApiHealthGetResponse, ListJobsApiJobsGetData, ListJobsApiJobsGetError, ListJobsApiJobsGetResponse, ListRecipesApiRecipesGetData, ListRecipesApiRecipesGetError, ListRecipesApiRecipesGetResponse, PatchRecipeApiRecipesRecipeIdPatchData, PatchRecipeApiRecipesRecipeIdPatchError, PatchRecipeApiRecipesRecipeIdPatchResponse, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostData, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostError, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostResponse, UploadRecipeVideoApiRecipesUploadPostData, UploadRecipeVideoApiRecipesUploadPostError, UploadRecipeVideoApiRecipesUploadPostResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -255,6 +255,30 @@ export const patchRecipeApiRecipesRecipeIdPatchMutation = (options?: Partial<Opt
     const mutationOptions: UseMutationOptions<PatchRecipeApiRecipesRecipeIdPatchResponse, PatchRecipeApiRecipesRecipeIdPatchError, Options<PatchRecipeApiRecipesRecipeIdPatchData>> = {
         mutationFn: async (fnOptions) => {
             const { data } = await patchRecipeApiRecipesRecipeIdPatch({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Regenerate Illustration
+ *
+ * Enqueue an illustration job to (re)generate this recipe's cover — the
+ * detail-page 'Regenerate illustration' affordance and the jobs-drawer Retry
+ * for a failed illustration job both land here. Owner-scoped: a recipe that
+ * isn't the caller's is a 404 (never enqueue paid work for another owner).
+ * 202 when a fresh job was enqueued, 200 when an active illustration job for
+ * this recipe already exists (dedupe).
+ */
+export const regenerateIllustrationApiRecipesRecipeIdIllustrationPostMutation = (options?: Partial<Options<RegenerateIllustrationApiRecipesRecipeIdIllustrationPostData>>): UseMutationOptions<RegenerateIllustrationApiRecipesRecipeIdIllustrationPostResponse, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostError, Options<RegenerateIllustrationApiRecipesRecipeIdIllustrationPostData>> => {
+    const mutationOptions: UseMutationOptions<RegenerateIllustrationApiRecipesRecipeIdIllustrationPostResponse, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostError, Options<RegenerateIllustrationApiRecipesRecipeIdIllustrationPostData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await regenerateIllustrationApiRecipesRecipeIdIllustrationPost({
                 ...options,
                 ...fnOptions,
                 throwOnError: true

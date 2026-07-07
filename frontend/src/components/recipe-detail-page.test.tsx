@@ -67,6 +67,34 @@ describe('RecipeDetailPage', () => {
     ).toBeInTheDocument();
   });
 
+  it('enqueues a cover job from the Regenerate illustration control', async () => {
+    genState.recipesById['r1'] = recipeDetail({ id: 'r1', has_image: true });
+    genState.regenerateIllustration.mockResolvedValue({});
+
+    renderApp('/recipes/r1');
+
+    const button = await screen.findByRole('button', {
+      name: 'Regenerate illustration',
+    });
+    fireEvent.click(button);
+    await waitFor(() =>
+      expect(genState.regenerateIllustration).toHaveBeenCalledWith(
+        expect.objectContaining({ path: { recipe_id: 'r1' } }),
+      ),
+    );
+    expect(await screen.findByText(/Queued/)).toBeInTheDocument();
+  });
+
+  it('labels the cover control Generate when the recipe has no image yet', async () => {
+    genState.recipesById['r1'] = recipeDetail({ id: 'r1', has_image: false });
+
+    renderApp('/recipes/r1');
+
+    expect(
+      await screen.findByRole('button', { name: 'Generate illustration' }),
+    ).toBeInTheDocument();
+  });
+
   it('shows no illustration hero when has_image is false', async () => {
     genState.recipesById['r1'] = recipeDetail({ has_image: false });
 

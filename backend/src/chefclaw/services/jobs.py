@@ -29,11 +29,11 @@ import uuid
 from collections.abc import Awaitable, Callable, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, NamedTuple
 
 from chefclaw import errors, observability, spend
 from chefclaw.config import Settings
-from chefclaw.documents import RecipeDocument, SourceInfo, validate_extraction
+from chefclaw.documents import SourceInfo, validate_extraction
 from chefclaw.extractors import (
     ExtractionUsage,
     ExtractorAdapter,
@@ -46,7 +46,7 @@ from chefclaw.images import (
     build_illustration_prompt,
     get_image_generator,
 )
-from chefclaw.models import Job, JobStatus
+from chefclaw.models import Job, JobStatus, JobType
 from chefclaw.services.illustrations import illustration_path, write_illustration
 from chefclaw.services.repo import JobStore
 from chefclaw.sources import CanonicalRef, FetchedMedia, SourceAdapter, resolve_source
@@ -58,6 +58,7 @@ __all__ = [
     "Worker",
     "default_source_adapters",
     "enqueue_extract",
+    "enqueue_illustration",
     "enqueue_upload",
 ]
 
@@ -87,6 +88,26 @@ _UPLOAD_STAGING_DIRNAME = "chefclaw-uploads"
 _JOB_SCRATCH_DIRNAME = "chefclaw-jobs"
 
 Sleeper = Callable[[float], Awaitable[None]]
+
+
+class _IllustrationOutcome(NamedTuple):
+    """One recipe's illustration result. ``reason`` is None on success, else a
+    taxonomy string ('budget_exceeded' / 'config_error' / 'illustration_failed')
+    the illustration job folds into its terminal error_type."""
+
+    ok: bool
+    reason: str | None
+
+
+# When an illustration job has mixed failures, the terminal error_type prefers
+# the operator-actionable reasons (budget/config — the drawer shows guidance,
+# not a Retry) over the transient one (illustration_failed — a Retry button).
+def _summarize_illustration_failures(reasons: Sequence[str]) -> str:
+    if "budget_exceeded" in reasons:
+        return "budget_exceeded"
+    if "config_error" in reasons:
+        return "config_error"
+    return "illustration_failed"
 
 
 def default_source_adapters(settings: Settings) -> list[SourceAdapter]:
@@ -182,8 +203,34 @@ async def enqueue_extract(
     # xsec_token URLs are per-share; the resolved one is the good one).
     payload = {"url": url, "fetch_url": ref.fetch_url}
     return await _dedupe_or_insert(
-        store, owner_id=owner_id, job_type="extract", ref=ref, payload=payload
+        store, owner_id=owner_id, job_type=JobType.EXTRACT.value, ref=ref, payload=payload
     )
+
+
+async def enqueue_illustration(
+    store: JobStore, owner_id: uuid.UUID, recipe_id: uuid.UUID
+) -> tuple[Job, bool]:
+    """Enqueue (or dedupe) an illustration job for ONE recipe — the retriable,
+    on-demand-regeneratable cover-image path (V2-E follow-up, 2026-07-07).
+
+    An ACTIVE illustration job already targeting this recipe wins (return it):
+    the paid image call is deduped exactly like extraction, so the post-store
+    enqueue, the startup backfill, a drawer Retry, and a detail-page Regenerate
+    can all fire without stacking duplicate paid jobs on one recipe. The job
+    carries a null platform/canonical_id (it is keyed to the recipe, not a
+    source identity), so it never collides with the canonical-identity dedupe.
+    Returns ``(job, existing)``."""
+    active = await store.find_active_illustration_job(recipe_id)
+    if active is not None:
+        return active, True
+    job = await store.insert_job(
+        owner_id=owner_id,
+        job_type=JobType.ILLUSTRATION.value,
+        payload={"recipe_ids": [str(recipe_id)]},
+        platform=None,
+        canonical_id=None,
+    )
+    return job, False
 
 
 async def enqueue_upload(
@@ -211,7 +258,7 @@ async def enqueue_upload(
         "sha256": media.extra.get("sha256"),
     }
     return await _dedupe_or_insert(
-        store, owner_id=owner_id, job_type="upload", ref=ref, payload=payload
+        store, owner_id=owner_id, job_type=JobType.UPLOAD.value, ref=ref, payload=payload
     )
 
 
@@ -329,10 +376,6 @@ class Worker:
         is deliberately LEFT in its running stage for the next boot's
         reconcile to flip to ``interrupted`` — restart must not look like a
         retryable failure."""
-        scratch_dir = _scratch_root(self._settings) / _JOB_SCRATCH_DIRNAME / str(job.id)
-        stage = "download"
-        terminal = True
-        started = time.perf_counter()
         job_extra = {
             "job_id": str(job.id),
             "job_type": job.type,
@@ -344,6 +387,17 @@ class Worker:
             job.id, job.type, job.platform, job.attempts,
             extra=job_extra,
         )
+        # Illustration jobs skip download/extract entirely — a different stage
+        # machine (budget-gated image gen per recipe), no scratch, no media
+        # retention, its own terminal semantics.
+        if job.type == JobType.ILLUSTRATION.value:
+            await self._process_illustration(job, job_extra)
+            return
+
+        scratch_dir = _scratch_root(self._settings) / _JOB_SCRATCH_DIRNAME / str(job.id)
+        stage = "download"
+        terminal = True
+        started = time.perf_counter()
         try:
             media = await self._download(job, scratch_dir)
             logger.info(
@@ -432,7 +486,7 @@ class Worker:
     # ── stages ───────────────────────────────────────────────────────────────
 
     async def _download(self, job: Job, scratch_dir: Path) -> FetchedMedia:
-        if job.type == "upload":
+        if job.type == JobType.UPLOAD.value:
             video_path = Path(job.payload["video_path"])
             if not video_path.is_file():
                 raise errors.DownloadFailedError(
@@ -593,11 +647,12 @@ class Worker:
                 err.retryable = False
                 raise err
             await self.store.adopt_recipes(job.id, recipe_ids)
-            return recipe_ids  # the racer's rows — their own image pass owns them
-        # Illustrations AFTER the commit: best-effort, budget-gated, and a
-        # crash between the store and here is healed by the startup backfill
-        # (its documented job).
-        await self._store_illustrations(job, documents, recipe_ids)
+            return recipe_ids  # the racer's rows — their own image jobs own them
+        # Illustrations AFTER the commit: enqueue one best-effort illustration
+        # job per stored recipe (the images are generated by a separate,
+        # retriable job — never inside the paid-extraction crash-loss window;
+        # a crash before the enqueue is healed by the startup backfill).
+        await self._enqueue_illustrations(job, recipe_ids)
         return recipe_ids
 
     async def _record_attempt(self, job: Job, usage: ExtractionUsage | None) -> None:
@@ -620,37 +675,85 @@ class Worker:
             cost_usd=spend.estimate_cost(usage),
         )
 
-    # ── illustrations (generated cartoon covers — best-effort, post-store) ───
+    # ── illustrations (generated cartoon covers — their own retriable job) ───
 
     def _media_root(self) -> Path:
         # resolve() so every persisted image_url is absolute — the /image route
         # serves only files that resolve under this same root.
         return Path(self._settings.media_dir).resolve()
 
-    async def _store_illustrations(
-        self, job: Job, documents: Sequence[RecipeDocument], recipe_ids: Sequence[uuid.UUID]
+    async def _enqueue_illustrations(
+        self, job: Job, recipe_ids: Sequence[uuid.UUID]
     ) -> None:
-        """One generated illustration per dish, AFTER the atomic store. STRICTLY
-        BEST-EFFORT: budget refusal, an image-API error, or a write failure
-        just leaves image_url NULL (the backfill may heal it later) — it must
-        NEVER fail or delay the recipe store. Unlike the old ffmpeg covers, this
-        does NOT depend on a retained video: the prompt is built from the
-        recipe's text fields (Hard Rule 7)."""
-        media_root = self._media_root()
-        for dish_index, (document, recipe_id) in enumerate(
-            zip(documents, recipe_ids, strict=False)
-        ):
-            prompt = build_illustration_prompt(document.model_dump(mode="json"))
-            out_path = illustration_path(
-                media_root, job.platform, job.canonical_id, dish_index
+        """After the atomic store, enqueue one best-effort illustration job per
+        stored recipe. STRICTLY BEST-EFFORT: an enqueue failure just leaves the
+        recipe image-less (the startup backfill re-enqueues it later) — it must
+        NEVER fail the extraction, whose recipes are already committed."""
+        for recipe_id in recipe_ids:
+            try:
+                await enqueue_illustration(self.store, job.owner_id, recipe_id)
+            except Exception:
+                logger.warning(
+                    "could not enqueue illustration job for recipe %s (best-effort)",
+                    recipe_id,
+                    exc_info=True,
+                )
+
+    async def _process_illustration(self, job: Job, job_extra: dict[str, Any]) -> None:
+        """Drive one claimed illustration job: (re)generate the cover image for
+        each recipe in its payload. The paid image call is budget-gated and
+        ledgered per image exactly like extraction (fail-closed). Terminal
+        ``stored`` when every image landed; ``failed`` (surfaced, retriable)
+        when one or more could not be generated.
+
+        Never raises except CancelledError (shutdown mid-job) — then the job is
+        LEFT ``illustrating`` for the next boot's reconcile. Per-image failures
+        are swallowed; only a STORE write (set_status/mark_failed) leaks, and
+        run_forever survives it (leaving the job for reconcile)."""
+        await self.store.set_status(job.id, JobStatus.ILLUSTRATING.value)
+        recipe_ids = [uuid.UUID(rid) for rid in job.payload.get("recipe_ids", [])]
+        targets = await self.store.load_recipes_for_illustration(job.id, recipe_ids)
+        if not targets:
+            # The recipes were hard-deleted since the enqueue — nothing to
+            # illustrate. That is a successful no-op, not a failure.
+            logger.info(
+                "illustration job %s has no live recipes — nothing to do", job.id,
+                extra={**job_extra, "stage": "illustrate"},
             )
-            await self._generate_and_persist_illustration(
+            await self.store.set_status(job.id, JobStatus.STORED.value)
+            return
+
+        media_root = self._media_root()
+        failures: list[str] = []
+        for ref in targets:
+            prompt = build_illustration_prompt(ref.document)
+            out_path = illustration_path(
+                media_root, ref.platform, ref.canonical_id, ref.dish_index
+            )
+            outcome = await self._generate_and_persist_illustration(
                 job_id=job.id,
-                owner_id=job.owner_id,
-                recipe_id=recipe_id,
+                owner_id=ref.owner_id,
+                recipe_id=ref.id,
                 prompt=prompt,
                 out_path=out_path,
             )
+            if not outcome.ok:
+                failures.append(outcome.reason or "illustration_failed")
+
+        if failures:
+            error_type = _summarize_illustration_failures(failures)
+            detail = f"{len(failures)} of {len(targets)} illustration(s) could not be generated"
+            logger.warning(
+                "illustration job %s failed (%s): %s", job.id, error_type, detail,
+                extra={**job_extra, "stage": "illustrate", "error_type": error_type},
+            )
+            await self.store.mark_failed(job.id, error_type, detail)
+        else:
+            logger.info(
+                "illustration job %s stored (%d image(s))", job.id, len(targets),
+                extra={**job_extra, "stage": "illustrate"},
+            )
+            await self.store.set_status(job.id, JobStatus.STORED.value)
 
     async def _generate_and_persist_illustration(
         self,
@@ -660,27 +763,41 @@ class Worker:
         recipe_id: uuid.UUID,
         prompt: str,
         out_path: Path,
-    ) -> bool:
-        """The shared budget-gate → generate → persist → ledger path (live
-        post-store stage AND the startup backfill). Returns True when an
-        illustration landed. Best-effort: every failure logs and returns False,
-        leaving image_url NULL. Budget check + ledger row bracket the paid call
-        exactly like extraction (fail-closed). ``job_id`` attributes the spend
-        row to the recipe's originating job (an existing jobs row)."""
+    ) -> "_IllustrationOutcome":
+        """The budget-gate → generate → ledger → persist path for ONE recipe.
+        Best-effort: every failure logs and returns an outcome carrying the
+        reason (never raises for a pipeline error), leaving image_url NULL. The
+        budget check + ledger row bracket the paid call exactly like extraction
+        (fail-closed). ``job_id`` attributes the spend row to the driving
+        illustration job (an existing jobs row). CancelledError (BaseException)
+        passes through — shutdown leaves the job for reconcile."""
         try:
-            # Budget gate FIRST (cheap, no write), immediately before the paid
-            # image call — a full backfill's spike is bounded by the same
-            # fail-closed monthly budget / daily cap as extraction.
+            # Budget gate FIRST (cheap, no write), immediately before EVERY paid
+            # image call — bounded by the same fail-closed monthly budget /
+            # daily cap as extraction. Budget/config refusals get their own
+            # reason so the job surfaces the right (non-Retry) guidance.
             await self.store.check_budget(owner_id)
             adapter = self._image_generator_factory(self._settings)  # ConfigError ⇒ skip
             result = await adapter.generate(prompt)
-        except Exception:
+        except errors.BudgetExceededError:
+            logger.info(
+                "illustration skipped for recipe %s — budget cap reached", recipe_id
+            )
+            return _IllustrationOutcome(False, "budget_exceeded")
+        except errors.ConfigError:
             logger.warning(
-                "illustration generation skipped for recipe %s (best-effort)",
+                "illustration skipped for recipe %s — image generator misconfigured",
                 recipe_id,
                 exc_info=True,
             )
-            return False
+            return _IllustrationOutcome(False, "config_error")
+        except Exception:
+            logger.warning(
+                "illustration generation failed for recipe %s (best-effort)",
+                recipe_id,
+                exc_info=True,
+            )
+            return _IllustrationOutcome(False, "illustration_failed")
 
         # Ledger the paid image attempt: a flat per-image cost (NOT token-based
         # estimate_cost) with the image model id and STYLE_VERSION as the
@@ -706,23 +823,25 @@ class Worker:
 
         persisted = write_illustration(out_path, result.image_bytes)
         if persisted is None:
-            return False
+            return _IllustrationOutcome(False, "illustration_failed")
         try:
             await self.store.set_recipe_image(recipe_id, persisted, STYLE_VERSION)
         except Exception:
             logger.warning(
                 "illustration persist failed for recipe %s", recipe_id, exc_info=True
             )
-            return False
-        return True
+            return _IllustrationOutcome(False, "illustration_failed")
+        return _IllustrationOutcome(True, None)
 
     async def backfill_illustrations(self) -> None:
         """One-shot startup backfill (best-effort): any recipe with image_url
-        NULL — stored before the illustration stage existed, OR by a run that
-        crashed between the atomic store and its post-store image pass — gets a
-        generated illustration. Budget-gated per image (a full-library backfill
-        is the only cost spike). Never raises — a failed backfill must never
-        take the worker down."""
+        NULL — stored before illustrations existed, left behind by a crash
+        between the atomic store and the illustration enqueue, or by an
+        illustration job that failed terminally — gets a fresh illustration
+        job ENQUEUED (deduped per recipe, so a still-pending job is never
+        twinned). The images are then generated by the strictly-serial claim
+        loop like any other illustration job. Never raises — a failed backfill
+        must never take the worker down."""
         try:
             missing = await self.store.list_recipes_missing_images()
         except Exception:
@@ -730,31 +849,20 @@ class Worker:
             return
         if not missing:
             return
-        generated = skipped = 0
-        media_root = self._media_root()
+        enqueued = 0
         for recipe in missing:
             try:
-                prompt = build_illustration_prompt(recipe.document)
-                out_path = illustration_path(
-                    media_root, recipe.platform, recipe.canonical_id, recipe.dish_index
+                _job, existing = await enqueue_illustration(
+                    self.store, recipe.owner_id, recipe.id
                 )
-                # The spend row is attributed to the recipe's originating job.
-                if await self._generate_and_persist_illustration(
-                    job_id=recipe.job_id,
-                    owner_id=recipe.owner_id,
-                    recipe_id=recipe.id,
-                    prompt=prompt,
-                    out_path=out_path,
-                ):
-                    generated += 1
-                else:
-                    skipped += 1
+                if not existing:
+                    enqueued += 1
             except Exception:
-                skipped += 1
                 logger.warning(
-                    "illustration backfill failed for recipe %s", recipe.id, exc_info=True
+                    "illustration backfill: enqueue failed for recipe %s", recipe.id,
+                    exc_info=True,
                 )
-        logger.info("illustration backfill: %d generated, %d skipped", generated, skipped)
+        logger.info("illustration backfill: %d illustration job(s) enqueued", enqueued)
 
     # ── media retention (§4, MEDIA_RETENTION knob) ───────────────────────────
 
