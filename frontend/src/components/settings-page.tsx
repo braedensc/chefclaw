@@ -6,9 +6,9 @@ import {
   getSpendApiSpendGetOptions,
   healthApiHealthGetOptions,
 } from '../client/@tanstack/react-query.gen';
+import { useAuth } from '../auth-context';
 import type { HealthResponse } from '../client/types.gen';
 import { CHILI_BTN, CYAN_BTN } from '../lib/button-styles';
-import { useTokenActions } from '../token-context';
 
 /**
  * Poll cadence for the health readout. The interval lives on THIS query's
@@ -27,11 +27,11 @@ export const SPEND_HISTORY_DAYS = 30;
  * calls), a spend history (GET /api/spend), sidecar + tiered cookie posture
  * (Rednote access), and backup staleness (Backups).
  *
- * Failure handling is absorbed from the Phase-1 HealthPanel: 401 → clear the
- * token; other non-2xx → show the status; no response → the stack is down.
+ * Failure handling: 401 → the session ended, offer to sign in again; other
+ * non-2xx → show the status; no response → the stack is down.
  */
 export function SettingsPage() {
-  const { clearToken } = useTokenActions();
+  const { signOut } = useAuth();
   const health = useQuery({
     ...healthApiHealthGetOptions(),
     refetchInterval: HEALTH_POLL_MS,
@@ -63,15 +63,11 @@ export function SettingsPage() {
           {status === 401 ? (
             <>
               <p className="text-chili-bright text-sm">
-                Token rejected (401) — clear the token and re-enter it.
+                Your session ended (401) — sign in again to continue.
               </p>
               <div className="mt-3 flex gap-2">
-                <button
-                  type="button"
-                  onClick={clearToken}
-                  className={CHILI_BTN}
-                >
-                  Clear token & re-enter
+                <button type="button" onClick={signOut} className={CHILI_BTN}>
+                  Sign in again
                 </button>
                 <button
                   type="button"

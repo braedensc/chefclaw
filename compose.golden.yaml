@@ -31,12 +31,16 @@ services:
       timeout: 3s
       retries: 10
 
-  # One-shot: applies Alembic migrations (also seeds the owner row), then exits.
+  # One-shot: applies Alembic migrations, then (M2) seeds the FIXED-id admin the
+  # fake auth provider resolves to (chefclaw.seed_golden_owner), then exits. In
+  # fake auth mode require_owner short-circuits to CHEFCLAW_FAKE_OWNER_ID, so
+  # that id must be a real users row for the FK + /api/me to work.
   migrate:
     build:
       context: .
       dockerfile: Dockerfile.api
-    command: ["alembic", "upgrade", "head"]
+    command:
+      ["sh", "-c", "alembic upgrade head && python -m chefclaw.seed_golden_owner"]
     environment:
       DB_HOST: postgres
       DB_PORT: "5432"

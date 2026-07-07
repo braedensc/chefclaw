@@ -4,12 +4,44 @@
 
 import type {
   HealthResponse,
+  InviteOut,
+  InvitePublicOut,
   JobOut,
+  MeOut,
   RecipeDetail,
   RecipePage,
   RecipeSummary,
   SpendSummaryOut,
 } from '../client/types.gen';
+
+export function meOut(overrides: Partial<MeOut> = {}): MeOut {
+  return {
+    id: '01890000-0000-7000-8000-000000000001',
+    name: 'owner',
+    email: 'owner@localhost',
+    is_admin: true,
+    ...overrides,
+  };
+}
+
+export function inviteOut(overrides: Partial<InviteOut> = {}): InviteOut {
+  return {
+    id: 'invite-1',
+    email: 'friend@example.com',
+    status: 'pending',
+    expires_at: '2026-07-14T00:00:00Z',
+    created_at: '2026-07-07T00:00:00Z',
+    accepted_at: null,
+    dev_activation_link: null,
+    ...overrides,
+  };
+}
+
+export function invitePublic(
+  overrides: Partial<InvitePublicOut> = {},
+): InvitePublicOut {
+  return { status: 'pending', email: 'friend@example.com', ...overrides };
+}
 
 export function jobOut(overrides: Partial<JobOut> = {}): JobOut {
   return {

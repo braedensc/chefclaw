@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 import { STAGES } from '../../src/lib/cooking-stages';
-import { seedToken, wipeRecipes } from './helpers';
+import { wipeRecipes } from './helpers';
 
 // The core-loop golden path (plan §16.9): paste → job chip → stored card →
 // detail. The fake source resolves EVERY fake:// URL to ONE canonical
@@ -39,7 +39,6 @@ test.beforeEach(async ({ request }) => {
 test('paste a link, watch the chip to stored, browse the card and detail', async ({
   page,
 }) => {
-  await seedToken(page);
   await page.goto('/');
 
   // Paste bar pinned at the top of the library.
