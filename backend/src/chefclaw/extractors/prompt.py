@@ -8,10 +8,11 @@ spend ledger via :class:`~chefclaw.extractors.ExtractionUsage`.
 
 from importlib import resources
 
+from chefclaw.covers import catalog_menu
 from chefclaw.errors import ConfigError
 
-PROMPT_VERSION = "v3"
-_PROMPT_RESOURCE = "extract_v3.md"
+PROMPT_VERSION = "v4"
+_PROMPT_RESOURCE = "extract_v4.md"
 
 
 def load_prompt() -> str:
@@ -38,3 +39,20 @@ def with_source_context(
     if not context_lines:
         return prompt
     return prompt + "\n\n## Source context (metadata, not content)\n" + "\n".join(context_lines)
+
+
+def with_cover_catalog(prompt: str) -> str:
+    """Append the cover-sprite catalog menu (V2-F) so the model can pick a VALID
+    ``cover_sprite_id``. The menu is appended at CALL time from the covers
+    catalog (not baked into the prompt file) so it grows with the library with
+    no prompt edit. Every real extractor backend appends it — the fake extractor
+    returns canned dishes and never builds a prompt."""
+    return (
+        prompt
+        + "\n\n## Cover sprite catalog — choose `cover_sprite_id` from these ids\n\n"
+        + "Each line is `id | English name | 中文 name | tags`. Pick the ONE id "
+        + "whose dish best matches this dish (same dish, else closest cuisine + "
+        + "form). Copy the id EXACTLY; use `null` if nothing fits — never invent "
+        + "an id.\n\n"
+        + catalog_menu()
+    )

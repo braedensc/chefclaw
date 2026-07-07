@@ -33,7 +33,8 @@ from typing import Any, NamedTuple
 
 from chefclaw import errors, observability, spend
 from chefclaw.config import Settings
-from chefclaw.documents import SourceInfo, validate_extraction
+from chefclaw.covers import AssignmentMiss, CoverAssignment, assign_cover_sprite
+from chefclaw.documents import SourceInfo, ValidatedDish, validate_extraction
 from chefclaw.extractors import (
     ExtractionUsage,
     ExtractorAdapter,
@@ -47,6 +48,12 @@ from chefclaw.images import (
     get_image_generator,
 )
 from chefclaw.models import Job, JobStatus, JobType
+from chefclaw.services.frames import (
+    FRAME_STYLE_VERSION,
+    frame_path,
+    grab_frame,
+    resolve_timestamp,
+)
 from chefclaw.services.illustrations import illustration_path, write_illustration
 from chefclaw.services.repo import JobStore
 from chefclaw.sources import CanonicalRef, FetchedMedia, SourceAdapter, resolve_source
@@ -87,7 +94,16 @@ POLITENESS_DELAY_MAX_SECONDS = 5.0
 _UPLOAD_STAGING_DIRNAME = "chefclaw-uploads"
 _JOB_SCRATCH_DIRNAME = "chefclaw-jobs"
 
+# The image-generator modes that DRIVE an illustration job. In the default
+# ``sprite`` mode covers are inline sprites assigned during extraction — no
+# illustration job, no paid image call. Real frames (video_frame) are a layer
+# ON TOP of sprite mode (chefclaw_real_covers), captured inline, never a job.
+_ILLUSTRATION_MODES = ("fake", "gemini")
+
 Sleeper = Callable[[float], Awaitable[None]]
+# The whole "grab one frame" operation, injectable so worker tests never shell
+# out to ffmpeg (a fake writes a dummy jpeg). Default = the real ffmpeg grab.
+FrameGrabber = Callable[[Path, float, Path], Awaitable[str | None]]
 
 
 class _IllustrationOutcome(NamedTuple):
@@ -283,7 +299,8 @@ class Worker:
         image_generator_factory: Callable[
             [Settings], ImageGeneratorAdapter
         ] = get_image_generator,
-        backfill_illustrations_on_start: bool = False,
+        frame_grabber: FrameGrabber = grab_frame,
+        backfill_covers_on_start: bool = False,
         sleeper: Sleeper = asyncio.sleep,
         jitter: Callable[[], float] = random.random,
         idle_seconds: float = IDLE_SLEEP_SECONDS,
@@ -296,7 +313,10 @@ class Worker:
         # image generator (no network, no spend). The backfill flag defaults
         # OFF (tests); the app turns it on for the one-shot startup pass.
         self._image_generator_factory = image_generator_factory
-        self._backfill_illustrations_on_start = backfill_illustrations_on_start
+        # Injectable ffmpeg frame grab (private real-frame layer) — tests inject
+        # a fake so no ffmpeg is shelled out.
+        self._frame_grabber = frame_grabber
+        self._backfill_covers_on_start = backfill_covers_on_start
         # The one-shot backfill's task handle (run_forever spawns it in the
         # background) — exposed for tests and cancelled on worker shutdown.
         self.backfill_task: asyncio.Task[None] | None = None
@@ -323,14 +343,15 @@ class Worker:
                         logger.debug("startup reconcile failed (db not up yet?)", exc_info=True)
                         await self._sleeper(self._idle_seconds)
                         continue
-                    if self._backfill_illustrations_on_start and self.backfill_task is None:
+                    if self._backfill_covers_on_start and self.backfill_task is None:
                         # One-shot, best-effort, never raises — spawned in the
-                        # BACKGROUND so a slow image pass never delays the first
-                        # claim. Job execution stays strictly serial: the
-                        # backfill only runs subprocess/HTTP + row updates,
-                        # which is acceptable concurrency.
+                        # BACKGROUND so a slow pass never delays the first claim.
+                        # Assigns missing sprites (all modes), then enqueues
+                        # illustration jobs (adapter modes) or grabs real frames
+                        # (sprite + real-covers). Only row updates + subprocess/
+                        # HTTP, so job execution stays strictly serial.
                         self.backfill_task = asyncio.create_task(
-                            self.backfill_illustrations(), name="chefclaw-illustration-backfill"
+                            self.backfill_covers(), name="chefclaw-cover-backfill"
                         )
                 try:
                     job = await self.store.claim_next_job()
@@ -613,6 +634,11 @@ class Worker:
         documents = [dish.document for dish in validated]
         estimates = [dish.estimated for dish in validated]
         tags = [dish.tags for dish in validated]
+        # Resolve each dish's cover sprite (model pick → deterministic fallback →
+        # unknown-dish + a logged miss). The ids ride into the ATOMIC store; the
+        # misses are recorded best-effort AFTER, keyed to the stored recipe ids.
+        assignments = [self._assign_cover(dish) for dish in validated]
+        cover_sprite_ids = [assignment.sprite_id for assignment in assignments]
 
         extraction_meta: dict[str, Any] = {
             "model_id": outcome.usage.model_id,
@@ -632,12 +658,13 @@ class Worker:
         if retention_warnings:
             extraction_meta["warnings"].extend(retention_warnings)
 
-        # The atomic store comes FIRST — the illustration stage must never sit
-        # inside the paid-work crash-loss window (an image API hiccup before
-        # the store would reconcile to interrupted and a human retry would
-        # re-pay). Derived estimates ride along in the atomic store.
+        # The atomic store comes FIRST — the cover stages (illustration OR real
+        # frame) must never sit inside the paid-work crash-loss window (an image
+        # hiccup before the store would reconcile to interrupted and a human
+        # retry would re-pay). Derived estimates + the assigned cover_sprite_id
+        # ride along in the atomic store.
         recipe_ids = await self.store.store_results(
-            job, documents, estimates, tags, extraction_meta=extraction_meta
+            job, documents, estimates, tags, cover_sprite_ids, extraction_meta=extraction_meta
         )
         if recipe_ids is None:
             # UNIQUE(owner_id, platform, canonical_id, dish_index) fired: a raced
@@ -658,12 +685,18 @@ class Worker:
                 err.retryable = False
                 raise err
             await self.store.adopt_recipes(job.id, recipe_ids)
-            return recipe_ids  # the racer's rows — their own image jobs own them
-        # Illustrations AFTER the commit: enqueue one best-effort illustration
-        # job per stored recipe (the images are generated by a separate,
-        # retriable job — never inside the paid-extraction crash-loss window;
-        # a crash before the enqueue is healed by the startup backfill).
-        await self._enqueue_illustrations(job, recipe_ids)
+            return recipe_ids  # the racer's rows — their own cover work owns them
+        # Covers AFTER the commit (best-effort; a crash here is healed by the
+        # startup backfill). Log any sprite-assignment misses, then produce the
+        # image_url cover for this mode: a private real frame (sprite mode +
+        # real-covers) captured inline from the still-in-scratch video, OR a
+        # generated illustration job (adapter modes). Sprite-only mode does
+        # neither — the inline sprite already assigned above IS the cover.
+        await self._record_cover_misses(job.owner_id, assignments, recipe_ids)
+        if self._real_covers_active():
+            await self._capture_frames(job, validated, recipe_ids, media)
+        elif self._settings.chefclaw_image_generator in _ILLUSTRATION_MODES:
+            await self._enqueue_illustrations(job, recipe_ids)
         return recipe_ids
 
     async def _record_attempt(self, job: Job, usage: ExtractionUsage | None) -> None:
@@ -692,6 +725,90 @@ class Worker:
         # resolve() so every persisted image_url is absolute — the /image route
         # serves only files that resolve under this same root.
         return Path(self._settings.media_dir).resolve()
+
+    # ── covers (sprite assignment, miss log, private real frames) ────────────
+
+    def _assign_cover(self, dish: ValidatedDish) -> CoverAssignment:
+        """Resolve one dish's cover sprite: the model's pick if it is a valid
+        catalog id, else the deterministic keyword match, else ``unknown-dish``
+        with a miss to log."""
+        return assign_cover_sprite(
+            suggested_sprite_id=dish.cover_sprite_id,
+            dish_name_en=dish.document.dish_name.en,
+            dish_name_original=dish.document.dish_name.original,
+            cuisine_type=dish.document.cuisine_type,
+            tags=dish.tags,
+        )
+
+    async def _record_cover_misses(
+        self,
+        owner_id: uuid.UUID,
+        assignments: Sequence[CoverAssignment],
+        recipe_ids: Sequence[uuid.UUID],
+    ) -> None:
+        """Append any sprite-assignment misses to the ``cover_misses`` log, keyed
+        to the stored recipe ids. STRICTLY BEST-EFFORT — a diagnostic write must
+        never fail an extraction whose recipes are already committed."""
+        entries: list[tuple[uuid.UUID | None, AssignmentMiss]] = [
+            (recipe_id, assignment.miss)
+            for assignment, recipe_id in zip(assignments, recipe_ids, strict=False)
+            if assignment.miss is not None
+        ]
+        if not entries:
+            return
+        try:
+            await self.store.record_cover_misses(owner_id, entries)
+        except Exception:
+            logger.warning("could not record %d cover miss(es) (best-effort)", len(entries),
+                           exc_info=True)
+
+    def _real_covers_active(self) -> bool:
+        """Private real-frame capture runs ONLY in sprite mode with the global
+        ``CHEFCLAW_REAL_COVERS`` switch on (the per-user grant additionally gates
+        SERVING). Both default off ⇒ pure sprites, no capture."""
+        return (
+            self._settings.chefclaw_image_generator == "sprite"
+            and self._settings.chefclaw_real_covers
+        )
+
+    async def _capture_frames(
+        self,
+        job: Job,
+        validated: Sequence[ValidatedDish],
+        recipe_ids: Sequence[uuid.UUID],
+        media: FetchedMedia,
+    ) -> None:
+        """Grab one finished-dish beauty-shot frame per recipe from the still-in-
+        scratch video (before _cleanup discards it) and persist it as image_url.
+        STRICTLY BEST-EFFORT per dish — a failure leaves the recipe sprite-only.
+        Whether a captured frame is ever SERVED is gated per-viewer downstream."""
+        media_root = self._media_root()
+        for dish_index, (dish, recipe_id) in enumerate(
+            zip(validated, recipe_ids, strict=False)
+        ):
+            timestamp = resolve_timestamp(
+                dish.beauty_shot_timestamp_seconds, media.duration_seconds
+            )
+            if timestamp is None:
+                continue  # no usable timestamp and no duration — skip, keep sprite
+            out_path = frame_path(
+                media_root, job.owner_id, job.platform, job.canonical_id, dish_index
+            )
+            try:
+                persisted = await self._frame_grabber(media.video_path, timestamp, out_path)
+            except asyncio.CancelledError:
+                raise
+            except Exception:
+                logger.warning("real-frame capture failed for recipe %s (best-effort)",
+                               recipe_id, exc_info=True)
+                continue
+            if persisted is None:
+                continue
+            try:
+                await self.store.set_recipe_image(recipe_id, persisted, FRAME_STYLE_VERSION)
+            except Exception:
+                logger.warning("real-frame persist failed for recipe %s", recipe_id,
+                               exc_info=True)
 
     async def _enqueue_illustrations(
         self, job: Job, recipe_ids: Sequence[uuid.UUID]
@@ -843,6 +960,108 @@ class Worker:
             )
             return _IllustrationOutcome(False, "illustration_failed")
         return _IllustrationOutcome(True, None)
+
+    async def backfill_covers(self) -> None:
+        """One-shot startup cover backfill (best-effort, never raises). ALWAYS
+        ensures every recipe has a ``cover_sprite_id`` (even in adapter modes a
+        sprite is the fallback when an illustration is missing), then produces
+        the mode's ``image_url`` cover: enqueue illustration jobs (fake/gemini)
+        or grab a private real frame for granted owners whose source video
+        survived (sprite + real-covers). Sprite-only mode does neither."""
+        await self.backfill_sprites()
+        if self._settings.chefclaw_image_generator in _ILLUSTRATION_MODES:
+            await self.backfill_illustrations()
+        elif self._real_covers_active():
+            await self.backfill_frames()
+
+    async def backfill_sprites(self) -> None:
+        """Assign a ``cover_sprite_id`` to every recipe missing one (the
+        deterministic matcher, NO model call), logging misses. Never raises — a
+        failed backfill must never take the worker down."""
+        try:
+            missing = await self.store.list_recipes_missing_sprites()
+        except Exception:
+            logger.warning("sprite backfill: could not list recipes", exc_info=True)
+            return
+        if not missing:
+            return
+        assigned = 0
+        for ref in missing:
+            try:
+                dish_name = ref.document.get("dish_name") or {}
+                assignment = assign_cover_sprite(
+                    suggested_sprite_id=None,
+                    dish_name_en=dish_name.get("en"),
+                    dish_name_original=dish_name.get("original"),
+                    cuisine_type=ref.document.get("cuisine_type"),
+                    tags=ref.tags,
+                )
+                await self.store.set_recipe_sprite(ref.id, assignment.sprite_id)
+                assigned += 1
+                if assignment.miss is not None:
+                    await self.store.record_cover_misses(
+                        ref.owner_id, [(ref.id, assignment.miss)]
+                    )
+            except Exception:
+                logger.warning(
+                    "sprite backfill: assignment failed for recipe %s", ref.id, exc_info=True
+                )
+        logger.info("sprite backfill: %d recipe(s) assigned a cover sprite", assigned)
+
+    async def backfill_frames(self) -> None:
+        """Grab a private real frame for granted owners' recipes whose SOURCE
+        VIDEO still exists on the media volume (retention=keep). Almost always a
+        no-op — retention defaults to discard, so old recipes have no video.
+        Never raises."""
+        try:
+            candidates = await self.store.list_recipes_for_frame_backfill()
+        except Exception:
+            logger.warning("frame backfill: could not list recipes", exc_info=True)
+            return
+        if not candidates:
+            return
+        media_root = self._media_root()
+        grabbed = 0
+        for ref in candidates:
+            try:
+                video = self._retained_video_path(ref.extraction_meta)
+                if video is None:
+                    continue
+                timestamp = resolve_timestamp(None, self._document_duration(ref.document))
+                if timestamp is None:
+                    continue
+                out_path = frame_path(
+                    media_root, ref.owner_id, ref.platform, ref.canonical_id, ref.dish_index
+                )
+                persisted = await self._frame_grabber(video, timestamp, out_path)
+                if persisted is None:
+                    continue
+                await self.store.set_recipe_image(ref.id, persisted, FRAME_STYLE_VERSION)
+                grabbed += 1
+            except asyncio.CancelledError:
+                raise
+            except Exception:
+                logger.warning("frame backfill: failed for recipe %s", ref.id, exc_info=True)
+        logger.info("frame backfill: %d real frame(s) captured", grabbed)
+
+    @staticmethod
+    def _retained_video_path(extraction_meta: dict[str, Any]) -> Path | None:
+        """The first still-existing retained media file (retention=keep archives
+        the source video under extraction_meta['retained_media'])."""
+        for entry in extraction_meta.get("retained_media", []) or []:
+            path = Path(str(entry))
+            if path.is_file():
+                return path
+        return None
+
+    @staticmethod
+    def _document_duration(document: dict[str, Any]) -> int | None:
+        source = document.get("source")
+        if isinstance(source, dict):
+            duration = source.get("video_duration_seconds")
+            if isinstance(duration, int):
+                return duration
+        return None
 
     async def backfill_illustrations(self) -> None:
         """One-shot startup backfill (best-effort): any recipe with image_url

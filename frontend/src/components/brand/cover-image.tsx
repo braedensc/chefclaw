@@ -5,18 +5,38 @@ import { getRecipeImageApiRecipesRecipeIdImageGetOptions } from '../../client/@t
 import { fallbackCoverGradient, platformAccent } from './platform-accents';
 import { SteamWisps } from './steam-wisps';
 
-// The authed recipe image (a generated dish illustration), fetched through the
-// generated SDK — auth and ApiError mapping live centrally in src/api.ts.
-// <img> can't send an Authorization header, so the image bytes come down as a
-// blob → object URL. Loading and error states show the same platform-tinted
-// fallback as hasImage=false — no spinner flash; empty covers still look
-// intentional.
+// The recipe card cover, resolved by precedence (V2-F):
+//   1. a served image (a PRIVATE real video frame, or a generated illustration)
+//      when hasImage — fetched through the generated SDK as an auth'd blob
+//      (an <img> can't send an Authorization header, so bytes come down as a
+//      blob → object URL);
+//   2. else the assigned curated dish SPRITE, rendered INLINE from the bundled
+//      catalog (no API call — a static asset) — this is the DEFAULT cover;
+//   3. else the platform-tinted gradient (a recipe not yet assigned a sprite,
+//      or an unknown id).
+// The scrim + gradient fallback keep overlaid titles legible in every state.
+
+// Every dish sprite bundled as a static asset URL, keyed by the file stem (the
+// catalog id). Eager so the id→url map exists synchronously; only the sprites
+// actually rendered are fetched by the browser.
+const SPRITE_URLS = import.meta.glob('../../covers/sprites/*.svg', {
+  query: '?url',
+  import: 'default',
+  eager: true,
+}) as Record<string, string>;
+
+function spriteUrl(id: string | null | undefined): string | null {
+  if (!id) return null;
+  return SPRITE_URLS[`../../covers/sprites/${id}.svg`] ?? null;
+}
 
 export interface CoverImageProps {
   recipeId: string;
   hasImage: boolean;
   platform: string;
   alt: string;
+  /** The assigned dish-sprite id — the inline default cover under any served image. */
+  coverSpriteId?: string | null;
   /** Caller sizes the tile (e.g. `aspect-[16/10]`) — the art fills it. */
   className?: string;
 }
@@ -56,6 +76,7 @@ export function CoverImage({
   hasImage,
   platform,
   alt,
+  coverSpriteId,
   className,
 }: CoverImageProps) {
   const imageQuery = useQuery({
@@ -87,13 +108,16 @@ export function CoverImage({
   }, [objectUrl]);
 
   // A blob that doesn't decode (a corrupt/partial image, or a placeholder in
-  // dev) must show the tasteful fallback, never a broken-image glyph. Reset
-  // the flag whenever the URL changes so a new image gets a fresh chance.
+  // dev) must fall through to the sprite/gradient, never a broken-image glyph.
+  // Reset the flag whenever the URL changes so a new image gets a fresh chance.
   const [decodeFailed, setDecodeFailed] = useState(false);
   useEffect(() => setDecodeFailed(false), [objectUrl]);
 
   const showImage =
     hasImage && objectUrl !== null && !imageQuery.isError && !decodeFailed;
+  // The sprite shows whenever the served image isn't (loading, errored, or
+  // never existed) — so it also stands in while a real-frame blob loads.
+  const sprite = spriteUrl(coverSpriteId);
 
   return (
     <div className={`relative overflow-hidden ${className ?? ''}`}>
@@ -102,6 +126,13 @@ export function CoverImage({
           src={objectUrl}
           alt={alt}
           onError={() => setDecodeFailed(true)}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      ) : sprite !== null ? (
+        <img
+          src={sprite}
+          alt={alt}
+          data-cover-sprite={coverSpriteId ?? undefined}
           className="absolute inset-0 h-full w-full object-cover"
         />
       ) : (

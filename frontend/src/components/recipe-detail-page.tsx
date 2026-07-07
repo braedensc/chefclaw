@@ -180,14 +180,20 @@ function RecipeHero({ detail, doc }: { detail: RecipeDetail; doc: RecipeDoc }) {
     </h1>
   );
 
+  // A cover exists when there's a served image (real frame / illustration) OR
+  // an assigned sprite (the default) — CoverImage resolves the precedence
+  // (served image → sprite → gradient) internally.
+  const hasCover = detail.has_image || detail.cover_sprite_id != null;
+
   return (
     <header className="mt-4">
-      {detail.has_image ? (
+      {hasCover ? (
         <div className="relative overflow-hidden rounded-card border border-line">
           <CoverImage
             recipeId={detail.id}
-            hasImage
+            hasImage={detail.has_image ?? false}
             platform={detail.platform}
+            coverSpriteId={detail.cover_sprite_id}
             alt={`${zhTitle ?? enTitle ?? 'Untitled dish'} — cover photo`}
             className="aspect-[21/9] w-full"
           />

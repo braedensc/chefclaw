@@ -129,11 +129,16 @@ def build_illustration_prompt(document: dict) -> str:
 def get_image_generator(settings: Settings) -> ImageGeneratorAdapter:
     """Config-selected image generator (``CHEFCLAW_IMAGE_GENERATOR``): fail closed.
 
-    - ``fake`` (default) — a canned placeholder image, zero spend, safe
-      everywhere (tests, golden suite, CI).
-    - ``gemini`` — the real adapter; an empty ``GEMINI_API_KEY`` is a typed
-      ConfigError HERE, before any paid image call could happen (fail-closed,
-      mirrors the extractor seam).
+    - ``fake`` — a canned placeholder image, zero spend, safe everywhere (tests,
+      golden suite, CI).
+    - ``gemini`` — the real (legacy) paid illustration adapter; an empty
+      ``GEMINI_API_KEY`` is a typed ConfigError HERE, before any paid image call
+      could happen (fail-closed, mirrors the extractor seam).
+    - ``sprite`` (the DEFAULT) — there is NO adapter: covers are curated sprites
+      assigned during extraction and rendered inline. The worker never enqueues
+      an illustration job in sprite mode, so this is only reached by a STALE
+      illustration job left over from a mode switch — a ConfigError makes it fail
+      loud and retriable rather than silently generate.
     - anything else — ConfigError (a typo must never silently pick a backend).
     """
     name = settings.chefclaw_image_generator
@@ -150,8 +155,14 @@ def get_image_generator(settings: Settings) -> ImageGeneratorAdapter:
         from chefclaw.images.gemini import GeminiImageGenerator
 
         return GeminiImageGenerator(settings)
+    if name == "sprite":
+        raise ConfigError(
+            "CHEFCLAW_IMAGE_GENERATOR=sprite has no image adapter — covers are "
+            "inline sprites assigned during extraction (no illustration job)."
+        )
     raise ConfigError(
-        f"Unknown CHEFCLAW_IMAGE_GENERATOR value {name!r} — expected 'fake' or 'gemini'."
+        f"Unknown CHEFCLAW_IMAGE_GENERATOR value {name!r} — "
+        "expected 'sprite', 'fake', or 'gemini'."
     )
 
 
