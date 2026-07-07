@@ -108,6 +108,9 @@ def golden_settings(tmp_path: Path, **overrides) -> Settings:
         monthly_llm_budget_usd="10",
         max_extraction_attempts_per_day="25",
         chefclaw_extractor="fake",
+        # These DB tests exercise the illustration job path — keep the fake image
+        # generator (the app default is sprite, which enqueues no illustration).
+        chefclaw_image_generator="fake",
         media_retention="discard",
         scratch_dir=str(tmp_path / "scratch"),
         media_dir=str(tmp_path / "media"),
@@ -390,7 +393,10 @@ async def test_store_results_unique_violation_adopts(
     documents = [dish.document for dish in validated]
     estimates = [dish.estimated for dish in validated]
     tags = [dish.tags for dish in validated]
-    result = await store.store_results(job_b, documents, estimates, tags, extraction_meta={})
+    cover_sprite_ids = ["unknown-dish" for _ in documents]
+    result = await store.store_results(
+        job_b, documents, estimates, tags, cover_sprite_ids, extraction_meta={}
+    )
     assert result is None  # the real IntegrityError path
     await store.adopt_recipes(job_b.id, raced_ids)
     async with sessionmaker() as session:
@@ -660,3 +666,131 @@ async def test_cross_owner_dedupe_isolation_and_shared_canonical_store(
     assert total_recipes == len(a_ids) + len(b_ids)  # both persisted; none lost
     # Isolation still holds after both stored — each lookup is owner-fenced:
     assert await store.find_recipe_ids(owner_a, "bilibili", "BVshared01-p1") == a_ids
+
+
+# ─── V2-F cover system (real SQL) ─────────────────────────────────────────────
+
+
+async def test_sprite_mode_stores_cover_id_and_no_illustration_job(
+    sessionmaker, owner_id, tmp_path: Path
+) -> None:
+    """Sprite mode (the app default) writes recipes.cover_sprite_id in the atomic
+    store and enqueues NO illustration job — against real SQL."""
+    settings = golden_settings(tmp_path, chefclaw_image_generator="sprite")
+    store = PostgresJobStore(sessionmaker, settings)
+    source = FakeSource(platform="bilibili", canonical_id="BVcover001-p1")
+    worker = Worker(
+        store=store,
+        adapters=[source],
+        settings=settings,
+        extractor_factory=lambda _s: FakeExtractor(),
+        sleeper=_noop_sleep,
+        jitter=lambda: 0.0,
+    )
+    job, _ = await enqueue_extract(store, owner_id, FAKE_URL, [source], settings)
+    await worker.process(job)
+
+    async with sessionmaker() as session:
+        recipe = (await session.execute(select(Recipe))).scalars().one()
+        illustration_count = await session.scalar(
+            select(func.count(Job.id)).where(Job.type == "illustration")
+        )
+    assert recipe.cover_sprite_id == "red-braised-pork"  # the fake dish's valid pick
+    assert illustration_count == 0
+
+
+async def test_backfill_sprites_assigns_and_logs_miss_real_sql(
+    sessionmaker, owner_id, tmp_path: Path
+) -> None:
+    """The startup sprite backfill assigns a missing cover_sprite_id and writes a
+    cover_misses row for an unmatchable dish — exercising set_recipe_sprite +
+    record_cover_misses against real SQL."""
+    from chefclaw.models import CoverMiss
+
+    settings = golden_settings(tmp_path, chefclaw_image_generator="sprite")
+    store = PostgresJobStore(sessionmaker, settings)
+    async with sessionmaker() as session, session.begin():
+        session.add_all(
+            [
+                Recipe(
+                    owner_id=owner_id,
+                    platform="bilibili",
+                    source_url=FAKE_URL,
+                    canonical_id="BVbf001-p1",
+                    dish_index=0,
+                    cover_sprite_id=None,
+                    tags=["pizza"],
+                    document={"dish_name": {"en": "Margherita Pizza"}, "cuisine_type": "Italian"},
+                ),
+                Recipe(
+                    owner_id=owner_id,
+                    platform="bilibili",
+                    source_url=FAKE_URL,
+                    canonical_id="BVbf002-p1",
+                    dish_index=0,
+                    cover_sprite_id=None,
+                    tags=[],
+                    document={"dish_name": {"en": "Zqxrb Flooble"}, "cuisine_type": None},
+                ),
+            ]
+        )
+
+    worker = Worker(
+        store=store,
+        adapters=[FakeSource(platform="bilibili", canonical_id="BVx")],
+        settings=settings,
+        extractor_factory=lambda _s: FakeExtractor(),
+        sleeper=_noop_sleep,
+        jitter=lambda: 0.0,
+    )
+    await worker.backfill_sprites()
+
+    async with sessionmaker() as session:
+        by_canonical = {
+            r.canonical_id: r.cover_sprite_id
+            for r in (await session.execute(select(Recipe))).scalars().all()
+        }
+        misses = (await session.execute(select(CoverMiss))).scalars().all()
+    assert by_canonical["BVbf001-p1"] == "margherita-pizza"
+    assert by_canonical["BVbf002-p1"] == "unknown-dish"
+    assert len(misses) == 1
+    assert misses[0].reason == "no_match"
+    assert misses[0].resolved_sprite_id == "unknown-dish"
+
+
+async def test_frame_backfill_query_scoped_by_grant_real_sql(
+    sessionmaker, owner_id, tmp_path: Path
+) -> None:
+    """list_recipes_for_frame_backfill returns ONLY image-less recipes whose
+    OWNER is real-covers-granted (the User join) — a frame is never even
+    considered for an ungranted owner."""
+    store = PostgresJobStore(sessionmaker, golden_settings(tmp_path))
+    # owner_id is ungranted by default; make a second, granted owner.
+    async with sessionmaker() as session, session.begin():
+        granted = User(name="pal", email="pal@localhost", real_covers_enabled=True)
+        session.add(granted)
+        await session.flush()
+        granted_id = granted.id
+        session.add_all(
+            [
+                Recipe(
+                    owner_id=owner_id,  # ungranted
+                    platform="bilibili",
+                    source_url=FAKE_URL,
+                    canonical_id="BVungranted-p1",
+                    dish_index=0,
+                    document={"dish_name": {"en": "A"}},
+                ),
+                Recipe(
+                    owner_id=granted_id,  # granted
+                    platform="bilibili",
+                    source_url=FAKE_URL,
+                    canonical_id="BVgranted-p1",
+                    dish_index=0,
+                    document={"dish_name": {"en": "B"}},
+                ),
+            ]
+        )
+
+    candidates = await store.list_recipes_for_frame_backfill()
+    assert [c.owner_id for c in candidates] == [granted_id]  # only the granted owner's

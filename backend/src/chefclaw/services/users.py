@@ -1,9 +1,14 @@
-"""User administration service (M3 per-user caps, ADR 2026-07-07-per-user-budget-caps).
+"""User administration service.
 
-The only write here is the admin cap setter: it updates the two nullable
-``users`` cap columns the paid-call gate (:func:`chefclaw.spend.check_budget`)
-reads. NULL on a column means 'use the global env default'; a positive value
-overrides it for that account.
+Two admin surfaces, both behind transport-layer ``require_admin`` (critique M9 —
+identity/admin status are never settable here):
+
+- **Per-user cost controls (M3, ADR 2026-07-07-per-user-budget-caps):** the cap
+  setter updates the nullable ``users`` cap columns the paid-call gate
+  (:func:`chefclaw.spend.check_budget`) reads (NULL = use the global env
+  default) plus the ``paid_tier`` flag.
+- **Private real-frame grant (V2-F):** the owner lists members and toggles each
+  one's ``real_covers_enabled``.
 """
 
 import uuid
@@ -14,6 +19,14 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from chefclaw.models import User
+
+__all__ = [
+    "UserBudgetRow",
+    "list_users",
+    "read_paid_tier",
+    "set_real_covers_enabled",
+    "set_user_budget",
+]
 
 Sm = async_sessionmaker[AsyncSession]
 
@@ -76,3 +89,24 @@ async def set_user_budget(
             max_attempts_per_day=user.max_attempts_per_day,
             paid_tier=user.paid_tier,
         )
+
+
+async def list_users(sm: async_sessionmaker[AsyncSession]) -> list[User]:
+    """Every account, oldest first (the owner is the seed row)."""
+    async with sm() as session:
+        return list((await session.execute(select(User).order_by(User.created_at))).scalars().all())
+
+
+async def set_real_covers_enabled(
+    sm: async_sessionmaker[AsyncSession], user_id: uuid.UUID, enabled: bool
+) -> User | None:
+    """Set one member's private real-frame grant (V2-F). Returns the updated
+    user, or ``None`` when no such user exists (→ 404)."""
+    async with sm() as session:
+        user = await session.get(User, user_id)
+        if user is None:
+            return None
+        user.real_covers_enabled = enabled
+        await session.commit()
+        await session.refresh(user)
+        return user

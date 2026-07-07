@@ -62,6 +62,7 @@ export function RecipeCard({
           recipeId={recipe.id}
           hasImage={recipe.has_image ?? false}
           platform={recipe.platform}
+          coverSpriteId={recipe.cover_sprite_id}
           alt={altTitle}
           className="aspect-[16/10]"
         />

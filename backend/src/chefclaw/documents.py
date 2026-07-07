@@ -300,16 +300,47 @@ def validate_document(raw: dict) -> RecipeDocument:
         ) from exc
 
 
+def _sanitize_sprite_suggestion(raw: object) -> str | None:
+    """The model's optional ``cover_sprite_id`` pick from the catalog menu.
+
+    Split out (like tags) before document validation — it is a DECORATIVE cover
+    choice, not captured food data (Hard Rule 7 does not apply), so this is
+    lenient: a non-empty string is kept as a raw suggestion (the worker resolves
+    it against the catalog with a deterministic fallback), anything else ⇒ None.
+    Never fails an extraction."""
+    if isinstance(raw, str):
+        stripped = raw.strip()
+        return stripped or None
+    return None
+
+
+def _sanitize_timestamp(raw: object) -> float | None:
+    """The model's optional finished-dish beauty-shot ``beauty_shot_timestamp_
+    seconds`` (V2-F private real-frame layer). A non-negative number is kept; a
+    bool, a string, or a negative value ⇒ None (the worker falls back to a
+    ~90%-through heuristic). Metadata, not food data — never fails an
+    extraction."""
+    if isinstance(raw, bool):  # bool is an int subclass — reject it explicitly
+        return None
+    if isinstance(raw, int | float) and raw >= 0:
+        return float(raw)
+    return None
+
+
 class ValidatedDish(NamedTuple):
     """One validated dish: the verbatim ``document``, its DERIVED ``estimated``
-    attributes (or None), and the sanitized auto-``tags`` (0–3, editable
-    metadata). The estimates and tags are SPLIT OUT of the raw dish before
-    document validation so ``RecipeDocument`` never carries a non-verbatim
-    value (Hard Rule 7)."""
+    attributes (or None), the sanitized auto-``tags`` (0–3, editable metadata),
+    the model's raw ``cover_sprite_id`` suggestion (resolved against the catalog
+    by the worker), and the optional beauty-shot timestamp (real-frame layer).
+    All the non-document fields are SPLIT OUT of the raw dish before document
+    validation so ``RecipeDocument`` never carries a non-verbatim value (Hard
+    Rule 7)."""
 
     document: RecipeDocument
     estimated: EstimatedAttributes | None
     tags: list[str]
+    cover_sprite_id: str | None = None
+    beauty_shot_timestamp_seconds: float | None = None
 
 
 def validate_extraction(
@@ -350,11 +381,22 @@ def validate_extraction(
                 f"dish {index} is not a JSON object (got {type(dish).__name__})",
                 raw_output=dish,
             )
-        # Split the derived estimates and auto-tags out (without mutating the
-        # input) so the document validates clean under extra="forbid".
+        # Split the derived estimates, auto-tags, and the cover fields out
+        # (without mutating the input) so the document validates clean under
+        # extra="forbid". The cover_sprite_id + beauty-shot timestamp are
+        # decorative/metadata (Hard Rule 7 does not apply) — sanitized leniently,
+        # never fail a whole extraction, resolved against the catalog by the
+        # worker.
         estimated = validate_estimated(dish.get("estimated"))
         tags = sanitize_tags(dish.get("tags"))
-        merged = {k: v for k, v in dish.items() if k not in ("estimated", "tags")}
+        cover_sprite_id = _sanitize_sprite_suggestion(dish.get("cover_sprite_id"))
+        beauty_shot = _sanitize_timestamp(dish.get("beauty_shot_timestamp_seconds"))
+        merged = {
+            k: v
+            for k, v in dish.items()
+            if k
+            not in ("estimated", "tags", "cover_sprite_id", "beauty_shot_timestamp_seconds")
+        }
         merged["source"] = provenance
         try:
             document = RecipeDocument.model_validate(merged)
@@ -362,5 +404,7 @@ def validate_extraction(
             raise ValidationFailedError(
                 f"dish {index} failed validation: {exc}", raw_output=merged
             ) from exc
-        results.append(ValidatedDish(document, estimated, tags))
+        results.append(
+            ValidatedDish(document, estimated, tags, cover_sprite_id, beauty_shot)
+        )
     return results

@@ -115,12 +115,22 @@ class Settings(BaseSettings):
     dashscope_model: str = "qwen3-vl-plus"  # config, never trusted as current
     dashscope_base_url: str = "https://dashscope-intl.aliyuncs.com/compatible-mode/v1"
 
-    # ── Illustration cover generation (V2-E, 2026-07-06) ────────────────────
-    # Card covers are GENERATED cartoon illustrations built from text fields
-    # (never a video frame). "fake" is the SAFE default (tests, golden suite,
-    # zero spend/network); compose sets "gemini" for the real stack. Reuses the
-    # existing Gemini key/SDK — no new provider or secret.
-    chefclaw_image_generator: str = "fake"
+    # ── Card covers (V2-F, 2026-07-07) ──────────────────────────────────────
+    # The cover-generation mode. "sprite" (the DEFAULT) assigns a curated
+    # original dish-sprite id during extraction and renders it INLINE from the
+    # bundled catalog — zero spend, no illustration job, shippable-safe. "fake"
+    # is the canned-blob path (golden/tests exercise the /image route); "gemini"
+    # is the legacy paid text-only illustration (demoted from default, V2-E).
+    # A real private video-frame cover is a SEPARATE layer over sprite mode,
+    # gated by chefclaw_real_covers below (never a value of this knob).
+    chefclaw_image_generator: str = "sprite"
+    # V2-F private real-frame layer, the GLOBAL half of a two-gate grant (the
+    # per-user users.real_covers_enabled is the other). Default FALSE ⇒ pure
+    # sprites: no beauty-shot frame is ever captured OR served. Meaningful only
+    # in sprite mode. A frame reaches a viewer ONLY when this is true AND the
+    # requesting owner is granted — so multi-user/public stays sprite-only and a
+    # creator frame never crosses to an ungranted viewer.
+    chefclaw_real_covers: bool = False
     # !!! CONFIRM this model id at deploy — image models sunset FAST and this
     # cannot be verified from here (Gemini 2.5 Flash Image / Imagen 4 both
     # retire Aug–Oct 2026). "Nano Banana 2". !!!

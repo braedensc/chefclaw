@@ -27,6 +27,9 @@ from chefclaw.schemas import (
     InviteList,
     InviteOut,
     InvitePublicOut,
+    UserAdminList,
+    UserAdminPatch,
+    UserAdminRow,
     UserBudgetOut,
     UserBudgetPatch,
 )
@@ -188,6 +191,37 @@ async def admin_spend(
             for u in summary.users
         ],
     )
+
+
+@router.get("/admin/users", response_model=UserAdminList)
+async def list_users(
+    owner_id: Annotated[uuid.UUID, Depends(require_admin)],
+) -> UserAdminList:
+    """Every member + their private real-frame grant (V2-F). NEVER a secret —
+    no token_hash, no oauth subject."""
+    rows = await users.list_users(db.get_sessionmaker())
+    return UserAdminList(items=[UserAdminRow.model_validate(u) for u in rows])
+
+
+@router.patch(
+    "/admin/users/{user_id}",
+    response_model=UserAdminRow,
+    responses={404: _ERR},
+)
+async def set_user_real_covers(
+    user_id: uuid.UUID,
+    body: UserAdminPatch,
+    owner_id: Annotated[uuid.UUID, Depends(require_admin)],
+) -> UserAdminRow | JSONResponse:
+    """Grant/revoke one member's PRIVATE real-frame covers (V2-F). Owner-only
+    (require_admin); ``real_covers_enabled`` is the ONLY settable field (the
+    body schema is ``extra="forbid"``, so no admin/identity escalation)."""
+    user = await users.set_real_covers_enabled(
+        db.get_sessionmaker(), user_id, body.real_covers_enabled
+    )
+    if user is None:
+        return error_response(404, "not_found", f"no user {user_id}")
+    return UserAdminRow.model_validate(user)
 
 
 @router.get("/invites/{token}", response_model=InvitePublicOut)

@@ -16,6 +16,7 @@ from sqlalchemy import (
     TIMESTAMP,
     Boolean,
     CheckConstraint,
+    Float,
     ForeignKey,
     Index,
     Integer,
@@ -163,6 +164,15 @@ class User(Base):
     paid_tier: Mapped[bool] = mapped_column(
         Boolean, nullable=False, server_default=text("false")
     )
+    # V2-F private real-frame cover grant: when TRUE (and the global
+    # CHEFCLAW_REAL_COVERS switch is also on), this user may capture + SEE real
+    # finished-dish video frames on their own recipes; otherwise they only ever
+    # see sprites. Default FALSE — settable ONLY by the admin/owner (never a
+    # user-facing self-write), the second of two gates that keep creator frames
+    # off any ungranted viewer. Real frames NEVER cross to another user.
+    real_covers_enabled: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, server_default=text("false")
+    )
     created_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True), nullable=False, server_default=text("now()")
     )
@@ -213,6 +223,14 @@ class Recipe(Base):
     image_url: Mapped[str | None] = mapped_column(Text)
     # Which fixed style block produced the illustration (e.g. "cartoon-v1").
     image_style_version: Mapped[str | None] = mapped_column(Text)
+    # The assigned curated dish-sprite id (V2-F) — the DEFAULT card cover,
+    # rendered INLINE from the bundled SVG catalog (frontend/src/covers), never
+    # served via the API. Assigned during extraction (Gemini pick + deterministic
+    # keyword fallback) and by the startup backfill; falls back to 'unknown-dish'.
+    # Precedence per viewer: a real video frame (image_url, if allowed) → else
+    # this sprite. NULL only for rows not yet assigned (a transient pre-backfill
+    # state); Hard Rule 7 does not apply — a sprite is decorative, not food data.
+    cover_sprite_id: Mapped[str | None] = mapped_column(Text)
     # DERIVED spiciness/difficulty estimates (Hard Rule 7): kept SEPARATE from
     # the raw `document` so it never overwrites verbatim captures — same
     # posture as the reserved nutrition_ref. NULL when the extraction supplied
@@ -290,6 +308,53 @@ class LlmSpend(Base):
         Integer, nullable=False, server_default=text("0")
     )
     cost_usd: Mapped[Decimal] = mapped_column(Numeric(10, 6), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP(timezone=True), nullable=False, server_default=text("now()")
+    )
+
+
+class CoverMiss(Base):
+    """Append-only cover-assignment miss log (V2-F). One row whenever sprite
+    assignment falls back to the generic ``unknown-dish`` — either because the
+    deterministic matcher found nothing above the confidence threshold, or the
+    model suggested an id the catalog doesn't contain. It is the ONLY input the
+    future PR-gated "cover gardener" dev pass consumes to author new sprites for
+    real gaps; the running server NEVER generates art or writes the repo (that
+    would bypass branch protection + CI, a §5 / Hard Rule 5 hole). Nothing here
+    is food data (Hard Rule 7 does not apply) — it's diagnostics about a
+    decorative default.
+
+    ``recipe_id`` is a soft link (``ON DELETE SET NULL``): recipes are hard-
+    deleted, and a diagnostic row must outlive its recipe, not cascade away."""
+
+    __tablename__ = "cover_misses"
+    __table_args__ = (Index("ix_cover_misses_created_at", "created_at"),)
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, server_default=text("uuidv7()")
+    )
+    owner_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False
+    )
+    recipe_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("recipes.id", ondelete="SET NULL")
+    )
+    dish_name_en: Mapped[str | None] = mapped_column(Text)
+    dish_name_original: Mapped[str | None] = mapped_column(Text)
+    cuisine_type: Mapped[str | None] = mapped_column(Text)
+    tags: Mapped[list[str]] = mapped_column(
+        ARRAY(Text), nullable=False, server_default=text("'{}'::text[]")
+    )
+    # The raw id the model suggested when it was NOT a known catalog id (else
+    # NULL — a model miss vs. a genuine no-match are distinguishable downstream).
+    suggested_sprite_id: Mapped[str | None] = mapped_column(Text)
+    # What assignment actually resolved to (today always 'unknown-dish', but
+    # recorded so a future threshold change stays legible in the log).
+    resolved_sprite_id: Mapped[str] = mapped_column(Text, nullable=False)
+    # The best deterministic-match score (0..1), NULL when there was no candidate.
+    score: Mapped[float | None] = mapped_column(Float)
+    # Why it missed: 'no_match' | 'low_confidence' | 'unknown_model_id'.
+    reason: Mapped[str] = mapped_column(Text, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True), nullable=False, server_default=text("now()")
     )

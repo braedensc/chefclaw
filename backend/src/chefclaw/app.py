@@ -288,11 +288,12 @@ async def _lifespan(app: FastAPI):
         store=PostgresJobStore(db.get_sessionmaker(), settings),
         adapters=default_source_adapters(settings),
         settings=settings,
-        # One-shot best-effort illustration backfill for recipes stored before
-        # the illustration stage existed / by a crashed post-store pass
-        # (defaults OFF so tests never call the real image generator). The
-        # image_generator_factory defaults to the real config-selected adapter.
-        backfill_illustrations_on_start=True,
+        # One-shot best-effort cover backfill on start: assign missing sprites
+        # (all modes), then enqueue illustration jobs (adapter modes) or grab
+        # private real frames (sprite + real-covers). Defaults OFF in tests so
+        # they never shell ffmpeg / call the real image generator; the app turns
+        # it on. Factories default to the real config-selected adapters.
+        backfill_covers_on_start=True,
     )
     task = asyncio.create_task(worker.run_forever(), name="chefclaw-extraction-worker")
     # Health reads aliveness off this: a done() task = the worker died while
