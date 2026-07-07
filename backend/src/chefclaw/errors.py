@@ -134,3 +134,12 @@ class UploadTooLargeError(ChefclawError):
     exists so an authed client cannot fill the server's disk."""
 
     error_type = "upload_too_large"
+
+
+class EmailSendError(ChefclawError):
+    """The transactional-email provider (SES) failed to send an invite. Surfaced
+    at the admin create-invite endpoint as a 502; the invite stays pending
+    (unsent), and a resend rotates the same row and retries. Never carries the
+    recipient address in a way that would log it (Hard Rule 2)."""
+
+    error_type = "email_send_failed"

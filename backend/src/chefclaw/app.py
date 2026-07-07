@@ -26,6 +26,7 @@ from chefclaw.auth import assert_prod_auth_safe, require_owner
 from chefclaw.config import Settings, get_settings
 from chefclaw.errors import ConfigError
 from chefclaw.extractors import extractor_model_id
+from chefclaw.routers.admin import router as admin_router
 from chefclaw.routers.auth import router as auth_router
 from chefclaw.routers.extraction import router as extraction_router
 from chefclaw.routers.jobs import router as jobs_router
@@ -364,6 +365,7 @@ def create_app() -> FastAPI:
     app.add_middleware(observability.RequestLogMiddleware)
     app.include_router(api_router)
     app.include_router(auth_router)
+    app.include_router(admin_router)
     app.include_router(extraction_router)
     app.include_router(jobs_router)
     app.include_router(library_router)

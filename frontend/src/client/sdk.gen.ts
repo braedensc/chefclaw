@@ -2,7 +2,7 @@
 
 import { type Client, type ClientMeta, formDataBodySerializer, type Options as Options2, type RequestResult, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { DeleteRecipeApiRecipesRecipeIdDeleteData, DeleteRecipeApiRecipesRecipeIdDeleteErrors, DeleteRecipeApiRecipesRecipeIdDeleteResponses, ExtractRecipeApiRecipesExtractPostData, ExtractRecipeApiRecipesExtractPostErrors, ExtractRecipeApiRecipesExtractPostResponses, GetJobApiJobsJobIdGetData, GetJobApiJobsJobIdGetErrors, GetJobApiJobsJobIdGetResponses, GetRecipeApiRecipesRecipeIdGetData, GetRecipeApiRecipesRecipeIdGetErrors, GetRecipeApiRecipesRecipeIdGetResponses, GetRecipeImageApiRecipesRecipeIdImageGetData, GetRecipeImageApiRecipesRecipeIdImageGetErrors, GetRecipeImageApiRecipesRecipeIdImageGetResponses, GetSpendApiSpendGetData, GetSpendApiSpendGetErrors, GetSpendApiSpendGetResponses, GoogleCallbackApiAuthGoogleCallbackGetData, GoogleCallbackApiAuthGoogleCallbackGetErrors, GoogleCallbackApiAuthGoogleCallbackGetResponses, GoogleLoginApiAuthGoogleLoginGetData, GoogleLoginApiAuthGoogleLoginGetErrors, GoogleLoginApiAuthGoogleLoginGetResponses, HealthApiHealthGetData, HealthApiHealthGetResponses, ListJobsApiJobsGetData, ListJobsApiJobsGetErrors, ListJobsApiJobsGetResponses, ListRecipesApiRecipesGetData, ListRecipesApiRecipesGetErrors, ListRecipesApiRecipesGetResponses, LogoutApiAuthLogoutPostData, LogoutApiAuthLogoutPostResponses, MeApiMeGetData, MeApiMeGetResponses, PatchRecipeApiRecipesRecipeIdPatchData, PatchRecipeApiRecipesRecipeIdPatchErrors, PatchRecipeApiRecipesRecipeIdPatchResponses, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostData, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostErrors, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostResponses, UploadRecipeVideoApiRecipesUploadPostData, UploadRecipeVideoApiRecipesUploadPostErrors, UploadRecipeVideoApiRecipesUploadPostResponses } from './types.gen';
+import type { CreateInviteApiAdminInvitesPostData, CreateInviteApiAdminInvitesPostErrors, CreateInviteApiAdminInvitesPostResponses, DeleteRecipeApiRecipesRecipeIdDeleteData, DeleteRecipeApiRecipesRecipeIdDeleteErrors, DeleteRecipeApiRecipesRecipeIdDeleteResponses, ExtractRecipeApiRecipesExtractPostData, ExtractRecipeApiRecipesExtractPostErrors, ExtractRecipeApiRecipesExtractPostResponses, GetJobApiJobsJobIdGetData, GetJobApiJobsJobIdGetErrors, GetJobApiJobsJobIdGetResponses, GetRecipeApiRecipesRecipeIdGetData, GetRecipeApiRecipesRecipeIdGetErrors, GetRecipeApiRecipesRecipeIdGetResponses, GetRecipeImageApiRecipesRecipeIdImageGetData, GetRecipeImageApiRecipesRecipeIdImageGetErrors, GetRecipeImageApiRecipesRecipeIdImageGetResponses, GetSpendApiSpendGetData, GetSpendApiSpendGetErrors, GetSpendApiSpendGetResponses, GoogleCallbackApiAuthGoogleCallbackGetData, GoogleCallbackApiAuthGoogleCallbackGetErrors, GoogleCallbackApiAuthGoogleCallbackGetResponses, GoogleLoginApiAuthGoogleLoginGetData, GoogleLoginApiAuthGoogleLoginGetErrors, GoogleLoginApiAuthGoogleLoginGetResponses, HealthApiHealthGetData, HealthApiHealthGetResponses, ListInvitesApiAdminInvitesGetData, ListInvitesApiAdminInvitesGetErrors, ListInvitesApiAdminInvitesGetResponses, ListJobsApiJobsGetData, ListJobsApiJobsGetErrors, ListJobsApiJobsGetResponses, ListRecipesApiRecipesGetData, ListRecipesApiRecipesGetErrors, ListRecipesApiRecipesGetResponses, LogoutApiAuthLogoutPostData, LogoutApiAuthLogoutPostResponses, MeApiMeGetData, MeApiMeGetResponses, PatchRecipeApiRecipesRecipeIdPatchData, PatchRecipeApiRecipesRecipeIdPatchErrors, PatchRecipeApiRecipesRecipeIdPatchResponses, PublicInviteApiInvitesTokenGetData, PublicInviteApiInvitesTokenGetErrors, PublicInviteApiInvitesTokenGetResponses, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostData, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostErrors, RegenerateIllustrationApiRecipesRecipeIdIllustrationPostResponses, RevokeInviteApiAdminInvitesInviteIdRevokePostData, RevokeInviteApiAdminInvitesInviteIdRevokePostErrors, RevokeInviteApiAdminInvitesInviteIdRevokePostResponses, UploadRecipeVideoApiRecipesUploadPostData, UploadRecipeVideoApiRecipesUploadPostErrors, UploadRecipeVideoApiRecipesUploadPostResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -17,6 +17,38 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
      */
     meta?: keyof ClientMeta extends never ? Record<string, unknown> : ClientMeta;
 };
+
+/**
+ * List Invites
+ *
+ * List invites (newest first), optionally filtered by status. NEVER returns
+ * a token_hash.
+ */
+export const listInvitesApiAdminInvitesGet = <ThrowOnError extends boolean = false>(options?: Options<ListInvitesApiAdminInvitesGetData, ThrowOnError>): RequestResult<ListInvitesApiAdminInvitesGetResponses, ListInvitesApiAdminInvitesGetErrors, ThrowOnError> => (options?.client ?? client).get<ListInvitesApiAdminInvitesGetResponses, ListInvitesApiAdminInvitesGetErrors, ThrowOnError>({ url: '/api/admin/invites', ...options });
+
+/**
+ * Create Invite
+ *
+ * Issue (or rotate + resend) a pending invite. Already an active member ⇒
+ * 409; a new invite ⇒ 201; a rotate/resend ⇒ 200. The activation link is
+ * emailed; it rides in the response ONLY when chefclaw_email='fake'.
+ */
+export const createInviteApiAdminInvitesPost = <ThrowOnError extends boolean = false>(options: Options<CreateInviteApiAdminInvitesPostData, ThrowOnError>): RequestResult<CreateInviteApiAdminInvitesPostResponses, CreateInviteApiAdminInvitesPostErrors, ThrowOnError> => (options.client ?? client).post<CreateInviteApiAdminInvitesPostResponses, CreateInviteApiAdminInvitesPostErrors, ThrowOnError>({
+    url: '/api/admin/invites',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Revoke Invite
+ *
+ * Revoke a pending invite (idempotent). Already-accepted ⇒ 409; missing ⇒
+ * 404; otherwise 200.
+ */
+export const revokeInviteApiAdminInvitesInviteIdRevokePost = <ThrowOnError extends boolean = false>(options: Options<RevokeInviteApiAdminInvitesInviteIdRevokePostData, ThrowOnError>): RequestResult<RevokeInviteApiAdminInvitesInviteIdRevokePostResponses, RevokeInviteApiAdminInvitesInviteIdRevokePostErrors, ThrowOnError> => (options.client ?? client).post<RevokeInviteApiAdminInvitesInviteIdRevokePostResponses, RevokeInviteApiAdminInvitesInviteIdRevokePostErrors, ThrowOnError>({ url: '/api/admin/invites/{invite_id}/revoke', ...options });
 
 /**
  * Google Callback
@@ -49,6 +81,15 @@ export const logoutApiAuthLogoutPost = <ThrowOnError extends boolean = false>(op
  * state (plan §16 amendment 3).
  */
 export const healthApiHealthGet = <ThrowOnError extends boolean = false>(options?: Options<HealthApiHealthGetData, ThrowOnError>): RequestResult<HealthApiHealthGetResponses, unknown, ThrowOnError> => (options?.client ?? client).get<HealthApiHealthGetResponses, unknown, ThrowOnError>({ url: '/api/health', ...options });
+
+/**
+ * Public Invite
+ *
+ * PUBLIC invite-accept lookup (M13): a live pending invite reveals its
+ * email; a missing/expired/revoked/accepted token is a uniform 'invalid' with
+ * no email (no enumeration oracle, no address leak).
+ */
+export const publicInviteApiInvitesTokenGet = <ThrowOnError extends boolean = false>(options: Options<PublicInviteApiInvitesTokenGetData, ThrowOnError>): RequestResult<PublicInviteApiInvitesTokenGetResponses, PublicInviteApiInvitesTokenGetErrors, ThrowOnError> => (options.client ?? client).get<PublicInviteApiInvitesTokenGetResponses, PublicInviteApiInvitesTokenGetErrors, ThrowOnError>({ url: '/api/invites/{token}', ...options });
 
 /**
  * List Jobs

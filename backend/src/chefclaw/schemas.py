@@ -14,11 +14,15 @@ import uuid
 from datetime import date, datetime
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 __all__ = [
     "ErrorBody",
     "ExtractRequest",
+    "InviteCreate",
+    "InviteList",
+    "InviteOut",
+    "InvitePublicOut",
     "JobOut",
     "RecipeDetail",
     "MeOut",
@@ -40,6 +44,47 @@ class MeOut(BaseModel):
     name: str
     email: str
     is_admin: bool
+
+
+class InviteCreate(BaseModel):
+    """POST /api/admin/invites body. Lightweight email shape check (a friends-
+    invite flow, not a validation fortress) — normalization happens server-side."""
+
+    email: str = Field(min_length=3, max_length=320)
+
+    @field_validator("email")
+    @classmethod
+    def _looks_like_email(cls, v: str) -> str:
+        s = v.strip()
+        if "@" not in s or " " in s or "." not in s.rsplit("@", 1)[-1]:
+            raise ValueError("not a valid email address")
+        return s
+
+
+class InviteOut(BaseModel):
+    """An invite as the admin sees it — NEVER the token_hash. ``dev_activation_
+    link`` is present ONLY when chefclaw_email='fake' (the real link is emailed)."""
+
+    id: uuid.UUID
+    email: str
+    status: str
+    expires_at: datetime
+    created_at: datetime
+    accepted_at: datetime | None = None
+    dev_activation_link: str | None = None
+
+
+class InviteList(BaseModel):
+    items: list[InviteOut]
+
+
+class InvitePublicOut(BaseModel):
+    """GET /api/invites/{token} — the public invite-accept shape (M13). ``status``
+    is 'pending' | 'invalid'; ``email`` is revealed ONLY for a live pending
+    invite (a missing/expired/revoked token is a uniform 'invalid', no email)."""
+
+    status: str
+    email: str | None = None
 
 
 class ErrorBody(BaseModel):

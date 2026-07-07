@@ -78,6 +78,16 @@ def assert_prod_auth_safe(settings: Settings) -> None:
             "CHEFCLAW_AUTH_PROVIDER=google but GOOGLE_OAUTH_CLIENT_ID/SECRET is empty "
             "— no OAuth without explicit credentials (fail-closed)."
         )
+    # Email provider (PR 3): the same fake-in-prod footgun as auth (M7).
+    if settings.chefclaw_email not in ("fake", "ses"):
+        raise ConfigError(
+            f"Unknown CHEFCLAW_EMAIL {settings.chefclaw_email!r} — expected 'fake' or 'ses'."
+        )
+    if settings.chefclaw_email == "fake" and settings.sentry_environment == "vps":
+        raise ConfigError(
+            "CHEFCLAW_EMAIL=fake in a 'vps' (prod) environment — refusing to start: "
+            "invite emails would only be logged, never sent. Set CHEFCLAW_EMAIL=ses."
+        )
 
 
 async def fetch_session_owner_id(token_hash: str) -> uuid.UUID | None:
